@@ -8,8 +8,7 @@ defmodule GUI.Input.EventHandler do
 
   # eliminate the don't cares
   def process(state, {input, _details}) when input in @inputs_we_dont_care_about do
-    # do nothing - pass through unaltered state
-    state
+    state # do nothing - pass through unaltered state
   end
 
   def process(%{command_buffer: %{visible?: false}} = state, @space_bar) do
@@ -56,7 +55,6 @@ defmodule GUI.Input.EventHandler do
 
   def process(state, unhandled_event) do
     Logger.debug("#{__MODULE__} Unhandled event: #{inspect(unhandled_event)}")
-    # add_to_input_history(state, input)
     state
   end
 
