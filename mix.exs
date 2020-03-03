@@ -24,6 +24,10 @@ defmodule Franklin.MixProject do
     [
       {:scenic, "~> 0.10"},
       {:scenic_driver_glfw, "~> 0.10", targets: :host},
+      {:ecto_sql, "~> 3.0"},
+      #TODO might not need both of these...
+      {:truetype_metrics, "~> 0.3"},
+      {:font_metrics, "~> 0.3"}
     ]
   end
 end

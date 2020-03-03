@@ -4,9 +4,11 @@ defmodule Franklin.Application do
   use Application
 
   def start(_type, _args) do
-    children =
-      [] # start with an empty list
-      |> Enum.concat(GUI.startup_process_childspec_list())
+    children = [
+      Franklin.Commander,
+      # Franklin.PubSub,
+      GUI.Initialize.scenic_childspec
+    ]
 
     opts = [strategy: :one_for_one, name: Franklin.Supervisor]
     Supervisor.start_link(children, opts)
