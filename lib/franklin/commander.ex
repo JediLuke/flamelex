@@ -55,7 +55,11 @@ defmodule Franklin.Commander do
 
   def new_note do
     IO.puts "Here we will create a new note!"
-    GUI.Scene.Root.action('NEW_NOTE_COMMAND')
+    contents = %{
+      title: "My new note...",
+      text: "Contains some cool notes!"
+    }
+    GUI.Scene.Root.action({'NEW_NOTE_COMMAND', contents})
     :ok
   end
 end
