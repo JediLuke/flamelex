@@ -6,6 +6,7 @@ defmodule Franklin.Application do
   def start(_type, _args) do
     children = [
       Franklin.Commander,
+      Franklin.BufferSupervisor,
       # Franklin.PubSub,
       GUI.Initialize.scenic_childspec
     ]
