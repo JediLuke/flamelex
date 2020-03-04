@@ -50,11 +50,14 @@ defmodule GUI.RootReducer do
     top_left_corner_y = height / 5
     id = {:note, generate_note_buffer_id(state.component_ref)}
 
+    {:note, note_num} = id
+    multi_note_offset = (note_num - 1) * 15
+
     new_graph =
       graph
       |> GUI.Component.Note.add_to_graph(%{
            id: id,
-           top_left_corner: {top_left_corner_x, top_left_corner_y},
+           top_left_corner: {top_left_corner_x + multi_note_offset, top_left_corner_y + multi_note_offset},
            dimensions: {width, height},
            contents: contents
          })
