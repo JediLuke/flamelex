@@ -9,6 +9,8 @@ defmodule Franklin.Commander do
     GenServer.start_link(__MODULE__, default_params)
   end
 
+  #TODO RootScene should monitor commander to show errors
+
   def process(command) when is_binary(command) do
     GenServer.cast(__MODULE__, {:command_buffer_command, command})
   end
@@ -29,6 +31,9 @@ defmodule Franklin.Commander do
     case command do
       "note" ->
         :ok = new_note()
+        {:noreply, state}
+      "help" ->
+        raise "Help is no implemented, and it should be!!"
         {:noreply, state}
       "Luke is the best" ->
         IO.puts "Yes he is!"
