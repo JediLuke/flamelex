@@ -52,8 +52,8 @@ defmodule Franklin.Commander do
 
   def new_note do
     Franklin.BufferSupervisor.note(%{
-      title: "My new note...",
-      text: "Contains some cool notes!"
+      title: "",
+      text: ""
     })
   end
 end

@@ -43,14 +43,14 @@ defmodule GUI.RootReducer do
     state
   end
 
-  def process({%{viewport: %{width: w}} = state, graph}, {'NEW_NOTE_COMMAND', contents}) do
+  def process({%{viewport: %{width: w}} = state, graph}, {'NEW_NOTE_COMMAND', contents, buffer_pid: buf_pid}) do
     width  = w / 3
     height = width
     top_left_corner_x = (w/2)-(width/2) # center the box
     top_left_corner_y = height / 5
-    id = {:note, generate_note_buffer_id(state.component_ref)}
+    id = {:note, generate_note_buffer_id(state.component_ref), buf_pid}
 
-    {:note, note_num} = id
+    {:note, note_num, _buf_pid} = id
     multi_note_offset = (note_num - 1) * 15
 
     new_graph =
@@ -64,10 +64,24 @@ defmodule GUI.RootReducer do
     {state |> Map.replace!(:active_buffer, id), new_graph}
   end
 
+  def process({state, _graph}, {'NOTE_INPUT', {:note, _x, _pid} = active_buffer, input}) do
+    [{{:note, _x, buffer_pid}, component_pid}] =
+      state.component_ref
+      |> Enum.filter(fn
+           {^active_buffer, _pid} ->
+            true
+         _else ->
+            false
+         end)
+
+    Franklin.Buffer.Note.input(buffer_pid, {component_pid, input})
+    state
+  end
+
   defp generate_note_buffer_id(component_ref) when is_list(component_ref) do
     component_ref
     |> Enum.filter(fn
-         {{:note, _x}, _pid} ->
+         {{:note, _x, _buf_pid}, _pid} ->
              true
          _else ->
              false

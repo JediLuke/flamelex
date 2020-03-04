@@ -53,6 +53,11 @@ defmodule GUI.Input.EventHandler do
     state |> add_to_input_history(input)
   end
 
+  def process(%{active_buffer: {:note, _x, _pid} = buf} = state, input) when input in @valid_command_buffer_inputs do #TODO update inputs
+    Scene.action({'NOTE_INPUT', buf, input})
+    state |> add_to_input_history(input)
+  end
+
   def process(state, unhandled_event) do
     Logger.debug("#{__MODULE__} Unhandled event: #{inspect(unhandled_event)}")
     state
