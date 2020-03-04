@@ -14,4 +14,8 @@ defmodule DevTools do
   def new_note do
     Franklin.Commander.new_note()
   end
+
+  def root_state do
+    :sys.get_state(GUI.Scene.Root)
+  end
 end
