@@ -44,7 +44,14 @@ defmodule GUI.RootReducer do
   end
 
   def process({state, graph}, 'NEW_NOTE_COMMAND') do
-    new_graph = graph |> GUI.Component.Note.add_to_graph(%{})
+    IO.inspect state
+    new_graph =
+      graph
+      |> GUI.Component.Note.add_to_graph(%{
+           id: :untitled_note,
+           top_left_corner: {300, 300},
+           dimensions: {100, 300}
+         })
     {state, new_graph}
   end
 end
