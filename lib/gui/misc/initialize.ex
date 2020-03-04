@@ -17,7 +17,8 @@ defmodule GUI.Initialize do
   @main_viewport_config %{
     name: :main_viewport,
     # size: {1680, 1005},
-    size: {1440, 855}, # macbook pro screen res
+    # size: {1440, 855}, # macbook pro screen res
+    size: {2560, 1395}, # 32" BenQ full screen
     default_scene: {GUI.Scene.Root, nil},
     drivers: [
       %{
