@@ -37,6 +37,7 @@ defmodule GUI.Scene.Root do
            top_left_corner: {0, viewport_height - @default_command_buffer_height},
            dimensions: {viewport_width, @default_command_buffer_height}
          })
+      |> GUI.Component.Note.add_to_graph(%{})
 
     {:ok, {state, graph}, push: graph}
   end
@@ -61,6 +62,7 @@ defmodule GUI.Scene.Root do
     Process.monitor(pid)
 
     new_component = {identifier, pid}
+    #TODO ensure new component registry is unique!
     new_ref_list = ref_list ++ [new_component]
     new_state = state |> Map.replace!(:component_ref, new_ref_list)
 
