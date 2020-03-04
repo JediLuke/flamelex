@@ -35,6 +35,15 @@ defmodule Franklin.Commander do
       "help" ->
         raise "Help is no implemented, and it should be!!"
         {:noreply, state}
+      "reload GUI" ->
+        Logger.warn "Sendking kill to GUI.Scene.Root..."
+        IEx.Helpers.recompile
+        Process.exit(Process.whereis(GUI.Scene.Root), :kill)
+        {:noreply, state}
+      "restart" ->
+        Logger.warn "Restarting Franklin..."
+        :init.restart()
+        {:noreply, state}
       "Luke is the best" ->
         IO.puts "Yes he is!"
         {:noreply, state}
