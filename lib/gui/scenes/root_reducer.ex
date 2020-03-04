@@ -43,14 +43,17 @@ defmodule GUI.RootReducer do
     state
   end
 
-  def process({state, graph}, 'NEW_NOTE_COMMAND') do
-    IO.inspect state
+  def process({%{viewport: %{width: w, height: h}} = state, graph}, 'NEW_NOTE_COMMAND') do
+    width  = w / 3
+    height = width
+    top_left_corner_x = (w/2)-(width/2) # center the box
+    top_left_corner_y = height / 5
     new_graph =
       graph
       |> GUI.Component.Note.add_to_graph(%{
            id: :untitled_note,
-           top_left_corner: {300, 300},
-           dimensions: {100, 300}
+           top_left_corner: {top_left_corner_x, top_left_corner_y},
+           dimensions: {width, height}
          })
     {state, new_graph}
   end

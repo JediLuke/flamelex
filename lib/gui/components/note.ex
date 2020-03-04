@@ -21,7 +21,7 @@ defmodule GUI.Component.Note do
   }, _opts) do
     graph =
       Graph.build()
-      |> rect({width, height}, translate: {x, y}, fill: :dark_slate_blue, stroke: {1, :ghost_white})
+      |> rect({width, height}, translate: {x, y}, fill: :cornflower_blue, stroke: {1, :ghost_white})
 
     GenServer.call(GUI.Scene.Root, {:register, id})
     {:ok, %{}, push: graph}
