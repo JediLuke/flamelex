@@ -12,6 +12,6 @@ defmodule DevTools do
   end
 
   def new_note do
-    GUI.Scene.Root.action('NEW_NOTE_COMMAND')
+    Franklin.Commander.new_note()
   end
 end

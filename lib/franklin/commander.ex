@@ -28,7 +28,7 @@ defmodule Franklin.Commander do
   def handle_cast({:command_buffer_command, command}, state) do
     case command do
       "note" ->
-        IO.puts "Here we will create a new note!"
+        :ok = new_note()
         {:noreply, state}
       "Luke is the best" ->
         IO.puts "Yes he is!"
@@ -37,5 +37,11 @@ defmodule Franklin.Commander do
         Logger.warn "#{__MODULE__} unrecognised command: #{inspect other_command}"
         {:noreply, state}
     end
+  end
+
+  def new_note do
+    IO.puts "Here we will create a new note!"
+    GUI.Scene.Root.action('NEW_NOTE_COMMAND')
+    :ok
   end
 end
