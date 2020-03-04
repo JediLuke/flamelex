@@ -14,8 +14,9 @@ defmodule Franklin.Buffer.Note do
 
   @impl true
   def init(contents) do
-    Logger.info "#{__MODULE__} initializing... #{inspect contents}"
+    state = contents |> Map.merge(%{uuid: UUID.uuid4()})
+    Logger.info "#{__MODULE__} initializing... #{inspect state}"
     GUI.Scene.Root.action({'NEW_NOTE_COMMAND', contents})
-    {:ok, contents}
+    {:ok, state}
   end
 end
