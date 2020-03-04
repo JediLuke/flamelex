@@ -10,4 +10,8 @@ defmodule Franklin.BufferSupervisor do
   def init(_init_arg) do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
+
+  def note(contents) do
+    DynamicSupervisor.start_child(__MODULE__, {Franklin.Buffer.Note, contents})
+  end
 end

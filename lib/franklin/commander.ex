@@ -30,7 +30,7 @@ defmodule Franklin.Commander do
   def handle_cast({:command_buffer_command, command}, state) do
     case command do
       "note" ->
-        :ok = new_note()
+        new_note()
         {:noreply, state}
       "help" ->
         raise "Help is no implemented, and it should be!!"
@@ -54,12 +54,10 @@ defmodule Franklin.Commander do
   end
 
   def new_note do
-    IO.puts "Here we will create a new note!"
     contents = %{
       title: "My new note...",
       text: "Contains some cool notes!"
     }
-    GUI.Scene.Root.action({'NEW_NOTE_COMMAND', contents})
-    :ok
+    Franklin.BufferSupervisor.note(contents)
   end
 end
