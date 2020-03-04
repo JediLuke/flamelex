@@ -42,4 +42,9 @@ defmodule GUI.RootReducer do
     GenServer.cast(pid, {:action, action})
     state
   end
+
+  def process({state, graph}, 'NEW_NOTE_COMMAND') do
+    new_graph = graph |> GUI.Component.Note.add_to_graph(%{})
+    {state, new_graph}
+  end
 end

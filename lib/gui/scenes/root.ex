@@ -37,7 +37,6 @@ defmodule GUI.Scene.Root do
            top_left_corner: {0, viewport_height - @default_command_buffer_height},
            dimensions: {viewport_width, @default_command_buffer_height}
          })
-      |> GUI.Component.Note.add_to_graph(%{})
 
     {:ok, {state, graph}, push: graph}
   end

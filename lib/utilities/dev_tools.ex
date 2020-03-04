@@ -10,4 +10,8 @@ defmodule DevTools do
     Application.stop(:franklin)
     Application.start(:franklin)
   end
+
+  def new_note do
+    GUI.Scene.Root.action('NEW_NOTE_COMMAND')
+  end
 end
