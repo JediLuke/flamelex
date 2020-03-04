@@ -27,7 +27,8 @@ defmodule GUI.Scene.Root do
       input_history: [], # holds all the input we've entered
       command_buffer: %{
         visible?: false
-      }
+      },
+      active_buffer: nil
     }
 
     graph =
@@ -62,6 +63,7 @@ defmodule GUI.Scene.Root do
 
     new_component = {identifier, pid}
     #TODO ensure new component registry is unique!
+    Logger.info "Registering component: #{inspect new_component}..."
     new_ref_list = ref_list ++ [new_component]
     new_state = state |> Map.replace!(:component_ref, new_ref_list)
 

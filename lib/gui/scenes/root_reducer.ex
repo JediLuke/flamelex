@@ -48,14 +48,28 @@ defmodule GUI.RootReducer do
     height = width
     top_left_corner_x = (w/2)-(width/2) # center the box
     top_left_corner_y = height / 5
+    id = {:note, generate_note_buffer_id(state.component_ref)}
+
     new_graph =
       graph
       |> GUI.Component.Note.add_to_graph(%{
-           id: :untitled_note,
+           id: id,
            top_left_corner: {top_left_corner_x, top_left_corner_y},
            dimensions: {width, height},
            contents: contents
          })
-    {state, new_graph}
+    {state |> Map.replace!(:active_buffer, id), new_graph}
+  end
+
+  defp generate_note_buffer_id(component_ref) when is_list(component_ref) do
+    component_ref
+    |> Enum.filter(fn
+         {{:note, _x}, _pid} ->
+             true
+         _else ->
+             false
+       end)
+    |> Enum.count
+    |> (&(&1 + 1)).()
   end
 end
