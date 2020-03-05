@@ -27,7 +27,8 @@ defmodule Franklin.MixProject do
       {:ecto_sql, "~> 3.0"},
       {:truetype_metrics, "~> 0.3"},
       {:font_metrics, "~> 0.3"},
-      {:elixir_uuid, "~> 1.2"}
+      {:elixir_uuid, "~> 1.2"},
+      {:jason, "~> 1.1"}
     ]
   end
 end

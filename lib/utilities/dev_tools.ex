@@ -24,10 +24,18 @@ defmodule DevTools do
     IO.inspect r
 
     {:ok, file} = File.open("./data/franklin.data", [:write])
-    IO.binwrite(file, "world")
+
+    data = %{
+      author: "Luke",
+      project: "Franklin"
+    } |> Jason.encode!
+
+    IO.inspect data, label: "DDD"
+
+    IO.binwrite(file, data)
     File.close(file)
 
     {:ok, file_contents} = File.read("./data/franklin.data")
-    file_contents
+    file_contents |> Jason.decode!
   end
 end
