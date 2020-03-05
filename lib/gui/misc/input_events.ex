@@ -21,6 +21,7 @@ defmodule GUI.ScenicInputEvents do
       @backspace_key {:key, {"backspace", :press, 0}}
       @backspace_repeat {:key, {"backspace", :repeat, 0}}
       @backspace_input [@backspace_key, @backspace_repeat]
+      @tab_key {:key, {"tab", :press, 0}}
 
       @space_bar {:codepoint, {" ", 0}}
 

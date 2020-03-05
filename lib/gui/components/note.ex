@@ -24,6 +24,10 @@ defmodule GUI.Component.Note do
 
   def info(_data), do: ~s(Invalid data)
 
+  def move_cursor_to_text_section(pid) do
+    GenServer.cast(pid, {:action, 'MOVE_CURSOR_TO_TEXT_SECTION'})
+  end
+
   def handle_call({:register, identifier}, {pid, _ref}, {%{component_ref: ref_list} = state, graph}) do
     Process.monitor(pid)
 
@@ -68,8 +72,14 @@ defmodule GUI.Component.Note do
          translate: {x+15, y+title_font_size+65}, # text draws from bottom-left corner?? :( also, how high is it???
          fill: :black)
 
+    state = %{
+      component_ref: [],
+      title_origin: {x+15, y+title_font_size},
+      text_origin: {x+15, y+title_font_size+65}
+    }
+
     GenServer.call(GUI.Scene.Root, {:register, id})
-    {:ok, {%{component_ref: []}, graph}, push: graph}
+    {:ok, {state, graph}, push: graph}
   end
 
   def handle_cast({'APPEND_INPUT_TO_TITLE', %{focus: :title, title: new_title}}, {state, graph}) do
@@ -80,6 +90,23 @@ defmodule GUI.Component.Note do
     |> GUI.Component.Cursor.move_right_one_column()
 
     {:noreply, {state, new_graph}, push: new_graph}
+  end
+
+  def handle_cast({:action, 'MOVE_CURSOR_TO_TEXT_SECTION'}, {state, graph}) do
+    {text_origin_x, text_origin_y} = state.text_origin
+    {new_x, new_y} = {text_origin_x, text_origin_y-15}
+    # get width of text font (use FontMetrics)
+    # get height of text font
+    text_size = 24 # I think? This is just what I set way back in Root scene
+
+    {_x_min, _y_min, _x_max, y_max} = GUI.FontHelpers.get_max_box_for_ibm_plex(text_size)
+    new_width        = GUI.FontHelpers.monospace_font_width(:ibm_plex, text_size)  #TODO should probably truncate this
+    y_box_buffer = 1
+    new_height       = y_max + y_box_buffer #TODO should probably truncate this
+
+    find_component_reference_pid!(state.component_ref, :cursor)
+    |> GUI.Component.Cursor.move(top_left_corner: {new_x, new_y}, dimensions: {new_width, new_height})
+    {:noreply, {state, graph}}
   end
 
   defp add_cursor(graph, %{top_left_corner: {x, y}}, font_size) do
@@ -95,13 +122,10 @@ defmodule GUI.Component.Note do
 
     graph
     |> GUI.Component.Cursor.add_to_graph(%{
+          id: :cursor,
           top_left_corner: {x_coordinate, y_coordinate},
           dimensions: {width, height},
           parent: %{pid: self()}
         })
-  end
-
-  defp find_cursor_pid(state) do
-
   end
 end

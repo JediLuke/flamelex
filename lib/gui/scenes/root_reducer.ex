@@ -3,6 +3,7 @@ defmodule GUI.RootReducer do
   This module contains functions which process events received from the GUI.
   """
   require Logger
+  import Utilities.ComponentUtils
 
   def process({%{command_buffer: %{visible?: false}} = state, _graph}, 'SHOW_COMMAND_BUFFER') do
     {:command_buffer, pid} = state.component_ref |> hd #TODO, eventually we'll have more componenst
@@ -75,6 +76,12 @@ defmodule GUI.RootReducer do
          end)
 
     Franklin.Buffer.Note.input(buffer_pid, {component_pid, input})
+    state
+  end
+
+  def process({%{active_buffer: {:note, _x, _pid} = active_buffer_id} = state, _graph}, {:active_buffer, :note, 'MOVE_CURSOR_TO_TEXT_SECTION'}) do
+    find_component_reference_pid!(state.component_ref, active_buffer_id)
+    |> GUI.Component.Note.move_cursor_to_text_section
     state
   end
 

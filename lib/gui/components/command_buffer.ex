@@ -123,7 +123,8 @@ defmodule GUI.Components.CommandBuffer do
     |> GUI.Component.Cursor.add_to_graph(%{
          top_left_corner: {x_coordinate, y_coordinate},
          dimensions: {width, height},
-         parent: %{pid: self()}
+         parent: %{pid: self()},
+         id: :cursor
        })
   end
 

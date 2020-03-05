@@ -24,13 +24,18 @@ defmodule GUI.Component.Cursor do
     dimensions: {_width, _height},
     color: _color,
     hidden?: _hidden?,
+    id: _id,
     parent: %{
       pid: _parent_pid
     }
   } = data), do: {:ok, data}
   def verify(%{
+    id: _id,
     top_left_corner: {_x, _y},
-    dimensions: {_width, _height}
+    dimensions: {_width, _height},
+    parent: %{
+      pid: _parent_pid
+    }
   } = data), do: {:ok, data}
   def verify(_), do: :invalid_data
 
@@ -38,18 +43,25 @@ defmodule GUI.Component.Cursor do
     GenServer.cast(pid, {:action, 'MOVE_RIGHT_ONE_COLUMN'})
   end
 
+  def move(pid, [top_left_corner: {_new_x, _new_y}, dimensions: {_new_width, _new_height}] = new_data) do
+    GenServer.cast(pid, {:move, new_data})
+  end
+
+  #TODO dont hard code cursor, use the id passed in
+
   def init(%{
     top_left_corner: {x, y},
     dimensions: {_width, _height},
     color: _color,
     hidden?: _hidden?,
+    id: id,
     parent: %{
       pid: _parent_pid
     }
   } = data, _opts) do
     Logger.info "#{__MODULE__} initializing...#{inspect data}"
 
-    GenServer.call(data.parent.pid, {:register, :cursor})
+    GenServer.call(data.parent.pid, {:register, id})
 
     state = data |> Map.merge(%{timer: nil, original_position: {x, y}}) # holds an erlang :timer for the blink
     graph = generate_graph(state)
@@ -96,6 +108,25 @@ defmodule GUI.Component.Cursor do
       |> Graph.modify(:cursor, fn %Scenic.Primitive{} = box ->
            put_transform(box, :translate, new_state.top_left_corner)
          end)
+
+    {:noreply, {new_state, new_graph}, push: new_graph}
+  end
+
+  def handle_cast({:move, [top_left_corner: new_top_left_corner, dimensions: {new_width, new_height}]}, {state, graph}) do
+    new_state =
+      %{state|top_left_corner: new_top_left_corner}
+
+    [%Scenic.Primitive{id: :cursor, styles: %{fill: color, hidden: hidden?}}] =
+      Graph.find(graph, fn primitive -> primitive == :cursor end)
+
+    new_graph =
+      graph
+      |> Graph.delete(:cursor)
+      |> rect({new_width, new_height},
+           id: :cursor,
+           translate: new_state.top_left_corner,
+           fill: color,
+           hidden?: hidden?)
 
     {:noreply, {new_state, new_graph}, push: new_graph}
   end

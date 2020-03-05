@@ -5,9 +5,10 @@ defmodule Franklin.Buffer.Note do
 
   def start_link(contents), do: GenServer.start_link(__MODULE__, contents)
   def input(pid, {scenic_component_pid, input}), do: GenServer.cast(pid, {:input, {scenic_component_pid, input}})
-  def set_focus(pid, :text), do: GenServer.cast(pid, {:set_focus, :text})
+  def tab_key_pressed(pid), do: GenServer.cast(pid, :tab_key_pressed)
   def set_mode(pid, :command), do: GenServer.cast(pid, :activate_command_mode)
   def save(pid), do: GenServer.cast(pid, :save)
+
 
   ## GenServer callbacks
   ## -------------------------------------------------------------------
@@ -26,7 +27,12 @@ defmodule Franklin.Buffer.Note do
 
   def handle_cast({:input, {scenic_component_pid, {:codepoint, {letter, _num}}}}, %{focus: :title} = state) do
     state = %{state|title: state.title <> letter}
-    GenServer.cast(scenic_component_pid, {'APPEND_INPUT_TO_TITLE', state})
+    GenServer.cast(scenic_component_pid, {'APPEND_INPUT_TO_TITLE', state}) #TODO make this a Note.something function
+    {:noreply, state}
+  end
+
+  def handle_cast(:tab_key_pressed, %{focus: :title} = state) do
+    GUI.Scene.Root.action({:active_buffer, :note, 'MOVE_CURSOR_TO_TEXT_SECTION'})
     {:noreply, state}
   end
 end

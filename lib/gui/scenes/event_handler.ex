@@ -5,15 +5,21 @@ defmodule GUI.Input.EventHandler do
   require Logger
   use GUI.ScenicInputEvents
   alias GUI.Scene.Root, as: Scene
+  import Utilities.ComponentUtils
 
   # eliminate the don't cares
   def process(state, {input, _details}) when input in @inputs_we_dont_care_about do
     state # do nothing - pass through unaltered state
   end
 
-  def process(%{active_buffer: {:note, _x, _pid} = buf} = state, input) when input in @valid_command_buffer_inputs do #TODO update inputs
+  def process(%{active_buffer: {:note, _x, _pid} = buf} = state, input) when input in @valid_command_buffer_inputs do
     Scene.action({'NOTE_INPUT', buf, input})
     state |> add_to_input_history(input)
+  end
+
+  def process(%{active_buffer: {:note, _x, buffer_pid}} = state, @tab_key) do
+    Franklin.Buffer.Note.tab_key_pressed(buffer_pid)
+    state
   end
 
   def process(%{command_buffer: %{visible?: false}} = state, @space_bar) do
