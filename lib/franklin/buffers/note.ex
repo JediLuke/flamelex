@@ -2,6 +2,7 @@ defmodule Franklin.Buffer.Note do
   @moduledoc false
   use GenServer
   require Logger
+  alias Utilities.DataFile
 
   def start_link(contents), do: GenServer.start_link(__MODULE__, contents)
   def input(pid, {scenic_component_pid, input}), do: GenServer.cast(pid, {:input, {scenic_component_pid, input}})
@@ -15,7 +16,7 @@ defmodule Franklin.Buffer.Note do
   ## -------------------------------------------------------------------
 
 
-  def init(contents) do
+  def init(%{title: _title, text: _text} = contents) do
     state = contents |> Map.merge(%{
       uuid: UUID.uuid4(),
       focus: :title
@@ -45,7 +46,16 @@ defmodule Franklin.Buffer.Note do
   end
 
   def handle_cast(:save_and_close, state) do
-    Logger.warn "NOT SAVING THE NTOE YET"
+    DataFile.read()
+      |> Map.merge(%{
+           state.uuid => %{
+             title: state.title,
+             text: state.text,
+             tags: ["note"]
+           },
+         })
+      |> DataFile.write()
+
     GUI.Scene.Root.action({:active_buffer, :note, 'CLOSE_NOTE_BUFFER'})
     {:noreply, state}
   end

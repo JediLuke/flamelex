@@ -11,8 +11,12 @@ defmodule Utilities.DataFile do
     |> write_binary()
   end
   def read do
-    {:ok, file_contents} = File.read(data_file_path())
-    file_contents |> Jason.decode!
+    case File.read(data_file_path()) do
+      {:ok, ""} ->
+        %{} # we treat this file as a map that gets saves to disk. EMpty file -> empty map
+      {:ok, file_contents} ->
+        file_contents |> Jason.decode!
+    end
   end
 
   defp write_binary(data) when is_binary(data) do
