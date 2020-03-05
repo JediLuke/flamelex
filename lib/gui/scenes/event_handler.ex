@@ -11,6 +11,11 @@ defmodule GUI.Input.EventHandler do
     state # do nothing - pass through unaltered state
   end
 
+  def process(%{active_buffer: {:note, _x, _pid} = buf} = state, input) when input in @valid_command_buffer_inputs do #TODO update inputs
+    Scene.action({'NOTE_INPUT', buf, input})
+    state |> add_to_input_history(input)
+  end
+
   def process(%{command_buffer: %{visible?: false}} = state, @space_bar) do
     Scene.action('SHOW_COMMAND_BUFFER')
     state
@@ -50,11 +55,6 @@ defmodule GUI.Input.EventHandler do
 
   def process(%{command_buffer: %{visible?: true}} = state, input) when input in @valid_command_buffer_inputs do
     Scene.action({'COMMAND_BUFFER_INPUT', input})
-    state |> add_to_input_history(input)
-  end
-
-  def process(%{active_buffer: {:note, _x, _pid} = buf} = state, input) when input in @valid_command_buffer_inputs do #TODO update inputs
-    Scene.action({'NOTE_INPUT', buf, input})
     state |> add_to_input_history(input)
   end
 
