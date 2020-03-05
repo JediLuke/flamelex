@@ -114,7 +114,7 @@ defmodule GUI.Component.Cursor do
 
   def handle_cast({:move, [top_left_corner: new_top_left_corner, dimensions: {new_width, new_height}]}, {state, graph}) do
     new_state =
-      %{state|top_left_corner: new_top_left_corner}
+      %{state|top_left_corner: new_top_left_corner, dimensions: {new_width, new_height}}
 
     [%Scenic.Primitive{id: :cursor, styles: %{fill: color, hidden: hidden?}}] =
       Graph.find(graph, fn primitive -> primitive == :cursor end)

@@ -34,6 +34,14 @@ defmodule GUI.Component.Note do
     GenServer.cast(pid, {:action, 'MOVE_CURSOR_TO_TITLE_SECTION'})
   end
 
+  def append_text(pid, :title, state) do
+    GenServer.cast(pid, {'APPEND_INPUT_TO_TITLE', state})
+  end
+
+  def append_text(pid, :text, state) do
+    GenServer.cast(pid, {'APPEND_INPUT_TO_TEXT', state})
+  end
+
   def handle_call({:register, identifier}, {pid, _ref}, {%{component_ref: ref_list} = state, graph}) do
     Process.monitor(pid)
 
@@ -98,6 +106,16 @@ defmodule GUI.Component.Note do
     {:noreply, {state, new_graph}, push: new_graph}
   end
 
+  def handle_cast({'APPEND_INPUT_TO_TEXT', %{focus: :text, text: new_text}}, {state, graph}) do
+    new_graph =
+      graph |> Graph.modify(:text, &text(&1, new_text, fill: :black))
+
+    find_component_reference_pid!(state.component_ref, :cursor)
+    |> GUI.Component.Cursor.move_right_one_column()
+
+    {:noreply, {state, new_graph}, push: new_graph}
+  end
+
   def handle_cast({:action, 'MOVE_CURSOR_TO_TEXT_SECTION'}, {state, graph}) do
     {text_origin_x, text_origin_y} = state.text_origin
     {new_x, new_y} = {text_origin_x, text_origin_y-15}
@@ -112,6 +130,7 @@ defmodule GUI.Component.Note do
 
     find_component_reference_pid!(state.component_ref, :cursor)
     |> GUI.Component.Cursor.move(top_left_corner: {new_x, new_y}, dimensions: {new_width, new_height})
+
     {:noreply, {state, graph}}
   end
 

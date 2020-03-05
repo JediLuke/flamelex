@@ -28,7 +28,13 @@ defmodule Franklin.Buffer.Note do
 
   def handle_cast({:input, {scenic_component_pid, {:codepoint, {letter, _num}}}}, %{focus: :title} = state) do
     state = %{state|title: state.title <> letter}
-    GenServer.cast(scenic_component_pid, {'APPEND_INPUT_TO_TITLE', state}) #TODO make this a Note.something function
+    GUI.Component.Note.append_text(scenic_component_pid, :title, state)
+    {:noreply, state}
+  end
+
+  def handle_cast({:input, {scenic_component_pid, {:codepoint, {letter, _num}}}}, %{focus: :text} = state) do
+    state = %{state|text: state.text <> letter}
+    GUI.Component.Note.append_text(scenic_component_pid, :text, state)
     {:noreply, state}
   end
 
