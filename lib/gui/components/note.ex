@@ -54,6 +54,11 @@ defmodule GUI.Component.Note do
     {:reply, :ok, {new_state, graph}}
   end
 
+  def handle_call(:deactivate, {_pid, _ref}, {state, graph}) do
+    Logger.info "#{__MODULE__} deactivating..."
+    {:reply, :ok, {state, graph}}
+  end
+
   @doc false
   def init(%{
     id: id,
@@ -71,20 +76,23 @@ defmodule GUI.Component.Note do
 
     graph =
       Graph.build()
-      |> rect({width, height}, translate: {x, y}, fill: :cornflower_blue, stroke: {1, :ghost_white})
-      |> text(title_text,
-         id: :title,
-         font: @ibm_plex_mono,
-         translate: {x+15, y+title_font_size}, # text draws from bottom-left corner?? :( also, how high is it???
-         font_size: title_font_size,
-         fill: :black)
-      |> add_cursor(data, title_font_size)
-      |> line({{x+15, y+title_font_size+25}, {x+width-15, y+title_font_size+25}}, stroke: {3, :black})
-      |> text(note_text,
-         id: :text,
-         font: @ibm_plex_mono,
-         translate: {x+15, y+title_font_size+65}, # text draws from bottom-left corner?? :( also, how high is it???
-         fill: :black)
+      |> group(fn graph ->
+           graph
+           |> rect({width, height}, translate: {x, y}, fill: :cornflower_blue, stroke: {1, :ghost_white})
+           |> text(title_text,
+             id: :title,
+             font: @ibm_plex_mono,
+             translate: {x+15, y+title_font_size}, # text draws from bottom-left corner?? :( also, how high is it???
+             font_size: title_font_size,
+             fill: :black)
+           |> add_cursor(data, title_font_size)
+           |> line({{x+15, y+title_font_size+25}, {x+width-15, y+title_font_size+25}}, stroke: {3, :black})
+           |> text(note_text,
+             id: :text,
+             font: @ibm_plex_mono,
+             translate: {x+15, y+title_font_size+65}, # text draws from bottom-left corner?? :( also, how high is it???
+             fill: :black)
+         end)
 
     state = %{
       component_ref: [],

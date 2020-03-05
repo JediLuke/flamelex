@@ -61,8 +61,14 @@ defmodule GUI.RootReducer do
            top_left_corner: {top_left_corner_x + multi_note_offset, top_left_corner_y + multi_note_offset},
            dimensions: {width, height},
            contents: contents
-         })
-    {state |> Map.replace!(:active_buffer, id), new_graph}
+         }, id: id)
+
+    new_state =
+      state
+      |> Map.replace!(:active_buffer, id)
+      |> Map.replace!(:mode, :edit)
+
+    {new_state, new_graph}
   end
 
   def process({state, _graph}, {'NOTE_INPUT', {:note, _x, _pid} = active_buffer, input}) do
@@ -83,6 +89,19 @@ defmodule GUI.RootReducer do
     find_component_reference_pid!(state.component_ref, active_buffer_id)
     |> GUI.Component.Note.move_cursor_to_text_section
     state
+  end
+
+  def process({%{active_buffer: {:note, _x, _pid} = active_buffer_id} = state, graph}, {:active_buffer, :note, 'CLOSE_NOTE_BUFFER'}) do
+
+    # find_component_reference_pid!(state.component_ref, active_buffer_id)
+    # |> GUI.Component.Note.close_buffer
+
+    new_graph =
+      graph |> Scenic.Graph.delete(active_buffer_id)
+
+    #TODO here we can de-link the component
+
+    {state, new_graph}
   end
 
   def process({%{active_buffer: {:note, _x, _pid} = active_buffer_id} = state, _graph}, {:active_buffer, :note, 'MOVE_CURSOR_TO_TITLE_SECTION'}) do

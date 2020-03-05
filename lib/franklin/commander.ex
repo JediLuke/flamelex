@@ -30,7 +30,7 @@ defmodule Franklin.Commander do
   def handle_cast({:command_buffer_command, command}, state) do
     case command do
       "note" ->
-          new_note()
+          new_note() #TODO change to tidbit, with note tags
           {:noreply, state}
       "help" ->
           raise "Help is no implemented, and it should be!!"

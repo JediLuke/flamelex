@@ -8,6 +8,12 @@ defmodule GUI.Scene.Root do
   @default_command_buffer_height 72
   @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash
 
+  @valid_modes [
+    :control,     # command mode
+    :edit,        # insert mode
+    :reader
+  ]
+
   def init(nil = _init_params, opts) do
     Logger.info "Initializing #{__MODULE__}..."
     Process.register(self(), __MODULE__)
@@ -28,6 +34,7 @@ defmodule GUI.Scene.Root do
       command_buffer: %{
         visible?: false
       },
+      mode: :control, #TODO start in reader mode
       active_buffer: nil
     }
 
@@ -91,8 +98,16 @@ defmodule GUI.Scene.Root do
     end
   end
 
+  def handle_info({:DOWN, ref, :process, object, reason}, state) when reason in [:normal, :shutdown] do
+    context = %{ref: ref, object: object}
+    Logger.info "A component monitored by #{__MODULE__} ended normally. #{inspect context}"
+    #TODO remove from component list
+    {:noreply, state}
+  end
+
   def handle_info({:DOWN, ref, :process, object, reason}, _state) do
     context = %{ref: ref, object: object, reason: reason}
+    #TODO remove from component list
     raise "Monitored process died. #{inspect context}"
   end
 end

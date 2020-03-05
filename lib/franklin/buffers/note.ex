@@ -8,7 +8,7 @@ defmodule Franklin.Buffer.Note do
   def tab_key_pressed(pid), do: GenServer.cast(pid, :tab_key_pressed)
   def reverse_tab(pid), do: GenServer.cast(pid, :reverse_tab)
   def set_mode(pid, :command), do: GenServer.cast(pid, :activate_command_mode)
-  def save(pid), do: GenServer.cast(pid, :save)
+  def save_and_close(pid), do: GenServer.cast(pid, :save_and_close)
 
 
   ## GenServer callbacks
@@ -42,6 +42,12 @@ defmodule Franklin.Buffer.Note do
     GUI.Scene.Root.action({:active_buffer, :note, 'MOVE_CURSOR_TO_TEXT_SECTION'})
     new_state = %{state|focus: :text}
     {:noreply, new_state}
+  end
+
+  def handle_cast(:save_and_close, state) do
+    Logger.warn "NOT SAVING THE NTOE YET"
+    GUI.Scene.Root.action({:active_buffer, :note, 'CLOSE_NOTE_BUFFER'})
+    {:noreply, state}
   end
 
   def handle_cast(:tab_key_pressed, %{focus: :text} = state) do
