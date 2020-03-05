@@ -1,20 +1,5 @@
 defmodule GUI.Component.ColoredBox do
-  @moduledoc """
-  Add a blinking text-input caret to a graph.
-
-  ## Data
-  `{x_coordinate, y_coordinate, width, height, color}`
-
-  * `x_coordinate` - Where in the x plane (horizontal & to the right, from top-left corner of the window) the top-left corner of the box is positioned
-  * `y_coordinate` - Where in the y plane (vertical & down, from top-left corner of the window) the top-left corner of the box is positioned
-  * `width` - integer greater than zero
-  * `height` - integer greater than zero
-  * `color` - any [valid color](Scenic.Primitive.Style.Paint.Color.html).
-
-  graph
-  |> BlinkingBox.add_to_graph({x_coordinate, y_coordinate, width, height, color})
-
-  """
+  @moduledoc false
   use Scenic.Component
   alias GUI.Structs.{Coordinates, Dimensions}
   alias Scenic.Graph

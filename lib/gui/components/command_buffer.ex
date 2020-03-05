@@ -120,9 +120,10 @@ defmodule GUI.Components.CommandBuffer do
     height       = y_max + y_box_buffer #TODO should probably truncate this
 
     graph
-    |> GUI.Component.BlinkingBox.add_to_graph(%{
+    |> GUI.Component.Cursor.add_to_graph(%{
          top_left_corner: {x_coordinate, y_coordinate},
-         dimensions: {width, height}
+         dimensions: {width, height},
+         parent: %{pid: self()}
        })
   end
 

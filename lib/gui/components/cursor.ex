@@ -1,9 +1,9 @@
-defmodule GUI.Component.BlinkingBox do
+defmodule GUI.Component.Cursor do
   @moduledoc """
   Add a blinking text-input caret to a graph.
 
   graph
-  |> BlinkingBox.add_to_graph({x_coordinate, y_coordinate, width, height, color})
+  |> Cursor.add_to_graph({x_coordinate, y_coordinate, width, height, color})
   """
   use Scenic.Component, has_children: false
   import Scenic.{Primitive, Primitives}
@@ -23,7 +23,10 @@ defmodule GUI.Component.BlinkingBox do
     top_left_corner: {_x, _y},
     dimensions: {_width, _height},
     color: _color,
-    hidden?: _hidden?
+    hidden?: _hidden?,
+    parent: %{
+      pid: _parent_pid
+    }
   } = data), do: {:ok, data}
   def verify(%{
     top_left_corner: {_x, _y},
@@ -31,18 +34,22 @@ defmodule GUI.Component.BlinkingBox do
   } = data), do: {:ok, data}
   def verify(_), do: :invalid_data
 
-  # --------------------------------------------------------
-  @doc false
+  def move_right_one_column(pid) do
+    GenServer.cast(pid, {:action, 'MOVE_RIGHT_ONE_COLUMN'})
+  end
 
   def init(%{
     top_left_corner: {x, y},
     dimensions: {_width, _height},
     color: _color,
-    hidden?: _hidden?
+    hidden?: _hidden?,
+    parent: %{
+      pid: _parent_pid
+    }
   } = data, _opts) do
-    Logger.info "Initializing #{__MODULE__}..."
+    Logger.info "#{__MODULE__} initializing...#{inspect data}"
 
-    GenServer.call(GUI.Components.CommandBuffer, {:register, :cursor}) #TODO this could be passed in as the "parent module/props"
+    GenServer.call(data.parent.pid, {:register, :cursor})
 
     state = data |> Map.merge(%{timer: nil, original_position: {x, y}}) # holds an erlang :timer for the blink
     graph = generate_graph(state)

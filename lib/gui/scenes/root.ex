@@ -63,7 +63,7 @@ defmodule GUI.Scene.Root do
 
     new_component = {identifier, pid}
     #TODO ensure new component registry is unique!
-    Logger.info "Registering component: #{inspect new_component}..."
+    Logger.info "#{__MODULE__} registering component: #{inspect new_component}..."
     new_ref_list = ref_list ++ [new_component]
     new_state = state |> Map.replace!(:component_ref, new_ref_list)
 

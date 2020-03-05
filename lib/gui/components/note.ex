@@ -3,6 +3,8 @@ defmodule GUI.Component.Note do
   use Scenic.Component
   alias Scenic.Graph
   import Scenic.Primitives
+  require Logger
+  import Utilities.ComponentUtils
 
   @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash
 
@@ -22,6 +24,18 @@ defmodule GUI.Component.Note do
 
   def info(_data), do: ~s(Invalid data)
 
+  def handle_call({:register, identifier}, {pid, _ref}, {%{component_ref: ref_list} = state, graph}) do
+    Process.monitor(pid)
+
+    new_component = {identifier, pid}
+    #TODO ensure new component registry is unique!
+    Logger.info "#{__MODULE__} registering component: #{inspect new_component}..."
+    new_ref_list = ref_list ++ [new_component]
+    new_state = state |> Map.replace!(:component_ref, new_ref_list)
+
+    {:reply, :ok, {new_state, graph}}
+  end
+
   @doc false
   def init(%{
     id: id,
@@ -29,6 +43,7 @@ defmodule GUI.Component.Note do
     dimensions: {width, height},
     contents: %{title: title, text: note_contents}
   } = data, _opts) do
+    Logger.info "#{__MODULE__} initializing...#{inspect data}"
     title_text = if title == "", do: @title_prompt, else: title
     note_text = if note_contents == "", do: @text_prompt, else: title
     title_font_size = 48
@@ -54,12 +69,15 @@ defmodule GUI.Component.Note do
          fill: :black)
 
     GenServer.call(GUI.Scene.Root, {:register, id})
-    {:ok, {_state = %{}, graph}, push: graph}
+    {:ok, {%{component_ref: []}, graph}, push: graph}
   end
 
-  def handle_cast({'TITLE_INPUT', %{focus: :title, title: new_title}}, {state, graph}) do
+  def handle_cast({'APPEND_INPUT_TO_TITLE', %{focus: :title, title: new_title}}, {state, graph}) do
     new_graph =
       graph |> Graph.modify(:title, &text(&1, new_title, fill: :black))
+
+    find_component_reference_pid!(state.component_ref, :cursor)
+    |> GUI.Component.Cursor.move_right_one_column()
 
     {:noreply, {state, new_graph}, push: new_graph}
   end
@@ -76,9 +94,14 @@ defmodule GUI.Component.Note do
     height       = y_max + y_box_buffer #TODO should probably truncate this
 
     graph
-    |> GUI.Component.BlinkingBox.add_to_graph(%{
+    |> GUI.Component.Cursor.add_to_graph(%{
           top_left_corner: {x_coordinate, y_coordinate},
-          dimensions: {width, height}
+          dimensions: {width, height},
+          parent: %{pid: self()}
         })
+  end
+
+  defp find_cursor_pid(state) do
+
   end
 end
