@@ -101,8 +101,8 @@ defmodule GUI.Component.Note do
 
     {_x_min, _y_min, _x_max, y_max} = GUI.FontHelpers.get_max_box_for_ibm_plex(text_size)
     new_width        = GUI.FontHelpers.monospace_font_width(:ibm_plex, text_size)  #TODO should probably truncate this
-    y_box_buffer = 1
-    new_height       = y_max + y_box_buffer #TODO should probably truncate this
+    y_box_buffer = 3
+    new_height       = y_max - y_box_buffer #TODO should probably truncate this
 
     find_component_reference_pid!(state.component_ref, :cursor)
     |> GUI.Component.Cursor.move(top_left_corner: {new_x, new_y}, dimensions: {new_width, new_height})
