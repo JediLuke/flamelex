@@ -26,6 +26,7 @@ defmodule GUI.ScenicInputEvents do
       @space_bar {:codepoint, {" ", 0}}
 
       @left_shift_and_space_bar {:key, {" ", :press, 1}}
+      @left_shift_and_tab {:key, {"tab", :press, 1}}
 
       @lowercase_a {:codepoint, {"a", 0}}
       @lowercase_b {:codepoint, {"b", 0}}

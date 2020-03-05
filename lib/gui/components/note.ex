@@ -8,6 +8,8 @@ defmodule GUI.Component.Note do
 
   @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash
 
+  @title_font_size 48
+
   @title_prompt "New note..."
   @text_prompt "Press <TAB> to move to the text input area."
 
@@ -26,6 +28,10 @@ defmodule GUI.Component.Note do
 
   def move_cursor_to_text_section(pid) do
     GenServer.cast(pid, {:action, 'MOVE_CURSOR_TO_TEXT_SECTION'})
+  end
+
+  def move_cursor_to_title_section(pid) do
+    GenServer.cast(pid, {:action, 'MOVE_CURSOR_TO_TITLE_SECTION'})
   end
 
   def handle_call({:register, identifier}, {pid, _ref}, {%{component_ref: ref_list} = state, graph}) do
@@ -74,7 +80,7 @@ defmodule GUI.Component.Note do
 
     state = %{
       component_ref: [],
-      title_origin: {x+15, y+title_font_size},
+      title_origin: {x, y},
       text_origin: {x+15, y+title_font_size+65}
     }
 
@@ -106,6 +112,27 @@ defmodule GUI.Component.Note do
 
     find_component_reference_pid!(state.component_ref, :cursor)
     |> GUI.Component.Cursor.move(top_left_corner: {new_x, new_y}, dimensions: {new_width, new_height})
+    {:noreply, {state, graph}}
+  end
+
+  def handle_cast({:action, 'MOVE_CURSOR_TO_TITLE_SECTION'}, {state, graph}) do
+    # get width of text font (use FontMetrics)
+    # get height of text font
+
+    {_x_min, _y_min, _x_max, y_max} = GUI.FontHelpers.get_max_box_for_ibm_plex(@title_font_size)
+    new_width        = GUI.FontHelpers.monospace_font_width(:ibm_plex, @title_font_size)  #TODO should probably truncate this
+    y_box_buffer = 3
+    new_height       = y_max + y_box_buffer #TODO should probably truncate this
+
+    {x, y} = state.title_origin
+    y_offset     = y+10
+    y_box_buffer = 2 # it looks weird having box exact same size as the text
+    x_coordinate = x+15
+    y_coordinate = y_offset + y_box_buffer
+
+    find_component_reference_pid!(state.component_ref, :cursor)
+    |> GUI.Component.Cursor.move(top_left_corner: {x_coordinate, y_coordinate}, dimensions: {new_width, new_height})
+
     {:noreply, {state, graph}}
   end
 

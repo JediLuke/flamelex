@@ -85,6 +85,12 @@ defmodule GUI.RootReducer do
     state
   end
 
+  def process({%{active_buffer: {:note, _x, _pid} = active_buffer_id} = state, _graph}, {:active_buffer, :note, 'MOVE_CURSOR_TO_TITLE_SECTION'}) do
+    find_component_reference_pid!(state.component_ref, active_buffer_id)
+    |> GUI.Component.Note.move_cursor_to_title_section
+    state
+  end
+
   defp generate_note_buffer_id(component_ref) when is_list(component_ref) do
     component_ref
     |> Enum.filter(fn

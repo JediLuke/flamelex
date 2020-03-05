@@ -22,6 +22,11 @@ defmodule GUI.Input.EventHandler do
     state
   end
 
+  def process(%{active_buffer: {:note, _x, buffer_pid}} = state, @left_shift_and_tab) do
+    Franklin.Buffer.Note.reverse_tab(buffer_pid)
+    state
+  end
+
   def process(%{command_buffer: %{visible?: false}} = state, @space_bar) do
     Scene.action('SHOW_COMMAND_BUFFER')
     state
