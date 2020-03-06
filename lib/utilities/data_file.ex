@@ -10,6 +10,7 @@ defmodule Utilities.DataFile do
     |> Jason.encode!
     |> write_binary()
   end
+
   def read do
     case File.read(data_file_path()) do
       {:ok, ""} ->
