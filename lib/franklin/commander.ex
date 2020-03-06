@@ -32,11 +32,14 @@ defmodule Franklin.Commander do
       "note" ->
           new_note() #TODO change to tidbit, with note tags
           {:noreply, state}
+      "list notes" ->
+          raise "Need to be able to list notes!"
+          {:noreply, state}
       "help" ->
           raise "Help is no implemented, and it should be!!"
           {:noreply, state}
-      "reload GUI" ->
-          Logger.warn "Sendking kill to GUI.Scene.Root..."
+      "reload" ->
+          Logger.warn "Sending `kill` to GUI.Scene.Root..."
           IEx.Helpers.recompile
           Process.exit(Process.whereis(GUI.Scene.Root), :kill)
           {:noreply, state}
@@ -44,16 +47,13 @@ defmodule Franklin.Commander do
           Logger.warn "Restarting Franklin..."
           :init.restart()
           {:noreply, state}
-      other_command ->
-          Logger.warn "#{__MODULE__} unrecognised command: #{inspect other_command}"
+      unrecognised_command ->
+          Logger.warn "#{__MODULE__} unrecognised command. Attempting to run as Elixir code... #{inspect unrecognised_command}"
+          Code.eval_string(unrecognised_command)
           {:noreply, state}
     end
   end
 
-  def new_note do
-    Franklin.BufferSupervisor.note(%{
-      title: "",
-      text: ""
-    })
-  end
+  def new_note, do: Franklin.BufferSupervisor.note(%{title: "", text: ""})
+
 end

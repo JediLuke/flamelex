@@ -10,7 +10,7 @@ defmodule GUI.Scene.Root do
 
   @valid_modes [
     :control,     # command mode
-    :edit,        # insert mode
+    :insert,      # insert mode
     :reader
   ]
 
@@ -23,7 +23,6 @@ defmodule GUI.Scene.Root do
     {:ok, %Scenic.ViewPort.Status{size: {viewport_width, viewport_height}}} =
       opts[:viewport] |> Scenic.ViewPort.info()
 
-    #TODO ok this could probably be a struct...
     state = %{
       viewport: %{
         width: viewport_width,
@@ -34,7 +33,7 @@ defmodule GUI.Scene.Root do
       command_buffer: %{
         visible?: false
       },
-      mode: :control, #TODO start in reader mode
+      mode: :control,    #TODO start in reader mode with a welcome screen
       active_buffer: nil
     }
 

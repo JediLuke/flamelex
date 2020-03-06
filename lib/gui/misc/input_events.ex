@@ -100,9 +100,19 @@ defmodule GUI.ScenicInputEvents do
         @uppercase_Z
       ]
 
+      @period {:codepoint, {".", 0}}
+      @bang {:codepoint, {"!", 1}}
+      @question_mark {:codepoint, {"?", 1}}
+      @left_bracket {:codepoint, {"(", 1}}
+      @right_bracket {:codepoint, {")", 1}}
+      @quote_character {:codepoint, {"\"", 1}}
+      @colon {:codepoint, {":", 1}}
+
       @all_letters @lowercase_letters ++ @uppercase_letters
 
-      @valid_command_buffer_inputs @all_letters ++ [@space_bar]
+      @valid_command_buffer_inputs @all_letters ++ [@space_bar, @period,
+        @bang, @question_mark, @left_bracket, @right_bracket, @quote_character,
+        @colon]
 
     end
   end
