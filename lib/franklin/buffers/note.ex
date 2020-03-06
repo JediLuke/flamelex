@@ -51,6 +51,9 @@ defmodule Franklin.Buffer.Note do
            state.uuid => %{
              title: state.title,
              text: state.text,
+             datetime_utc: DateTime.utc_now(),
+             #TODO hash entire contents
+             #TODO handle timezones
              tags: ["note"]
            },
          })
