@@ -23,3 +23,5 @@ erl_crash.dump
 franklin-*.tar
 
 .elixir_ls
+
+/data/
