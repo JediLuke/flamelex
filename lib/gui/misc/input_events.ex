@@ -107,12 +107,16 @@ defmodule GUI.ScenicInputEvents do
       @right_bracket {:codepoint, {")", 1}}
       @quote_character {:codepoint, {"\"", 1}}
       @colon {:codepoint, {":", 1}}
+      @percent_sign {:codepoint, {"%", 1}}
+      @left_brace {:codepoint, {"{", 1}}
+      @right_brace {:codepoint, {"}", 1}}
+      @comma {:codepoint, {",", 0}}
 
       @all_letters @lowercase_letters ++ @uppercase_letters
 
       @valid_command_buffer_inputs @all_letters ++ [@space_bar, @period,
         @bang, @question_mark, @left_bracket, @right_bracket, @quote_character,
-        @colon]
+        @colon, @percent_sign, @left_brace, @right_brace, @comma]
 
     end
   end
