@@ -1,7 +1,7 @@
 defmodule GUI.Component.ColoredBox do
   @moduledoc false
   use Scenic.Component
-  alias GUI.Structs.{Coordinates, Dimensions}
+  # alias GUI.Structs.{Coordinates, Dimensions}
   alias Scenic.Graph
   import Scenic.Primitives
 

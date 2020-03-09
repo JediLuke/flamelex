@@ -2,7 +2,7 @@ defmodule GUI.Components.CommandBuffer do
   use Scenic.Component
   alias Scenic.Graph
   require Logger
-  import Scenic.{Primitive, Primitives}
+  import Scenic.Primitives
 
   @text_size 24 #32 px
   @text_size_px 32
