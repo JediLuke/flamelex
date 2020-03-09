@@ -1,4 +1,4 @@
-defmodule GUI.Reducer.Root.Mode.Command do
+defmodule GUI.Reducer.ControlMode do
   @moduledoc """
   Contains module attribute definitions of all the Scenic input events.
   """
@@ -7,7 +7,7 @@ defmodule GUI.Reducer.Root.Mode.Command do
   defmacro __using__(_opts) do
     quote do
 
-      def process({%{command_buffer: %{visible?: false}} = state, _graph}, 'SHOW_COMMAND_BUFFER') do
+      def process({%{command_buffer: %{visible?: false}, mode: :control} = state, _graph}, 'SHOW_COMMAND_BUFFER') do
         {:command_buffer, pid} = state.component_ref |> hd #TODO, eventually we'll have more componenst
         new_command_buffer_map =
           state.command_buffer

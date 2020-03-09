@@ -33,7 +33,7 @@ defmodule Franklin.Commander do
           new_note() #TODO change to tidbit, with note tags
           {:noreply, state}
       "list notes" ->
-          raise "Need to be able to list notes!"
+          list_notes()
           {:noreply, state}
       "help" ->
           raise "Help is no implemented, and it should be!!"
@@ -54,6 +54,11 @@ defmodule Franklin.Commander do
     end
   end
 
-  def new_note, do: Franklin.BufferSupervisor.note(%{title: "", text: ""})
+  def new_note do
+    Franklin.BufferSupervisor.note(%{title: "", text: ""})
+  end
 
+  def list_notes do
+    Franklin.BufferSupervisor.list(:notes)
+  end
 end

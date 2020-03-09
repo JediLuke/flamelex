@@ -5,7 +5,7 @@ defmodule GUI.RootReducer do
   require Logger
   import Utilities.ComponentUtils
 
-  use GUI.Reducer.Root.Mode.Command
+  use GUI.Reducer.ControlMode
 
   def process({%{viewport: %{width: w}} = state, graph}, {'NEW_NOTE_COMMAND', contents, buffer_pid: buf_pid}) do
     width  = w / 3
@@ -34,33 +34,33 @@ defmodule GUI.RootReducer do
     {new_state, new_graph}
   end
 
-  def process({%{viewport: %{width: w}} = state, graph}, {'NEW_LIST_NOTES_BUFFER', notes, buffer_pid: buf_pid}) do
-    # width  = w / 3
-    # height = width
-    # top_left_corner_x = (w/2)-(width/2) # center the box
-    # top_left_corner_y = height / 5
-    # id = {:note, generate_note_buffer_id(state.component_ref), buf_pid}
+  def process({%{viewport: %{width: w}} = state, graph}, {'NEW_LIST_NOTES_BUFFER', notes, buffer_pid: _buf_pid}) do
+    ibm_plex_mono = GUI.Initialize.ibm_plex_mono_hash()
 
-    # {:note, note_num, _buf_pid} = id
-    # multi_note_offset = (note_num - 1) * 15
+    add_notes =
+      fn(graph, notes) ->
+        {graph, _offset_count} =
+          Enum.reduce(notes, {graph, _offset_count = 0}, fn {_key, note}, {graph, offset_count} ->
+            graph =
+              graph
+              |> Scenic.Primitives.group(fn graph ->
+                   graph
+                   |> Scenic.Primitives.rect({w / 2, 100}, translate: {10, 10 + offset_count * 110}, fill: :cornflower_blue, stroke: {1, :ghost_white})
+                   |> Scenic.Primitives.text(note["title"], font: ibm_plex_mono,
+                       translate: {25, 50 + offset_count * 110}, # text draws from bottom-left corner?? :( also, how high is it???
+                       font_size: 24, fill: :black)
+                 end)
 
-    # new_graph =
-    #   graph
-    #   |> GUI.Component.Note.add_to_graph(%{
-    #        id: id,
-    #        top_left_corner: {top_left_corner_x + multi_note_offset, top_left_corner_y + multi_note_offset},
-    #        dimensions: {width, height},
-    #        contents: contents
-    #      }, id: id)
 
-    # new_state =
-    #   state
-    #   |> Map.replace!(:active_buffer, id)
-    #   |> Map.replace!(:mode, :edit)
+            {graph, offset_count + 1}
+          end)
+        graph
+      end
 
-    # {new_state, new_graph}
-    Logger.warn "Here we will list notes!"
-    {state, graph}
+    new_graph =
+      graph |> add_notes.(notes)
+
+    {state, new_graph}
   end
 
   def process({state, _graph}, {'NOTE_INPUT', {:note, _x, _pid} = active_buffer, input}) do

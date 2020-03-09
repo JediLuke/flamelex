@@ -14,4 +14,8 @@ defmodule Franklin.BufferSupervisor do
   def note(contents) do
     DynamicSupervisor.start_child(__MODULE__, {Franklin.Buffer.Note, contents})
   end
+
+  def list(:notes) do
+    DynamicSupervisor.start_child(__MODULE__, {Franklin.Buffer.List, :notes})
+  end
 end
