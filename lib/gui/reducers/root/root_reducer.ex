@@ -71,6 +71,35 @@ defmodule GUI.RootReducer do
     {new_state, new_graph}
   end
 
+  def process({%{viewport: %{width: w}} = state, graph}, {'NEW_LIST_NOTES_BUFFER', notes, buffer_pid: buf_pid}) do
+    # width  = w / 3
+    # height = width
+    # top_left_corner_x = (w/2)-(width/2) # center the box
+    # top_left_corner_y = height / 5
+    # id = {:note, generate_note_buffer_id(state.component_ref), buf_pid}
+
+    # {:note, note_num, _buf_pid} = id
+    # multi_note_offset = (note_num - 1) * 15
+
+    # new_graph =
+    #   graph
+    #   |> GUI.Component.Note.add_to_graph(%{
+    #        id: id,
+    #        top_left_corner: {top_left_corner_x + multi_note_offset, top_left_corner_y + multi_note_offset},
+    #        dimensions: {width, height},
+    #        contents: contents
+    #      }, id: id)
+
+    # new_state =
+    #   state
+    #   |> Map.replace!(:active_buffer, id)
+    #   |> Map.replace!(:mode, :edit)
+
+    # {new_state, new_graph}
+    Logger.warn "Here we will list notes!"
+    {state, graph}
+  end
+
   def process({state, _graph}, {'NOTE_INPUT', {:note, _x, _pid} = active_buffer, input}) do
     [{{:note, _x, buffer_pid}, component_pid}] =
       state.component_ref
