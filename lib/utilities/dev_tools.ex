@@ -38,4 +38,13 @@ defmodule DevTools do
     {:ok, file_contents} = File.read("./data/franklin.data")
     file_contents |> Jason.decode!
   end
+
+  @project_root_dir "/Users/luke/workbench/elixir/franklin"
+  @priv_dir @project_root_dir <> "/priv"
+
+  def font_metrics do
+    @priv_dir |> Path.join("/static/fonts/IBM-Plex-Mono/IBMPlexMono-Regular.ttf.metrics")
+    |> File.read!
+    |> FontMetrics.from_binary!
+  end
 end
