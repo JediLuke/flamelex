@@ -15,13 +15,10 @@ very stable editor.
 
 Some of my main goals are:
 
-* Completely programmable - Franklin easily lets programmers customize
-  their setup.
-* Easy for beginners. Comes with tutorial, full help, and good UX
-* Feedback! Show what mode we're in etc. Advanced users can disable this stuff.
-* User-friendly - vi & emacs are famous for their difficult learning curve
-* Self-documenting - like emacs does, but actually usable
+* Easy for beginners. Comes with tutorial, full help, and good UX (always give the user feedback!)
+* Self-documenting
 * Contains a personal memex, modelled on tiddlywiki
+* REPL driven for absolute programmability
 
 With some notable features:
 
