@@ -34,33 +34,50 @@ defmodule GUI.RootReducer do
     {new_state, new_graph}
   end
 
-  def process({%{viewport: %{width: w}} = state, graph}, {'NEW_LIST_NOTES_BUFFER', notes, buffer_pid: _buf_pid}) do
-    ibm_plex_mono = GUI.Initialize.ibm_plex_mono_hash()
-
-    add_notes =
-      fn(graph, notes) ->
-        {graph, _offset_count} =
-          Enum.reduce(notes, {graph, _offset_count = 0}, fn {_key, note}, {graph, offset_count} ->
-            graph =
-              graph
-              |> Scenic.Primitives.group(fn graph ->
-                   graph
-                   |> Scenic.Primitives.rect({w / 2, 100}, translate: {10, 10 + offset_count * 110}, fill: :cornflower_blue, stroke: {1, :ghost_white})
-                   |> Scenic.Primitives.text(note["title"], font: ibm_plex_mono,
-                       translate: {25, 50 + offset_count * 110}, # text draws from bottom-left corner?? :( also, how high is it???
-                       font_size: 24, fill: :black)
-                 end)
-
-
-            {graph, offset_count + 1}
-          end)
-        graph
-      end
+  def process({%{viewport: %{width: w, height: h}} = state, graph}, {'NEW_LIST_NOTES_BUFFER', notes, buffer_pid: buf_pid}) do
+    id = {:list, :notes, buf_pid}
 
     new_graph =
-      graph |> add_notes.(notes)
+      graph
+      |> GUI.Component.List.add_to_graph(%{
+          id: id,
+          top_left_corner: {0, 0},
+          dimensions: {w, h},
+          contents: notes
+        }, id: id)
 
-    {state, new_graph}
+    new_state =
+      state
+      |> Map.replace!(:active_buffer, id)
+      # |> Map.replace!(:mode, :edit)
+
+    {new_state, new_graph}
+
+    # ibm_plex_mono = GUI.Initialize.ibm_plex_mono_hash()
+
+    # add_notes =
+    #   fn(graph, notes) ->
+    #     {graph, _offset_count} =
+    #       Enum.reduce(notes, {graph, _offset_count = 0}, fn {_key, note}, {graph, offset_count} ->
+    #         graph =
+    #           graph
+    #           |> Scenic.Primitives.group(fn graph ->
+    #                graph
+    #                |> Scenic.Primitives.rect({w / 2, 100}, translate: {10, 10 + offset_count * 110}, fill: :cornflower_blue, stroke: {1, :ghost_white})
+    #                |> Scenic.Primitives.text(note["title"], font: ibm_plex_mono,
+    #                    translate: {25, 50 + offset_count * 110}, # text draws from bottom-left corner?? :( also, how high is it???
+    #                    font_size: 24, fill: :black)
+    #              end)
+
+
+    #         {graph, offset_count + 1}
+    #       end)
+    #     graph
+    #   end
+
+    # new_graph =
+    #   graph |> add_notes.(notes)
+
   end
 
   def process({state, _graph}, {'NOTE_INPUT', {:note, _x, _pid} = active_buffer, input}) do
