@@ -34,6 +34,10 @@ defmodule GUI.Initialize do
     {Scenic, viewports: [@main_viewport_config]}
   end
 
+  def viewport_config do
+    @main_viewport_config
+  end
+
   def load_custom_fonts_into_global_cache do
     Scenic.Cache.Static.Font.load(@font_folder, @custom_font_hash, scope: :global)
     Scenic.Cache.Static.FontMetrics.load(@custom_metrics_path, @custom_metrics_hash, scope: :global)

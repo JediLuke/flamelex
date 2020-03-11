@@ -6,9 +6,9 @@ defmodule Franklin.Application do
   def start(_type, _args) do
     children = [
       Franklin.Commander,
-      Franklin.BufferSupervisor,
-      # Franklin.PubSub,
-      GUI.Initialize.scenic_childspec
+      Franklin.PubSub,
+      Franklin.Buffer.TopLevelSupervisor,
+      {Scenic, viewports: [GUI.Initialize.viewport_config()]}
     ]
 
     opts = [strategy: :one_for_one, name: Franklin.Supervisor]
