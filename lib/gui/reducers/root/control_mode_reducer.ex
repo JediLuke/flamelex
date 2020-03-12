@@ -7,13 +7,13 @@ defmodule GUI.Reducer.ControlMode do
   defmacro __using__(_opts) do
     quote do
 
-      def process({%{command_buffer: %{visible?: false}, mode: :control} = state, _graph}, 'SHOW_COMMAND_BUFFER') do
+      def process({%{command_buffer: %{visible?: false}, mode: :control} = state, _graph}, 'SHOW_EXECUTE_COMMAND_PROMPT') do
         {:command_buffer, pid} = state.component_ref |> hd #TODO, eventually we'll have more componenst
         new_command_buffer_map =
           state.command_buffer
           |> Map.replace!(:visible?, true)
 
-        GenServer.cast(pid, {:action, 'SHOW_COMMAND_BUFFER'})
+        GenServer.cast(pid, {:action, 'SHOW_EXECUTE_COMMAND_PROMPT'})
         %{state|command_buffer: new_command_buffer_map}
       end
 

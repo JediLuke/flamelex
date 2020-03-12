@@ -17,7 +17,7 @@ defmodule GUI.Input.EventHandler do
 
 
   def process(%{command_buffer: %{visible?: false}, mode: :control} = state, @space_bar) do
-    Scene.action('SHOW_COMMAND_BUFFER')
+    Scene.action('SHOW_EXECUTE_COMMAND_PROMPT')
     state
   end
 

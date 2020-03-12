@@ -7,48 +7,105 @@ defmodule GUI.Components.CommandBuffer do
   @text_size 24 #32 px
   @text_size_px 32
 
-  @prompt_margin 24
+  @prompt_margin 12
   @prompt_size 24
   @prompt_to_blinker_distance 32
 
   @empty_command_buffer_text_prompt "Enter a command..."
 
+  @impl Scenic.Component
   def verify(%{
     id: _id,
     top_left_corner: {_x, _y},
-    dimensions: {_w, _h}
-  } = data), do: {:ok, data}
-  def verify(_), do: :invalid_data
+    dimensions: {_w, _h},
+    state: %{text: _t}} = data) do
+      {:ok, data}
+    end
+  def verify(_else), do: :invalid_data
 
+  @impl Scenic.Component
   def info(_data), do: ~s(Invalid data)
 
-  def init(data, opts) do
+  @impl Scenic.Component
+  def init(%{state: %{text: _t}} = data, opts), do: init_logic(data, opts)
+
+  # def show, do: show_command_buffer()
+
+
+  ## Private functions
+  ## -------------------------------------------------------------------
+
+
+  defp init_logic(%{state: %{text: initial_text}} = data, opts) do
     Logger.info "Initializing #{__MODULE__}..."
     Process.register(self(), __MODULE__)
-    GenServer.call(GUI.Scene.Root, {:register, :command_buffer})
+    # GenServer.call(GUI.Scene.Root, {:register, :command_buffer})
 
     state = %{
       component_ref: [],
-      text: ""
+      text: "",
+      data: data
     }
+
+    %{top_left_corner: {_x, top_left_y}, dimensions: {_w, height}} = data
+
+    # text size != text size in pixels. We get the difference between these 2, in pixels, and halve it, to get an offset we can use to center this text inside the command buffer
+    y_offset = top_left_y + (height - @prompt_size)/2 # y is the reference coord, the offset from the top of the screen, where the command buffer gets drawn. (height - prompt_size) is how much bigger the buffer is than the command prompt, so it gives us the extra space - we divide this by 2 to get how much extra space we need to add, to the reference y coordinate, to center the command prompt inside the buffer
+    text_centering_offset = (@text_size_px - @text_size)/2
+
+    # text draws from bottom-left corner?? :(
+    lower_left_corner_x = @prompt_margin - 1
+    lower_left_corner_y = y_offset + @text_size - text_centering_offset - 1
 
     graph =
       Graph.build(font_size: @text_size, font: opts[:styles][:font])
-      |> group(fn graph ->
-           graph
-           |> draw_background(data)
-           |> draw_command_prompt(data)
-           |> add_blinking_box_cursor(data)
-           |> draw_command_prompt_text(state, data)
-         end, [
-           id: data.id,
-           hidden: true
-         ])
+      |> text(initial_text,
+          translate: {lower_left_corner_x, lower_left_corner_y},
+          fill: :dark_grey)
+      # |> draw_status_bar(data)
+      # |> group(fn graph ->
+      #      graph
+      #      |> draw_background(data)
+      #      |> draw_command_prompt(data)
+      #      |> add_blinking_box_cursor(data)
+      #      |> draw_command_prompt_text(state, data)
+      #    end, [
+      #      id: data.id,
+      #      hidden: true
+      #    ])
 
     {:ok, {state, graph}, push: graph}
   end
 
+  defp draw_status_bar(graph, data) do
+    graph
+    |> group(fn graph ->
+         graph
+         |> draw_background(data, :white_smoke)
+         |> print_mode(data)
+       end, [
+         id: data.id
+       ])
+  end
+
   def action(a), do: GenServer.cast(__MODULE__, {:action, a})
+
+  def handle_cast({:action, 'SHOW_EXECUTE_COMMAND_PROMPT'}, {state, _graph}) do
+    new_graph =
+      Scenic.Graph.build()
+        |> group(fn graph ->
+          graph
+          |> draw_background(state.data)
+          |> draw_command_prompt(state.data)
+          |> add_blinking_box_cursor(state.data)
+          |> draw_command_prompt_text(state, state.data)
+        end, [
+          id: :command_buffer,
+        #  hidden: true
+        ])
+
+    {:noreply, {state, new_graph}, push: new_graph}
+  end
 
   def handle_cast({:action, action}, {state, graph}) do
     case GUI.Components.CommandBuffer.Reducer.process({state, graph}, action) do
@@ -79,9 +136,38 @@ defmodule GUI.Components.CommandBuffer do
   ## -------------------------------------------------------------------
 
 
+  defp draw_background(graph, d = %{top_left_corner: {top_left_x, top_left_y}, dimensions: {width, height}}, color) when is_atom(color) do
+    IO.inspect d
+    graph
+    |> rect({width + 1, height}, [ #TODO need +1 here for some reason
+         fill: color,
+         translate: {top_left_x, top_left_y}
+       ])
+  end
   defp draw_background(graph, %{top_left_corner: {top_left_x, top_left_y}, dimensions: {width, height}}) do
     graph
-    |> rect({width, height}, [fill: :purple, translate: {top_left_x, top_left_y}])
+    |> rect({width, height}, [
+         fill: :purple,
+         translate: {top_left_x, top_left_y}
+       ])
+  end
+
+  defp print_mode(graph, %{top_left_corner: {_x, top_left_y}, dimensions: {_w, height}}) do
+    # text size != text size in pixels. We get the difference between these 2, in pixels, and halve it, to get an offset we can use to center this text inside the command buffer
+    y_offset = top_left_y + (height - @prompt_size)/2 # y is the reference coord, the offset from the top of the screen, where the command buffer gets drawn. (height - prompt_size) is how much bigger the buffer is than the command prompt, so it gives us the extra space - we divide this by 2 to get how much extra space we need to add, to the reference y coordinate, to center the command prompt inside the buffer
+    text_centering_offset = (@text_size_px - @text_size)/2
+
+    # text draws from bottom-left corner?? :(
+    lower_left_corner_x = @prompt_margin
+    lower_left_corner_y = y_offset + @text_size - text_centering_offset
+
+    graph
+    |> text("COMMAND",
+         translate: {lower_left_corner_x, lower_left_corner_y},
+         fill: :midnight_blue)
+    |> text("MODE",
+         translate: {lower_left_corner_x+18, lower_left_corner_y + 18},
+         fill: :midnight_blue)
   end
 
   defp draw_command_prompt(graph, %{top_left_corner: {_x, top_left_y}, dimensions: {_w, height}}) do

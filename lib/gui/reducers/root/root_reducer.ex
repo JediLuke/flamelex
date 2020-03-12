@@ -7,6 +7,28 @@ defmodule GUI.RootReducer do
 
   use GUI.Reducer.ControlMode
 
+  def initialize(%{buffers: [%{id: :command_buffer}, %{id: {:text_editor, 1, :untitled}, active: true}]} = state) do
+    %{viewport: %{width: w, height: h}} = state
+    command_buffer = state.buffers |> hd()
+
+    graph =
+      Scenic.Graph.build(font: @ibm_plex_mono, font_size: @text_size)
+      # |> GUI.Component.TextEditor.add_to_graph(%{
+      #     id: {:text_editor, 1, :untitled},
+      #     top_left_corner: {0, 0},
+      #     dimensions: {w, h - command_buffer.data.height},
+      #     contents: "This is an editor buffer.\n\nYou are using Franklin."
+      #   })
+      |> GUI.Components.CommandBuffer.add_to_graph(%{
+          id: :command_buffer,
+          top_left_corner: {0, h - command_buffer.data.height},
+          dimensions: {w, command_buffer.data.height},
+          state: %{text: "Welcome to Franklin. Press <f1> for help."}
+        })
+
+    {state, graph}
+  end
+
   def process({%{viewport: %{width: w}} = state, graph}, {'NEW_NOTE_COMMAND', contents, buffer_pid: buf_pid}) do
     width  = w / 3
     height = width

@@ -2,17 +2,14 @@ defmodule GUI.Scene.Root do
   use Scenic.Scene
   require Logger
   alias GUI.Input.EventHandler
-  alias GUI.Components.CommandBuffer
+  # alias GUI.Components.CommandBuffer
 
-  @text_size 24
-  @default_command_buffer_height 72
-  @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash
+  # @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash
 
-  @valid_modes [
-    :control,     # command mode
-    :insert,      # insert mode
-    :reader
-  ]
+
+  ## public API
+  ## -------------------------------------------------------------------
+
 
   def init(nil = _init_params, opts) do
     Logger.info "Initializing #{__MODULE__}..."
@@ -20,30 +17,7 @@ defmodule GUI.Scene.Root do
 
     GUI.Initialize.load_custom_fonts_into_global_cache
 
-    {:ok, %Scenic.ViewPort.Status{size: {viewport_width, viewport_height}}} =
-      opts[:viewport] |> Scenic.ViewPort.info()
-
-    state = %{
-      viewport: %{
-        width: viewport_width,
-        height: viewport_height,
-      },
-      component_ref: [], # contains pids of components, which call back & register themselves
-      input_history: [], # holds all the input we've entered
-      command_buffer: %{
-        visible?: false
-      },
-      mode: :control,    #TODO start in reader mode with a welcome screen
-      active_buffer: nil
-    }
-
-    graph =
-      Scenic.Graph.build(font: @ibm_plex_mono, font_size: @text_size)
-      |> CommandBuffer.add_to_graph(%{
-           id: :command_buffer,
-           top_left_corner: {0, viewport_height - @default_command_buffer_height},
-           dimensions: {viewport_width, @default_command_buffer_height}
-         })
+    {state, graph} = initial_state(opts) |> GUI.RootReducer.initialize()
 
     {:ok, {state, graph}, push: graph}
   end
@@ -76,19 +50,11 @@ defmodule GUI.Scene.Root do
     {:reply, :ok, {new_state, graph}}
   end
 
-  def handle_cast({:redraw, new_graph}, {state, _graph}) do
-    {:noreply, {state, new_graph}, push: new_graph}
-  end
+  # def handle_cast({:redraw, new_graph}, {state, _graph}) do
+  #   {:noreply, {state, new_graph}, push: new_graph}
+  # end
 
   def handle_cast({:action, action}, {state, graph}) do
-    # try do
-    #   new_state = state |> Reducer.apply_action(a)
-    #   {:noreply, new_state, push: new_state.graph}
-    # rescue
-    #   FunctionClauseError -> #TODO need to be able to pattern match exclusively on Redux not found here
-    #     Logger.error "Scene received an action `#{inspect a}` that has not been defined in Redux."
-    #     {:noreply, state}
-    # end
     case GUI.RootReducer.process({state, graph}, action) do
       {new_state, %Scenic.Graph{} = new_graph} when is_map(new_state) ->
           {:noreply, {new_state, new_graph}, push: new_graph}
@@ -106,7 +72,59 @@ defmodule GUI.Scene.Root do
 
   def handle_info({:DOWN, ref, :process, object, reason}, _state) do
     context = %{ref: ref, object: object, reason: reason}
-    #TODO remove from component list
+    #TODO handle failures
     raise "Monitored process died. #{inspect context}"
+  end
+
+
+  ## private functions
+  ## -------------------------------------------------------------------
+
+
+  defp initial_state(opts) do
+    %{
+      viewport: fetch_viewport_info(opts),
+
+      # buffers - all the current buffers. Note that buffers will call back with their pids once the components are initialized
+      buffers: [
+        %{
+          id: :command_buffer,
+          pid: nil,
+          data: %{
+            height: 28
+          },
+          state: %{
+            text: "Welcome to Franklin. Press <f1> for help."
+          }
+        },
+        %{
+          id: {:text_editor, 1, :untitled},
+          pid: nil,
+          data: %{
+            text_size: 24
+          },
+          active: :true
+        }
+      ],
+
+      # the input mode for Franklin
+      input_mode: :control,
+
+      # input history keeps track of inputs that have been entered by the user
+      input_history: []
+    }
+  end
+
+  defp fetch_viewport_info(opts) do
+    {:ok, %Scenic.ViewPort.Status{size: {
+      viewport_width,
+      viewport_height
+    }}} =
+      opts[:viewport] |> Scenic.ViewPort.info()
+
+    %{
+      width: viewport_width,
+      height: viewport_height,
+    }
   end
 end

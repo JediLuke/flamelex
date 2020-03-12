@@ -10,14 +10,27 @@ defmodule GUI.Components.CommandBuffer.Reducer do
 
   @empty_command_buffer_text_prompt "Enter a command..."
 
-  def process({state, graph}, 'SHOW_COMMAND_BUFFER') do
-    new_graph =
-      graph |> Graph.modify(:command_buffer, fn primitive ->
-        primitive |> put_style(:hidden, false)
-      end)
+  # def process({state, graph}, 'SHOW_COMMAND_BUFFER') do
+  #   IO.puts "HEREHER"
+  #   new_graph =
+  #     Scenic.Graph.build()
+  #       |> group(fn graph ->
+  #         graph
+  #         |> draw_background(data)
+  #         |> draw_command_prompt(data)
+  #         |> add_blinking_box_cursor(data)
+  #         |> draw_command_prompt_text(state, data)
+  #       end, [
+  #         id: :command_buffer,
+  #       #  hidden: true
+  #       ])
 
-    {state, new_graph}
-  end
+  #     # graph |> Graph.modify(:command_buffer, fn primitive ->
+  #     #   primitive |> put_style(:hidden, false)
+  #     # end)
+
+  #   {state, new_graph}
+  # end
 
   def process({state, graph}, 'HIDE_COMMAND_BUFFER') do
     new_graph =
