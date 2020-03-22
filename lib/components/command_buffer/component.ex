@@ -20,11 +20,12 @@ defmodule GUI.Components.CommandBuffer do
 
     state =
       data |> Map.merge(%{
-        component_ref: []
+        component_ref: [],
+        opts: opts
       })
 
     graph =
-      Reducer.initialize(state, opts)
+      Reducer.initialize(state)
 
     {:ok, {state, graph}, push: graph}
   end

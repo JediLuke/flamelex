@@ -6,7 +6,7 @@ defmodule Franklin.Actions.CommandBuffer do
   alias GUI.Components.CommandBuffer, as: Component
 
   def activate do
-    Component.action('SHOW_EXECUTE_COMMAND_PROMPT')
+    Component.action('ACTIVATE_COMMAND_BUFFER_PROMPT')
   end
 
   def deactivate do

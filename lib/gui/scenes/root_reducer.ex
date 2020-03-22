@@ -6,6 +6,8 @@ defmodule GUI.RootReducer do
   import Utilities.ComponentUtils
 
   use GUI.Reducer.ControlMode
+  @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash
+  @text_size 24
 
   def initialize(%{buffers: [%{id: :command_buffer}, %{id: {:text_editor, 1, :untitled}, active: true}]} = state) do
     %{viewport: %{width: w, height: h}} = state

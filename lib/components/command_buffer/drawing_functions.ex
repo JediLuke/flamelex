@@ -3,41 +3,66 @@ defmodule GUI.Components.CommandBuffer.DrawingFunctions do
   alias Scenic.Graph
 
 
-  @text_size 24 #32 px
-  @text_size_px 32
+  @margin 8               # left-hand side margin
 
   @prompt_margin 12
   @prompt_size 18
   @prompt_to_blinker_distance 22
 
-  @empty_command_buffer_text_prompt "Enter a command..."
+  @empty_command_buffer_text_prompt "Enter a command..." #TODO move to a config file
 
-  def blank_graph(opts) do
-    Graph.build(font_size: @text_size, font: opts[:styles][:font])
-  end
-
-  def echo_buffer(graph, state) do
-    graph
+  def echo_buffer(state) do
+    state
+    |> blank_graph()
     |> background(state)
-    |> buffer_text(state)
+    |> echo_text(state)
   end
 
-  def background(graph, %{top_left_corner: {x, y}, dimensions: {w, h}}, color) when is_atom(color) do
+  def empty_command_buffer(state) do
+    state
+    |> blank_graph()
+    |> group(fn graph ->
+         graph
+         |> background(state, :purple)
+        #  |> draw_command_prompt(state)
+        #  |> add_blinking_box_cursor(state)
+        #  |> draw_command_prompt_text(state)
+      #  end, [
+      #    id: :command_buffer,
+      #   #  hidden: true
+      #  ])
+    end)
+  end
+
+
+  ## private functions
+  ## -------------------------------------------------------------------
+
+
+  defp blank_graph(%{opts: opts}) do
+    #TODO add a check for styles
+    Graph.build(
+      font: opts[:styles][:font],
+      font_size: opts[:styles][:font_size]
+    )
+  end
+
+  defp background(graph, %{top_left_corner: {x, y}, dimensions: {w, h}}, color) when is_atom(color) do
     #TODO need width +1 here for some quirky reason of Scenic library
     graph
     |> rect({w + 1, h}, [fill: color, translate: {x, y}])
   end
-  def background(graph, %{top_left_corner: {x, y}, dimensions: {w, h}}) do
+  defp background(graph, %{top_left_corner: {x, y}, dimensions: {w, h}}) do
     #TODO need width +1 here for some quirky reason of Scenic library
     graph
     |> rect({w + 1, h}, [translate: {x, y}, fill: :green]) #TODO only green for dev
   end
 
-  def buffer_text(graph, %{mode: :echo, text: t, top_left_corner: {x, y}}) do
+  defp echo_text(graph, %{mode: :echo, text: t, top_left_corner: {x, y}}) do
     # text draws from bottom-left corner?? :(
     graph
     |> text(t,
-         translate: {x+5, y+21}, #TODO
+         translate: {x + @margin, y + 21}, #TODO
          fill: :dark_grey
        )
   end

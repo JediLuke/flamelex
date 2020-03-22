@@ -11,33 +11,16 @@ defmodule GUI.Components.CommandBuffer.Reducer do
   # alias Scenic.Graph
   # require Logger
 
-  def initialize(state, opts) do
-    Draw.blank_graph(opts)
-    |> Draw.echo_buffer(state)
+  def initialize(state) do
+    Draw.echo_buffer(state)
   end
 
-  # @empty_command_buffer_text_prompt "Enter a command..."
+  def process({%{mode: :echo} = state, _graph}, 'ACTIVATE_COMMAND_BUFFER_PROMPT') do
+    new_graph = Draw.empty_command_buffer(state)
+    new_state = state |> Map.replace!(:mode, :command)
 
-  # def process({%{mode: :echo} = state, _graph}, 'ACTIVATE_COMMAND_BUFFER_PROMPT') do
-  #   new_graph =
-  #     Scenic.Graph.build()
-  #       |> group(fn graph ->
-  #         graph
-  #         |> draw_background(state)
-  #         |> draw_command_prompt(state)
-  #         |> add_blinking_box_cursor(state)
-  #         |> draw_command_prompt_text(state)
-  #       end, [
-  #         id: :command_buffer,
-  #       #  hidden: true
-  #       ])
-
-  #   new_state =
-  #     state
-  #     |> Map.replace!(:mode, :command)
-
-  #   {new_state, new_graph}
-  # end
+    {new_state, new_graph}
+  end
 
   # def process({state, graph}, 'DEACTIVATE_COMMAND_BUFFER') do
   #   #TODO remove all text from the string etc.
