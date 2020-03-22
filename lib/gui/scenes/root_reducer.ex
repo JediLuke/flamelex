@@ -23,7 +23,8 @@ defmodule GUI.RootReducer do
           id: :command_buffer,
           top_left_corner: {0, h - command_buffer.data.height},
           dimensions: {w, command_buffer.data.height},
-          state: %{text: "Welcome to Franklin. Press <f1> for help."}
+          mode: :echo,
+          text: "Welcome to Franklin. Press <f1> for help."
         })
 
     {state, graph}
