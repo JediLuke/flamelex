@@ -22,15 +22,17 @@ defmodule GUI.Components.CommandBuffer.Reducer do
     {new_state, new_graph}
   end
 
-  # def process({state, graph}, 'DEACTIVATE_COMMAND_BUFFER') do
-  #   #TODO remove all text from the string etc.
-  #   new_graph =
-  #     graph |> Scenic.Graph.modify(:command_buffer, fn primitive ->
-  #       primitive |> Scenic.Primitive.put_style(:hidden, true)
-  #     end)
+  def process({%{mode: :command} = state, _graph}, 'DEACTIVATE_COMMAND_BUFFER') do
+    new_state =
+      state
+      |> Map.replace!(:mode, :echo)
+      |> Map.replace!(:text, "Left `command` mode.")
 
-  #   {:noreply, {state, new_graph}, push: new_graph}
-  # end
+    new_graph =
+      Draw.echo_buffer(new_state)
+
+    {new_state, new_graph}
+  end
 
   # def process({state, graph}, {'COMMAND_BUFFER_INPUT', {:codepoint, {letter, x}}}) when x in [0, 1] do # need the check on x because lower and uppercase letters have a different number here for some reason
   #   updated_buffer_text = state.text <> letter
