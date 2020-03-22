@@ -15,24 +15,89 @@ defmodule GUI.Components.CommandBuffer do
 
   @impl Scenic.Component
   def verify(%{
-    id: _id,
-    top_left_corner: {_x, _y},
-    dimensions: {_w, _h},
-    state: %{text: _t}} = data) do
+      id: _id,
+      top_left_corner: {_x, _y},
+      dimensions: {_w, _h},
+      state: %{text: _t}} = data)
+    do
       {:ok, data}
-    end
+  end
   def verify(_else), do: :invalid_data
 
   @impl Scenic.Component
   def info(_data), do: ~s(Invalid data)
 
-  @impl Scenic.Component
+  @impl Scenic.Scene
   def init(%{state: %{text: _t}} = data, opts), do: init_logic(data, opts)
 
-  # def show, do: show_command_buffer()
+  def action(a), do: GenServer.cast(__MODULE__, {:action, a})
 
 
-  ## Private functions
+  ## GenServer callbacks
+  ## -------------------------------------------------------------------
+
+
+  @impl Scenic.Scene
+  def handle_cast({:action, 'SHOW_EXECUTE_COMMAND_PROMPT'}, {state, _graph}) do
+    new_graph =
+      Scenic.Graph.build()
+        |> group(fn graph ->
+          graph
+          |> draw_background(state.data)
+          |> draw_command_prompt(state.data)
+          |> add_blinking_box_cursor(state.data)
+          |> draw_command_prompt_text(state, state.data)
+        end, [
+          id: :command_buffer,
+        #  hidden: true
+        ])
+
+    {:noreply, {state, new_graph}, push: new_graph}
+  end
+
+  def handle_cast({:action, 'DEACTIVATE_COMMAND_BUFFER'}, {state, graph}) do
+    #TODO remove all text from the string etc.
+    new_graph =
+      graph |> Scenic.Graph.modify(:command_buffer, fn primitive ->
+        primitive |> Scenic.Primitive.put_style(:hidden, true)
+      end)
+
+    {:noreply, {state, new_graph}, push: new_graph}
+  end
+
+  def handle_cast({:action, unknown_action}, {state, graph}) do
+    Logger.error "#{__MODULE__} received unknown action: #{inspect unknown_action}"
+    {:noreply, {state, graph}}
+  end
+
+  # def handle_cast({:action, action}, {state, graph}) do
+  #   case GUI.Components.CommandBuffer.Reducer.process({state, graph}, action) do
+  #     {new_state, %Scenic.Graph{} = new_graph} when is_map(new_state)
+  #       -> {:noreply, {new_state, new_graph}, push: new_graph}
+  #     new_state when is_map(new_state)
+  #       -> {:noreply, {new_state, graph}}
+  #   end
+  # end
+
+  @impl Scenic.Scene
+  def handle_call({:register, identifier}, {pid, _ref}, {%{component_ref: ref_list} = state, graph}) do
+    Process.monitor(pid)
+
+    new_component = {identifier, pid}
+    new_ref_list = ref_list ++ [new_component]
+    new_state = state |> Map.replace!(:component_ref, new_ref_list)
+
+    {:reply, :ok, {new_state, graph}}
+  end
+
+  @impl Scenic.Scene
+  def handle_info({:DOWN, ref, :process, object, reason}, _state) do
+    context = %{ref: ref, object: object, reason: reason}
+    raise "Monitored process died. #{inspect context}"
+  end
+
+
+  ## private functions
   ## -------------------------------------------------------------------
 
 
@@ -88,69 +153,17 @@ defmodule GUI.Components.CommandBuffer do
        ])
   end
 
-  def action(a), do: GenServer.cast(__MODULE__, {:action, a})
-
-  def handle_cast({:action, 'SHOW_EXECUTE_COMMAND_PROMPT'}, {state, _graph}) do
-    new_graph =
-      Scenic.Graph.build()
-        |> group(fn graph ->
-          graph
-          |> draw_background(state.data)
-          |> draw_command_prompt(state.data)
-          |> add_blinking_box_cursor(state.data)
-          |> draw_command_prompt_text(state, state.data)
-        end, [
-          id: :command_buffer,
-        #  hidden: true
-        ])
-
-    {:noreply, {state, new_graph}, push: new_graph}
+  defp draw_background(graph, data = %{top_left_corner: {_top_left_x, _top_left_y}, dimensions: {_width, _height}}) do
+    draw_background(graph, data, :purple)
   end
-
-  def handle_cast({:action, action}, {state, graph}) do
-    case GUI.Components.CommandBuffer.Reducer.process({state, graph}, action) do
-      {new_state, %Scenic.Graph{} = new_graph} when is_map(new_state)
-        -> {:noreply, {new_state, new_graph}, push: new_graph}
-      new_state when is_map(new_state)
-        -> {:noreply, {new_state, graph}}
-    end
-  end
-
-  def handle_call({:register, identifier}, {pid, _ref}, {%{component_ref: ref_list} = state, graph}) do
-    Process.monitor(pid)
-
-    new_component = {identifier, pid}
-    new_ref_list = ref_list ++ [new_component]
-    new_state = state |> Map.replace!(:component_ref, new_ref_list)
-
-    {:reply, :ok, {new_state, graph}}
-  end
-
-  def handle_info({:DOWN, ref, :process, object, reason}, _state) do
-    context = %{ref: ref, object: object, reason: reason}
-    raise "Monitored process died. #{inspect context}"
-  end
-
-
-  ## Private functions
-  ## -------------------------------------------------------------------
-
-
-  defp draw_background(graph, d = %{top_left_corner: {top_left_x, top_left_y}, dimensions: {width, height}}, color) when is_atom(color) do
-    IO.inspect d
+  defp draw_background(graph, %{top_left_corner: {top_left_x, top_left_y}, dimensions: {width, height}}, color) when is_atom(color) do
     graph
     |> rect({width + 1, height}, [ #TODO need +1 here for some reason
          fill: color,
          translate: {top_left_x, top_left_y}
        ])
   end
-  defp draw_background(graph, %{top_left_corner: {top_left_x, top_left_y}, dimensions: {width, height}}) do
-    graph
-    |> rect({width, height}, [
-         fill: :purple,
-         translate: {top_left_x, top_left_y}
-       ])
-  end
+
 
   defp print_mode(graph, %{top_left_corner: {_x, top_left_y}, dimensions: {_w, height}}) do
     # text size != text size in pixels. We get the difference between these 2, in pixels, and halve it, to get an offset we can use to center this text inside the command buffer

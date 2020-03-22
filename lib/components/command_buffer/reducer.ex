@@ -32,13 +32,13 @@ defmodule GUI.Components.CommandBuffer.Reducer do
   #   {state, new_graph}
   # end
 
-  def process({state, graph}, 'HIDE_COMMAND_BUFFER') do
-    new_graph =
-      graph |> Graph.modify(:command_buffer, fn primitive ->
-        primitive |> put_style(:hidden, true)
-      end)
-    {state, new_graph}
-  end
+  # def process({state, graph}, 'HIDE_COMMAND_BUFFER') do
+  #   new_graph =
+  #     graph |> Graph.modify(:command_buffer, fn primitive ->
+  #       primitive |> put_style(:hidden, true)
+  #     end)
+  #   {state, new_graph}
+  # end
 
   def process({state, graph}, {'COMMAND_BUFFER_INPUT', {:codepoint, {letter, x}}}) when x in [0, 1] do # need the check on x because lower and uppercase letters have a different number here for some reason
     updated_buffer_text = state.text <> letter

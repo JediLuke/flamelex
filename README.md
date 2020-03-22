@@ -25,3 +25,12 @@ With some notable features:
 * Ability to read documents & maintain my own notes on such documents
 * Ability to do source-control inside the editor
 * Integrated with Elixir compiler
+
+## How to use Franklin
+
+Franklin is CLI driven.
+
+```
+use Actions
+cmd
+```

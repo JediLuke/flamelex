@@ -6,6 +6,7 @@ defmodule Actions do
     end
   end
 
+  @doc "This function is just a shorthand function for use during Dev."
   def cmd do
     Franklin.Actions.CommandBuffer.activate
   end
