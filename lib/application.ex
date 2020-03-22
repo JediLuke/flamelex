@@ -5,9 +5,9 @@ defmodule Franklin.Application do
 
   def start(_type, _args) do
     children = [
-      Franklin.Commander,
-      Franklin.PubSub,
-      Franklin.Buffer.TopLevelSupervisor,
+      # Franklin.Commander,
+      # Franklin.PubSub,
+      # Franklin.Buffer.TopLevelSupervisor,
       {Scenic, viewports: [GUI.Initialize.viewport_config()]}
     ]
 

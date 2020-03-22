@@ -2,6 +2,7 @@ defmodule DevTools do
   defmacro __using__(_) do
     quote do
       import DevTools
+      use Actions
     end
   end
 
