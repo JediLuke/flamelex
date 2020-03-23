@@ -1,4 +1,4 @@
-defmodule GUI.Component.Cursor do
+defmodule GUI.Component.Cursor2 do
   @moduledoc """
   Add a blinking text-input caret to a graph.
 
@@ -33,9 +33,9 @@ defmodule GUI.Component.Cursor do
     id: _id,
     top_left_corner: {_x, _y},
     dimensions: {_width, _height},
-    parent: %{
-      pid: _parent_pid
-    }
+    # parent: %{
+    #   pid: _parent_pid
+    # }
   } = data), do: {:ok, data}
   def verify(_), do: :invalid_data
 
@@ -54,14 +54,14 @@ defmodule GUI.Component.Cursor do
     dimensions: {_width, _height},
     color: _color,
     hidden?: _hidden?,
-    id: id,
-    parent: %{
-      pid: _parent_pid
-    }
+    # id: id,
+    # parent: %{
+    #   pid: _parent_pid
+    # }
   } = data, _opts) do
     Logger.info "#{__MODULE__} initializing...#{inspect data}"
 
-    GenServer.call(data.parent.pid, {:register, id})
+    # GenServer.call(data.parent.pid, {:register, id})
 
     state = data |> Map.merge(%{timer: nil, original_position: {x, y}}) # holds an erlang :timer for the blink
     graph = generate_graph(state)

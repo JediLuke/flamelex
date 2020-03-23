@@ -1,12 +1,13 @@
 defmodule GUI.Components.CommandBuffer.DrawingFunctions do
   import Scenic.Primitives
   alias Scenic.Graph
+  alias Components.TextBox
 
 
   @margin 8               # left-hand side margin
 
   @prompt_margin 12
-  @prompt_size 18
+
   @prompt_to_blinker_distance 22
 
   @empty_command_buffer_text_prompt "Enter a command..." #TODO move to a config file
@@ -18,13 +19,16 @@ defmodule GUI.Components.CommandBuffer.DrawingFunctions do
     |> echo_text(state)
   end
 
-  def empty_command_buffer(state) do
+  def empty_command_buffer(%{top_left_corner: {x, y}, dimensions: {w, h}} = state) do
+    IO.inspect state
+
     state
     |> blank_graph()
     |> group(fn graph ->
          graph
          |> background(state, :purple)
-        #  |> draw_command_prompt(state)
+         |> command_prompt(state)
+         |> TextBox.add_to_graph(state |> text_box_initialization_data())
         #  |> add_blinking_box_cursor(state)
         #  |> draw_command_prompt_text(state)
       #  end, [
@@ -67,8 +71,39 @@ defmodule GUI.Components.CommandBuffer.DrawingFunctions do
        )
   end
 
+  defp command_prompt(graph, %{top_left_corner: {_x, top_left_y}, dimensions: {_w, height}}) do
+    prompt_size = 18
+    y_offset    = top_left_y + (height - prompt_size)/2 # from the top-left position of the box, the command prompt y-offset. (height - prompt_size) is how much bigger the buffer is than the command prompt, so it gives us the extra space - we divide this by 2 to get how much extra space we need to add, to the reference y coordinate, to center the command prompt inside the buffer
 
+    # cmd_prompt_coordinates =
+    #   x - point 1
+    #   |\
+    #   | \ x - point 2 (apex of triangle)
+    #   | /
+    #   |/
+    #   x - point
 
+    cmd_prompt_coordinates =
+      {{@margin, y_offset}, # point 1
+          {@margin+prompt_width(prompt_size), y_offset+prompt_size/2}, # point 2
+      {@margin, y_offset + prompt_size}} # point 3
+
+    graph
+    |> triangle(cmd_prompt_coordinates, fill: :ghost_white)
+  end
+
+  defp prompt_width(prompt_size) do
+    prompt_size * 0.67
+  end
+
+  defp text_box_initialization_data(%{dimensions: {buffer_width, buffer_height}, top_left_corner: {buffer_top_left_corner, buffer_top_right_corner}}) do
+    #TODO make prompt_size a global or a state value or whatever
+    %{
+      id: :text_box,
+      dimensions: {buffer_width - @margin, buffer_height - 10},
+      top_left_corner: {buffer_top_left_corner + @margin + prompt_width(18) + @margin, buffer_top_right_corner + 5}
+    }
+  end
 
       # # text size != text size in pixels. We get the difference between these 2, in pixels, and halve it, to get an offset we can use to center this text inside the command buffer
       # # y_offset = top_left_y + (height - @prompt_size)/2 # y is the reference coord, the offset from the top of the screen, where the command buffer gets drawn. (height - prompt_size) is how much bigger the buffer is than the command prompt, so it gives us the extra space - we divide this by 2 to get how much extra space we need to add, to the reference y coordinate, to center the command prompt inside the buffer
@@ -110,28 +145,7 @@ defmodule GUI.Components.CommandBuffer.DrawingFunctions do
   #       fill: :midnight_blue)
   # end
 
-  # defp draw_command_prompt(graph, %{top_left_corner: {_x, top_left_y}, dimensions: {_w, height}}) do
-  #   x_margin = @prompt_margin
-  #   y_offset = top_left_y + (height - @prompt_size)/2 # from the top-left position of the box, the command prompt y-offset. (height - prompt_size) is how much bigger the buffer is than the command prompt, so it gives us the extra space - we divide this by 2 to get how much extra space we need to add, to the reference y coordinate, to center the command prompt inside the buffer
 
-  #   # cmd_prompt_coordinates =
-  #   #   x - point 1
-  #   #   |\
-  #   #   | \ x - point 2 (apex of triangle)
-  #   #   | /
-  #   #   |/
-  #   #   x - point
-
-  #   cmd_prompt_coordinates =
-  #     {{x_margin, y_offset}, # point 1
-
-  #           {x_margin+@prompt_size*0.67, y_offset+@prompt_size/2}, # point 2
-
-  #     {x_margin, y_offset + @prompt_size}} # point 3
-
-  #   graph
-  #   |> triangle(cmd_prompt_coordinates, fill: :ghost_white)
-  # end
 
   # defp add_blinking_box_cursor(graph, %{top_left_corner: {_x, top_left_y}, dimensions: {_w, height}}) do
 

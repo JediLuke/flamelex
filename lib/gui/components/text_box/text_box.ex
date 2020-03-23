@@ -1,18 +1,16 @@
-defmodule GUI.Component.TextEditor do
+defmodule Components.TextBox do
   @moduledoc false
   use Scenic.Component
-  alias Scenic.Graph
-  import Scenic.Primitives
   require Logger
-  import Utilities.ComponentUtils
+  import Components.Utilities.CommonDrawingFunctions
+  alias GUI.Component.Cursor
 
-  @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash
+  #TODO have horizontal scrolling if we go over the line
 
   def verify(%{
     id: _id,
     top_left_corner: {_x, _y},
-    dimensions: {_w, _h},
-    contents: _contents
+    dimensions: {_w, _h}
   } = data), do: {:ok, data}
   def verify(_), do: :invalid_data
 
@@ -24,28 +22,24 @@ defmodule GUI.Component.TextEditor do
   # end
 
   @doc false
-  def init(%{
-    id: id,
-    top_left_corner: {_x, _y},
-    dimensions: {w, h},
-    contents: contents
-  } = data, _opts) do
+  def init(%{id: _id, top_left_corner: {_x, _y}, dimensions: {w, h}} = data, _opts) do
     Logger.info "#{__MODULE__} initializing...#{inspect data}"
 
-    state = %{
-      text: contents
-    }
+    # GenServer.call(GUI.Scene.Root, {:register, id})
+    state =
+      data
 
     graph =
       Scenic.Graph.build()
-      |> GUI.Component.BufferFrame.add_buffer_frame({w, h}, :control)
-      |> text(state.text,
-           translate: {18, 18},
-           fill: :white)
+      |> background(state, :red)
+      |> GUI.Component.Cursor2.add_to_graph(data |> cursor_params())
 
-    GenServer.call(GUI.Scene.Root, {:register, id})
+
+    IO.puts "HIHIHIHI"
     {:ok, {state, graph}, push: graph}
   end
+  # def init(%{id: id, top_left_corner: {_x, _y}, dimensions: {w, h}} = data, _opts) do
+  # end
 
   # defp add_notes(graph, contents) do
   #   {graph, _offset_count} =
@@ -66,4 +60,17 @@ defmodule GUI.Component.TextEditor do
 
   #   graph
   # end
+
+  defp cursor_params(%{
+    dimensions: {_width, height},
+    id: :text_box,
+    top_left_corner: {x, y}
+  }) do
+    cursor_width = GUI.FontHelpers.monospace_font_width(:ibm_plex, 24) #TODO get this properly
+    %{
+      id: :cursor,
+      top_left_corner: {x, y},
+      dimensions: {cursor_width, height}
+    }
+  end
 end
