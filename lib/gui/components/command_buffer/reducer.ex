@@ -7,17 +7,17 @@ defmodule GUI.Components.CommandBuffer.Reducer do
   alias GUI.Components.CommandBuffer.DrawingFunctions, as: Draw
   require Logger
 
-  # import Scenic.{Primitive, Primitives}
-  # alias Scenic.Graph
-  # require Logger
-
   def initialize(state) do
     Draw.echo_buffer(state)
   end
 
-  def process({%{mode: :echo} = state, _graph}, 'ACTIVATE_COMMAND_BUFFER_PROMPT') do
-    new_graph = Draw.empty_command_buffer(state)
-    new_state = state |> Map.replace!(:mode, :command)
+  def process({%{mode: :echo, text: ""} = state, _graph}, 'ACTIVATE_COMMAND_BUFFER_PROMPT') do
+    new_graph =
+      Draw.empty_command_buffer(state)
+      #TODO show a command prompt text which dissapears when we enter something
+
+    new_state =
+      state |> Map.replace!(:mode, :command)
 
     {new_state, new_graph}
   end
@@ -34,19 +34,25 @@ defmodule GUI.Components.CommandBuffer.Reducer do
     {new_state, new_graph}
   end
 
-  # def process({state, graph}, {'COMMAND_BUFFER_INPUT', {:codepoint, {letter, x}}}) when x in [0, 1] do # need the check on x because lower and uppercase letters have a different number here for some reason
-  #   updated_buffer_text = state.text <> letter
-  #   new_state = state |> Map.replace!(:text, updated_buffer_text)
+  # def process({state, graph}, {'ENTER_CHARACTER', {:codepoint, {letter, x}}}) when x in [0, 1] do # need the check on x because lower and uppercase letters have a different number here for some reason
+  def process({%{mode: :command} = state, graph}, {'ENTER_CHARACTER', char}) when is_binary(char) do
+    updated_buffer_text =
+      state.text <> char
 
-  #   {:cursor, pid} = state.component_ref |> hd #TODO, eventually we'll have more componenst
-  #   GenServer.cast(pid, {:action, 'MOVE_RIGHT_ONE_COLUMN'})
+    new_state =
+      state |> Map.replace!(:text, updated_buffer_text)
 
-  #   new_graph =
-  #     graph
-  #     |> Graph.modify(:buffer_text, &text(&1, updated_buffer_text, fill: :ghost_white))
+    #TODO move the cursor
+    # {:cursor, pid} = state.component_ref |> hd #TODO, eventually we'll have more componenst
+    # GenServer.cast(pid, {:action, 'MOVE_RIGHT_ONE_COLUMN'})
 
-  #   {new_state, new_graph}
-  # end
+    # $TODO update text box - requres sending msg to text_buffer
+    # new_graph =
+    #   graph
+    #   |> Graph.modify(:buffer_text, &text(&1, updated_buffer_text, fill: :blue))
+
+    new_state
+  end
 
 
   # def process({%{text: ""} = state, _graph}, 'COMMAND_BUFFER_BACKSPACE') do

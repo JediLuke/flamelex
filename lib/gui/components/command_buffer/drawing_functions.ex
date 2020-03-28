@@ -13,17 +13,13 @@ defmodule GUI.Components.CommandBuffer.DrawingFunctions do
   @empty_command_buffer_text_prompt "Enter a command..." #TODO move to a config file
 
   def echo_buffer(state) do
-    state
-    |> blank_graph()
+    blank_graph(state)
     |> background(state)
     |> echo_text(state)
   end
 
   def empty_command_buffer(%{top_left_corner: {x, y}, dimensions: {w, h}} = state) do
-    IO.inspect state
-
-    state
-    |> blank_graph()
+    blank_graph(state)
     |> group(fn graph ->
          graph
          |> background(state, :purple)
@@ -59,15 +55,19 @@ defmodule GUI.Components.CommandBuffer.DrawingFunctions do
   defp background(graph, %{top_left_corner: {x, y}, dimensions: {w, h}}) do
     #TODO need width +1 here for some quirky reason of Scenic library
     graph
-    |> rect({w + 1, h}, [translate: {x, y}, fill: :green]) #TODO only green for dev
+    |> rect({w + 1, h}, [translate: {x, y}])
+  end
+  defp background(graph, _else) do
+    graph
   end
 
   defp echo_text(graph, %{mode: :echo, text: t, top_left_corner: {x, y}}) do
+    IO.puts "ECHOING TEXT"
     # text draws from bottom-left corner?? :(
     graph
     |> text(t,
          translate: {x + @margin, y + 21}, #TODO
-         fill: :dark_grey
+         fill: :green
        )
   end
 

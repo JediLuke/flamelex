@@ -59,16 +59,21 @@ defmodule GUI.RootReducer do
     {new_state, new_graph}
   end
 
-  def process({%{viewport: %{width: w, height: h}} = state, graph}, {'NEW_LIST_NOTES_BUFFER', notes, buffer_pid: buf_pid}) do
-    id = {:list, :notes, buf_pid}
+  def process({%{viewport: %{width: w, height: h}} = state, graph}, {'NEW_LIST_BUFFER', data}) do
+
+    # state = DataFile.read()
+    command_buffer = state.buffers |> hd()
+    # id = {:list, :notes, buf_pid}
+    id = {:list, :notes}
 
     new_graph =
       graph
       |> GUI.Component.List.add_to_graph(%{
           id: id,
           top_left_corner: {0, 0},
-          dimensions: {w, h},
-          contents: notes
+          # dimensions: {w, h - command_buffer.data.height - 1}, #TODO this does put 1 pixel between the two, do we want that??
+          dimensions: {w, h - command_buffer.data.height},
+          contents: data
         }, id: id)
 
     new_state =

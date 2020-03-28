@@ -21,7 +21,8 @@ defmodule GUI.Components.CommandBuffer do
     state =
       data |> Map.merge(%{
         component_ref: [],
-        opts: opts
+        opts: opts,
+        text: "" #TODO show some prompt text when the echo buffer gets initialized
       })
 
     graph =

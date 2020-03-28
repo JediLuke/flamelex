@@ -3,7 +3,6 @@ defmodule Components.TextBox do
   use Scenic.Component
   require Logger
   import Components.Utilities.CommonDrawingFunctions
-  alias GUI.Component.Cursor
 
   #TODO have horizontal scrolling if we go over the line
 

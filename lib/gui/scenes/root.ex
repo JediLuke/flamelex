@@ -91,7 +91,8 @@ defmodule GUI.Scene.Root do
           id: :command_buffer,
           pid: nil,
           data: %{
-            height: 28
+            # height: 28
+            height: Application.fetch_env!(:franklin, :bar_height)
           },
           state: %{
             text: "Welcome to Franklin. Press <f1> for help."
@@ -111,7 +112,10 @@ defmodule GUI.Scene.Root do
       input_mode: :control,
 
       # input history keeps track of inputs that have been entered by the user
-      input_history: []
+      input_history: [],
+
+      # holds the ID of the active buffer
+      active_buffer: nil
     }
   end
 
