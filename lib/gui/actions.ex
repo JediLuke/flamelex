@@ -6,6 +6,7 @@ defmodule Actions do
   end
 
   alias GUI.Scene.Root, as: Franklin
+  alias Structs.TidBit
 
   def new_buffer(:test) do
     new_buffer(%{
@@ -22,7 +23,12 @@ defmodule Actions do
       ]
     })
   end
+
   def new_buffer(%{type: :list, data: data}) do
     Franklin.action({'NEW_LIST_BUFFER', data})
+  end
+
+  def save_new_tidbit(%TidBit{} = t) do
+    Utilities.Data.append(t)
   end
 end

@@ -12,9 +12,9 @@ defmodule DevTools do
     Application.start(:franklin)
   end
 
-  def new_note do
-    Franklin.Commander.new_note()
-  end
+  # def new_note do
+  #   Franklin.Commander.new_note()
+  # end
 
   def root_state do
     :sys.get_state(GUI.Scene.Root)
@@ -47,5 +47,10 @@ defmodule DevTools do
     @priv_dir |> Path.join("/static/fonts/IBM-Plex-Mono/IBMPlexMono-Regular.ttf.metrics")
     |> File.read!
     |> FontMetrics.from_binary!
+  end
+
+  def tidbit_save do
+    Structs.TidBit.initialize(%{title: "A dev TidBit"})
+    |> Actions.save_new_tidbit()
   end
 end

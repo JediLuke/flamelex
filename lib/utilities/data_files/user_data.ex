@@ -15,6 +15,12 @@ defmodule Utilities.Data do
     |> write_binary(filepath)
   end
 
+  def append(data) do
+    read()
+    |> Map.merge(data)
+    |> write()
+  end
+
   def read do
     read(user_data_file_path())
   end
