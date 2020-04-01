@@ -6,21 +6,6 @@ defmodule Utilities.Data do
     File.cwd! <> "/data/user.data"
   end
 
-  def write(map) when is_map(map) do
-    write(map, user_data_file_path()) # default to use data
-  end
-  def write(map, filepath) when is_map(map) do
-    map
-    |> Jason.encode!
-    |> write_binary(filepath)
-  end
-
-  def append(data) do
-    read()
-    |> Map.merge(data)
-    |> write()
-  end
-
   def read do
     read(user_data_file_path())
   end
@@ -29,8 +14,28 @@ defmodule Utilities.Data do
       {:ok, ""} ->
         %{} # we treat this file as a map that gets saves to disk. Empty file -> empty map
       {:ok, file_contents} ->
-        file_contents |> Jason.decode!
+        %{"data" => data} =
+          file_contents
+          |> IO.inspect
+          |> Jason.decode!
+
+        data
     end
+  end
+
+  def append(data) do
+    read()
+    |> Map.merge(%{data.uuid => data})
+    |> write()
+  end
+
+  defp write(map) when is_map(map) do
+    write(map, user_data_file_path()) # default to use data
+  end
+  defp write(map, filepath) when is_map(map) do
+    %{data: map}
+    |> Jason.encode!
+    |> write_binary(filepath)
   end
 
   defp write_binary(data, file_path) when is_binary(data) do

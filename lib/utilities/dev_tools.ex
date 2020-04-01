@@ -50,7 +50,15 @@ defmodule DevTools do
   end
 
   def tidbit_save do
-    Structs.TidBit.initialize(%{title: "A dev TidBit"})
+    Structs.TidBit.initialize(%{title: "A dev TidBit", tags: ["luke"], content: "That's my name!"})
     |> Actions.save_new_tidbit()
+  end
+  def tidbit_save(title, content, tags) do
+    Structs.TidBit.initialize(%{title: title, tags: tags, content: content})
+    |> Actions.save_new_tidbit()
+  end
+
+  def new_reminder(title, content, tags \\ []) do
+    tidbit_save(title, content, tags ++ ["reminder"])
   end
 end
