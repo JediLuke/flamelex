@@ -12,14 +12,20 @@ defmodule Utilities.DataFiles.Tags do
       {:ok, ""} ->
         []
       {:ok, file_contents} ->
-        file_contents |> :erlang.binary_to_term()
+        %{"tags" => tags} = file_contents |> Jason.decode!
+        tags
     end
   end
 
   def new_tag(new_tag) when is_binary(new_tag) do
-    all_tags() ++ [new_tag]
-    |> :erlang.term_to_binary()
-    |> write_binary(tags_file())
+    tags = all_tags() ++ [new_tag]
+    %{tags: tags} |> write(tags_file())
+  end
+
+  defp write(map, filepath) when is_map(map) do
+    map
+    |> Jason.encode!
+    |> write_binary(filepath)
   end
 
   defp write_binary(data, file_path) when is_binary(data) do
