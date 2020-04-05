@@ -16,7 +16,6 @@ defmodule Utilities.Data do
       {:ok, file_contents} ->
         %{"data" => data} =
           file_contents
-          |> IO.inspect
           |> Jason.decode!
 
         data
@@ -28,6 +27,19 @@ defmodule Utilities.Data do
     |> Map.merge(%{data.uuid => data})
     |> write()
   end
+
+  def find(tags: t) when is_binary(t) do
+    #TODO for now we find all with this tag, but this wil get more complicated
+    #TODO pretty sure this is n^2 lol
+    #TODO although it's N^2, this is a pretty nifty line of code!
+    read()
+    |> Enum.filter(fn {_key, data} -> data["tags"] |> Enum.member?(t) end)
+  end
+
+
+  ## private functions
+  ## -------------------------------------------------------------------
+
 
   defp write(map) when is_map(map) do
     write(map, user_data_file_path()) # default to use data
