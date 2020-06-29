@@ -57,8 +57,13 @@ defmodule DevTools do
     Structs.TidBit.initialize(%{title: title, tags: tags, content: content})
     |> Actions.save_new_tidbit()
   end
+  def tidbit_save(title, content, tags, extra_metadata) do
+    Structs.TidBit.initialize(%{title: title, tags: tags, content: content} |> Map.merge(extra_metadata))
+    |> Actions.save_new_tidbit()
+  end
 
   def new_reminder(title, content, tags \\ []) do
-    tidbit_save(title, content, tags ++ ["reminder"])
+    #TODO remind me in 12 seconds
+    tidbit_save(title, content, tags ++ ["reminder"], %{remind_me_datetime: DateTime.utc_now() |> DateTime.add(3600, :second)})
   end
 end

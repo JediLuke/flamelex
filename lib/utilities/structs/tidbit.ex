@@ -6,15 +6,27 @@ defmodule Structs.TidBit do
 
   @derive Jason.Encoder
   defstruct [
-    uuid: nil,
-    hash: nil,
-    title: nil,
-    tags: [],
-    creation_timestamp: nil,
-    content: nil
+    uuid: nil,                # a UUIDv4
+    hash: nil,                # the md5 of the tidbit
+    title: nil,               # Title of the TidBit
+    tags: [],                 # any tags we want to apply to this TidBit
+    creation_timestamp: nil,  # when the TidBit was created
+    content: nil,             # actual TidBit content
+    remind_me_datetime: nil,  # when to remind me (for reminder TidBits)
+    due_datetime: nil,        # the due date (for reminders)
+    log: nil                  # a log of edits for this TidBit
   ]
 
   def initialize(data), do: validate(data) |> create_struct()
+
+  def ack_reminder(reminder = %__MODULE__{tags: old_tags}) when is_list(old_tags) do
+    new_tags =
+      old_tags
+      |> Enum.reject(& &1 == "reminder")
+      |> Enum.concat(["ackd_reminder"])
+
+    reminder |> Map.replace!(:tags, new_tags)
+  end
 
 
   ## private functions

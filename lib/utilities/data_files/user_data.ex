@@ -1,5 +1,7 @@
 defmodule Utilities.Data do
+  alias Structs.TidBit
 
+  #TODO we probably need locking on this MOFO :( - use a process & use GenServer.call, done.
 
   def user_data_file_path do
     #TODO this magically works because of mix? but should be better really
@@ -14,17 +16,21 @@ defmodule Utilities.Data do
       {:ok, ""} ->
         %{} # we treat this file as a map that gets saves to disk. Empty file -> empty map
       {:ok, file_contents} ->
-        %{"data" => data} =
-          file_contents
-          |> Jason.decode!
-
-        data
+        %{"data" => %{} = data} = Jason.decode!(file_contents)
+        data #TODO need to convert all these to TidBits
     end
   end
 
   def append(data) do
     read()
     |> Map.merge(%{data.uuid => data})
+    |> write()
+  end
+
+  def replace_tidbit(%TidBit{uuid: old_id}, %TidBit{uuid: new_id} = new_tidbit) when old_id == new_id do
+    read()
+    # |> Enum.reject(& &1.uuid == old_id)
+    |> Map.merge(new_tidbit)
     |> write()
   end
 
@@ -53,6 +59,6 @@ defmodule Utilities.Data do
   defp write_binary(data, file_path) when is_binary(data) do
     {:ok, file} = File.open(file_path, [:write])
     IO.binwrite(file, data)
-    File.close(file)
+    File.close(file) # returns :ok
   end
 end
