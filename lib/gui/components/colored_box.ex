@@ -1,7 +1,8 @@
 defmodule GUI.Component.ColoredBox do
   @moduledoc false
+
+
   use Scenic.Component
-  # alias GUI.Structs.{Coordinates, Dimensions}
   alias Scenic.Graph
   import Scenic.Primitives
 
@@ -13,20 +14,17 @@ defmodule GUI.Component.ColoredBox do
 
 
   # --------------------------------------------------------------------
-  # defmodule State do
-  #   defstruct coordinates: Coordinates.initialize({0, 0}),
-  #             dimensions: Dimensions.initialize({0, 0})
-  # end
-
-
-  # --------------------------------------------------------------------
   @doc false
-  def verify([coordinates: {x, y}, dimensions: {w, h}, color: c] = data) when all_positive_integers(x, y, w, h) and is_atom(c) do #TODO check the atom is a valid color
-    {:ok, data}
-  end
-  def verify([coordinates: {x, y}, dimensions: {w, h}, color: c, stroke: {s, c2}] = data) when all_positive_integers(x, y, w, h, s) and all_atoms(c, c2) do #TODO check the atom is a valid color
-    {:ok, data}
-  end
+  def verify([coordinates: {x, y}, dimensions: {w, h}, color: c] = data)
+      when all_positive_integers(x, y, w, h)
+      and is_atom(c)
+      do {:ok, data} #TODO check the atom is a valid color
+      end
+  def verify([coordinates: {x, y}, dimensions: {w, h}, color: c, stroke: {s, c2}] = data)
+      when all_positive_integers(x, y, w, h, s)
+      and all_atoms(c, c2)
+      do {:ok, data} #TODO check the atom is a valid color
+      end
   def verify(_), do: :invalid_data
 
 
