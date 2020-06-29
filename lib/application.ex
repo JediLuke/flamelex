@@ -8,6 +8,7 @@ defmodule Franklin.Application do
       # Franklin.Commander,
       # Franklin.PubSub,
       # Franklin.Buffer.TopLevelSupervisor,
+      Franklin.Agent.TopLevelSupervisor,
       {Scenic, viewports: [GUI.Initialize.viewport_config()]}
     ]
 
