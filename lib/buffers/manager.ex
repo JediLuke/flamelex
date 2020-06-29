@@ -14,7 +14,6 @@ defmodule Franklin.Buffer.Manager do
   end
 
   @impl true
-
   def handle_continue(:after_init, _params) do
     state = %{}
     Logger.info("Initialization complete.")
