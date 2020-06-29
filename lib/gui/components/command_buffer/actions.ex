@@ -12,4 +12,8 @@ defmodule Franklin.Actions.CommandBuffer do
   def deactivate do
     Component.action('DEACTIVATE_COMMAND_BUFFER')
   end
+
+  def enter_character(char) when is_binary(char) do
+    Component.action({'ENTER_CHARACTER', char})
+  end
 end

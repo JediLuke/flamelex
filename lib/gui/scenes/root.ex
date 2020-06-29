@@ -22,9 +22,7 @@ defmodule GUI.Scene.Root do
     {:ok, {state, graph}, push: graph}
   end
 
-  def redraw(%Scenic.Graph{} = g) do
-    GenServer.cast(__MODULE__, {:redraw, g})
-  end
+  def redraw(%Scenic.Graph{} = g), do: GenServer.cast(__MODULE__, {:redraw, g})
 
   def action(a), do: GenServer.cast(__MODULE__, {:action, a})
 
@@ -38,22 +36,24 @@ defmodule GUI.Scene.Root do
     {:noreply, {state, graph}}
   end
 
-  def handle_call({:register, identifier}, {pid, _ref}, {%{component_ref: ref_list} = state, graph}) do
-    Process.monitor(pid)
+  #TODO this is fkin stupid...
+  # def handle_call({:register, identifier}, {pid, _ref}, {%{component_ref: ref_list} = state, graph}) do
+  #   Process.monitor(pid)
 
-    new_component = {identifier, pid}
-    #TODO ensure new component registry is unique!
-    Logger.info "#{__MODULE__} registering component: #{inspect new_component}..."
-    new_ref_list = ref_list ++ [new_component]
-    new_state = state |> Map.replace!(:component_ref, new_ref_list)
+  #   new_component = {identifier, pid}
+  #   #TODO ensure new component registry is unique!
+  #   Logger.info "#{__MODULE__} registering component: #{inspect new_component}..."
+  #   new_ref_list = ref_list ++ [new_component]
+  #   new_state = state |> Map.replace!(:component_ref, new_ref_list)
 
-    {:reply, :ok, {new_state, graph}}
-  end
+  #   {:reply, :ok, {new_state, graph}}
+  # end
 
   # def handle_cast({:redraw, new_graph}, {state, _graph}) do
   #   {:noreply, {state, new_graph}, push: new_graph}
   # end
 
+  #TODO do this in a totally different process
   def handle_cast({:action, action}, {state, graph}) do
     case GUI.RootReducer.process({state, graph}, action) do
       {new_state, %Scenic.Graph{} = new_graph} when is_map(new_state) ->
@@ -63,18 +63,20 @@ defmodule GUI.Scene.Root do
     end
   end
 
-  def handle_info({:DOWN, ref, :process, object, reason}, state) when reason in [:normal, :shutdown] do
-    context = %{ref: ref, object: object}
-    Logger.info "A component monitored by #{__MODULE__} ended normally. #{inspect context}"
-    #TODO remove from component list
-    {:noreply, state}
-  end
+  #TODO possibly link to buffer processes once they are up
 
-  def handle_info({:DOWN, ref, :process, object, reason}, _state) do
-    context = %{ref: ref, object: object, reason: reason}
-    #TODO handle failures
-    raise "Monitored process died. #{inspect context}"
-  end
+  # def handle_info({:DOWN, ref, :process, object, reason}, state) when reason in [:normal, :shutdown] do
+  #   context = %{ref: ref, object: object}
+  #   Logger.info "A component monitored by #{__MODULE__} ended normally. #{inspect context}"
+  #   #TODO remove from component list
+  #   {:noreply, state}
+  # end
+
+  # def handle_info({:DOWN, ref, :process, object, reason}, _state) do
+  #   context = %{ref: ref, object: object, reason: reason}
+  #   #TODO handle failures
+  #   raise "Monitored process died. #{inspect context}"
+  # end
 
 
   ## private functions
@@ -120,15 +122,11 @@ defmodule GUI.Scene.Root do
   end
 
   defp fetch_viewport_info(opts) do
-    {:ok, %Scenic.ViewPort.Status{size: {
-      viewport_width,
-      viewport_height
-    }}} =
-      opts[:viewport] |> Scenic.ViewPort.info()
+    {:ok, %Scenic.ViewPort.Status{size:
+      { viewport_width, viewport_height }}} =
+                          opts[:viewport]
+                          |> Scenic.ViewPort.info()
 
-    %{
-      width: viewport_width,
-      height: viewport_height,
-    }
+    %{width: viewport_width, height: viewport_height}
   end
 end

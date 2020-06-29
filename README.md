@@ -2,6 +2,11 @@
 
 A combination text-editor & memex written in Elixir.
 
+```
+iex -S mix run
+use Franklin
+```
+
 ## Goals of the project
 
 Franklin was born out of my frustration trying to create the "perfect"
@@ -25,6 +30,14 @@ With some notable features:
 * Ability to read documents & maintain my own notes on such documents
 * Ability to do source-control inside the editor
 * Integrated with Elixir compiler
+
+## In progress
+
+Ability to open & save files
+* extra points - able to open text-only webpages (requires using HTTP client to fetch raw text)
+Ability to perform basic text editing (insertion / deletion / substitution)
+Ability to Load "environments" (saved config/data-store/knowledge-base/organizer)
+Ability to execute commands via IEx and/or the command buffer
 
 ## How to use Franklin
 
