@@ -4,11 +4,11 @@ defmodule Franklin.CLI do
   """
 
   def help do
-    IO.puts "No help to be found."
+    raise "No help to be found."
     # GUI.open_buffer(%{text: "No help to be found."}) #TODO probably use some kind of Buffer struct here
   end
 
-  def open(filepath) do
+  def open(file: filepath) do
     with {:ok, text} <- File.read(filepath),
          {:ok, _buf} <- GUI.new_buffer(text: text), do: :ok
   end

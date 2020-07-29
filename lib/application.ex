@@ -1,9 +1,18 @@
 defmodule Franklin.Application do
-  @moduledoc false
+  @moduledoc ~S(`Franklin` is a Memex & computation tool written in Elixir.)
 
   use Application
+  require Logger
+
+  @welcome_string ~s(Welcome to Franklin.
+
+  * `help`         :: Get more help.)
+
 
   def start(_type, _args) do
+
+    Logger.info @welcome_string
+
     children = [
       # Franklin.Commander,
       # Franklin.PubSub,
