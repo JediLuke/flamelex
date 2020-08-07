@@ -2,8 +2,8 @@ defmodule GUI.Component.List do
   @moduledoc false
   use Scenic.Component
   require Logger
-  import Components.Utilities.CommonDrawingFunctions
-  alias GUI.Structs.BufferFrame
+  # import Components.Utilities.CommonDrawingFunctions
+  alias GUI.Structs.Frame
 
   @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash
 
@@ -35,12 +35,12 @@ defmodule GUI.Component.List do
 
     graph =
       Scenic.Graph.build()
-      |> add_buffer_frame(%BufferFrame{
-           buffer_type: :list,
-           name: "List buffer",
-           width: w,
-           height: h
-      })
+      # |> add_buffer_frame(%BufferFrame{
+      #      buffer_type: :list,
+      #      name: "List buffer",
+      #      width: w,
+      #      height: h
+      # })
 
     {graph, _offset_count} =
       # Enum.reduce(contents, {graph, _offset_count = 0}, fn {_key, note} = iter, {graph, offset_count} ->

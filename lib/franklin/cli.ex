@@ -92,10 +92,6 @@ defmodule Franklin.CLI do
     raise "not implemented yet"
   end
 
-  # command buffer commands
-  def activate_command_buffer,   do: Franklin.Actions.CommandBuffer.activate()
-  def deactivate_command_buffer, do: Franklin.Actions.CommandBuffer.deactivate()
-
   def reload_and_restart do
     raise "Epic fail lulz"
   end

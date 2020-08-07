@@ -15,25 +15,29 @@ defmodule GUI.Root.Reducer do
   # import Utilities.ComponentUtils
   # use GUI.Reducer.ControlMode #TODO check this out...
 
-  @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash()
-  @text_size 24
-
   use GUI.Reducer.NewFrame
 
 
   def initialize(_state) do
     state = %{}
-    graph = Scenic.Graph.build(font: @ibm_plex_mono, font_size: @text_size)
+    graph = GUI.Utilities.Draw.blank_graph()
+            |> draw_command_buffer()
 
     {state, graph}
   end
 
-  # this function acts as a catch-all for all actions that don't match anything
-  # without this, the process which calls this (which right now is GUI.Root.Scene !!)
-  # can crash (!!) if no action matches what is passed in
+  # This function acts as a catch-all for all actions that don't match
+  # anything. Without this, the process which calls this (which right
+  # now is GUI.Root.Scene !!) can crash (!!) if no action matches what
+  # is passed in.
   def process({_state, _graph}, action) do
     Logger.warn "#{__MODULE__} received an action it did not recognise. #{inspect action}"
     :ignore
+  end
+
+  defp draw_command_buffer(graph) do
+    graph
+    |> IO.inspect()
   end
 end
 

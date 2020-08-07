@@ -20,6 +20,8 @@ defmodule Structs.Buffer do
     # log: nil                  # a log of edits for this TidBit
   ]
 
+  # Utilities.ProcessRegistry.fetch_buffer_pid!(file_name) |> Franklin.Buffer.Text.insert("WooLoo", [after: 3])
+
   # def initialize(data), do: validate(data) |> create_struct()
 
   # def ack_reminder(reminder = %__MODULE__{tags: old_tags}) when is_list(old_tags) do

@@ -1,4 +1,4 @@
-defmodule GUI.Structs.BufferFrame do
+defmodule GUI.Structs.Frame do
   @moduledoc """
   Struct which holds relevant data for rendering a buffer frame status bar.
 
@@ -11,8 +11,6 @@ defmodule GUI.Structs.BufferFrame do
   # @valid_buffer_types [:list] # all the types of buffer that you can have
 
   defstruct [
-    buffer_type: nil,
-    name: "untitled",
     width: 0,
     height: 0
   ]
@@ -26,18 +24,18 @@ defmodule GUI.Structs.BufferFrame do
   # end
 
 
-  def initialize(%{buffer_type: _b, name: _n, width: _w, height: _h} = data) do
-    struct(__MODULE__, data) # return the struct
-    # %Token{data: data}
-    # case data |> is_valid? do
-    #   %{is_valid?: true} = data ->
-    #     struct(__MODULE__, data) # return the struct
-    #   _else ->
-    #     error_msg = "Invalid data when initializing #{__MODULE__}."
-    #     Logger.error error_msg <> " data: #{inspect data}"
-    #     raise error_msg
-    # end
-  end
+  # def initialize(%{buffer_type: _b, name: _n, width: _w, height: _h} = data) do
+  #   struct(__MODULE__, data) # return the struct
+  #   # %Token{data: data}
+  #   # case data |> is_valid? do
+  #   #   %{is_valid?: true} = data ->
+  #   #     struct(__MODULE__, data) # return the struct
+  #   #   _else ->
+  #   #     error_msg = "Invalid data when initializing #{__MODULE__}."
+  #   #     Logger.error error_msg <> " data: #{inspect data}"
+  #   #     raise error_msg
+  #   # end
+  # end
 
 
   ## private functions

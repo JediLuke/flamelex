@@ -48,20 +48,20 @@ defmodule GUI.Components.CommandBuffer do
     end
   end
 
-  @impl Scenic.Scene
-  def handle_call({:register, identifier}, {pid, _ref}, {%{component_ref: ref_list} = state, graph}) do
-    Process.monitor(pid)
+  # @impl Scenic.Scene
+  # def handle_call({:register, identifier}, {pid, _ref}, {%{component_ref: ref_list} = state, graph}) do
+  #   Process.monitor(pid)
 
-    new_component = {identifier, pid}
-    new_ref_list = ref_list ++ [new_component]
-    new_state = state |> Map.replace!(:component_ref, new_ref_list)
+  #   new_component = {identifier, pid}
+  #   new_ref_list = ref_list ++ [new_component]
+  #   new_state = state |> Map.replace!(:component_ref, new_ref_list)
 
-    {:reply, :ok, {new_state, graph}}
-  end
+  #   {:reply, :ok, {new_state, graph}}
+  # end
 
-  @impl Scenic.Scene
-  def handle_info({:DOWN, ref, :process, object, reason}, _state) do
-    context = %{ref: ref, object: object, reason: reason}
-    raise "Monitored process died. #{inspect context}"
-  end
+  # @impl Scenic.Scene
+  # def handle_info({:DOWN, ref, :process, object, reason}, _state) do
+  #   context = %{ref: ref, object: object, reason: reason}
+  #   raise "Monitored process died. #{inspect context}"
+  # end
 end

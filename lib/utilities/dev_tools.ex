@@ -38,6 +38,10 @@ defmodule DevTools do
     :fin
   end
 
+  # command buffer commands
+  def activate_command_buffer,   do: Franklin.Actions.CommandBuffer.activate()
+  def deactivate_command_buffer, do: Franklin.Actions.CommandBuffer.deactivate()
+
   # def new_note do
   #   Franklin.Commander.new_note()
   # end

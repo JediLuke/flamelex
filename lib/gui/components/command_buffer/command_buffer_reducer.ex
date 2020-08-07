@@ -4,7 +4,7 @@ defmodule GUI.Components.CommandBuffer.Reducer do
   'action' (usually a string, sometimed with some params) and return a
   mutated state and/or graph.
   """
-  alias GUI.Components.CommandBuffer.DrawingFunctions, as: Draw
+  # alias GUI.Components.CommandBuffer.DrawingFunctions, as: Draw
   require Logger
 
   def initialize(state) do

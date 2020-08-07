@@ -15,7 +15,7 @@ defmodule Franklin.Application do
 
     children = [
       GUI.TopLevelSupervisor,
-      Franklin.Buffer.Supervisor, #TODO get red of Franklin at the start, why do we have that?
+      Franklin.Buffer.Supervisor, #TODO get rid of Franklin at the start of the module names, why do we have that? (maybe benefits for IEx??)
       Franklin.Agent.TopLevelSupervisor
     ]
 

@@ -4,7 +4,7 @@ defmodule GUI.Component.Note do
   alias Scenic.Graph
   import Scenic.Primitives
   require Logger
-  import Utilities.ComponentUtils
+  # import Utilities.ComponentUtils
 
   @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash
 
@@ -108,8 +108,8 @@ defmodule GUI.Component.Note do
     new_graph =
       graph |> Graph.modify(:title, &text(&1, new_title, fill: :black))
 
-    find_component_reference_pid!(state.component_ref, :cursor)
-    |> GUI.Component.Cursor.move_right_one_column()
+    # find_component_reference_pid!(state.component_ref, :cursor)
+    # |> GUI.Component.Cursor.move_right_one_column()
 
     {:noreply, {state, new_graph}, push: new_graph}
   end
@@ -118,8 +118,8 @@ defmodule GUI.Component.Note do
     new_graph =
       graph |> Graph.modify(:text, &text(&1, new_text, fill: :black))
 
-    find_component_reference_pid!(state.component_ref, :cursor)
-    |> GUI.Component.Cursor.move_right_one_column()
+    # find_component_reference_pid!(state.component_ref, :cursor)
+    # |> GUI.Component.Cursor.move_right_one_column()
 
     {:noreply, {state, new_graph}, push: new_graph}
   end
@@ -136,8 +136,8 @@ defmodule GUI.Component.Note do
     y_box_buffer = 3
     new_height       = y_max - y_box_buffer #TODO should probably truncate this
 
-    find_component_reference_pid!(state.component_ref, :cursor)
-    |> GUI.Component.Cursor.move(top_left_corner: {new_x, new_y}, dimensions: {new_width, new_height})
+    # find_component_reference_pid!(state.component_ref, :cursor)
+    # |> GUI.Component.Cursor.move(top_left_corner: {new_x, new_y}, dimensions: {new_width, new_height})
 
     {:noreply, {state, graph}}
   end
@@ -157,8 +157,8 @@ defmodule GUI.Component.Note do
     x_coordinate = x+15
     y_coordinate = y_offset + y_box_buffer
 
-    find_component_reference_pid!(state.component_ref, :cursor)
-    |> GUI.Component.Cursor.move(top_left_corner: {x_coordinate, y_coordinate}, dimensions: {new_width, new_height})
+    # find_component_reference_pid!(state.component_ref, :cursor)
+    # |> GUI.Component.Cursor.move(top_left_corner: {x_coordinate, y_coordinate}, dimensions: {new_width, new_height})
 
     {:noreply, {state, graph}}
   end

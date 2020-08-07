@@ -2,7 +2,7 @@ defmodule Components.TextBox do
   @moduledoc false
   use Scenic.Component
   require Logger
-  import Components.Utilities.CommonDrawingFunctions
+  # import Components.Utilities.CommonDrawingFunctions
 
   #TODO have horizontal scrolling if we go over the line
 
@@ -30,7 +30,7 @@ defmodule Components.TextBox do
 
     graph =
       Scenic.Graph.build()
-      |> background(state, :red)
+      # |> background(state, :red)
       |> GUI.Component.Cursor2.add_to_graph(data |> cursor_params())
 
 
