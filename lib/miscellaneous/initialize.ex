@@ -19,7 +19,7 @@ defmodule GUI.Initialize do
     # size: {1680, 1005}, # macbook pro screen res?
     # size: {1440, 855}, # macbook pro screen res
     # size: {2560, 1395}, # 32" BenQ full screen
-    size: {800, 600},
+    size: {800, 600}, # exactly 80 columns at size 24 font!
     default_scene: {GUI.Scene.Root, nil},
     drivers: [
       %{

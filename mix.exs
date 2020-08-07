@@ -28,7 +28,8 @@ defmodule Franklin.MixProject do
       {:truetype_metrics, "~> 0.3"},
       {:font_metrics, "~> 0.3"},
       {:elixir_uuid, "~> 1.2"},
-      {:jason, "~> 1.1"}
+      {:jason, "~> 1.1"},
+      {:gproc, "~> 0.5.0"}
     ]
   end
 end

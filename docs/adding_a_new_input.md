@@ -17,7 +17,7 @@ This is the "flow"
 incoming_input
 |> GUI.Scene.Root.handle_input/3
 |> GUI.Input.EventHandler.process/2
-|> GUI.RootReducer.process/2                  # propagate actions by sending messages to registered child components
+|> GUI.Root.Reducer.process/2                  # propagate actions by sending messages to registered child components
 |> ChildComponent.handle_cast({:action, a})   # handles incoming actions in same fashion
 ```
 

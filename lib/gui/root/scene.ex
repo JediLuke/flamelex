@@ -1,4 +1,4 @@
-defmodule GUI.Scene.Root do
+defmodule GUI.Scene.Root do #TODO rename to Root.Scene
   use Scenic.Scene
   require Logger
   alias GUI.Input.EventHandler
@@ -15,9 +15,10 @@ defmodule GUI.Scene.Root do
     Logger.info "Initializing #{__MODULE__}..."
     Process.register(self(), __MODULE__)
 
-    GUI.Initialize.load_custom_fonts_into_global_cache
+    GUI.Initialize.load_custom_fonts_into_global_cache()
 
-    {state, graph} = initial_state(opts) |> GUI.RootReducer.initialize()
+    {state, graph} = initial_state(opts)
+                     |> GUI.Root.Reducer.initialize()
 
     {:ok, {state, graph}, push: graph}
   end
@@ -26,13 +27,16 @@ defmodule GUI.Scene.Root do
 
   def action(a), do: GenServer.cast(__MODULE__, {:action, a})
 
+  def pop_state, do: GenServer.call(__MODULE__, :pop_state)
+
 
   ## Scenic.Scene callbacks
   ## -------------------------------------------------------------------
 
 
+  #TODO do this in a totally different process
   def handle_input(input, _context, {state, graph}) do
-    state = EventHandler.process(state, input)
+    state = EventHandler.process(state, input) #TODO do this in a totally different process
     {:noreply, {state, graph}}
   end
 
@@ -49,13 +53,26 @@ defmodule GUI.Scene.Root do
   #   {:reply, :ok, {new_state, graph}}
   # end
 
+  @doc """
+  Simply return the current state, and the %Scenic.Graph{}
+
+  This is used by GUI.Controller when it initializes - it calls this process
+  to grab the state of the GUI, & it's able to "take charge" once the
+  state is known.
+  """
+  def handle_call(:pop_state, {_pid, _ref}, {state, graph}) do
+    {:reply, :ok, {state, graph}}
+  end
+
   # def handle_cast({:redraw, new_graph}, {state, _graph}) do
   #   {:noreply, {state, new_graph}, push: new_graph}
   # end
 
-  #TODO do this in a totally different process
+  #TODO do this in a totally different process - right now, the entire GUI can crash just because an action wasn't found...
   def handle_cast({:action, action}, {state, graph}) do
-    case GUI.RootReducer.process({state, graph}, action) do
+    case GUI.Root.Reducer.process({state, graph}, action) do
+      :ignore ->
+          {:noreply, {state, graph}}
       {new_state, %Scenic.Graph{} = new_graph} when is_map(new_state) ->
           {:noreply, {new_state, new_graph}, push: new_graph}
       new_state when is_map(new_state) ->
@@ -84,31 +101,32 @@ defmodule GUI.Scene.Root do
 
 
   defp initial_state(opts) do
+    #TODO this should be a struct
     %{
       viewport: fetch_viewport_info(opts),
 
       # buffers - all the current buffers. Note that buffers will call back with their pids once the components are initialized
-      buffers: [
-        %{
-          id: :command_buffer,
-          pid: nil,
-          data: %{
-            # height: 28
-            height: Application.fetch_env!(:franklin, :bar_height)
-          },
-          state: %{
-            text: "Welcome to Franklin. Press <f1> for help."
-          }
-        },
-        %{
-          id: {:text_editor, 1, :untitled},
-          pid: nil,
-          data: %{
-            text_size: 24
-          },
-          active: :true
-        }
-      ],
+      # buffers: [
+      #   %{
+      #     id: :command_buffer,
+      #     pid: nil,
+      #     data: %{
+      #       # height: 28
+      #       height: Application.fetch_env!(:franklin, :bar_height)
+      #     },
+      #     state: %{
+      #       text: "Welcome to Franklin. Press <f1> for help."
+      #     }
+      #   },
+      #   %{
+      #     id: {:text_editor, 1, :untitled},
+      #     pid: nil,
+      #     data: %{
+      #       text_size: 24
+      #     },
+      #     active: :true
+      #   }
+      # ],
 
       # the input mode for Franklin
       input_mode: :control,
@@ -122,7 +140,7 @@ defmodule GUI.Scene.Root do
   end
 
   defp fetch_viewport_info(opts) do
-    {:ok, %Scenic.ViewPort.Status{size:
+    {:ok, %Scenic.ViewPort.Status{ size:
       { viewport_width, viewport_height }}} =
                           opts[:viewport]
                           |> Scenic.ViewPort.info()

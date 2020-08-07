@@ -1,18 +1,31 @@
-defmodule Franklin.Commander do
+defmodule Franklin.Buffer.Commander do
   @moduledoc """
   Processes command buffer commands.
   """
   use GenServer
   require Logger
+  alias GUI.Components.CommandBuffer, as: Component
 
-  def start_link([] = default_params) do
-    GenServer.start_link(__MODULE__, default_params)
+  def start_link([]) do
+    GenServer.start_link(__MODULE__, [])
   end
 
-  #TODO RootScene should monitor commander to show errors
+  #TODO RootScene should monitor commander to show errors #TODO ???
 
   def process(command) when is_binary(command) do
     GenServer.cast(__MODULE__, {:command_buffer_command, command})
+  end
+
+  def activate do #TODO so actually this sends a msg to the buffer, which may choose to ignore it, but will then use the Gui.Reducer to process what a new graph will look like, & send it to the GUI process
+    Component.action('ACTIVATE_COMMAND_BUFFER_PROMPT')
+  end
+
+  def deactivate do
+    Component.action('DEACTIVATE_COMMAND_BUFFER')
+  end
+
+  def enter_character(char) when is_binary(char) do
+    Component.action({'ENTER_CHARACTER', char})
   end
 
   ## GenServer callbacks

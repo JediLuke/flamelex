@@ -34,6 +34,11 @@ defmodule GUI.Components.CommandBuffer.DrawingFunctions do
     end)
   end
 
+  def rectangle(%Scenic.Graph{} = graph) do
+    graph
+    |> rect({50, 50}, [fill: :red, translate: {200, 200}])
+  end
+
 
   ## private functions
   ## -------------------------------------------------------------------

@@ -14,11 +14,9 @@ defmodule Franklin.Application do
     Logger.info @welcome_string
 
     children = [
-      # Franklin.Commander,
-      # Franklin.PubSub,
-      # Franklin.Buffer.TopLevelSupervisor,
-      Franklin.Agent.TopLevelSupervisor,
-      {Scenic, viewports: [GUI.Initialize.viewport_config()]}
+      GUI.TopLevelSupervisor,
+      Franklin.Buffer.Supervisor, #TODO get red of Franklin at the start, why do we have that?
+      Franklin.Agent.TopLevelSupervisor
     ]
 
     opts = [strategy: :one_for_one, name: Franklin.Supervisor]

@@ -12,9 +12,8 @@ defmodule Franklin.Agent.TopLevelSupervisor do
 
     children = [
       {DynamicSupervisor,
-        name: Franklin.Agent.DynamicSupervisor,
-        strategy: :one_for_one
-      },
+            name: Franklin.Agent.DynamicSupervisor,
+            strategy: :one_for_one},
       Franklin.Agent.Reminders
     ]
 
