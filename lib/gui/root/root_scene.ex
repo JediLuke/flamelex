@@ -2,7 +2,7 @@ defmodule GUI.Scene.Root do #TODO rename to Root.Scene
   use Scenic.Scene
   require Logger
   alias GUI.Input.EventHandler
-  # alias GUI.Components.CommandBuffer
+  # alias GUI.Component.CommandBuffer
 
   # @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash
 
@@ -27,7 +27,7 @@ defmodule GUI.Scene.Root do #TODO rename to Root.Scene
 
   def action(a), do: GenServer.cast(__MODULE__, {:action, a})
 
-  def pop_state, do: GenServer.call(__MODULE__, :pop_state)
+  # def pop_state, do: GenServer.call(__MODULE__, :pop_state)
 
 
   ## Scenic.Scene callbacks

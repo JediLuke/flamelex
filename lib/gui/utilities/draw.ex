@@ -56,7 +56,7 @@ end
 
 
 
-# defmodule GUI.Components.CommandBuffer.DrawingFunctions do
+# defmodule GUI.Component.CommandBuffer.DrawingFunctions do
 #   import Scenic.Primitives
 #   alias Scenic.Graph
 #   alias Components.TextBox

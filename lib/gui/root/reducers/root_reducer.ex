@@ -83,7 +83,7 @@ end
 
 
 #   #     #TODO we do want this just not here
-#   #     # |> GUI.Components.CommandBuffer.add_to_graph(%{
+#   #     # |> GUI.Component.CommandBuffer.add_to_graph(%{
 #   #     #     id: :command_buffer,
 #   #     #     top_left_corner: {0, h - command_buffer.data.height},
 #   #     #     dimensions: {w, command_buffer.data.height},

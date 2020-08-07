@@ -1,7 +1,7 @@
-defmodule GUI.Components.CommandBuffer do
+defmodule GUI.Component.CommandBuffer do
   use Scenic.Component
   require Logger
-  alias GUI.Components.CommandBuffer.Reducer
+  alias GUI.Component.CommandBuffer.Reducer
 
   @impl Scenic.Component
   def verify(%{id: _id, mode: :echo, top_left_corner: {_x, _y}, dimensions: {_w, _h}} = data), do: {:ok, data}

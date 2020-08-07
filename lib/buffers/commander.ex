@@ -4,7 +4,7 @@ defmodule Franklin.Buffer.Commander do
   """
   use GenServer
   require Logger
-  alias GUI.Components.CommandBuffer, as: Component
+  alias GUI.Component.CommandBuffer, as: Component
 
   def start_link([]) do
     GenServer.start_link(__MODULE__, [])

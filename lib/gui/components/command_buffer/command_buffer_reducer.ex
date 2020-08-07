@@ -1,10 +1,10 @@
-defmodule GUI.Components.CommandBuffer.Reducer do
+defmodule GUI.Component.CommandBuffer.Reducer do
   @moduledoc """
   This module contains reducer functions - they take in a graph, & an
   'action' (usually a string, sometimed with some params) and return a
   mutated state and/or graph.
   """
-  # alias GUI.Components.CommandBuffer.DrawingFunctions, as: Draw
+  # alias GUI.Component.CommandBuffer.DrawingFunctions, as: Draw
   require Logger
 
   def initialize(state) do
