@@ -14,9 +14,9 @@ defmodule Franklin.Application do
     Logger.info @welcome_string
 
     children = [
-      GUI.TopLevelSupervisor,
-      Franklin.Buffer.Supervisor, #TODO get rid of Franklin at the start of the module names, why do we have that? (maybe benefits for IEx??)
-      Franklin.Agent.TopLevelSupervisor
+      GUI.TopLevelSupervisor, # GUI gets started first, because buffers/agents call GUI processes & we want those processes to be there
+      Franklin.Buffer.TopLevelSupervisor, #TODO get rid of Franklin at the start of the module names, why do we have that? (maybe benefits for IEx??)
+      # Franklin.Agent.TopLevelSupervisor
     ]
 
     opts = [strategy: :one_for_one, name: Franklin.Supervisor]

@@ -4,39 +4,49 @@ defmodule Franklin.Buffer.Commander do
   """
   use GenServer
   require Logger
-  alias GUI.Component.CommandBuffer, as: Component
+  alias Structs.Buffer
 
-  def start_link([]) do
-    GenServer.start_link(__MODULE__, [])
+  def start_link([] = _default_params) do
+    GenServer.start_link(__MODULE__, Buffer.new(:command_buffer)) #NOTE: no need to use gproc for the commander
   end
-
-  #TODO RootScene should monitor commander to show errors #TODO ???
 
   def process(command) when is_binary(command) do
     GenServer.cast(__MODULE__, {:command_buffer_command, command})
   end
 
-  def activate do #TODO so actually this sends a msg to the buffer, which may choose to ignore it, but will then use the Gui.Reducer to process what a new graph will look like, & send it to the GUI process
-    Component.action('ACTIVATE_COMMAND_BUFFER_PROMPT')
+  def activate do
+    # #TODO so actually this sends a msg to the buffer, which may choose to ignore it, but will then use the Gui.Reducer to process what a new graph will look like, & send it to the GUI process
+    # IO.puts "ACTIVATE"
+    # GUI.Component.CommandBuffer.action('ACTIVATE_COMMAND_BUFFER_PROMPT')
+    GUI.activate_command_buffer()
   end
 
   def deactivate do
-    Component.action('DEACTIVATE_COMMAND_BUFFER')
+    GUI.Component.CommandBuffer.action('DEACTIVATE_COMMAND_BUFFER')
   end
 
   def enter_character(char) when is_binary(char) do
-    Component.action({'ENTER_CHARACTER', char})
+    GUI.Component.CommandBuffer.action({'ENTER_CHARACTER', char})
   end
+
 
   ## GenServer callbacks
   ## -------------------------------------------------------------------
 
 
   @impl true
-  def init(_params) do
+  def init(%Buffer{} = state) do
     Logger.info "Initializing #{__MODULE__}..."
     Process.register(self(), __MODULE__)
-    {:ok, _initial_state = %{}}
+    {:ok, state, {:continue, :initialize_gui}}
+  end
+
+  @impl GenServer
+  def handle_continue(:initialize_gui, state) do
+    IO.puts "Initializing GUI ???"
+    :timer.sleep(500) #TODO, this is necessary because the Root Scene is not started in sequence by Scenic, so we can't guarantee it is up yet when we start the application...
+    GUI.Component.CommandBuffer.initialize(state)
+    {:noreply, state}
   end
 
   @impl true

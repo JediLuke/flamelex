@@ -38,7 +38,10 @@ defmodule GUI.Controller do
   @impl true
   def handle_continue(:after_init, state) do
     # send self(), :check_reminders
-    Logger.info("Initialization complete.")
+
+    # GUI.Component.CommandBuffer.initialize() #NOTE: don't do this here, when the buffer comes up that does it
+
+    Logger.info("#{__MODULE__} initialization complete.")
     {:noreply, state}
   end
 

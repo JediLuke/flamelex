@@ -9,7 +9,7 @@ defmodule DevTools do
     end
   end
 
-  def recompile, do: IEx.Helpers.recompile
+  # def recompile, do: IEx.Helpers.recompile
 
   def restart_and_recompile do
     Application.stop(:franklin)
@@ -23,6 +23,13 @@ defmodule DevTools do
   end
 
   def fire_dev_loop do
+    IEx.Helpers.recompile()
+
+    # open_file_in_buffer()
+    activate_command_buffer()
+  end
+
+  def open_file_in_buffer do
     file_name = "/Users/luke/workbench/elixir/franklin/README.md"
     Franklin.CLI.open(file: file_name) # will open as the active buffer
 
@@ -31,16 +38,17 @@ defmodule DevTools do
 
     string = "Luke"
 
-    # %Buffer{name: file_name, type: :text}
+    Franklin.Buffer.Text.insert(file_name, string, after: 3)
 
-    fetch_buffer_pid!(file_name) |> Franklin.Buffer.Text.insert(string, [after: 7])
+    # fetch_buffer_pid!(file_name)
+    # |> Franklin.Buffer.Text.insert(string, [after: 7])
 
-    :fin
+    :ok
   end
 
   # command buffer commands
-  def activate_command_buffer,   do: Franklin.Actions.CommandBuffer.activate()
-  def deactivate_command_buffer, do: Franklin.Actions.CommandBuffer.deactivate()
+  def activate_command_buffer,   do: Franklin.Buffer.Commander.activate()
+  def deactivate_command_buffer, do: Franklin.Buffer.Commander.deactivate()
 
   # def new_note do
   #   Franklin.Commander.new_note()

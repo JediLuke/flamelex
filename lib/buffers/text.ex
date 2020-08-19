@@ -17,10 +17,16 @@ defmodule Franklin.Buffer.Text do
   # def set_mode(pid, :command), do: GenServer.cast(pid, :activate_command_mode)
   # def save_and_close(pid), do: GenServer.cast(pid, :save_and_close)
 
-  def insert(buffer_pid, char, [after: x]) when is_pid(buffer_pid) do #TODO use buffer process
-    buffer_pid
-    |> GenServer.cast({:insert_char, char, after: x})
+  def insert(file_name, string, opts) when is_bitstring(file_name) do
+    file_name
+    |> Utilities.ProcessRegistry.fetch_buffer_pid!()
+    |> insert(string, opts)
   end
+  def insert(buffer_pid, string, [after: x]) when is_pid(buffer_pid) do
+    buffer_pid
+    |> GenServer.cast({:insert_char, string, after: x})
+  end
+
 
   ## GenServer callbacks
   ## -------------------------------------------------------------------

@@ -4,55 +4,54 @@ defmodule GUI.Component.CommandBuffer.Reducer do
   'action' (usually a string, sometimed with some params) and return a
   mutated state and/or graph.
   """
-  # alias GUI.Component.CommandBuffer.DrawingFunctions, as: Draw
   require Logger
+  alias GUI.Utilities.Draw
+  import Scenic.Primitives
 
   def initialize(state) do
-    Draw.echo_buffer(state)
+    draw_command_buffer(state)
   end
 
-  def process({%{mode: :echo, text: ""} = state, _graph}, 'ACTIVATE_COMMAND_BUFFER_PROMPT') do
-    new_graph =
-      Draw.empty_command_buffer(state)
-      #TODO show a command prompt text which dissapears when we enter something
 
-    new_state =
-      state |> Map.replace!(:mode, :command)
+  def process({_state, graph}, 'ACTIVATE_COMMAND_BUFFER') do
+    #TODO change the visible flag on this component to true
+    graph
+    |> IO.inspect
 
-    {new_state, new_graph}
+    :ignore_action
   end
 
-  def process({%{mode: :command} = state, _graph}, 'DEACTIVATE_COMMAND_BUFFER') do
-    new_state =
-      state
-      |> Map.replace!(:mode, :echo)
-      |> Map.replace!(:text, "Left `command` mode.")
+  # def process({%{mode: :command} = state, _graph}, 'DEACTIVATE_COMMAND_BUFFER') do
+  #   new_state =
+  #     state
+  #     |> Map.replace!(:mode, :echo)
+  #     |> Map.replace!(:text, "Left `command` mode.")
 
-    new_graph =
-      Draw.echo_buffer(new_state)
+  #   new_graph =
+  #     Draw.echo_buffer(new_state)
 
-    {new_state, new_graph}
-  end
+  #   {new_state, new_graph}
+  # end
 
-  # def process({state, graph}, {'ENTER_CHARACTER', {:codepoint, {letter, x}}}) when x in [0, 1] do # need the check on x because lower and uppercase letters have a different number here for some reason
-  def process({%{mode: :command} = state, graph}, {'ENTER_CHARACTER', char}) when is_binary(char) do
-    updated_buffer_text =
-      state.text <> char
+  # # def process({state, graph}, {'ENTER_CHARACTER', {:codepoint, {letter, x}}}) when x in [0, 1] do # need the check on x because lower and uppercase letters have a different number here for some reason
+  # def process({%{mode: :command} = state, graph}, {'ENTER_CHARACTER', char}) when is_binary(char) do
+  #   updated_buffer_text =
+  #     state.text <> char
 
-    new_state =
-      state |> Map.replace!(:text, updated_buffer_text)
+  #   new_state =
+  #     state |> Map.replace!(:text, updated_buffer_text)
 
-    #TODO move the cursor
-    # {:cursor, pid} = state.component_ref |> hd #TODO, eventually we'll have more componenst
-    # GenServer.cast(pid, {:action, 'MOVE_RIGHT_ONE_COLUMN'})
+  #   #TODO move the cursor
+  #   # {:cursor, pid} = state.component_ref |> hd #TODO, eventually we'll have more componenst
+  #   # GenServer.cast(pid, {:action, 'MOVE_RIGHT_ONE_COLUMN'})
 
-    # $TODO update text box - requres sending msg to text_buffer
-    # new_graph =
-    #   graph
-    #   |> Graph.modify(:buffer_text, &text(&1, updated_buffer_text, fill: :blue))
+  #   # $TODO update text box - requres sending msg to text_buffer
+  #   # new_graph =
+  #   #   graph
+  #   #   |> Graph.modify(:buffer_text, &text(&1, updated_buffer_text, fill: :blue))
 
-    new_state
-  end
+  #   new_state
+  # end
 
 
   # def process({%{text: ""} = state, _graph}, 'COMMAND_BUFFER_BACKSPACE') do
@@ -101,4 +100,23 @@ defmodule GUI.Component.CommandBuffer.Reducer do
     Logger.error "#{__MODULE__} received unknown state/action combination: action: #{inspect unknown_action}, state: #{inspect state}"
     state
   end
+
+
+  #TODO start this as hidden
+  def draw_command_buffer(%{top_left_corner: {x, y}, dimensions: {w, h}} = state) do
+    Draw.blank_graph()
+    |> group(fn graph ->
+         graph
+         |> Draw.background(state, :purple)
+        #  |> command_prompt(state)
+        #  |> TextBox.add_to_graph(state |> text_box_initialization_data())
+        #  |> add_blinking_box_cursor(state)
+        #  |> draw_command_prompt_text(state)
+      #  end, [
+      #    id: :command_buffer,
+      #   #  hidden: true
+      #  ])
+    end)
+  end
+
 end

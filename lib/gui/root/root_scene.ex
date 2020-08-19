@@ -17,8 +17,9 @@ defmodule GUI.Scene.Root do #TODO rename to Root.Scene
 
     GUI.Initialize.load_custom_fonts_into_global_cache()
 
-    {state, graph} = initial_state(opts)
-                     |> GUI.Root.Reducer.initialize()
+    {state, graph} =
+      initial_state(opts) #TODO I hate this
+      |> GUI.Root.Reducer.initialize()
 
     {:ok, {state, graph}, push: graph}
   end
@@ -69,14 +70,15 @@ defmodule GUI.Scene.Root do #TODO rename to Root.Scene
   # end
 
   #TODO do this in a totally different process - right now, the entire GUI can crash just because an action wasn't found...
-  def handle_cast({:action, action}, {state, graph}) do
+  def handle_cast({:action, action}, process_state = {state, graph}) do
+    IO.puts "ROOT HANDLE CALL #{inspect action}"
     case GUI.Root.Reducer.process({state, graph}, action) do
-      :ignore ->
+      :ignore_action ->
           {:noreply, {state, graph}}
-      {new_state, %Scenic.Graph{} = new_graph} when is_map(new_state) ->
-          {:noreply, {new_state, new_graph}, push: new_graph}
-      new_state when is_map(new_state) ->
+      {:update_state, new_state} when is_map(new_state) ->
           {:noreply, {new_state, graph}}
+      {:update_all, {new_state, %Scenic.Graph{} = new_graph}} when is_map(new_state) ->
+          {:noreply, {new_state, new_graph}, push: new_graph}
     end
   end
 

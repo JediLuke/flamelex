@@ -35,7 +35,16 @@ defmodule Structs.Buffer do
 
   def new([name: n, content: c]) do
     %__MODULE__{
-      type: :text, name: n, content: c
+      type: :text,
+      name: n,
+      content: c
+    }
+  end
+  def new(:command_buffer) do
+    %__MODULE__{
+      type: :command,
+      name: "CommandBuffer",
+      content: nil
     }
   end
 

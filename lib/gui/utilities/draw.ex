@@ -2,11 +2,10 @@ defmodule GUI.Utilities.Draw do
   import Scenic.Primitives
 
   @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash()
-  @text_size 24
+  @default_text_size 24
 
-  def blank_graph do
-    # Scenic.Graph.build()
-    Scenic.Graph.build(font: @ibm_plex_mono, font_size: @text_size)
+  def blank_graph(text_size \\ @default_text_size) do
+    Scenic.Graph.build(font: @ibm_plex_mono, font_size: text_size)
   end
 
   def rectangle(%Scenic.Graph{} = graph) do
@@ -20,6 +19,17 @@ defmodule GUI.Utilities.Draw do
                translate: {5, 24}, # text draws from bottom-left corner?? :( also, how high is it???
                font_size: 24, fill: :white)
   end
+
+  def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}, color) when is_atom(color) do
+    #TODO need width +1 here for some quirky reason of Scenic library
+    graph
+    |> rect({w + 1, h}, [fill: color, translate: {x, y}])
+  end
+  def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}) do
+    #TODO need width +1 here for some quirky reason of Scenic library
+    graph
+    |> rect({w + 1, h}, [translate: {x, y}]) #TODO only green for dev
+  end
 end
 
 
@@ -29,16 +39,6 @@ end
 #   alias Scenic.Graph
 #   alias GUI.Structs.BufferFrame
 
-#   def background(%Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}, color) when is_atom(color) do
-#     #TODO need width +1 here for some quirky reason of Scenic library
-#     graph
-#     |> rect({w + 1, h}, [fill: color, translate: {x, y}])
-#   end
-#   def background(%Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}) do
-#     #TODO need width +1 here for some quirky reason of Scenic library
-#     graph
-#     |> rect({w + 1, h}, [translate: {x, y}]) #TODO only green for dev
-#   end
 
 
 #   def add_buffer_frame(%Graph{} = graph, %BufferFrame{} = data) do
@@ -76,21 +76,7 @@ end
 #     |> echo_text(state)
 #   end
 
-#   def empty_command_buffer(%{top_left_corner: {x, y}, dimensions: {w, h}} = state) do
-#     blank_graph(state)
-#     |> group(fn graph ->
-#          graph
-#          |> background(state, :purple)
-#          |> command_prompt(state)
-#          |> TextBox.add_to_graph(state |> text_box_initialization_data())
-#         #  |> add_blinking_box_cursor(state)
-#         #  |> draw_command_prompt_text(state)
-#       #  end, [
-#       #    id: :command_buffer,
-#       #   #  hidden: true
-#       #  ])
-#     end)
-#   end
+
 
 #   def rectangle(%Scenic.Graph{} = graph) do
 #     graph

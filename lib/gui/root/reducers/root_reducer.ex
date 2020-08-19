@@ -14,17 +14,49 @@ defmodule GUI.Root.Reducer do
 
   # import Utilities.ComponentUtils
   # use GUI.Reducer.ControlMode #TODO check this out...
-
-  use GUI.Reducer.NewFrame
+  # use GUI.Reducer.NewFrame #TODO love this idea but keep it simple for now
 
 
   def initialize(_state) do
-    state = %{}
-    graph = GUI.Utilities.Draw.blank_graph()
-            |> draw_command_buffer()
+    state = %{mode: :normal} #TODO should probs be a struct...
+    graph = default_root_graph()
 
-    {state, graph}
+    # update_state_and_graph(state, graph)
+    {state, graph} #NOTE: can't use update_state_and_graph here cause init doesn't handle that
   end
+
+  defp default_root_graph() do
+    GUI.Utilities.Draw.blank_graph()
+  end
+
+  def process({state, _graph}, 'ACTIVATE_COMMAND_BUFFER') do
+    GUI.Component.CommandBuffer.activate()
+    update_state_only(%{state|mode: :command})
+  end
+
+  def process({state, graph}, {'NEW_FRAME', [type: :text, content: content]}) do
+    new_graph =
+      graph
+      |> GUI.Utilities.Draw.text(content) #TODO update the correct buffer GUI process, & do it from within that buffer itself (high-five!)
+
+    update_state_and_graph(state, new_graph) #TODO do we update the state??
+  end
+
+  def process({state, graph}, {:initialize_command_buffer, %Structs.Buffer{type: :command}}) do
+    IO.puts "THIS IS INITIALIZING CMD BUFFER"
+    new_graph =
+      graph
+      # |> Scenic.Primitives.rect({100, 100}, translate: {10, 10}, fill: :cornflower_blue, stroke: {1, :ghost_white})
+      |> GUI.Component.CommandBuffer.add_to_graph(%{
+           # top_left_corner: {0, h - command_buffer.data.height},
+           top_left_corner: {0, 400},
+           # dimensions: {w, command_buffer.data.height},
+           dimensions: {400, 20}
+      })
+
+    update_state_and_graph(state, new_graph) #TODO do we need to update the root state at all? I hope not
+  end
+
 
   # This function acts as a catch-all for all actions that don't match
   # anything. Without this, the process which calls this (which right
@@ -32,18 +64,13 @@ defmodule GUI.Root.Reducer do
   # is passed in.
   def process({_state, _graph}, action) do
     Logger.warn "#{__MODULE__} received an action it did not recognise. #{inspect action}"
-    :ignore
+    ignore_this_action()
   end
 
-  defp draw_command_buffer(graph) do
-    graph
-    |> IO.inspect()
-  end
+  defp ignore_this_action(), do: :ignore_action
+  defp update_state_only(new_state), do: {:update_state, new_state}
+  defp update_state_and_graph(new_state, new_graph), do: {:update_all, {new_state, new_graph}}
 end
-
-
-
-
 
 
 ## TODO - below be dragons!
@@ -83,13 +110,7 @@ end
 
 
 #   #     #TODO we do want this just not here
-#   #     # |> GUI.Component.CommandBuffer.add_to_graph(%{
-#   #     #     id: :command_buffer,
-#   #     #     top_left_corner: {0, h - command_buffer.data.height},
-#   #     #     dimensions: {w, command_buffer.data.height},
-#   #     #     mode: :echo,
-#   #     #     text: "Welcome to Franklin. Press <f1> for help."
-#   #     #   })
+
 
 #   #   {state, graph}
 #   # end
