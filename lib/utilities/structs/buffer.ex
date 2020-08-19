@@ -1,14 +1,10 @@
 defmodule Structs.Buffer do
   # @moduledoc false
-  # require Logger
 
-  # defguard is_valid(data) when is_map(data)
-
-  # @derive Jason.Encoder
   defstruct [
-    type: nil,
-    name: nil,
-    content: nil
+    type:     nil,
+    name:     nil,
+    content:  nil
     # uuid: nil,                # a UUIDv4
     # hash: nil,                # the md5 of the tidbit
     # title: nil,               # Title of the TidBit
@@ -33,18 +29,11 @@ defmodule Structs.Buffer do
   #   reminder |> Map.replace!(:tags, new_tags)
   # end
 
-  def new([name: n, content: c]) do
+  def new(:command) do
     %__MODULE__{
-      type: :text,
-      name: n,
-      content: c
-    }
-  end
-  def new(:command_buffer) do
-    %__MODULE__{
-      type: :command,
-      name: "CommandBuffer",
-      content: nil
+      type:          :command,
+      name:          "CommandBuffer",
+      content:       nil
     }
   end
 

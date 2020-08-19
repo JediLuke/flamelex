@@ -11,22 +11,15 @@ defmodule GUI.Root.Reducer do
 
   """
   require Logger
+  alias GUI.Structs.Frame
 
-  # import Utilities.ComponentUtils
-  # use GUI.Reducer.ControlMode #TODO check this out...
-  # use GUI.Reducer.NewFrame #TODO love this idea but keep it simple for now
 
 
   def initialize(_state) do
     state = %{mode: :normal} #TODO should probs be a struct...
-    graph = default_root_graph()
+    graph = GUI.Utilities.Draw.blank_graph()
 
-    # update_state_and_graph(state, graph)
     {state, graph} #NOTE: can't use update_state_and_graph here cause init doesn't handle that
-  end
-
-  defp default_root_graph() do
-    GUI.Utilities.Draw.blank_graph()
   end
 
   def process({state, _graph}, 'ACTIVATE_COMMAND_BUFFER') do
@@ -34,25 +27,21 @@ defmodule GUI.Root.Reducer do
     update_state_only(%{state|mode: :command})
   end
 
-  def process({state, graph}, {'NEW_FRAME', [type: :text, content: content]}) do
+  # def process({state, graph}, {'NEW_FRAME', [type: :text, content: content]}) do
+  #   new_graph =
+  #     graph
+  #     |> GUI.Utilities.Draw.text(content) #TODO update the correct buffer GUI process, & do it from within that buffer itself (high-five!)
+
+  #   update_state_and_graph(state, new_graph) #TODO do we update the state??
+  # end
+
+  def process({state, graph}, {:initialize_command_buffer, buf}) do
+    buffer_frame =
+      Frame.new(buf, top_left_corner: {0, 400}, dimensions: {100, 100}, opts: []) #TODO use the state (viewport) to get dimensions & coordinates
+
     new_graph =
       graph
-      |> GUI.Utilities.Draw.text(content) #TODO update the correct buffer GUI process, & do it from within that buffer itself (high-five!)
-
-    update_state_and_graph(state, new_graph) #TODO do we update the state??
-  end
-
-  def process({state, graph}, {:initialize_command_buffer, %Structs.Buffer{type: :command}}) do
-    IO.puts "THIS IS INITIALIZING CMD BUFFER"
-    new_graph =
-      graph
-      # |> Scenic.Primitives.rect({100, 100}, translate: {10, 10}, fill: :cornflower_blue, stroke: {1, :ghost_white})
-      |> GUI.Component.CommandBuffer.add_to_graph(%{
-           # top_left_corner: {0, h - command_buffer.data.height},
-           top_left_corner: {0, 400},
-           # dimensions: {w, command_buffer.data.height},
-           dimensions: {400, 20}
-      })
+      |> GUI.Component.CommandBuffer.add_to_graph(buffer_frame)
 
     update_state_and_graph(state, new_graph) #TODO do we need to update the root state at all? I hope not
   end

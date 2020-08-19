@@ -2,13 +2,25 @@ defmodule GUI.Structs.Coordinates do
   @moduledoc """
   Struct which holds 2d points.
   """
-  defstruct [x: 0, y: 0]
-  defguard is_positive_integer(x) when is_integer(x) and x >= 0
+  use Franklin.Misc.CustomGuards
 
-  def initialize({x, y}) when is_positive_integer(x) and is_positive_integer(y) do
+  defstruct [x: 0, y: 0]
+
+  # def new(%__MODULE__{} = struct) do #TODO just return same struct?
+  #   struct
+  # end
+
+  def new({x, y}) when is_positive_integer(x) and is_positive_integer(y) do
     %__MODULE__{
       x: x,
       y: y
     }
   end
+
+  # def new(x: x, y: y) when is_positive_integer(x) and is_positive_integer(y) do
+  #   %__MODULE__{
+  #     x: x,
+  #     y: y
+  #   }
+  # end
 end

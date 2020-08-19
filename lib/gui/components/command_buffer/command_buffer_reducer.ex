@@ -4,21 +4,35 @@ defmodule GUI.Component.CommandBuffer.Reducer do
   'action' (usually a string, sometimed with some params) and return a
   mutated state and/or graph.
   """
-  require Logger
   alias GUI.Utilities.Draw
+  alias GUI.Structs.Frame
+  alias Scenic.Graph
   import Scenic.Primitives
+  require Logger
 
-  def initialize(state) do
-    draw_command_buffer(state)
+  @component_id :command
+
+  def initialize(%Frame{} = frame) do
+    Draw.blank_graph()
+    |> group(fn graph ->
+         graph
+         |> Draw.background(frame, :cornflower_blue)
+        #  |> command_prompt(state)
+        #  |> TextBox.add_to_graph(state |> text_box_initialization_data())
+        #  |> add_blinking_box_cursor(state)
+        #  |> draw_command_prompt_text(state)
+    end, [
+      id: @component_id,
+      hidden: true
+    ])
   end
 
+  def process({_state, graph}, 'ACTIVATE_COMMAND_BUFFER') do #TODO this should just be an atom
+    new_graph =
+      graph
+      |> Graph.modify(@component_id, &update_opts(&1, hidden: false))
 
-  def process({_state, graph}, 'ACTIVATE_COMMAND_BUFFER') do
-    #TODO change the visible flag on this component to true
-    graph
-    |> IO.inspect
-
-    :ignore_action
+    {:update_graph, new_graph}
   end
 
   # def process({%{mode: :command} = state, _graph}, 'DEACTIVATE_COMMAND_BUFFER') do
@@ -100,23 +114,4 @@ defmodule GUI.Component.CommandBuffer.Reducer do
     Logger.error "#{__MODULE__} received unknown state/action combination: action: #{inspect unknown_action}, state: #{inspect state}"
     state
   end
-
-
-  #TODO start this as hidden
-  def draw_command_buffer(%{top_left_corner: {x, y}, dimensions: {w, h}} = state) do
-    Draw.blank_graph()
-    |> group(fn graph ->
-         graph
-         |> Draw.background(state, :purple)
-        #  |> command_prompt(state)
-        #  |> TextBox.add_to_graph(state |> text_box_initialization_data())
-        #  |> add_blinking_box_cursor(state)
-        #  |> draw_command_prompt_text(state)
-      #  end, [
-      #    id: :command_buffer,
-      #   #  hidden: true
-      #  ])
-    end)
-  end
-
 end

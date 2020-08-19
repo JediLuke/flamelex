@@ -5,8 +5,10 @@ defmodule Franklin.Misc.CustomGuards do
     quote do
 
       defguard is_positive_integer(x)
-               when is_integer(x) and x >= 0
+               when is_integer(x)
+               and  x >= 0
 
+      #NOTE: Sadly, in macros we can't use recursion over a list of args...
       defguard all_positive_integers(a, b, c, d)
                when is_positive_integer(a)
                and  is_positive_integer(b)

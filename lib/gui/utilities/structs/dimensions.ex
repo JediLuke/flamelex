@@ -2,10 +2,11 @@ defmodule GUI.Structs.Dimensions do
   @moduledoc """
   Struct which holds 2d points.
   """
-  defstruct [width: 0, height: 0]
-  defguard is_positive_integer(x) when is_integer(x) and x >= 0
+  use Franklin.Misc.CustomGuards
 
-  def initialize({width, height}) when is_positive_integer(width) and is_positive_integer(height) do
+  defstruct [width: 0, height: 0]
+
+  def new({width, height}) when is_positive_integer(width) and is_positive_integer(height) do
     %__MODULE__{
       width: width,
       height: height

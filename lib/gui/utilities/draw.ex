@@ -1,35 +1,61 @@
 defmodule GUI.Utilities.Draw do
-  import Scenic.Primitives
+  use Franklin.Misc.CustomGuards
+  alias GUI.Structs.Frame
+
 
   @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash()
   @default_text_size 24
 
-  def blank_graph(text_size \\ @default_text_size) do
+
+  def blank_graph(text_size \\ @default_text_size) when is_integer(text_size) do
     Scenic.Graph.build(font: @ibm_plex_mono, font_size: text_size)
   end
 
-  def rectangle(%Scenic.Graph{} = graph) do
+  def background(%Scenic.Graph{} = graph, %Frame{} = frame, color) when is_atom(color) do
+    width  = frame.dimensions.width + 1 #TODO need width +1 here for some quirky reason of Scenic library
+    height = frame.dimensions.height
+
     graph
-    |> rect({50, 50}, [fill: :red, translate: {200, 200}])
+    |> Scenic.Primitives.rect({width, height}, fill: color, translate: {frame.coordinates.x, frame.coordinates.y})
   end
 
-  def text(%Scenic.Graph{} = graph, t) do
-    blank_graph()
-    |> text(t, font: @ibm_plex_mono,
-               translate: {5, 24}, # text draws from bottom-left corner?? :( also, how high is it???
-               font_size: 24, fill: :white)
-  end
 
-  def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}, color) when is_atom(color) do
-    #TODO need width +1 here for some quirky reason of Scenic library
-    graph
-    |> rect({w + 1, h}, [fill: color, translate: {x, y}])
-  end
-  def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}) do
-    #TODO need width +1 here for some quirky reason of Scenic library
-    graph
-    |> rect({w + 1, h}, [translate: {x, y}]) #TODO only green for dev
-  end
+
+  # |> Scenic.Primitives.rect({100, 100}, translate: {10, 10}, fill: :cornflower_blue, stroke: {1, :ghost_white})
+  # def rectangle( #TODO this is deprecated
+  #   %Scenic.Graph{} = graph,
+  #   {x, y}  = _coords,
+  #   [fill: c, translate: {x_translate, y_translate}] = opts)
+  # when all_positive_integers(x, y, x_translate, y_translate)
+  # and  is_list(opts)
+  # and  is_atom(c) do
+  #   coords = Coordinates.new(x: x, y: y)
+  #   rectangle(graph, coords, opts)
+  # end
+  # def rectangle(%Scenic.Graph{} = graph, %Coordinates{} = coords, opts) when is_list(opts) do
+  #   graph
+  #   |> Scenic.Primitives.rect(coords, opts)
+  # end
+
+  # def text(%Scenic.Graph{} = graph, t) do
+  #   graph
+  #   |> Scenic.Primitives.text(t, font: @ibm_plex_mono,
+  #              translate: {5, 24}, # text draws from bottom-left corner?? :( also, how high is it???
+  #              font_size: 24, fill: :white)
+  # end
+
+
+
+  # def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}, color) when is_atom(color) do
+  #   #TODO need width +1 here for some quirky reason of Scenic library
+  #   graph
+  #   |> Scenic.Primitives.rect({w + 1, h}, [fill: color, translate: {x, y}])
+  # end
+  # def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}) do
+  #   #TODO need width +1 here for some quirky reason of Scenic library
+  #   graph
+  #   |> Scenic.Primitives.rect({w + 1, h}, [translate: {x, y}]) #TODO only green for dev
+  # end
 end
 
 

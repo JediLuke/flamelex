@@ -7,7 +7,7 @@ defmodule Franklin.Buffer.Commander do
   alias Structs.Buffer
 
   def start_link([] = _default_params) do
-    GenServer.start_link(__MODULE__, Buffer.new(:command_buffer)) #NOTE: no need to use gproc for the commander
+    GenServer.start_link(__MODULE__, Buffer.new(:command)) #NOTE: no need to use gproc for the commander
   end
 
   def process(command) when is_binary(command) do
@@ -43,7 +43,6 @@ defmodule Franklin.Buffer.Commander do
 
   @impl GenServer
   def handle_continue(:initialize_gui, state) do
-    IO.puts "Initializing GUI ???"
     :timer.sleep(500) #TODO, this is necessary because the Root Scene is not started in sequence by Scenic, so we can't guarantee it is up yet when we start the application...
     GUI.Component.CommandBuffer.initialize(state)
     {:noreply, state}

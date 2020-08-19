@@ -70,8 +70,7 @@ defmodule GUI.Scene.Root do #TODO rename to Root.Scene
   # end
 
   #TODO do this in a totally different process - right now, the entire GUI can crash just because an action wasn't found...
-  def handle_cast({:action, action}, process_state = {state, graph}) do
-    IO.puts "ROOT HANDLE CALL #{inspect action}"
+  def handle_cast({:action, action}, {state, graph}) do
     case GUI.Root.Reducer.process({state, graph}, action) do
       :ignore_action ->
           {:noreply, {state, graph}}

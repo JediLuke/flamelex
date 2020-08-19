@@ -8,7 +8,6 @@ defmodule GUI do
   # def show_fullscreen(buffer), do: GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
 
   def activate_command_buffer do
-    IO.puts "START HERE"
     GUI.Scene.Root.action('ACTIVATE_COMMAND_BUFFER')
   end
 end

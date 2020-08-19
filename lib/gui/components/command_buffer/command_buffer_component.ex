@@ -3,45 +3,51 @@ defmodule GUI.Component.CommandBuffer do
   use Franklin.Misc.CustomGuards
   alias GUI.Component.CommandBuffer.Reducer
   alias Structs.Buffer
+  alias GUI.Structs.Frame
   require Logger
 
 
+  ## Public API
+  ## -------------------------------------------------------------------
+
+
+  @doc """
+  The `initialize` function is a function created as a convenience (it just
+  makes sense to put it here) which requests the GUI.Root.Scene to add this
+  Scenic.Component to the scene's graph.
+  """
+  def initialize(%Buffer{type: :command} = cmd_buf) do
+    GUI.Scene.Root.action({:initialize_command_buffer, cmd_buf})
+  end
+
+  @doc ~s(Make the command buffer visible.)
+  def activate, do: action 'ACTIVATE_COMMAND_BUFFER'
+
+
+  ## Public functions, which are nonetheless more or less for internal use
+  ## -------------------------------------------------------------------
+
+
+  #TODO hide these Scenic functions behind a nice macro
   @impl Scenic.Component
-  def verify(%{top_left_corner: {x, y}, dimensions: {w, h}} = data)
-             when all_positive_integers(x, y, w, h), do: {:ok, data}
+  def verify(%Frame{} = data), do: {:ok, data}
   def verify(_else), do: :invalid_data
 
   @impl Scenic.Component
   def info(_data), do: ~s(Invalid data)
 
-  def initialize(%Structs.Buffer{type: :command} = cmd_buf) do
-    IO.puts "THIS SHOULD BE STARTING THE PROCESS..."
-    GUI.Scene.Root.action({:initialize_command_buffer, cmd_buf})
-  end
-
   #NOTE: this is the one called by the RootReducer
   @impl Scenic.Scene
-  def init(data, opts) do
+  def init(%Frame{} = state, _opts) do
     Logger.info "Initializing #{__MODULE__}..."
-    Process.register(self(), __MODULE__) #TODO this should be grpoc
+    Process.register(self(), __MODULE__) #TODO this should be gproc
 
-    state =
-      data |> Map.merge(%{
-        component_ref: [],
-        opts: opts,
-        text: "" #TODO show some prompt text when the echo buffer gets initialized
-      })
-
-    graph =
-      Reducer.initialize(state)
+    graph = Reducer.initialize(state)
 
     {:ok, {state, graph}, push: graph}
   end
 
-  def activate, do: action 'ACTIVATE_COMMAND_BUFFER'
-
   def action(a) do
-    IO.puts "ACTION??? #{inspect a}"
     GenServer.cast(__MODULE__, {:action, a})
   end
 
@@ -52,15 +58,17 @@ defmodule GUI.Component.CommandBuffer do
 
   @impl Scenic.Scene
   def handle_cast({:action, action}, {state, graph}) do
-    IO.puts "COMPONENT HANDLING ACTION #{inspect action}"
-    case GUI.Component.CommandBuffer.Reducer.process({state, graph}, action) do
-      :ignore_action ->
-          {:noreply, {state, graph}}
-      {:update_state, new_state} when is_map(new_state) ->
-          {:noreply, {new_state, graph}}
-      {:update_all, {new_state, %Scenic.Graph{} = new_graph}} when is_map(new_state) ->
-          {:noreply, {new_state, new_graph}, push: new_graph}
-    end
+    GUI.Component.CommandBuffer.Reducer.process({state, graph}, action)
+    |> case do
+         :ignore_action
+            -> {:noreply, {state, graph}}
+         {:update_state, new_state} when is_map(new_state)
+            -> {:noreply, {new_state, graph}}
+         {:update_graph, %Scenic.Graph{} = new_graph}
+            -> {:noreply, {state, new_graph}, push: new_graph}
+         {:update_state_and_graph, {new_state, %Scenic.Graph{} = new_graph}} when is_map(new_state)
+            -> {:noreply, {new_state, new_graph}, push: new_graph}
+       end
   end
 
   # @impl Scenic.Scene
