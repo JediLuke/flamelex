@@ -7,6 +7,7 @@ defmodule GUI.Component.CommandBuffer.Reducer do
   alias GUI.Utilities.Draw
   alias GUI.Structs.Frame
   alias Scenic.Graph
+  alias GUI.Component.CommandBuffer.DrawingHelpers
   import Scenic.Primitives
   require Logger
 
@@ -19,7 +20,7 @@ defmodule GUI.Component.CommandBuffer.Reducer do
     |> group(fn graph ->
          graph
          |> Draw.background(frame, @command_mode_background_color)
-        #  |> command_prompt(state)
+         |> DrawingHelpers.draw_command_prompt(frame)
         #  |> TextBox.add_to_graph(state |> text_box_initialization_data())
         #  |> add_blinking_box_cursor(state)
         #  |> draw_command_prompt_text(state)

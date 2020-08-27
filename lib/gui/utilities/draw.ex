@@ -87,15 +87,6 @@ end
 #   alias Scenic.Graph
 #   alias Components.TextBox
 
-
-#   @margin 8               # left-hand side margin
-
-#   @prompt_margin 12
-
-#   @prompt_to_blinker_distance 22
-
-#   @empty_command_buffer_text_prompt "Enter a command..." #TODO move to a config file
-
 #   def echo_buffer(state) do
 #     blank_graph(state)
 #     |> background(state)
@@ -146,30 +137,8 @@ end
 #        )
 #   end
 
-#   defp command_prompt(graph, %{top_left_corner: {_x, top_left_y}, dimensions: {_w, height}}) do
-#     prompt_size = 18
-#     y_offset    = top_left_y + (height - prompt_size)/2 # from the top-left position of the box, the command prompt y-offset. (height - prompt_size) is how much bigger the buffer is than the command prompt, so it gives us the extra space - we divide this by 2 to get how much extra space we need to add, to the reference y coordinate, to center the command prompt inside the buffer
 
-#     # cmd_prompt_coordinates =
-#     #   x - point 1
-#     #   |\
-#     #   | \ x - point 2 (apex of triangle)
-#     #   | /
-#     #   |/
-#     #   x - point
 
-#     cmd_prompt_coordinates =
-#       {{@margin, y_offset}, # point 1
-#           {@margin+prompt_width(prompt_size), y_offset+prompt_size/2}, # point 2
-#       {@margin, y_offset + prompt_size}} # point 3
-
-#     graph
-#     |> triangle(cmd_prompt_coordinates, fill: :ghost_white)
-#   end
-
-#   defp prompt_width(prompt_size) do
-#     prompt_size * 0.67
-#   end
 
 #   defp text_box_initialization_data(%{dimensions: {buffer_width, buffer_height}, top_left_corner: {buffer_top_left_corner, buffer_top_right_corner}}) do
 #     #TODO make prompt_size a global or a state value or whatever
