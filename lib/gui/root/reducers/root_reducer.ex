@@ -13,18 +13,23 @@ defmodule GUI.Root.Reducer do
   require Logger
   alias GUI.Structs.Frame
 
+  @command_buffer_height 32
 
 
-  def initialize(_state) do
-    state = %{mode: :normal} #TODO should probs be a struct...
+
+  def initialize(opts) do
+    state = GUI.Structs.RootScene.new(opts)
     graph = GUI.Utilities.Draw.blank_graph()
 
     {state, graph} #NOTE: can't use update_state_and_graph here cause init doesn't handle that
   end
 
-  def process({state, _graph}, 'ACTIVATE_COMMAND_BUFFER') do
+  def process({state, _graph}, 'ACTIVATE_COMMAND_BUFFER') do #TODO why not make this an atom
+    # we need to do 2 separate things here,
+    #   1) Send a msg to CommandBuffer (separate process) to show itself
+    #   2) Update the state of the Scene.Root, because this state affects what inputs get mapped to
     GUI.Component.CommandBuffer.activate()
-    update_state_only(%{state|mode: :command})
+    put_in(state.input.mode, :command) |> update_state_only()
   end
 
   # def process({state, graph}, {'NEW_FRAME', [type: :text, content: content]}) do
@@ -35,9 +40,12 @@ defmodule GUI.Root.Reducer do
   #   update_state_and_graph(state, new_graph) #TODO do we update the state??
   # end
 
-  def process({state, graph}, {:initialize_command_buffer, buf}) do
+  def process({%{viewport: vp} = state, graph}, {:initialize_command_buffer, buf}) do
+
     buffer_frame =
-      Frame.new(buf, top_left_corner: {0, 400}, dimensions: {100, 100}, opts: []) #TODO use the state (viewport) to get dimensions & coordinates
+      buf |> Frame.new(
+               top_left_corner: {0, vp.height - @command_buffer_height},
+               dimensions:      {vp.width + 1, @command_buffer_height}, opts: []) #TODO why do we need that +1?? Without it, you can definitely see a thin black line on the edge
 
     new_graph =
       graph

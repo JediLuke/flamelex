@@ -17,9 +17,7 @@ defmodule GUI.Scene.Root do #TODO rename to Root.Scene
 
     GUI.Initialize.load_custom_fonts_into_global_cache()
 
-    {state, graph} =
-      initial_state(opts) #TODO I hate this
-      |> GUI.Root.Reducer.initialize()
+    {state, graph} = GUI.Root.Reducer.initialize(opts)
 
     {:ok, {state, graph}, push: graph}
   end
@@ -96,56 +94,4 @@ defmodule GUI.Scene.Root do #TODO rename to Root.Scene
   #   raise "Monitored process died. #{inspect context}"
   # end
 
-
-  ## private functions
-  ## -------------------------------------------------------------------
-
-
-  defp initial_state(opts) do
-    #TODO this should be a struct
-    %{
-      viewport: fetch_viewport_info(opts),
-
-      # buffers - all the current buffers. Note that buffers will call back with their pids once the components are initialized
-      # buffers: [
-      #   %{
-      #     id: :command_buffer,
-      #     pid: nil,
-      #     data: %{
-      #       # height: 28
-      #       height: Application.fetch_env!(:franklin, :bar_height)
-      #     },
-      #     state: %{
-      #       text: "Welcome to Franklin. Press <f1> for help."
-      #     }
-      #   },
-      #   %{
-      #     id: {:text_editor, 1, :untitled},
-      #     pid: nil,
-      #     data: %{
-      #       text_size: 24
-      #     },
-      #     active: :true
-      #   }
-      # ],
-
-      # the input mode for Franklin
-      input_mode: :control,
-
-      # input history keeps track of inputs that have been entered by the user
-      input_history: [],
-
-      # holds the ID of the active buffer
-      active_buffer: nil
-    }
-  end
-
-  defp fetch_viewport_info(opts) do
-    {:ok, %Scenic.ViewPort.Status{ size:
-      { viewport_width, viewport_height }}} =
-                          opts[:viewport]
-                          |> Scenic.ViewPort.info()
-
-    %{width: viewport_width, height: viewport_height}
-  end
 end

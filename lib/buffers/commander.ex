@@ -16,8 +16,8 @@ defmodule Franklin.Buffer.Commander do
 
   def activate do
     # #TODO so actually this sends a msg to the buffer, which may choose to ignore it, but will then use the Gui.Reducer to process what a new graph will look like, & send it to the GUI process
-    # IO.puts "ACTIVATE"
     # GUI.Component.CommandBuffer.action('ACTIVATE_COMMAND_BUFFER_PROMPT')
+    # GUI.Scene.Root.action('ACTIVATE_COMMAND_BUFFER')
     GUI.activate_command_buffer()
   end
 

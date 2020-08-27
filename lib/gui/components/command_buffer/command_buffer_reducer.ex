@@ -12,11 +12,13 @@ defmodule GUI.Component.CommandBuffer.Reducer do
 
   @component_id :command
 
+  @command_mode_background_color :cornflower_blue
+
   def initialize(%Frame{} = frame) do
     Draw.blank_graph()
     |> group(fn graph ->
          graph
-         |> Draw.background(frame, :cornflower_blue)
+         |> Draw.background(frame, @command_mode_background_color)
         #  |> command_prompt(state)
         #  |> TextBox.add_to_graph(state |> text_box_initialization_data())
         #  |> add_blinking_box_cursor(state)
@@ -31,6 +33,14 @@ defmodule GUI.Component.CommandBuffer.Reducer do
     new_graph =
       graph
       |> Graph.modify(@component_id, &update_opts(&1, hidden: false))
+
+    {:update_graph, new_graph}
+  end
+
+  def process({_state, graph}, 'DEACTIVATE_COMMAND_BUFFER') do #TODO this should just be an atom
+    new_graph =
+      graph
+      |> Graph.modify(@component_id, &update_opts(&1, hidden: true))
 
     {:update_graph, new_graph}
   end
@@ -112,6 +122,6 @@ defmodule GUI.Component.CommandBuffer.Reducer do
   # #NOTE: This must go on the bottom, as it's the catch-all...
   def process({state, _graph}, unknown_action) do
     Logger.error "#{__MODULE__} received unknown state/action combination: action: #{inspect unknown_action}, state: #{inspect state}"
-    state
+    :ignore_action
   end
 end
