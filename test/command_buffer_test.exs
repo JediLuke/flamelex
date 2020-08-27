@@ -1,6 +1,10 @@
 defmodule Franklin.Test.CommandBuffer do
   use ExUnit.Case
 
+  test "able to activate the command buffer"
+  test "able to deactivate the command buffer"
+
+
   describe "when in control mode" do
     test "press `space` to bring up the command buffer (if it's hidden)"
     test "press `space` to enter a space character in the command buffer (if the command buffer is visible)"
