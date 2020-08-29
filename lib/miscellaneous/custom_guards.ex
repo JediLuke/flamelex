@@ -4,8 +4,17 @@ defmodule Franklin.Misc.CustomGuards do
   defmacro __using__(_opts) do
     quote do
 
+      #NOTE: Include common aliases
+      alias Structs.Buffer
+      alias GUI.Utilities.Draw
+      alias GUI.Structs.Frame
+
       defguard is_positive_integer(x)
                when is_integer(x)
+               and  x >= 0
+
+      defguard is_positive_float(x)
+               when is_float(x)
                and  x >= 0
 
       #NOTE: Sadly, in macros we can't use recursion over a list of args...

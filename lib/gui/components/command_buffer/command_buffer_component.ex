@@ -3,7 +3,6 @@ defmodule GUI.Component.CommandBuffer do
   use Franklin.Misc.CustomGuards
   alias GUI.Component.CommandBuffer.Reducer
   alias Structs.Buffer
-  alias GUI.Structs.Frame
   require Logger
 
 

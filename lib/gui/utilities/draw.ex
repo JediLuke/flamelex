@@ -1,6 +1,5 @@
 defmodule GUI.Utilities.Draw do
   use Franklin.Misc.CustomGuards
-  alias GUI.Structs.Frame
 
 
   @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash()
@@ -17,6 +16,17 @@ defmodule GUI.Utilities.Draw do
 
     graph
     |> Scenic.Primitives.rect({width, height}, fill: color, translate: {frame.coordinates.x, frame.coordinates.y})
+  end
+
+  def border_box(%Scenic.Graph{} = graph, %Frame{} = frame) do
+    border_box(graph, frame, {1, :white})
+  end
+  def border_box(%Scenic.Graph{} = graph, %Frame{} = frame, {size, color} = stroke) when is_positive_integer(size) and is_atom(color) do
+    width  = frame.dimensions.width + 1 #TODO need width +1 here for some quirky reason of Scenic library
+    height = frame.dimensions.height
+
+    graph
+    |> Scenic.Primitives.rect({width, height}, stroke: stroke, translate: {frame.coordinates.x, frame.coordinates.y})
   end
 
 
@@ -140,14 +150,6 @@ end
 
 
 
-#   defp text_box_initialization_data(%{dimensions: {buffer_width, buffer_height}, top_left_corner: {buffer_top_left_corner, buffer_top_right_corner}}) do
-#     #TODO make prompt_size a global or a state value or whatever
-#     %{
-#       id: :text_box,
-#       dimensions: {buffer_width - @margin, buffer_height - 10},
-#       top_left_corner: {buffer_top_left_corner + @margin + prompt_width(18) + @margin, buffer_top_right_corner + 5}
-#     }
-#   end
 
 #       # # text size != text size in pixels. We get the difference between these 2, in pixels, and halve it, to get an offset we can use to center this text inside the command buffer
 #       # # y_offset = top_left_y + (height - @prompt_size)/2 # y is the reference coord, the offset from the top of the screen, where the command buffer gets drawn. (height - prompt_size) is how much bigger the buffer is than the command prompt, so it gives us the extra space - we divide this by 2 to get how much extra space we need to add, to the reference y coordinate, to center the command prompt inside the buffer

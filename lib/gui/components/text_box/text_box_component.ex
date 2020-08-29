@@ -1,17 +1,14 @@
-defmodule Components.TextBox do
+defmodule GUI.Component.TextBox do
   @moduledoc false
   use Scenic.Component
   require Logger
-  # import Components.Utilities.CommonDrawingFunctions
+  use Franklin.Misc.CustomGuards
 
   #TODO have horizontal scrolling if we go over the line
 
-  def verify(%{
-    id: _id,
-    top_left_corner: {_x, _y},
-    dimensions: {_w, _h}
-  } = data), do: {:ok, data}
-  def verify(_), do: :invalid_data
+  @impl Scenic.Component
+  def verify(%Frame{} = data), do: {:ok, data}
+  def verify(_else), do: :invalid_data
 
   def info(_data), do: ~s(Invalid data)
 
@@ -21,17 +18,17 @@ defmodule Components.TextBox do
   # end
 
   @doc false
-  def init(%{id: _id, top_left_corner: {_x, _y}, dimensions: {w, h}} = data, _opts) do
-    Logger.info "#{__MODULE__} initializing...#{inspect data}"
+  def init(%Frame{} = state, _opts) do
+    Logger.info "#{__MODULE__} initializing...#{inspect state}"
 
     # GenServer.call(GUI.Scene.Root, {:register, id})
-    state =
-      data
+    # state =
+    #   data
 
     graph =
       Scenic.Graph.build()
-      # |> background(state, :red)
-      |> GUI.Component.Cursor2.add_to_graph(data |> cursor_params())
+      |> Draw.background(state, :red)
+      # |> GUI.Component.Cursor.add_to_graph(data |> cursor_params())
 
 
     IO.puts "HIHIHIHI"

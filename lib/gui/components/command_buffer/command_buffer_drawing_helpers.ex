@@ -1,4 +1,5 @@
 defmodule GUI.Component.CommandBuffer.DrawingHelpers do
+  use Franklin.Misc.CustomGuards
 
 
   @prompt_color :ghost_white
@@ -12,8 +13,8 @@ defmodule GUI.Component.CommandBuffer.DrawingHelpers do
 
   def draw_command_prompt(graph, %GUI.Structs.Frame{
     #NOTE: These are the coords/dimens for the whole CommandBuffer Frame
-    coordinates: %GUI.Structs.Coordinates{x: _x, y: top_left_y},
-    dimensions: %GUI.Structs.Dimensions{height: height, width: _w}
+    coordinates: %GUI.Structs.Coordinates{x: _top_left_x, y: top_left_y},
+    dimensions: %GUI.Structs.Dimensions{height: height, width: _width}
   }) do
     #NOTE: The y_offset
     #      ------------
@@ -42,6 +43,34 @@ defmodule GUI.Component.CommandBuffer.DrawingHelpers do
     graph
     |> Scenic.Primitives.triangle({point1, point2, point3}, fill: @prompt_color)
   end
+
+  def draw_input_textbox(graph, %GUI.Structs.Frame{
+    #NOTE: These are the coords/dimens for the whole CommandBuffer Frame
+    coordinates: %GUI.Structs.Coordinates{x: cmd_buf_top_left_x, y: cmd_buf_top_left_y},
+    dimensions: %GUI.Structs.Dimensions{height: cmd_buf_height, width: cmd_buf_width}
+  }) do
+
+    total_prompt_width = prompt_width(@prompt_size) + (2*@prompt_margin)
+
+    textbox_coordinates = {
+      # this is the x coord for the top-left corner of the Textbox - take the CommandBuffer top_left_x and add some margin
+      cmd_buf_top_left_x + total_prompt_width,
+      # this is the y coord for the top-left corner of the Textbox - plus 5 to move the box down, because remember we reference from top-left corner
+      cmd_buf_top_left_y + 5
+    }
+
+    textbox_width      = cmd_buf_width - total_prompt_width - @prompt_margin
+    textbox_dimensions = {textbox_width, cmd_buf_height - 10}
+
+    textbox_frame =
+      Frame.new(
+              top_left_corner: textbox_coordinates,
+              dimensions:      textbox_dimensions)
+
+    graph
+    |> GUI.Utilities.Draw.border_box(textbox_frame)
+  end
+
 
   defp prompt_width(prompt_size) do
     prompt_size * 0.67

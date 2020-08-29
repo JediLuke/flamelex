@@ -4,12 +4,11 @@ defmodule GUI.Component.CommandBuffer.Reducer do
   'action' (usually a string, sometimed with some params) and return a
   mutated state and/or graph.
   """
-  alias GUI.Utilities.Draw
-  alias GUI.Structs.Frame
   alias Scenic.Graph
   alias GUI.Component.CommandBuffer.DrawingHelpers
   import Scenic.Primitives
   require Logger
+  use Franklin.Misc.CustomGuards
 
   @component_id :command
 
@@ -21,7 +20,7 @@ defmodule GUI.Component.CommandBuffer.Reducer do
          graph
          |> Draw.background(frame, @command_mode_background_color)
          |> DrawingHelpers.draw_command_prompt(frame)
-        #  |> TextBox.add_to_graph(state |> text_box_initialization_data())
+         |> DrawingHelpers.draw_input_textbox(frame)
         #  |> add_blinking_box_cursor(state)
         #  |> draw_command_prompt_text(state)
     end, [
@@ -39,24 +38,23 @@ defmodule GUI.Component.CommandBuffer.Reducer do
   end
 
   def process({_state, graph}, 'DEACTIVATE_COMMAND_BUFFER') do #TODO this should just be an atom
+    # def process({%{mode: :command} = state, _graph}, 'DEACTIVATE_COMMAND_BUFFER') do
+    #   new_state =
+    #     state
+    #     |> Map.replace!(:mode, :echo)
+    #     |> Map.replace!(:text, "Left `command` mode.")
+
+    #   new_graph =
+    #     Draw.echo_buffer(new_state)
+
+    #   {new_state, new_graph}
+    # end
     new_graph =
       graph
       |> Graph.modify(@component_id, &update_opts(&1, hidden: true))
 
     {:update_graph, new_graph}
   end
-
-  # def process({%{mode: :command} = state, _graph}, 'DEACTIVATE_COMMAND_BUFFER') do
-  #   new_state =
-  #     state
-  #     |> Map.replace!(:mode, :echo)
-  #     |> Map.replace!(:text, "Left `command` mode.")
-
-  #   new_graph =
-  #     Draw.echo_buffer(new_state)
-
-  #   {new_state, new_graph}
-  # end
 
   # # def process({state, graph}, {'ENTER_CHARACTER', {:codepoint, {letter, x}}}) when x in [0, 1] do # need the check on x because lower and uppercase letters have a different number here for some reason
   # def process({%{mode: :command} = state, graph}, {'ENTER_CHARACTER', char}) when is_binary(char) do

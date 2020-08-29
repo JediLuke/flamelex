@@ -1,4 +1,4 @@
-defmodule GUI.Component.Cursor2 do
+defmodule GUI.Component.Cursor do
   @moduledoc """
   Add a blinking text-input caret to a graph.
 

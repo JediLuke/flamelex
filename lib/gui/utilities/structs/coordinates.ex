@@ -17,10 +17,10 @@ defmodule GUI.Structs.Coordinates do
     }
   end
 
-  # def new(x: x, y: y) when is_positive_integer(x) and is_positive_integer(y) do
-  #   %__MODULE__{
-  #     x: x,
-  #     y: y
-  #   }
-  # end
+  def new({x, y}) do
+    %__MODULE__{
+      x: x,
+      y: y
+    }
+  end
 end

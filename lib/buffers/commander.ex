@@ -4,7 +4,7 @@ defmodule Franklin.Buffer.Commander do
   """
   use GenServer
   require Logger
-  alias Structs.Buffer
+  use Franklin.Misc.CustomGuards
 
   def start_link([] = _default_params) do
     GenServer.start_link(__MODULE__, Buffer.new(:command)) #NOTE: no need to use gproc for the commander
