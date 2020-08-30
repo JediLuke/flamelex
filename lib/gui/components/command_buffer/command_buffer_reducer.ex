@@ -10,18 +10,24 @@ defmodule GUI.Component.CommandBuffer.Reducer do
   require Logger
   use Franklin.Misc.CustomGuards
 
-  @component_id :command
+  @component_id :command_buffer
 
   @command_mode_background_color :cornflower_blue
 
   def initialize(%Frame{} = frame) do
+
+    # the textbox is internal to the command buffer, but we need the coordinates
+    # of it in a few places, so we can just pre-calculate it up here
+    %Frame{} = textbox_frame =
+      DrawingHelpers.calc_textbox_frame(frame)
+
     Draw.blank_graph()
     |> group(fn graph ->
          graph
          |> Draw.background(frame, @command_mode_background_color)
          |> DrawingHelpers.draw_command_prompt(frame)
-         |> DrawingHelpers.draw_input_textbox(frame)
-        #  |> add_blinking_box_cursor(state)
+         |> DrawingHelpers.draw_input_textbox(textbox_frame)
+         |> DrawingHelpers.draw_cursor(textbox_frame)
         #  |> draw_command_prompt_text(state)
     end, [
       id: @component_id,
@@ -55,6 +61,13 @@ defmodule GUI.Component.CommandBuffer.Reducer do
 
     {:update_graph, new_graph}
   end
+
+  # def process({_state, graph}, :move_cursor) do
+  #   graph
+  #   |> GUI.Component.Cursor.move()
+  #   {:update_graph, new_graph}
+  # end
+end
 
   # # def process({state, graph}, {'ENTER_CHARACTER', {:codepoint, {letter, x}}}) when x in [0, 1] do # need the check on x because lower and uppercase letters have a different number here for some reason
   # def process({%{mode: :command} = state, graph}, {'ENTER_CHARACTER', char}) when is_binary(char) do

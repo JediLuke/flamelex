@@ -1,5 +1,5 @@
 defmodule GUI.Component.CommandBuffer do
-  use Scenic.Component, has_children: false
+  use Scenic.Component
   use Franklin.Misc.CustomGuards
   alias GUI.Component.CommandBuffer.Reducer
   alias Structs.Buffer
@@ -48,6 +48,10 @@ defmodule GUI.Component.CommandBuffer do
 
   def action(a) do
     GenServer.cast(__MODULE__, {:action, a})
+  end
+
+  def move_cursor() do
+    GenServer.cast(__MODULE__, {:action, :move_cursor})
   end
 
 

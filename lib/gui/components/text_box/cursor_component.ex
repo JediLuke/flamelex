@@ -5,75 +5,77 @@ defmodule GUI.Component.Cursor do
   graph
   |> Cursor.add_to_graph({x_coordinate, y_coordinate, width, height, color})
   """
-  use Scenic.Component, has_children: false
+  use Scenic.Component
   import Scenic.{Primitive, Primitives}
   alias Scenic.Graph
   require Logger
+  use Franklin.Misc.CustomGuards
 
+  @blink_ms trunc(500) # blink speed in hertz
 
-  # blink speed in hertz
-  @blink_ms trunc(500)
-
-
+  @impl Scenic.Component
   def info(_data), do: ~s(Invalid data)
 
   # --------------------------------------------------------
   @doc false
-  def verify(%{
-    top_left_corner: {_x, _y},
-    dimensions: {_width, _height},
-    color: _color,
-    hidden?: _hidden?,
-    id: _id,
-    parent: %{
-      pid: _parent_pid
-    }
-  } = data), do: {:ok, data}
-  def verify(%{
-    id: _id,
-    top_left_corner: {_x, _y},
-    dimensions: {_width, _height},
-    # parent: %{
-    #   pid: _parent_pid
-    # }
-  } = data), do: {:ok, data}
-  def verify(_), do: :invalid_data
+  # def verify(%{
+  #   top_left_corner: {_x, _y},
+  #   dimensions: {_width, _height},
+  #   color: _color,
+  #   hidden?: _hidden?,
+  #   id: _id
+  # } = data), do: {:ok, data}
+  # def verify(_), do: :invalid_data
+
+  @impl Scenic.Component
+  def verify(%Frame{} = frame), do: {:ok, frame}
+  def verify(_else), do: :invalid_data
+
+  # def move(right: {x, :columns}) do
+
+  # end
 
   def move_right_one_column(pid) do
     GenServer.cast(pid, {:action, 'MOVE_RIGHT_ONE_COLUMN'})
   end
 
-  def move(pid, [top_left_corner: {_new_x, _new_y}, dimensions: {_new_width, _new_height}] = new_data) do
-    GenServer.cast(pid, {:move, new_data})
+  # def move(frame_id) do
+  def move({:command_buffer, :cursor, 1} = frame_id) do
+    pid = find_cursor(frame_id)
+    GenServer.cast(pid, 'MOVE_RIGHT_ONE_COLUMN')
+  end
+  defp find_cursor(_s) do
+    __MODULE__ #TODO this should be gproc
   end
 
-  #TODO dont hard code cursor, use the id passed in
+  @impl Scenic.Component
+  def init(%Frame{} = frame, _opts) do
+    Logger.info "Initializing #{__MODULE__}..."
 
-  def init(%{
-    top_left_corner: {x, y},
-    dimensions: {_width, _height},
-    color: _color,
-    hidden?: _hidden?,
-    # id: id,
-    # parent: %{
-    #   pid: _parent_pid
-    # }
-  } = data, _opts) do
-    Logger.info "#{__MODULE__} initializing...#{inspect data}"
+    IO.puts "Frame ID: #{inspect frame.id}"
+    Process.register(self(), __MODULE__) #TODO this should be gproc
 
-    # GenServer.call(data.parent.pid, {:register, id})
+    state = %{
+      frame: frame,
+      hidden?: false,
+      timer: nil, # holds an erlang :timer for the blink
+      original_position: {frame.coordinates.x, frame.coordinates.y} # so we can track how we've moved around
+    }
 
-    state = data |> Map.merge(%{timer: nil, original_position: {x, y}}) # holds an erlang :timer for the blink
-    graph = generate_graph(state)
+    graph =
+      Draw.blank_graph()
+      |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+           id: frame.id,
+           translate: {frame.coordinates.x, frame.coordinates.y},
+           fill: :ghost_white,
+           hidden?: false)
 
     GenServer.cast(self(), :start_blink)
 
     {:ok, {state, graph}, push: graph}
   end
-  def init(%{top_left_corner: {_x, _y}, dimensions: {_width, _height}} = data, opts) do
-    init(data |> Map.merge(%{color: :ghost_white, hidden?: false}), opts)
-  end
 
+  @impl Scenic.Component
   def handle_cast(:start_blink, {state, graph}) do
     {:ok, timer} = :timer.send_interval(@blink_ms, :blink)
     new_state = %{state | timer: timer}
@@ -165,26 +167,12 @@ defmodule GUI.Component.Cursor do
   def handle_info(:blink, {state, graph}) do
     new_state = %{state|hidden?: not state.hidden?}
 
-    # new_graph = generate_graph(new_state)
-
     new_graph =
       graph
-      |> Graph.modify(:cursor, &update_opts(&1, hidden: new_state.hidden?))
+      |> Graph.modify(state.frame.id, &update_opts(&1, hidden: new_state.hidden?))
 
     {:noreply, {new_state, new_graph}, push: new_graph}
   end
 
-  defp generate_graph(%{
-    top_left_corner: {x, y},
-    dimensions: {width, height},
-    color: color,
-    hidden?: hidden?
-  }) do
-    Graph.build()
-    |> rect({width, height},
-         id: :cursor,
-         translate: {x, y},
-         fill: color,
-         hidden?: hidden?)
-  end
+
 end

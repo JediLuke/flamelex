@@ -31,7 +31,6 @@ defmodule GUI.Component.TextBox do
       # |> GUI.Component.Cursor.add_to_graph(data |> cursor_params())
 
 
-    IO.puts "HIHIHIHI"
     {:ok, {state, graph}, push: graph}
   end
   # def init(%{id: id, top_left_corner: {_x, _y}, dimensions: {w, h}} = data, _opts) do

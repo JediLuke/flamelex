@@ -18,6 +18,23 @@ defmodule GUI.Utilities.Draw do
     |> Scenic.Primitives.rect({width, height}, fill: color, translate: {frame.coordinates.x, frame.coordinates.y})
   end
 
+  @doc """
+  Example:
+
+  ```
+  graph
+  |> Draw.box(
+        x: container_top_left_x,
+        y: container_top_left_y,
+        width: 10,
+        height: container_height)
+  ```
+  """
+  def box(%Scenic.Graph{} = graph, x: x, y: y, width: width, height: height) do
+    graph
+    |> Scenic.Primitives.rect({width, height}, fill: :white, translate: {x, y})
+  end
+
   def border_box(%Scenic.Graph{} = graph, %Frame{} = frame) do
     border_box(graph, frame, {1, :white})
   end

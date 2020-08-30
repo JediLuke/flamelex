@@ -6,6 +6,7 @@ defmodule GUI.Component.CommandBuffer.DrawingHelpers do
   @prompt_size 18
   @prompt_margin 12
 
+  @cursor_width GUI.FontHelpers.monospace_font_width(:ibm_plex, 24) #TODO get this properly
 
   # @prompt_to_blinker_distance 22
   # @empty_command_buffer_text_prompt "Enter a command..."
@@ -44,12 +45,11 @@ defmodule GUI.Component.CommandBuffer.DrawingHelpers do
     |> Scenic.Primitives.triangle({point1, point2, point3}, fill: @prompt_color)
   end
 
-  def draw_input_textbox(graph, %GUI.Structs.Frame{
+  def calc_textbox_frame(_buffer_frame = %GUI.Structs.Frame{
     #NOTE: These are the coords/dimens for the whole CommandBuffer Frame
     coordinates: %GUI.Structs.Coordinates{x: cmd_buf_top_left_x, y: cmd_buf_top_left_y},
     dimensions: %GUI.Structs.Dimensions{height: cmd_buf_height, width: cmd_buf_width}
   }) do
-
     total_prompt_width = prompt_width(@prompt_size) + (2*@prompt_margin)
 
     textbox_coordinates = {
@@ -67,8 +67,27 @@ defmodule GUI.Component.CommandBuffer.DrawingHelpers do
               top_left_corner: textbox_coordinates,
               dimensions:      textbox_dimensions)
 
+    # return
+    textbox_frame
+  end
+
+  def draw_input_textbox(graph, %GUI.Structs.Frame{} = textbox_frame) do
     graph
     |> GUI.Utilities.Draw.border_box(textbox_frame)
+  end
+
+  def draw_cursor(graph, %GUI.Structs.Frame{
+    coordinates: %GUI.Structs.Coordinates{x: container_top_left_x, y: container_top_left_y},
+    dimensions:  %GUI.Structs.Dimensions{height: container_height, width: _container_width}
+  }) do
+
+    cursor_frame = Frame.new(
+      id:              {:command_buffer, :cursor, 1},
+      top_left_corner: {container_top_left_x, container_top_left_y},
+      dimensions:      {@cursor_width, container_height})
+
+    graph
+    |> GUI.Component.Cursor.add_to_graph(cursor_frame)
   end
 
 

@@ -9,13 +9,22 @@ defmodule GUI.Structs.Frame do
 
 
   defstruct [
+    id:          nil,
     coordinates: %Coordinates{},
     dimensions:  %Dimensions{},
     scenic_opts: []
   ]
 
 
-def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d) do
+  #TODO really this should accept a %Coordinates{} and a %Dimensions{}
+  def new([id: id, top_left_corner: c, dimensions: d]) do
+    %__MODULE__{
+      id: id,
+      coordinates: c |> Coordinates.new(),
+      dimensions:  d |> Dimensions.new()
+    }
+  end
+  def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d) do
     %__MODULE__{
       coordinates: c |> Coordinates.new(),
       dimensions:  d |> Dimensions.new()
