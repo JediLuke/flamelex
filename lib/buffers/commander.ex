@@ -10,7 +10,7 @@ defmodule Franklin.Buffer.Commander do
     GenServer.start_link(__MODULE__, Buffer.new(:command)) #NOTE: no need to use gproc for the commander
   end
 
-  def process(command) when is_binary(command) do
+  def execute(command) when is_binary(command) do
     GenServer.cast(__MODULE__, {:command_buffer_command, command})
   end
 
@@ -26,7 +26,7 @@ defmodule Franklin.Buffer.Commander do
   end
 
   def enter_character(char) when is_binary(char) do
-    GUI.Component.CommandBuffer.action({'ENTER_CHARACTER', char})
+    GenServer.cast(__MODULE__, {:enter_char, char})
   end
 
 
@@ -48,39 +48,52 @@ defmodule Franklin.Buffer.Commander do
     {:noreply, state}
   end
 
-  @impl true
-  def handle_cast({:command_buffer_command, command}, state) do
-    case command do
-      "note" ->
-          new_note() #TODO change to tidbit, with note tags
-          {:noreply, state}
-      "list notes" ->
-          list_notes()
-          {:noreply, state}
-      "help" ->
-          raise "Help is no implemented, and it should be!!"
-          {:noreply, state}
-      "reload" ->
-          Logger.warn "Sending `kill` to GUI.Scene.Root..."
-          IEx.Helpers.recompile
-          Process.exit(Process.whereis(GUI.Scene.Root), :kill)
-          {:noreply, state}
-      "restart" ->
-          Logger.warn "Restarting Franklin..."
-          :init.restart()
-          {:noreply, state}
-      unrecognised_command ->
-          Logger.warn "#{__MODULE__} unrecognised command. Attempting to run as Elixir code... #{inspect unrecognised_command}"
-          Code.eval_string(unrecognised_command)
-          {:noreply, state}
-    end
+  @impl GenServer
+  def handle_cast({:enter_char, char}, state) do
+    new_state =
+      case state.content do
+        nil                 -> %{state|content: char}
+        c when is_binary(c) -> %{state|content: state.content <> char}
+      end
+
+    GUI.Component.CommandBuffer.action({:update_content, new_state.content})
+    GUI.Component.CommandBuffer.move_cursor()
+    {:noreply, new_state}
   end
 
-  def new_note do
-    Franklin.BufferSupervisor.note(%{title: "", text: ""})
-  end
+  # @impl true
+  # def handle_cast({:command_buffer_command, command}, state) do
+  #   case command do
+  #     "note" ->
+  #         new_note() #TODO change to tidbit, with note tags
+  #         {:noreply, state}
+  #     "list notes" ->
+  #         list_notes()
+  #         {:noreply, state}
+  #     "help" ->
+  #         raise "Help is no implemented, and it should be!!"
+  #         {:noreply, state}
+  #     "reload" ->
+  #         Logger.warn "Sending `kill` to GUI.Scene.Root..."
+  #         IEx.Helpers.recompile
+  #         Process.exit(Process.whereis(GUI.Scene.Root), :kill)
+  #         {:noreply, state}
+  #     "restart" ->
+  #         Logger.warn "Restarting Franklin..."
+  #         :init.restart()
+  #         {:noreply, state}
+  #     unrecognised_command ->
+  #         Logger.warn "#{__MODULE__} unrecognised command. Attempting to run as Elixir code... #{inspect unrecognised_command}"
+  #         Code.eval_string(unrecognised_command)
+  #         {:noreply, state}
+  #   end
+  # end
 
-  def list_notes do
-    Franklin.BufferSupervisor.list(:notes)
-  end
+  # def new_note do
+  #   Franklin.BufferSupervisor.note(%{title: "", text: ""})
+  # end
+
+  # def list_notes do
+  #   Franklin.BufferSupervisor.list(:notes)
+  # end
 end

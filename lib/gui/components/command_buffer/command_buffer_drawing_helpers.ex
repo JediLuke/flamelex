@@ -6,8 +6,10 @@ defmodule GUI.Component.CommandBuffer.DrawingHelpers do
   @prompt_size 18
   @prompt_margin 12
 
-  @cursor_width GUI.FontHelpers.monospace_font_width(:ibm_plex, 24) #TODO get this properly
+  @font_size 24
+  @cursor_width GUI.FontHelpers.monospace_font_width(:ibm_plex, @font_size) #TODO get this properly
 
+  @text_field_left_margin 2 # distance between the left-hand side of the text field box, and the start of the actual text. We want a little margin here for aesthetics
   # @prompt_to_blinker_distance 22
   # @empty_command_buffer_text_prompt "Enter a command..."
 
@@ -76,10 +78,14 @@ defmodule GUI.Component.CommandBuffer.DrawingHelpers do
     |> GUI.Utilities.Draw.border_box(textbox_frame)
   end
 
-  def draw_cursor(graph, %GUI.Structs.Frame{
-    coordinates: %GUI.Structs.Coordinates{x: container_top_left_x, y: container_top_left_y},
-    dimensions:  %GUI.Structs.Dimensions{height: container_height, width: _container_width}
-  }, id: cursor_component_id) do
+  def draw_cursor(
+        graph,
+        %GUI.Structs.Frame{
+           coordinates: %GUI.Structs.Coordinates{x: container_top_left_x, y: container_top_left_y},
+           dimensions:  %GUI.Structs.Dimensions{height: container_height, width: _container_width}
+        },
+        id: cursor_component_id)
+  do
 
     cursor_frame = Frame.new(
       id:              cursor_component_id,
@@ -90,6 +96,27 @@ defmodule GUI.Component.CommandBuffer.DrawingHelpers do
     |> GUI.Component.Cursor.add_to_graph(cursor_frame)
   end
 
+  def draw_text_field(
+        graph,
+        content,
+        %GUI.Structs.Frame{
+           coordinates: %GUI.Structs.Coordinates{x: container_top_left_x, y: container_top_left_y},
+           dimensions:  %GUI.Structs.Dimensions{height: container_height, width: _container_width}
+        },
+        id: text_field_id)
+  do
+
+    graph
+    |> Scenic.Primitives.text(
+         content,
+         id:        text_field_id,
+         translate: # {x_coord, y_coord}
+                    {container_top_left_x + @text_field_left_margin,
+                     container_top_left_y + (container_height-4)}, # text draws from bottom-left corner?? :( also, how high is it??? #TODO
+         font_size: @font_size,
+         fill:      :white)
+
+  end
 
   defp prompt_width(prompt_size) do
     prompt_size * 0.67

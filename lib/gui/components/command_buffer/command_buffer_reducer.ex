@@ -12,6 +12,7 @@ defmodule GUI.Component.CommandBuffer.Reducer do
 
   @component_id :command_buffer
   @cursor_component_id {:command_buffer, :cursor, 1}
+  @text_field_id {:command_buffer, :text_field}
 
   @command_mode_background_color :cornflower_blue
 
@@ -23,13 +24,13 @@ defmodule GUI.Component.CommandBuffer.Reducer do
       DrawingHelpers.calc_textbox_frame(frame)
 
     Draw.blank_graph()
-    |> group(fn graph ->
+    |> Scenic.Primitives.group(fn graph ->
          graph
          |> Draw.background(frame, @command_mode_background_color)
          |> DrawingHelpers.draw_command_prompt(frame)
          |> DrawingHelpers.draw_input_textbox(textbox_frame)
          |> DrawingHelpers.draw_cursor(textbox_frame, id: @cursor_component_id)
-        #  |> draw_command_prompt_text(state)
+         |> DrawingHelpers.draw_text_field("", textbox_frame, id: @text_field_id) #NOTE: Start with an empty string
     end, [
       id: @component_id,
       hidden: true
@@ -68,25 +69,13 @@ defmodule GUI.Component.CommandBuffer.Reducer do
     :ignore_action #TODO better name would be "no update to this processes state"
   end
 
-  # # def process({state, graph}, {'ENTER_CHARACTER', {:codepoint, {letter, x}}}) when x in [0, 1] do # need the check on x because lower and uppercase letters have a different number here for some reason
-  # def process({%{mode: :command} = state, graph}, {'ENTER_CHARACTER', char}) when is_binary(char) do
-  #   updated_buffer_text =
-  #     state.text <> char
+  # def process({state, graph}, {'ENTER_CHARACTER', {:codepoint, {letter, x}}}) when x in [0, 1] do # need the check on x because lower and uppercase letters have a different number here for some reason
+  def process({state, graph}, {:update_content, content}) when is_binary(content) do
+    new_graph =
+      graph |> Graph.modify(@text_field_id, &text(&1, content))
 
-  #   new_state =
-  #     state |> Map.replace!(:text, updated_buffer_text)
-
-  #   #TODO move the cursor
-  #   # {:cursor, pid} = state.component_ref |> hd #TODO, eventually we'll have more componenst
-  #   # GenServer.cast(pid, {:action, 'MOVE_RIGHT_ONE_COLUMN'})
-
-  #   # $TODO update text box - requres sending msg to text_buffer
-  #   # new_graph =
-  #   #   graph
-  #   #   |> Graph.modify(:buffer_text, &text(&1, updated_buffer_text, fill: :blue))
-
-  #   new_state
-  # end
+    {:update_graph, new_graph}
+  end
 
 
   # def process({%{text: ""} = state, _graph}, 'COMMAND_BUFFER_BACKSPACE') do

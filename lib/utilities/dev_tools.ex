@@ -1,6 +1,5 @@
 defmodule DevTools do
-  # alias Structs.Buffer
-  import Utilities.ProcessRegistry
+  alias Franklin.Buffer.Commander
 
   defmacro __using__(_) do
     quote do
@@ -27,6 +26,7 @@ defmodule DevTools do
 
     # open_file_in_buffer()
     activate_command_buffer()
+    Commander.enter_character("e")
   end
 
   def open_file_in_buffer do
