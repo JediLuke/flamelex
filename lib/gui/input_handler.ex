@@ -40,10 +40,10 @@ defmodule GUI.Input.EventHandler do
     state |> add_to_input_history(input)
   end
 
-  # def process(%{command_buffer: %{visible?: true}, mode: :control} = state, @enter_key) do
-  #   Scene.action('PROCESS_COMMAND_BUFFER_TEXT_AS_COMMAND')
-  #   state
-  # end
+  def process(%{input: %{mode: :command}} = state, @enter_key) do
+    Franklin.Buffer.Commander.execute_contents()
+    state
+  end
 
   # def process(%{command_buffer: %{visible?: true}, mode: :control} = state, @left_shift_and_space_bar) do
   #   Scene.action('CLEAR_AND_CLOSE_COMMAND_BUFFER')
