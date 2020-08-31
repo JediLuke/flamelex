@@ -12,79 +12,92 @@ defmodule GUI.Input.EventHandler do
   end
 
 
+  #TODO do all these in their own process process
+
+
   ## Command buffer commands
   ## -------------------------------------------------------------------
 
 
-  def process(%{command_buffer: %{visible?: false}, mode: :control} = state, @space_bar) do
-    Scene.action('SHOW_EXECUTE_COMMAND_PROMPT')
-    state
+  def process(%{input: %{mode: :normal}} = state, @space_bar) do
+    Logger.info "Space bar was pressed  !!"
+    Franklin.Buffer.Commander.activate()
+    state.input.mode |> put_in(:command)
   end
 
-  def process(%{command_buffer: %{visible?: true}, mode: :control} = state, input) when input in @valid_command_buffer_inputs do
-    Scene.action({'COMMAND_BUFFER_INPUT', input})
-    state |> add_to_input_history(input)
+  def process(%{input: %{mode: :command}} = state, @escape_key) do
+    Logger.debug "Closing CommandBuffer..."
+    Franklin.Buffer.Commander.deactivate()
+
+    state.input.mode |> put_in(:normal)
   end
 
-  def process(%{command_buffer: %{visible?: true}, mode: :control} = state, @enter_key) do
-    Scene.action('PROCESS_COMMAND_BUFFER_TEXT_AS_COMMAND')
-    state
-  end
 
-  def process(%{command_buffer: %{visible?: true}, mode: :control} = state, @escape_key) do
-    Scene.action('CLEAR_AND_CLOSE_COMMAND_BUFFER')
-    state
-  end
 
-  def process(%{command_buffer: %{visible?: true}, mode: :control} = state, @left_shift_and_space_bar) do
-    Scene.action('CLEAR_AND_CLOSE_COMMAND_BUFFER')
-    state
-  end
+  # def process(%{command_buffer: %{visible?: false}, mode: :control} = state, @space_bar) do
+  #   Scene.action('SHOW_EXECUTE_COMMAND_PROMPT')
+  #   state
+  # end
 
-  def process(%{command_buffer: %{visible?: true}, mode: :control} = state, @space_bar = input) do
-    Scene.action({'COMMAND_BUFFER_INPUT', input})
-    state |> add_to_input_history(input)
-  end
+  # def process(%{command_buffer: %{visible?: true}, mode: :control} = state, input) when input in @valid_command_buffer_inputs do
+  #   Scene.action({'COMMAND_BUFFER_INPUT', input})
+  #   state |> add_to_input_history(input)
+  # end
 
-  def process(%{command_buffer: %{visible?: true}, mode: :control} = state, backspace) when backspace in @backspace_input do
-    Scene.action('COMMAND_BUFFER_BACKSPACE')
-    state
-  end
+  # def process(%{command_buffer: %{visible?: true}, mode: :control} = state, @enter_key) do
+  #   Scene.action('PROCESS_COMMAND_BUFFER_TEXT_AS_COMMAND')
+  #   state
+  # end
+
+  # def process(%{command_buffer: %{visible?: true}, mode: :control} = state, @left_shift_and_space_bar) do
+  #   Scene.action('CLEAR_AND_CLOSE_COMMAND_BUFFER')
+  #   state
+  # end
+
+  # def process(%{command_buffer: %{visible?: true}, mode: :control} = state, @space_bar = input) do
+  #   Scene.action({'COMMAND_BUFFER_INPUT', input})
+  #   state |> add_to_input_history(input)
+  # end
+
+  # def process(%{command_buffer: %{visible?: true}, mode: :control} = state, backspace) when backspace in @backspace_input do
+  #   Scene.action('COMMAND_BUFFER_BACKSPACE')
+  #   state
+  # end
 
 
   ## Active buffer
   ## -------------------------------------------------------------------
 
 
-  def process(%{active_buffer: {:note, _x, _pid} = buf} = state, input) when input in @valid_command_buffer_inputs do
-    Scene.action({'NOTE_INPUT', buf, input})
-    state |> add_to_input_history(input)
-  end
+  # def process(%{active_buffer: {:note, _x, _pid} = buf} = state, input) when input in @valid_command_buffer_inputs do
+  #   Scene.action({'NOTE_INPUT', buf, input})
+  #   state |> add_to_input_history(input)
+  # end
 
-  def process(%{active_buffer: {:note, _x, buffer_pid}} = state, @tab_key) do
-    Franklin.Buffer.Note.tab_key_pressed(buffer_pid)
-    state
-  end
+  # def process(%{active_buffer: {:note, _x, buffer_pid}} = state, @tab_key) do
+  #   Franklin.Buffer.Note.tab_key_pressed(buffer_pid)
+  #   state
+  # end
 
-  def process(%{active_buffer: {:note, _x, _buffer_pid}, mode: :control} = state, @escape_key) do
-    Logger.warn "Pressing ESC in control mode does nothing right now."
-    state
-  end
+  # def process(%{active_buffer: {:note, _x, _buffer_pid}, mode: :control} = state, @escape_key) do
+  #   Logger.warn "Pressing ESC in control mode does nothing right now."
+  #   state
+  # end
 
-  def process(%{active_buffer: {:note, _x, buffer_pid}, mode: :control} = state, @enter_key) do
-    Franklin.Buffer.Note.save_and_close(buffer_pid)
-    state
-  end
+  # def process(%{active_buffer: {:note, _x, buffer_pid}, mode: :control} = state, @enter_key) do
+  #   Franklin.Buffer.Note.save_and_close(buffer_pid)
+  #   state
+  # end
 
-  def process(%{active_buffer: {:note, _x, _buffer_pid}, mode: mode} = state, @escape_key) when mode != :control do
-    #TODO write own action for switching modes
-    state |> Map.replace!(:mode, :control)
-  end
+  # def process(%{active_buffer: {:note, _x, _buffer_pid}, mode: mode} = state, @escape_key) when mode != :control do
+  #   #TODO write own action for switching modes
+  #   state |> Map.replace!(:mode, :control)
+  # end
 
-  def process(%{active_buffer: {:note, _x, buffer_pid}} = state, @left_shift_and_tab) do
-    Franklin.Buffer.Note.reverse_tab(buffer_pid) #TODO have better lookup than just pid, so we could use this from cmd line
-    state
-  end
+  # def process(%{active_buffer: {:note, _x, buffer_pid}} = state, @left_shift_and_tab) do
+  #   Franklin.Buffer.Note.reverse_tab(buffer_pid) #TODO have better lookup than just pid, so we could use this from cmd line
+  #   state
+  # end
 
 
 
@@ -100,6 +113,7 @@ defmodule GUI.Input.EventHandler do
   def process(state, unhandled_event) do
     Logger.debug("#{__MODULE__} Unhandled event: #{inspect(unhandled_event)}")
     state
+    |> IO.inspect(label: "-- DEBUG: state --")
   end
 
 

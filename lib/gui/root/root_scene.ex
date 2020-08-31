@@ -1,10 +1,6 @@
 defmodule GUI.Scene.Root do #TODO rename to Root.Scene
   use Scenic.Scene
   require Logger
-  alias GUI.Input.EventHandler
-  # alias GUI.Component.CommandBuffer
-
-  # @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash
 
 
   ## public API
@@ -22,10 +18,10 @@ defmodule GUI.Scene.Root do #TODO rename to Root.Scene
     {:ok, {state, graph}, push: graph}
   end
 
-  def redraw(%Scenic.Graph{} = g), do: GenServer.cast(__MODULE__, {:redraw, g})
-
   def action(a), do: GenServer.cast(__MODULE__, {:action, a})
 
+
+  # def redraw(%Scenic.Graph{} = g), do: GenServer.cast(__MODULE__, {:redraw, g})
   # def pop_state, do: GenServer.call(__MODULE__, :pop_state)
 
 
@@ -33,34 +29,30 @@ defmodule GUI.Scene.Root do #TODO rename to Root.Scene
   ## -------------------------------------------------------------------
 
 
-  #TODO do this in a totally different process
-  def handle_input(input, _context, {state, graph}) do
-    state = EventHandler.process(state, input) #TODO do this in a totally different process
-    {:noreply, {state, graph}}
-  end
+  # @doc """
+  # Simply return the current state, and the %Scenic.Graph{}
 
-  #TODO this is fkin stupid...
-  # def handle_call({:register, identifier}, {pid, _ref}, {%{component_ref: ref_list} = state, graph}) do
-  #   Process.monitor(pid)
-
-  #   new_component = {identifier, pid}
-  #   #TODO ensure new component registry is unique!
-  #   Logger.info "#{__MODULE__} registering component: #{inspect new_component}..."
-  #   new_ref_list = ref_list ++ [new_component]
-  #   new_state = state |> Map.replace!(:component_ref, new_ref_list)
-
-  #   {:reply, :ok, {new_state, graph}}
+  # This is used by GUI.Controller when it initializes - it calls this process
+  # to grab the state of the GUI, & it's able to "take charge" once the
+  # state is known.
+  # """
+  # def handle_call(:pop_state, {_pid, _ref}, {state, graph}) do
+  #   {:reply, :ok, {state, graph}}
   # end
 
   @doc """
-  Simply return the current state, and the %Scenic.Graph{}
+  This function handles user input. All input for a scene routes through
+  here.
 
-  This is used by GUI.Controller when it initializes - it calls this process
-  to grab the state of the GUI, & it's able to "take charge" once the
-  state is known.
+  We use the state of the root scene (which may include global variables
+  such as which mode we are in, and the recent input history, to allow
+  chaining of keystrokes), as well as the input itself, to compute the new
+  state, as well as fire off any secondary events or updates that this
+  input requests.
   """
-  def handle_call(:pop_state, {_pid, _ref}, {state, graph}) do
-    {:reply, :ok, {state, graph}}
+  def handle_input(input, _context, {state, graph}) do
+    state = GUI.Input.EventHandler.process(state, input)
+    {:noreply, {state, graph}}
   end
 
   # def handle_cast({:redraw, new_graph}, {state, _graph}) do
@@ -68,6 +60,15 @@ defmodule GUI.Scene.Root do #TODO rename to Root.Scene
   # end
 
   #TODO do this in a totally different process - right now, the entire GUI can crash just because an action wasn't found...
+  # the main idea here is, we should have a totally different process, which
+  # also holds this processes state. We route all inputs straight to that
+  # other process, which has just as much knowledge of what's going on
+  # (and in fact after this process boots & returns it's state, it has
+  # effectively ceded control over it's own state), so it's totally able
+  # to compute any changes to the GUI. It computes this new graph & simply
+  # sends this process an update. Thus this process is just doing two things,
+  # 1) spining up new event handler processes to respond to events and 2)
+  # receiving GUI updates computed by the corresponding controller.
   def handle_cast({:action, action}, {state, graph}) do
     case GUI.Root.Reducer.process({state, graph}, action) do
       :ignore_action ->
@@ -78,20 +79,4 @@ defmodule GUI.Scene.Root do #TODO rename to Root.Scene
           {:noreply, {new_state, new_graph}, push: new_graph}
     end
   end
-
-  #TODO possibly link to buffer processes once they are up
-
-  # def handle_info({:DOWN, ref, :process, object, reason}, state) when reason in [:normal, :shutdown] do
-  #   context = %{ref: ref, object: object}
-  #   Logger.info "A component monitored by #{__MODULE__} ended normally. #{inspect context}"
-  #   #TODO remove from component list
-  #   {:noreply, state}
-  # end
-
-  # def handle_info({:DOWN, ref, :process, object, reason}, _state) do
-  #   context = %{ref: ref, object: object, reason: reason}
-  #   #TODO handle failures
-  #   raise "Monitored process died. #{inspect context}"
-  # end
-
 end

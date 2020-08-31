@@ -7,7 +7,7 @@ defmodule Franklin.Misc.CustomGuards do
       #NOTE: Include common aliases
       alias Structs.Buffer
       alias GUI.Utilities.Draw
-      alias GUI.Structs.Frame
+      alias GUI.Structs.{Coordinates, Dimensions, Frame}
 
       defguard is_positive_integer(x)
                when is_integer(x)

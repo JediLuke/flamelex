@@ -21,13 +21,13 @@ defmodule Franklin.Buffer.Commander do
     GUI.activate_command_buffer()
   end
 
-  def deactivate do
-    GUI.Component.CommandBuffer.action('DEACTIVATE_COMMAND_BUFFER')
-  end
+  def deactivate, do: GenServer.cast(__MODULE__, :deactivate_command_buffer)
 
   def enter_character(char) when is_binary(char) do
     GenServer.cast(__MODULE__, {:enter_char, char})
   end
+
+  def reset_text_field, do: GenServer.cast(__MODULE__, :reset_text_field)
 
 
   ## GenServer callbacks
@@ -59,6 +59,23 @@ defmodule Franklin.Buffer.Commander do
     GUI.Component.CommandBuffer.action({:update_content, new_state.content})
     GUI.Component.CommandBuffer.move_cursor()
     {:noreply, new_state}
+  end
+
+  @impl GenServer
+  def handle_cast(:reset_text_field, state) do
+    new_state = %{state|content: ""}
+
+    GUI.Component.CommandBuffer.action({:update_content, new_state.content})
+    GUI.Component.CommandBuffer.action(:reset_cursor)
+    {:noreply, new_state}
+  end
+
+  @impl GenServer
+  def handle_cast(:deactivate_command_buffer, state) do
+    #NOTE/TODO: So, could it be possible we send msg to reset (to ourselves), then we send :hide to the GUI - but that :hide gets there first, then say in THIS process we start resetting, which involves further updates to GUI... can these events be run in the wrong order??
+    GenServer.cast(__MODULE__, :reset_text_field)
+    GUI.Component.CommandBuffer.action(:hide_command_buffer)
+    {:noreply, state}
   end
 
   # @impl true

@@ -45,18 +45,18 @@ defmodule GUI.Component.CommandBuffer.Reducer do
     {:update_graph, new_graph}
   end
 
-  def process({_state, graph}, 'DEACTIVATE_COMMAND_BUFFER') do #TODO this should just be an atom
-    # def process({%{mode: :command} = state, _graph}, 'DEACTIVATE_COMMAND_BUFFER') do
-    #   new_state =
-    #     state
-    #     |> Map.replace!(:mode, :echo)
-    #     |> Map.replace!(:text, "Left `command` mode.")
+  # def process({%{mode: :command} = state, _graph}, 'DEACTIVATE_COMMAND_BUFFER') do
+  #   new_state =
+  #     state
+  #     |> Map.replace!(:mode, :echo)
+  #     |> Map.replace!(:text, "Left `command` mode.")
 
-    #   new_graph =
-    #     Draw.echo_buffer(new_state)
+  #   new_graph =
+  #     Draw.echo_buffer(new_state)
 
-    #   {new_state, new_graph}
-    # end
+  #   {new_state, new_graph}
+  # end
+  def process({_state, graph}, :hide_command_buffer) do
     new_graph =
       graph
       |> Graph.modify(@component_id, &update_opts(&1, hidden: true))
@@ -68,6 +68,14 @@ defmodule GUI.Component.CommandBuffer.Reducer do
     @cursor_component_id |> GUI.Component.Cursor.move(:right)
     :ignore_action #TODO better name would be "no update to this processes state"
   end
+
+  def process({_state, _graph}, :reset_cursor) do
+    @cursor_component_id
+    |> GUI.Component.Cursor.action(:reset_position)
+
+    :ignore_action
+  end
+
 
   # def process({state, graph}, {'ENTER_CHARACTER', {:codepoint, {letter, x}}}) when x in [0, 1] do # need the check on x because lower and uppercase letters have a different number here for some reason
   def process({state, graph}, {:update_content, content}) when is_binary(content) do

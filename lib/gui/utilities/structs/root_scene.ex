@@ -4,6 +4,8 @@ defmodule GUI.Structs.RootScene do
   """
   use Franklin.Misc.CustomGuards
 
+  @valid_modes [:normal, :command, :select] #TODO validate the modes
+
   defstruct [
     viewport: %{      # Holds the viewport info (comes when GUI app starts)
       width: nil,

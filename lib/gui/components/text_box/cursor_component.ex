@@ -13,47 +13,51 @@ defmodule GUI.Component.Cursor do
 
   @blink_ms trunc(500) # blink speed in hertz
 
-  @impl Scenic.Component
-  def info(_data), do: ~s(Invalid data)
 
   # --------------------------------------------------------
-  @doc false
-  # def verify(%{
-  #   top_left_corner: {_x, _y},
-  #   dimensions: {_width, _height},
-  #   color: _color,
-  #   hidden?: _hidden?,
-  #   id: _id
-  # } = data), do: {:ok, data}
-  # def verify(_), do: :invalid_data
+  # actions (Public API)
+
+
+  def move(cursor_id, :right) do
+    cursor_id |> action(:move_right_one_column)
+  end
+
+  # This is the generic action handler, it feeds through to the Reducer
+  def action(cursor_id, params) do
+    cursor_id
+    |> Utilities.ProcessRegistry.fetch_pid!()
+    |> GenServer.cast({:action, params})
+  end
+
+
+  # --------------------------------------------------------
+  # Scenic.Component callbacks
+
+
+  @impl Scenic.Component
+  def info(_data), do: ~s(Invalid data)
 
   @impl Scenic.Component
   def verify(%Frame{} = frame), do: {:ok, frame}
   def verify(_else), do: :invalid_data
 
-  # def move(right: {x, :columns}) do
 
-  # end
+  # --------------------------------------------------------
+  # init
 
-  def move_right_one_column(pid) do
-    GenServer.cast(pid, {:action, 'MOVE_RIGHT_ONE_COLUMN'})
-  end
 
-  def move(cursor_id, :right) do
-    pid = cursor_id |> Utilities.ProcessRegistry.fetch_pid!()
-    GenServer.cast(pid, {:action, 'MOVE_RIGHT_ONE_COLUMN'})
-  end
-
+  @impl Scenic.Scene
   def init(%Frame{} = frame, _opts) do
     Logger.info "Initializing #{__MODULE__}..."
 
     Utilities.ProcessRegistry.register(frame.id)
 
+    #TODO use a Struct here
     state = %{
       frame: frame,
       hidden?: false,
       timer: nil, # holds an erlang :timer for the blink
-      original_position: {frame.coordinates.x, frame.coordinates.y} # so we can track how we've moved around
+      original_coordinates: frame.coordinates # so we can track how we've moved around
     }
 
     graph =
@@ -69,21 +73,22 @@ defmodule GUI.Component.Cursor do
     {:ok, {state, graph}, push: graph}
   end
 
-  @impl Scenic.Component
-  def handle_cast(:start_blink, {state, graph}) do
-    {:ok, timer} = :timer.send_interval(@blink_ms, :blink)
-    new_state = %{state | timer: timer}
-    {:noreply, {new_state, graph}}
-  end
 
-  def handle_cast({:action, 'MOVE_RIGHT_ONE_COLUMN'}, {state, graph}) do
-    %GUI.Structs.Dimensions{height: _height, width: width} = state.frame.dimensions
-    %GUI.Structs.Coordinates{x: current_top_left_x, y: current_top_left_y} = state.frame.coordinates
+  # --------------------------------------------------------
+  # actions handlers
+
+
+  @impl Scenic.Scene
+  def handle_cast({:action, :move_right_one_column}, {state, graph}) do
+    %Dimensions{height: _height, width: width} =
+      state.frame.dimensions
+    %Coordinates{x: current_top_left_x, y: current_top_left_y} =
+      state.frame.coordinates
 
     new_state =
       %{state|frame:
           state.frame |> Frame.reposition(
-            x: current_top_left_x + width,
+            x: current_top_left_x + width, #TODO this is actually just *slightly* too narrow for some reason
             y: current_top_left_y)}
 
     new_graph =
@@ -95,52 +100,85 @@ defmodule GUI.Component.Cursor do
     {:noreply, {new_state, new_graph}, push: new_graph}
   end
 
-  def handle_cast({:action, 'MOVE_LEFT_ONE_COLUMN'}, {state, graph}) do
-    {width, _height} = state.dimensions
-    {current_top_left_x, current_top_left_y} = state.top_left_corner
-
+  @impl Scenic.Scene
+  def handle_cast({:action, :reset_position}, {state, graph}) do
     new_state =
-      %{state|top_left_corner: {current_top_left_x - width, current_top_left_y}}
+      state.frame.coordinates |> put_in(state.original_coordinates)
 
     new_graph =
       graph
-      |> Graph.modify(:cursor, fn %Scenic.Primitive{} = box ->
-           put_transform(box, :translate, new_state.top_left_corner)
+      |> Graph.modify(state.frame.id, fn %Scenic.Primitive{} = box ->
+           put_transform(box, :translate, {new_state.frame.coordinates.x, new_state.frame.coordinates.y})
          end)
 
     {:noreply, {new_state, new_graph}, push: new_graph}
   end
 
-  def handle_cast({:move, [top_left_corner: new_top_left_corner, dimensions: {new_width, new_height}]}, {state, graph}) do
-    new_state =
-      %{state|top_left_corner: new_top_left_corner, dimensions: {new_width, new_height}}
 
-    [%Scenic.Primitive{id: :cursor, styles: %{fill: color, hidden: hidden?}}] =
-      Graph.find(graph, fn primitive -> primitive == :cursor end)
+  # --------------------------------------------------------
+  # GenServer callbacks
+
+
+  @impl Scenic.Scene
+  def handle_cast(:start_blink, {state, graph}) do
+    {:ok, timer} = :timer.send_interval(@blink_ms, :blink)
+    new_state = %{state | timer: timer}
+    {:noreply, {new_state, graph}}
+  end
+
+  @impl Scenic.Scene
+  def handle_info(:blink, {state, graph}) do
+    new_state = %{state|hidden?: not state.hidden?}
 
     new_graph =
       graph
-      |> Graph.delete(:cursor)
-      |> rect({new_width, new_height},
-           id: :cursor,
-           translate: new_state.top_left_corner,
-           fill: color,
-           hidden?: hidden?)
+      |> Graph.modify(state.frame.id, &update_opts(&1, hidden: new_state.hidden?))
 
     {:noreply, {new_state, new_graph}, push: new_graph}
   end
 
-  def handle_cast({:action, 'RESET_POSITION'}, {state, graph}) do
-    new_state = %{state|top_left_corner: state.original_position}
 
-    new_graph =
-      graph
-      |> Graph.modify(:cursor, fn %Scenic.Primitive{} = box ->
-           put_transform(box, :translate, state.original_position)
-         end)
 
-    {:noreply, {new_state, new_graph}, push: new_graph}
-  end
+
+  # def handle_cast({:action, 'MOVE_LEFT_ONE_COLUMN'}, {state, graph}) do
+  #   {width, _height} = state.dimensions
+  #   {current_top_left_x, current_top_left_y} = state.top_left_corner
+
+  #   new_state =
+  #     %{state|top_left_corner: {current_top_left_x - width, current_top_left_y}}
+
+  #   new_graph =
+  #     graph
+  #     |> Graph.modify(:cursor, fn %Scenic.Primitive{} = box ->
+  #          put_transform(box, :translate, new_state.top_left_corner)
+  #        end)
+
+  #   {:noreply, {new_state, new_graph}, push: new_graph}
+  # end
+
+
+
+
+  # def handle_cast({:move, [top_left_corner: new_top_left_corner, dimensions: {new_width, new_height}]}, {state, graph}) do
+  #   new_state =
+  #     %{state|top_left_corner: new_top_left_corner, dimensions: {new_width, new_height}}
+
+  #   [%Scenic.Primitive{id: :cursor, styles: %{fill: color, hidden: hidden?}}] =
+  #     Graph.find(graph, fn primitive -> primitive == :cursor end)
+
+  #   new_graph =
+  #     graph
+  #     |> Graph.delete(:cursor)
+  #     |> rect({new_width, new_height},
+  #          id: :cursor,
+  #          translate: new_state.top_left_corner,
+  #          fill: color,
+  #          hidden?: hidden?)
+
+  #   {:noreply, {new_state, new_graph}, push: new_graph}
+  # end
+
+
 
   # # --------------------------------------------------------
   # def handle_cast(:stop_blink, %{graph: old_graph, timer: timer} = state) do
@@ -160,16 +198,6 @@ defmodule GUI.Component.Cursor do
 
   #   {:noreply, new_state, push: new_graph}
   # end
-
-  def handle_info(:blink, {state, graph}) do
-    new_state = %{state|hidden?: not state.hidden?}
-
-    new_graph =
-      graph
-      |> Graph.modify(state.frame.id, &update_opts(&1, hidden: new_state.hidden?))
-
-    {:noreply, {new_state, new_graph}, push: new_graph}
-  end
 
 
 end
