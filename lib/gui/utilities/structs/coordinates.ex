@@ -23,4 +23,8 @@ defmodule GUI.Structs.Coordinates do
       y: y
     }
   end
+
+  def modify(%__MODULE__{} = struct, x: new_x, y: new_y) do
+    %{struct|x: new_x, y: new_y}
+  end
 end

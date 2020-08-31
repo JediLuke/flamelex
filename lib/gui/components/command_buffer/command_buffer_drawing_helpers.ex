@@ -79,10 +79,10 @@ defmodule GUI.Component.CommandBuffer.DrawingHelpers do
   def draw_cursor(graph, %GUI.Structs.Frame{
     coordinates: %GUI.Structs.Coordinates{x: container_top_left_x, y: container_top_left_y},
     dimensions:  %GUI.Structs.Dimensions{height: container_height, width: _container_width}
-  }) do
+  }, id: cursor_component_id) do
 
     cursor_frame = Frame.new(
-      id:              {:command_buffer, :cursor, 1},
+      id:              cursor_component_id,
       top_left_corner: {container_top_left_x, container_top_left_y},
       dimensions:      {@cursor_width, container_height})
 

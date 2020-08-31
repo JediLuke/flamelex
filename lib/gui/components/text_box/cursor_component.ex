@@ -39,10 +39,9 @@ defmodule GUI.Component.Cursor do
     GenServer.cast(pid, {:action, 'MOVE_RIGHT_ONE_COLUMN'})
   end
 
-  # def move(frame_id) do
-  def move({:command_buffer, :cursor, 1} = frame_id) do
-    pid = find_cursor(frame_id)
-    GenServer.cast(pid, 'MOVE_RIGHT_ONE_COLUMN')
+  def move(cursor_id, :right) do
+    pid = find_cursor(cursor_id)
+    GenServer.cast(pid, {:action, 'MOVE_RIGHT_ONE_COLUMN'})
   end
   defp find_cursor(_s) do
     __MODULE__ #TODO this should be gproc
@@ -83,17 +82,27 @@ defmodule GUI.Component.Cursor do
   end
 
   def handle_cast({:action, 'MOVE_RIGHT_ONE_COLUMN'}, {state, graph}) do
-    {width, _height} = state.dimensions
-    {current_top_left_x, current_top_left_y} = state.top_left_corner
+    %GUI.Structs.Dimensions{height: _height, width: width} = state.frame.dimensions
+    %GUI.Structs.Coordinates{x: current_top_left_x, y: current_top_left_y} = state.frame.coordinates
 
     new_state =
-      %{state|top_left_corner: {current_top_left_x + width, current_top_left_y}}
+      %{state|frame:
+          state.frame |> Frame.reposition(
+            x: current_top_left_x + width,
+            y: current_top_left_y)}
+
+
 
     new_graph =
       graph
-      |> Graph.modify(:cursor, fn %Scenic.Primitive{} = box ->
-           put_transform(box, :translate, new_state.top_left_corner)
+      |> Graph.modify(state.frame.id, fn %Scenic.Primitive{} = box ->
+           put_transform(box, :translate, {new_state.frame.coordinates.x, new_state.frame.coordinates.y})
          end)
+
+
+    IO.puts "UES WE CAM"
+    IO.puts "SS #{inspect state}"
+    IO.puts "SS2 #{inspect new_state}"
 
     {:noreply, {new_state, new_graph}, push: new_graph}
   end

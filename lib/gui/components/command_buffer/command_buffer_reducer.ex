@@ -11,6 +11,7 @@ defmodule GUI.Component.CommandBuffer.Reducer do
   use Franklin.Misc.CustomGuards
 
   @component_id :command_buffer
+  @cursor_component_id {:command_buffer, :cursor, 1}
 
   @command_mode_background_color :cornflower_blue
 
@@ -27,7 +28,7 @@ defmodule GUI.Component.CommandBuffer.Reducer do
          |> Draw.background(frame, @command_mode_background_color)
          |> DrawingHelpers.draw_command_prompt(frame)
          |> DrawingHelpers.draw_input_textbox(textbox_frame)
-         |> DrawingHelpers.draw_cursor(textbox_frame)
+         |> DrawingHelpers.draw_cursor(textbox_frame, id: @cursor_component_id)
         #  |> draw_command_prompt_text(state)
     end, [
       id: @component_id,
@@ -62,12 +63,10 @@ defmodule GUI.Component.CommandBuffer.Reducer do
     {:update_graph, new_graph}
   end
 
-  # def process({_state, graph}, :move_cursor) do
-  #   graph
-  #   |> GUI.Component.Cursor.move()
-  #   {:update_graph, new_graph}
-  # end
-end
+  def process({_state, _graph}, :move_cursor) do
+    @cursor_component_id |> GUI.Component.Cursor.move(:right)
+    :ignore_action #TODO better name would be "no update to this processes state"
+  end
 
   # # def process({state, graph}, {'ENTER_CHARACTER', {:codepoint, {letter, x}}}) when x in [0, 1] do # need the check on x because lower and uppercase letters have a different number here for some reason
   # def process({%{mode: :command} = state, graph}, {'ENTER_CHARACTER', char}) when is_binary(char) do

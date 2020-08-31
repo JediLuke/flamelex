@@ -21,4 +21,8 @@ defmodule GUI.Structs.Dimensions do
       height: height
     }
   end
+
+  def modify(%__MODULE__{} = struct, width: new_w, height: new_h) do
+    %{struct|width: new_w, height: new_h}
+  end
 end

@@ -39,6 +39,14 @@ defmodule GUI.Structs.Frame do
   end
 
 
+  def reposition(%__MODULE__{coordinates: coords} = frame, x: new_x, y: new_y) do
+    new_coordinates =
+      coords
+      |> Coordinates.modify(x: new_x, y: new_y)
+
+    %{frame|coordinates: new_coordinates}
+  end
+
   ## private functions
   ## -------------------------------------------------------------------
 
