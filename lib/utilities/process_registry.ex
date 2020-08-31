@@ -1,4 +1,5 @@
 defmodule Utilities.ProcessRegistry do
+  require Logger
 
   def fetch_buffer_pid(buffer_name),  do: fetch_pid({:buffer, buffer_name})
   def fetch_buffer_pid!(buffer_name), do: fetch_pid!(Structs.Buffer.rego(buffer_name))
@@ -15,4 +16,14 @@ defmodule Utilities.ProcessRegistry do
       {:error, _reason}       -> raise "Could not find a process with lookup_key: #{inspect lookup_key}"
     end
   end
+
+  def register(tag) do
+    Logger.info "#{__MODULE__} registering #{inspect tag}..."
+    # :n means `name`, :l means `local`
+    :gproc.reg({:n, :l, tag})
+  end
+
+  # def via_tuple(tag) do
+  #   {:via, :gproc, {:n, :l, tag}}
+  # end
 end

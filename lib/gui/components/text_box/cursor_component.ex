@@ -40,19 +40,14 @@ defmodule GUI.Component.Cursor do
   end
 
   def move(cursor_id, :right) do
-    pid = find_cursor(cursor_id)
+    pid = cursor_id |> Utilities.ProcessRegistry.fetch_pid!()
     GenServer.cast(pid, {:action, 'MOVE_RIGHT_ONE_COLUMN'})
   end
-  defp find_cursor(_s) do
-    __MODULE__ #TODO this should be gproc
-  end
 
-  @impl Scenic.Component
   def init(%Frame{} = frame, _opts) do
     Logger.info "Initializing #{__MODULE__}..."
 
-    IO.puts "Frame ID: #{inspect frame.id}"
-    Process.register(self(), __MODULE__) #TODO this should be gproc
+    Utilities.ProcessRegistry.register(frame.id)
 
     state = %{
       frame: frame,
@@ -91,18 +86,11 @@ defmodule GUI.Component.Cursor do
             x: current_top_left_x + width,
             y: current_top_left_y)}
 
-
-
     new_graph =
       graph
       |> Graph.modify(state.frame.id, fn %Scenic.Primitive{} = box ->
            put_transform(box, :translate, {new_state.frame.coordinates.x, new_state.frame.coordinates.y})
          end)
-
-
-    IO.puts "UES WE CAM"
-    IO.puts "SS #{inspect state}"
-    IO.puts "SS2 #{inspect new_state}"
 
     {:noreply, {new_state, new_graph}, push: new_graph}
   end
