@@ -4,7 +4,7 @@ defmodule GUI.Input.EventHandler do
   """
   require Logger
   use GUI.ScenicInputEvents
-  alias GUI.Scene.Root, as: Scene
+
 
   # eliminate the don't cares
   def process(state, {input, _details}) when input in @inputs_we_dont_care_about do
@@ -19,12 +19,14 @@ defmodule GUI.Input.EventHandler do
   ## -------------------------------------------------------------------
 
 
+  # activate the command buffer
   def process(%{input: %{mode: :normal}} = state, @space_bar) do
     Logger.info "Space bar was pressed  !!"
     Franklin.Buffer.Commander.activate()
     state.input.mode |> put_in(:command)
   end
 
+  # deactivate the command buffer
   def process(%{input: %{mode: :command}} = state, @escape_key) do
     Logger.debug "Closing CommandBuffer..."
     Franklin.Buffer.Commander.deactivate()
@@ -32,17 +34,11 @@ defmodule GUI.Input.EventHandler do
     state.input.mode |> put_in(:normal)
   end
 
-
-
-  # def process(%{command_buffer: %{visible?: false}, mode: :control} = state, @space_bar) do
-  #   Scene.action('SHOW_EXECUTE_COMMAND_PROMPT')
-  #   state
-  # end
-
-  # def process(%{command_buffer: %{visible?: true}, mode: :control} = state, input) when input in @valid_command_buffer_inputs do
-  #   Scene.action({'COMMAND_BUFFER_INPUT', input})
-  #   state |> add_to_input_history(input)
-  # end
+  def process(%{input: %{mode: :command}} = state, input) when input in @valid_command_buffer_inputs do
+    {:codepoint, {char, _num}} = input
+    Franklin.Buffer.Commander.enter_character(char)
+    state |> add_to_input_history(input)
+  end
 
   # def process(%{command_buffer: %{visible?: true}, mode: :control} = state, @enter_key) do
   #   Scene.action('PROCESS_COMMAND_BUFFER_TEXT_AS_COMMAND')
@@ -123,6 +119,7 @@ defmodule GUI.Input.EventHandler do
 
   #TODO lose input after certain amount
   defp add_to_input_history(state, {:codepoint, _details} = input) do
-    %{state|input_history: state.input_history ++ [input]}
+    state.input.history
+    |> put_in(state.input.history ++ [input])
   end
 end
