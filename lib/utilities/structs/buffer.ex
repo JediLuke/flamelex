@@ -37,6 +37,15 @@ defmodule Structs.Buffer do
     }
   end
 
+  #TODO kind of inelegant...
+  def new({:text, name, content}) do
+    %__MODULE__{
+      type:    :text,
+      name:    name,
+      content: content
+    }
+  end
+
   #TODO add number??
   def rego(%__MODULE__{name: name}), do: {:buffer, name}
   def rego(name), do: {:buffer, name}

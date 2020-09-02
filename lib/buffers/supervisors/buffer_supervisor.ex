@@ -12,7 +12,7 @@ defmodule Franklin.Buffer.Supervisor do
   def init(_args), do: DynamicSupervisor.init(strategy: :one_for_one)
 
   def start_buffer(type: :text, name: name, content: content) do
-    start_new_buffer_process({TextBuffer, [name: name, content: content]})
+    start_new_buffer_process({TextBuffer, {:text, name, content}})
   end
   # def start_buffer(content, of_type: :note) do
   #   #TODO add extra args to GUI, but it's still a text buffer

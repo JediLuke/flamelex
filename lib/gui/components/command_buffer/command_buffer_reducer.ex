@@ -45,6 +45,14 @@ defmodule GUI.Component.CommandBuffer.Reducer do
     {:update_graph, new_graph}
   end
 
+  def process({_state, graph}, :deactivate_command_buffer) do
+    new_graph =
+      graph
+      |> Graph.modify(@component_id, &update_opts(&1, hidden: true))
+
+  {:update_graph, new_graph}
+end
+
   # def process({%{mode: :command} = state, _graph}, 'DEACTIVATE_COMMAND_BUFFER') do
   #   new_state =
   #     state

@@ -19,13 +19,15 @@ defmodule Franklin.Buffer.Commander do
   end
 
   def activate do
-    # #TODO so actually this sends a msg to the buffer, which may choose to ignore it, but will then use the Gui.Reducer to process what a new graph will look like, & send it to the GUI process
-    # GUI.Component.CommandBuffer.action('ACTIVATE_COMMAND_BUFFER_PROMPT')
-    # GUI.Scene.Root.action('ACTIVATE_COMMAND_BUFFER')
-    GUI.activate_command_buffer()
+    #NOTE: Because this changes the mode, needs to be done by the Root Scene
+    GUI.Scene.Root.action(:activate_command_buffer)
   end
 
-  def deactivate, do: GenServer.cast(__MODULE__, :deactivate_command_buffer)
+  def deactivate do
+    #NOTE: Because this changes the mode, needs to be done by the Root Scene
+    reset_text_field()
+    GUI.Scene.Root.action(:deactivate_command_buffer)
+  end
 
   def enter_character(char) when is_binary(char) do
     GenServer.cast(__MODULE__, {:enter_char, char})
@@ -71,16 +73,19 @@ defmodule Franklin.Buffer.Commander do
 
     GUI.Component.CommandBuffer.action({:update_content, new_state.content})
     GUI.Component.CommandBuffer.action(:reset_cursor)
+
     {:noreply, new_state}
   end
 
-  @impl GenServer
-  def handle_cast(:deactivate_command_buffer, state) do
-    #NOTE/TODO: So, could it be possible we send msg to reset (to ourselves), then we send :hide to the GUI - but that :hide gets there first, then say in THIS process we start resetting, which involves further updates to GUI... can these events be run in the wrong order??
-    GenServer.cast(__MODULE__, :reset_text_field)
-    GUI.Component.CommandBuffer.action(:hide_command_buffer)
-    {:noreply, state}
-  end
+  # @impl GenServer
+  # def handle_cast(:deactivate_command_buffer, state) do
+  #   new_state = %{state|content: ""}
+
+  #   GenServer.cast(__MODULE__, :reset_text_field)
+  #   GUI.Component.CommandBuffer.action(:hide_command_buffer)
+
+  #   {:noreply, new_state} # reset the content to blank
+  # end
 
   # @impl true
   # def handle_cast({:command_buffer_command, command}, state) do
@@ -90,7 +95,7 @@ defmodule Franklin.Buffer.Commander do
   @impl GenServer
   def handle_cast(:execute_contents, state) do
     execute_command(state.content)
-    reset_text_field()
+    deactivate() #TODO this will send :update_content and :reset_cursor again!!
     {:noreply, state}
   end
 
@@ -114,6 +119,19 @@ defmodule Franklin.Buffer.Commander do
   def execute_command("note") do
     IO.puts "A new note!!"
     :ok
+  end
+
+  def execute_command("open") do
+    file_name = "/Users/luke/workbench/elixir/franklin/README.md"
+    Logger.info "Opening a file... #{inspect file_name}"
+    Franklin.CLI.open(file: file_name) # will open as the active buffer
+  end
+
+  def execute_command("edit") do
+    file_name = "/Users/luke/workbench/elixir/franklin/README.md"
+
+    string = "Luke"
+    Franklin.Buffer.Text.insert(file_name, string, after: 3)
   end
 
   def execute_command(unrecognised_command) do

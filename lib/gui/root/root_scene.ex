@@ -22,23 +22,23 @@ defmodule GUI.Scene.Root do #TODO rename to Root.Scene
 
 
   # def redraw(%Scenic.Graph{} = g), do: GenServer.cast(__MODULE__, {:redraw, g})
-  # def pop_state, do: GenServer.call(__MODULE__, :pop_state)
+
+  @doc """
+  This is useful for debugging.
+  """
+  def pop_state, do: GenServer.call(__MODULE__, :pop_state)
 
 
   ## Scenic.Scene callbacks
   ## -------------------------------------------------------------------
 
 
-  # @doc """
-  # Simply return the current state, and the %Scenic.Graph{}
-
-  # This is used by GUI.Controller when it initializes - it calls this process
-  # to grab the state of the GUI, & it's able to "take charge" once the
-  # state is known.
-  # """
-  # def handle_call(:pop_state, {_pid, _ref}, {state, graph}) do
-  #   {:reply, :ok, {state, graph}}
-  # end
+  @doc """
+  Simply return the current state, and the %Scenic.Graph{}
+  """
+  def handle_call(:pop_state, {_pid, _ref}, {state, graph}) do
+    {:reply, :ok, {state, graph}}
+  end
 
   @doc """
   This function handles user input. All input for a scene routes through

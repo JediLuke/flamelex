@@ -24,21 +24,19 @@ defmodule GUI.Root.Reducer do
     {state, graph} #NOTE: can't use update_state_and_graph here cause init doesn't handle that
   end
 
-  def process({state, _graph}, 'ACTIVATE_COMMAND_BUFFER') do #TODO why not make this an atom
+  def process({state, _graph}, :activate_command_buffer) do
     # we need to do 2 separate things here,
     #   1) Send a msg to CommandBuffer (separate process) to show itself
-    #   2) Update the state of the Scene.Root, because this state affects what inputs get mapped to
+    #   2) Update the state of the Scene.Root, because this state affects
+    #      what future inputs get mapped to
     GUI.Component.CommandBuffer.activate()
     put_in(state.input.mode, :command) |> update_state_only()
   end
 
-  # def process({state, graph}, {'NEW_FRAME', [type: :text, content: content]}) do
-  #   new_graph =
-  #     graph
-  #     |> GUI.Utilities.Draw.text(content) #TODO update the correct buffer GUI process, & do it from within that buffer itself (high-five!)
-
-  #   update_state_and_graph(state, new_graph) #TODO do we update the state??
-  # end
+  def process({state, _graph}, :deactivate_command_buffer) do
+    GUI.Component.CommandBuffer.deactivate()
+    put_in(state.input.mode, :normal) |> update_state_only()
+  end
 
   def process({%{viewport: vp} = state, graph}, {:initialize_command_buffer, buf}) do
 
@@ -54,6 +52,14 @@ defmodule GUI.Root.Reducer do
     update_state_and_graph(state, new_graph) #TODO do we need to update the root state at all? I hope not
   end
 
+  #TODO this at the moment renders a new Text frame
+  def process({state, graph}, {'NEW_FRAME', [type: :text, content: content]}) do
+    new_graph =
+      graph
+      |> GUI.Utilities.Draw.text(content) #TODO update the correct buffer GUI process, & do it from within that buffer itself (high-five!)
+
+    update_state_and_graph(state, new_graph) #TODO do we update the state??
+  end
 
   # This function acts as a catch-all for all actions that don't match
   # anything. Without this, the process which calls this (which right

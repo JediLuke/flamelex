@@ -107,9 +107,9 @@ defmodule GUI.Input.EventHandler do
 
 
   def process(state, unhandled_event) do
-    Logger.debug("#{__MODULE__} Unhandled event: #{inspect(unhandled_event)}")
+    # Logger.debug("#{__MODULE__} Unhandled event: #{inspect(unhandled_event)}")
     state
-    |> IO.inspect(label: "-- DEBUG: state --")
+    # |> IO.inspect(label: "-- DEBUG: state --")
   end
 
 

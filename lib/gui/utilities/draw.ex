@@ -64,12 +64,13 @@ defmodule GUI.Utilities.Draw do
   #   |> Scenic.Primitives.rect(coords, opts)
   # end
 
-  # def text(%Scenic.Graph{} = graph, t) do
-  #   graph
-  #   |> Scenic.Primitives.text(t, font: @ibm_plex_mono,
-  #              translate: {5, 24}, # text draws from bottom-left corner?? :( also, how high is it???
-  #              font_size: 24, fill: :white)
-  # end
+  #TODO remove this hideous function, right now it just works for rending fullscreen frames, but having card-coded coords like this is just wrong
+  def text(%Scenic.Graph{} = graph, t) do
+    graph
+    |> Scenic.Primitives.text(t, font: @ibm_plex_mono,
+               translate: {5, 24}, # text draws from bottom-left corner?? :( also, how high is it???
+               font_size: 24, fill: :white)
+  end
 
 
 

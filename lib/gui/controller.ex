@@ -72,15 +72,15 @@ defmodule GUI.Controller do
 
     # the reason we need this controller is, it can keep track of all the buffers that the GUI is managing. Ok fuck it we can maybe get rid of it
 
-    new_state =
-      state
-      |> Map.update!(:buffer_list, fn b -> b ++ [buffer] end)
-      |> Map.update!(:active_buffer, fn _ab -> buffer end)
+    # new_state =
+    #   state
+    #   |> Map.update!(:buffer_list, fn b -> b ++ [buffer] end)
+    #   |> Map.update!(:active_buffer, fn _ab -> buffer end)
 
     # IO.puts "SENDING --- #{new_state.active_buffer.content}"
     GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
 
-    {:noreply, new_state}
+    {:noreply, state}
   end
 
 

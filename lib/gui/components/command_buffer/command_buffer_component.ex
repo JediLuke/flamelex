@@ -22,6 +22,8 @@ defmodule GUI.Component.CommandBuffer do
   @doc ~s(Make the command buffer visible.)
   def activate, do: action 'ACTIVATE_COMMAND_BUFFER'
 
+  def deactivate, do: action :deactivate_command_buffer
+
 
   ## Public functions, which are nonetheless more or less for internal use
   ## -------------------------------------------------------------------
