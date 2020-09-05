@@ -3,9 +3,7 @@ defmodule GUI.Structs.Frame do
   Struct which holds relevant data for rendering a buffer frame status bar.
   """
   require Logger
-  use Franklin.Misc.CustomGuards
-  alias GUI.Structs.{Coordinates, Dimensions}
-  alias Structs.Buffer
+  use Flamelex.CommonDeclarations
 
 
   defstruct [

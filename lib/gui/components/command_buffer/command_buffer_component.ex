@@ -1,8 +1,7 @@
 defmodule GUI.Component.CommandBuffer do
   use Scenic.Component
-  use Franklin.Misc.CustomGuards
+  use Flamelex.CommonDeclarations
   alias GUI.Component.CommandBuffer.Reducer
-  alias Structs.Buffer
   require Logger
 
 
@@ -16,14 +15,15 @@ defmodule GUI.Component.CommandBuffer do
   Scenic.Component to the scene's graph.
   """
   def initialize(%Buffer{type: :command} = cmd_buf) do
+    #TODO so, should we send an action, or should we send a new graph???
     GUI.Scene.Root.action({:initialize_command_buffer, cmd_buf})
   end
 
   @doc ~s(Make the command buffer visible.)
-  def activate, do: action 'ACTIVATE_COMMAND_BUFFER'
-
+  def activate,   do: action :activate_command_buffer
   def deactivate, do: action :deactivate_command_buffer
 
+  def redraw(%Scenic.Graph{} = g), do: GenServer.cast(__MODULE__, {:redraw, g})
 
   ## Public functions, which are nonetheless more or less for internal use
   ## -------------------------------------------------------------------
@@ -63,6 +63,11 @@ defmodule GUI.Component.CommandBuffer do
   ## -------------------------------------------------------------------
 
 
+  def handle_cast({:redraw, new_graph}, {state, _graph}) do
+    {:noreply, {state, new_graph}, push: new_graph}
+  end
+
+  #TODO this should all be done by the Commander??
   @impl Scenic.Scene
   def handle_cast({:action, action}, {state, graph}) do
     GUI.Component.CommandBuffer.Reducer.process({state, graph}, action)

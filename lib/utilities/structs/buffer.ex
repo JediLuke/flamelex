@@ -1,19 +1,16 @@
-defmodule Structs.Buffer do
-  # @moduledoc false
+defmodule Flamelex.Structs.Buffer do
+  @moduledoc false
+  alias GUI.Structs.{Coordinates, Dimensions, Frame}
 
   defstruct [
-    type:     nil,
+    type:     nil,              # We support many types of buffer, e.g. :text, :list, :gfx
+    # tag:      nil,              # An identifier. Can be any type, e.g. "CommandBuffer", "oinap982q43un2>2f0", "luke and {:cursor, 1} are all valid. We use this to look up all related processes in gproc
     name:     nil,
-    content:  nil
-    # uuid: nil,                # a UUIDv4
-    # hash: nil,                # the md5 of the tidbit
-    # title: nil,               # Title of the TidBit
-    # tags: [],                 # any tags we want to apply to this TidBit
-    # creation_timestamp: nil,  # when the TidBit was created
-    # content: nil,             # actual TidBit content
-    # remind_me_datetime: nil,  # when to remind me (for reminder TidBits)
-    # due_datetime: nil,        # the due date (for reminders)
-    # log: nil                  # a log of edits for this TidBit
+    # title:    nil,              # An optional title
+    content:  nil,              # This field contains all the actual content of the buffer
+    # gui: %{                     # A buffer, when linked to the GUI, is responsible for managing & updating it's own GUI state
+    #   frame:  %Frame{},         # The Frame is the Flamelex concept of the box which this buffer controls
+    #   graph:  %Scenic.Graph{}   # The Graph is the actual GUI content. This gets updated when we re-draw the GUI
   ]
 
   # Utilities.ProcessRegistry.fetch_buffer_pid!(file_name) |> Franklin.Buffer.Text.insert("WooLoo", [after: 3])
@@ -50,6 +47,9 @@ defmodule Structs.Buffer do
   def rego(%__MODULE__{name: name}), do: {:buffer, name}
   def rego(name), do: {:buffer, name}
 
+  def update_content(%__MODULE__{} = buf, with: c) do
+    %{buf|content: c}
+  end
 
   # ## private functions
   # ## -------------------------------------------------------------------

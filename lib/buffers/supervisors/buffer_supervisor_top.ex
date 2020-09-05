@@ -5,14 +5,18 @@ defmodule Franklin.Buffer.TopLevelSupervisor do
   use Supervisor
   require Logger
 
-  def start_link(params), do: Supervisor.start_link(__MODULE__, params, name: __MODULE__)
+
+  def start_link(params) do
+    Supervisor.start_link(__MODULE__, params, name: __MODULE__)
+  end
+
 
   def init(_params) do
     Logger.info("#{__MODULE__} initializing...")
 
     children = [
       Franklin.Buffer.Supervisor,
-      Franklin.Buffer.Commander
+      Flamelex.Buffer.Command
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

@@ -1,10 +1,10 @@
 defmodule DevTools do
-  alias Franklin.Buffer.Commander
 
   defmacro __using__(_) do
     quote do
       import DevTools
       import Utilities.ProcessRegistry
+      alias Flamelex.Commander
     end
   end
 
@@ -25,7 +25,7 @@ defmodule DevTools do
     IEx.Helpers.recompile()
 
     # open_file_in_buffer()
-    activate_command_buffer()
+    # activate_command_buffer()
     Commander.enter_character("e")
   end
 
@@ -46,9 +46,7 @@ defmodule DevTools do
     :ok
   end
 
-  # command buffer commands
-  def activate_command_buffer,   do: Franklin.Buffer.Commander.activate()
-  def deactivate_command_buffer, do: Franklin.Buffer.Commander.deactivate()
+
 
   # def new_note do
   #   Franklin.Commander.new_note()

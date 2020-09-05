@@ -1,15 +1,16 @@
 defmodule Franklin.Buffer.Supervisor do
-  use DynamicSupervisor # Automatically defines child_spec/1
+  use DynamicSupervisor
 
-  alias Franklin.Buffer.Text, as: TextBuffer
-  # alias Franklin.Buffer.List, as: ListBuffer
-  # alias Franklin.Buffer.Whiteboard, as: WhiteboardBuffer
 
   def start_link(args) do
     DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
   end
 
-  def init(_args), do: DynamicSupervisor.init(strategy: :one_for_one)
+
+  def init(_args) do
+    DynamicSupervisor.init(strategy: :one_for_one)
+  end
+
 
   def start_buffer(type: :text, name: name, content: content) do
     start_new_buffer_process({TextBuffer, {:text, name, content}})
@@ -29,7 +30,9 @@ defmodule Franklin.Buffer.Supervisor do
   # def list(:notes),     do: start_new_buffer_process({Franklin.Buffer.List, :notes})
   # def whiteboard(args), do: start_new_buffer_process({Franklin.Buffer.Whiteboard, args})
 
+
   # private functions
+
 
   defp start_new_buffer_process(args) do
     DynamicSupervisor.start_child(__MODULE__, args)

@@ -20,28 +20,33 @@ defmodule GUI.Input.EventHandler do
 
 
   # activate the command buffer
-  def process(%{input: %{mode: :normal}} = state, @space_bar) do
-    Logger.info "Space bar was pressed  !!"
-    Franklin.Buffer.Commander.activate()
-    state.input.mode |> put_in(:command)
-  end
+  # def process(%{input: %{mode: :normal}} = state, @space_bar) do
+  #   Logger.info "Space bar was pressed  !!"
+  #   Franklin.Buffer.Command.activate()
+  #   state.input.mode |> put_in(:command)
+  # end
 
   # deactivate the command buffer
   def process(%{input: %{mode: :command}} = state, @escape_key) do
     Logger.debug "Closing CommandBuffer..."
-    Franklin.Buffer.Commander.deactivate()
+    Franklin.Buffer.Command.deactivate()
 
     state.input.mode |> put_in(:normal)
   end
 
   def process(%{input: %{mode: :command}} = state, input) when input in @valid_command_buffer_inputs do
     {:codepoint, {char, _num}} = input
-    Franklin.Buffer.Commander.enter_character(char)
+    Franklin.Buffer.Command.enter_character(char)
     state |> add_to_input_history(input)
   end
 
+  def process(%{input: %{mode: :command}} = state, @backspace_key) do
+    Franklin.Buffer.Command.backspace()
+    state
+  end
+
   def process(%{input: %{mode: :command}} = state, @enter_key) do
-    Franklin.Buffer.Commander.execute_contents()
+    Franklin.Buffer.Command.execute_contents()
     state
   end
 
@@ -53,11 +58,6 @@ defmodule GUI.Input.EventHandler do
   # def process(%{command_buffer: %{visible?: true}, mode: :control} = state, @space_bar = input) do
   #   Scene.action({'COMMAND_BUFFER_INPUT', input})
   #   state |> add_to_input_history(input)
-  # end
-
-  # def process(%{command_buffer: %{visible?: true}, mode: :control} = state, backspace) when backspace in @backspace_input do
-  #   Scene.action('COMMAND_BUFFER_BACKSPACE')
-  #   state
   # end
 
 

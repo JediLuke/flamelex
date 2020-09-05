@@ -2,7 +2,7 @@ defmodule GUI.Structs.Coordinates do
   @moduledoc """
   Struct which holds 2d points.
   """
-  use Franklin.Misc.CustomGuards
+  use Flamelex.CommonDeclarations
 
   defstruct [x: 0, y: 0]
 

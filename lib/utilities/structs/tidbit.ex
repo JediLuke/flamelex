@@ -1,4 +1,4 @@
-defmodule Structs.TidBit do
+defmodule Flamelex.Structs.TidBit do
   @moduledoc false
   require Logger
 

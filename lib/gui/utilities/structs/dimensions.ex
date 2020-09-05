@@ -2,7 +2,7 @@ defmodule GUI.Structs.Dimensions do
   @moduledoc """
   Struct which holds 2d points.
   """
-  use Franklin.Misc.CustomGuards
+  use Flamelex.CommonDeclarations
 
   defstruct [width: 0, height: 0]
 
@@ -15,7 +15,15 @@ defmodule GUI.Structs.Dimensions do
     }
   end
 
+  #TODO right now this is needed for handling floats...
   def new({width, height}) do
+    %__MODULE__{
+      width: width,
+      height: height
+    }
+  end
+
+  def new(%{width: width, height: height}) do
     %__MODULE__{
       width: width,
       height: height

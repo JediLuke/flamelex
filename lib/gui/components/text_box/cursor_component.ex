@@ -9,7 +9,7 @@ defmodule GUI.Component.Cursor do
   import Scenic.{Primitive, Primitives}
   alias Scenic.Graph
   require Logger
-  use Franklin.Misc.CustomGuards
+  use Flamelex.CommonDeclarations
 
   @blink_ms trunc(500) # blink speed in hertz
 

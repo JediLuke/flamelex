@@ -16,14 +16,6 @@ defmodule GUI.Root.Reducer do
   @command_buffer_height 32
 
 
-
-  def initialize(opts) do
-    state = GUI.Structs.RootScene.new(opts)
-    graph = GUI.Utilities.Draw.blank_graph()
-
-    {state, graph} #NOTE: can't use update_state_and_graph here cause init doesn't handle that
-  end
-
   def process({state, _graph}, :activate_command_buffer) do
     # we need to do 2 separate things here,
     #   1) Send a msg to CommandBuffer (separate process) to show itself
@@ -61,14 +53,15 @@ defmodule GUI.Root.Reducer do
     update_state_and_graph(state, new_graph) #TODO do we update the state??
   end
 
-  # This function acts as a catch-all for all actions that don't match
-  # anything. Without this, the process which calls this (which right
-  # now is GUI.Root.Scene !!) can crash (!!) if no action matches what
-  # is passed in.
-  def process({_state, _graph}, action) do
-    Logger.warn "#{__MODULE__} received an action it did not recognise. #{inspect action}"
-    ignore_this_action()
-  end
+  #NOTE: moved to OmegaReducer
+  # # This function acts as a catch-all for all actions that don't match
+  # # anything. Without this, the process which calls this (which right
+  # # now is GUI.Root.Scene !!) can crash (!!) if no action matches what
+  # # is passed in.
+  # def process({_state, _graph}, action) do
+  #   Logger.warn "#{__MODULE__} received an action it did not recognise. #{inspect action}"
+  #   ignore_this_action()
+  # end
 
   defp ignore_this_action(), do: :ignore_action
   defp update_state_only(new_state), do: {:update_state, new_state}

@@ -6,7 +6,6 @@ defmodule Franklin do
       import Franklin.CLI     # make most common CLI commands tab-completable on CLI
       alias Franklin.CLI      # ^^ this has a lot of noise though, so this can be convenient
 
-      alias Franklin.Buffer.Commander
     end
   end
 end

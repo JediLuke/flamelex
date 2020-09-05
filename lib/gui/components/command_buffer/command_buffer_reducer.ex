@@ -8,7 +8,7 @@ defmodule GUI.Component.CommandBuffer.Reducer do
   alias GUI.Component.CommandBuffer.DrawingHelpers
   import Scenic.Primitives
   require Logger
-  use Franklin.Misc.CustomGuards
+  use Flamelex.CommonDeclarations
 
   @component_id :command_buffer
   @cursor_component_id {:command_buffer, :cursor, 1}
@@ -37,7 +37,7 @@ defmodule GUI.Component.CommandBuffer.Reducer do
     ])
   end
 
-  def process({_state, graph}, 'ACTIVATE_COMMAND_BUFFER') do #TODO this should just be an atom
+  def process({_state, graph}, :activate_command_buffer) do
     new_graph =
       graph
       |> Graph.modify(@component_id, &update_opts(&1, hidden: false))
@@ -115,6 +115,7 @@ end
 
   #   {new_state, new_graph}
   # end
+
 
   # def process({state, graph}, 'CLEAR_BUFFER_TEXT') do
   #   new_state = state |> Map.replace!(:text, "")

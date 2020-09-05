@@ -1,5 +1,5 @@
 defmodule GUI.Utilities.Draw do
-  use Franklin.Misc.CustomGuards
+  use Flamelex.CommonDeclarations
 
 
   @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash()

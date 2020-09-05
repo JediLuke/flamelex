@@ -1,5 +1,5 @@
 defmodule GUI.Component.CommandBuffer.DrawingHelpers do
-  use Franklin.Misc.CustomGuards
+  use Flamelex.CommonDeclarations
 
 
   @prompt_color :ghost_white

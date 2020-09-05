@@ -1,11 +1,11 @@
-defmodule Franklin.Misc.CustomGuards do
+defmodule Flamelex.CommonDeclarations do
   @moduledoc false
 
   defmacro __using__(_opts) do
     quote do
 
       #NOTE: Include common aliases
-      alias Structs.Buffer
+      alias Flamelex.Structs.Buffer
       alias GUI.Utilities.Draw
       alias GUI.Structs.{Coordinates, Dimensions, Frame}
 
