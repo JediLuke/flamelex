@@ -23,19 +23,14 @@ defmodule Flamelex.Buffer.Command do
 
   def init(%Buffer{} = buf) do
     Logger.info "Initializing #{__MODULE__}..."
-    Process.register(self(), __MODULE__)
-    GUI.Component.CommandBuffer.initialize(buf) # start the Scenic.Component process
+    Process.register(self(), __MODULE__)          # the Commander is a little special, doesn't use gproc
+    GUI.Component.CommandBuffer.initialize(buf)   # start the Scenic.Component process
     {:ok, buf}
   end
 
-  # def handle_continue(:initialize_gui, buf) do
-  #   # :timer.sleep(500) #TODO, this is necessary because the Root Scene is not started in sequence by Scenic, so we can't guarantee it is up yet when we start the application...
-  #   # GUI.initialize_command_buffer(state) #TODO this should be the level of abstraction
 
-  #   #TODO so here, the state should hold the empty command buffer graph
-  #   GUI.Component.CommandBuffer.initialize(buf)
-  #   {:noreply, buf}
-  # end
+  ## handle_cast
+
 
   def handle_cast(:activate, state) do
     GUI.Component.CommandBuffer.activate()
@@ -43,9 +38,8 @@ defmodule Flamelex.Buffer.Command do
   end
 
   def handle_cast(:deactivate, state) do
-    # reset_text_field()
-    # GUI.Scene.Root.action(:deactivate_command_buffer)
-    raise "No"
+    Flamelex.Commander.reset_text_field()
+    GUI.Component.CommandBuffer.deactivate()
     {:noreply, state}
   end
 
@@ -70,14 +64,6 @@ defmodule Flamelex.Buffer.Command do
     {:noreply, new_buffer}
   end
 
-  def handle_cast(:reset_text_field, buf) do
-    new_buffer = %{buf|content: ""}
-
-    GUI.Component.CommandBuffer.action({:update_content, new_buffer.content})
-    GUI.Component.CommandBuffer.action(:reset_cursor)
-
-    {:noreply, new_buffer}
-  end
 
   # def handle_cast(:backspace, %Buffer{content: ""} = buf) do
   #   {:noreply, buf}
@@ -135,7 +121,6 @@ defmodule Flamelex.Buffer.Command do
 
   # end
 
-  @impl GenServer
   def handle_cast(:execute_contents, state) do
     execute_command(state.content)
     # deactivate() #TODO this will send :update_content and :reset_cursor again!!

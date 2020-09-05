@@ -1,4 +1,4 @@
-defmodule Franklin.Buffer.Supervisor do
+defmodule Flamelex.Buffer.Supervisor do
   use DynamicSupervisor
 
 
@@ -12,9 +12,11 @@ defmodule Franklin.Buffer.Supervisor do
   end
 
 
-  def start_buffer(type: :text, name: name, content: content) do
-    start_new_buffer_process({TextBuffer, {:text, name, content}})
+  def start_buffer_process(type: :text, name: name, content: content) do
+    #TODO TextBuffer isn't a real module (yet)...
+    DynamicSupervisor.start_child(__MODULE__, {TextBuffer, {:text, name, content}})
   end
+
   # def start_buffer(content, of_type: :note) do
   #   #TODO add extra args to GUI, but it's still a text buffer
   #   start_new_buffer_process({TextBuffer, content})
@@ -30,11 +32,4 @@ defmodule Franklin.Buffer.Supervisor do
   # def list(:notes),     do: start_new_buffer_process({Franklin.Buffer.List, :notes})
   # def whiteboard(args), do: start_new_buffer_process({Franklin.Buffer.Whiteboard, args})
 
-
-  # private functions
-
-
-  defp start_new_buffer_process(args) do
-    DynamicSupervisor.start_child(__MODULE__, args)
-  end
 end

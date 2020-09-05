@@ -15,7 +15,7 @@ defmodule Franklin.Buffer.TopLevelSupervisor do
     Logger.info("#{__MODULE__} initializing...")
 
     children = [
-      Franklin.Buffer.Supervisor,
+      Flamelex.Buffer.Supervisor,
       Flamelex.Buffer.Command
     ]
 

@@ -16,6 +16,16 @@ defmodule Flamelex.Omega.Reducer do
   use GUI.ScenicInputEvents
   alias Flamelex.Structs.OmegaState
 
+  @readme "/Users/luke/workbench/elixir/franklin/README.md"
+
+  ## Command mode
+
+  def handle_input(%OmegaState{mode: :command} = state, @escape_key) do
+    Flamelex.Commander.deactivate()
+    %{state|mode: :normal}
+  end
+
+  ## Normal mode
 
   def handle_input(%OmegaState{mode: :normal} = state, @space_bar) do
     Logger.info "Space bar was pressed !!"
@@ -23,12 +33,19 @@ defmodule Flamelex.Omega.Reducer do
     %{state|mode: :command}
   end
 
+  def handle_input(%OmegaState{mode: :normal} = state, @lowercase_h) do
+    Logger.info "Lowercase f was pressed !!"
+    Flamelex.Buffer.load(type: :text, file: @readme)
+    state
+  end
+
+
 
   # This function acts as a catch-all for all actions that don't match
   # anything. Without this, the process which calls this can crash (!!)
   # if no action matches what is passed in.
   def handle_input(%OmegaState{} = state, input) do
-    Logger.warn "#{__MODULE__} received an action it did not recognise. #{inspect input}"
+    Logger.warn "#{__MODULE__} recv'd unrecognised action/state combo. input: #{inspect input}, mode: #{inspect state.mode}"
     state # ignore
     # |> IO.inspect(label: "-- DEBUG --")
   end
