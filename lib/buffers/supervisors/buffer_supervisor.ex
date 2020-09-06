@@ -13,8 +13,8 @@ defmodule Flamelex.Buffer.Supervisor do
 
 
   def start_buffer_process(type: :text, name: name, content: content) do
-    #TODO TextBuffer isn't a real module (yet)...
-    DynamicSupervisor.start_child(__MODULE__, {TextBuffer, {:text, name, content}})
+    DynamicSupervisor.start_child(__MODULE__,
+                        {Flamelex.Buffer.Text, {:text, name, content}})
   end
 
   # def start_buffer(content, of_type: :note) do

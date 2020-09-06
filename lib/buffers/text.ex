@@ -1,8 +1,8 @@
-defmodule Franklin.Buffer.Text do
+defmodule Flamelex.Buffer.Text do
   @moduledoc false
   use GenServer
   require Logger
-  alias Structs.Buffer
+  use Flamelex.CommonDeclarations
   # alias Utilities.DataFile
   # import Utilities.ProcessRegistry
 

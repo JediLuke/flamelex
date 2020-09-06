@@ -4,8 +4,8 @@ defmodule GUI.Controller do
   buffers, handles updates, etc.
   """
   use GenServer
+  use Flamelex.CommonDeclarations
   require Logger
-  alias Structs.Buffer
 
 
   def start_link([] = default_params) do

@@ -34,7 +34,7 @@ defmodule Flamelex.Omega.Reducer do
   end
 
   def handle_input(%OmegaState{mode: :normal} = state, @lowercase_h) do
-    Logger.info "Lowercase f was pressed !!"
+    Logger.info "Lowercase h was pressed !!"
     Flamelex.Buffer.load(type: :text, file: @readme)
     state
   end
