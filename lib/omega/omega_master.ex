@@ -14,8 +14,8 @@ defmodule Flamelex.OmegaMaster do
   alias Flamelex.Structs.OmegaState
 
 
-  def start_link([] = _default_params) do
-    initial_state = OmegaState.new()
+  def start_link(_params) do
+    initial_state = OmegaState.init()
     GenServer.start_link(__MODULE__, initial_state)
   end
 
@@ -30,8 +30,17 @@ defmodule Flamelex.OmegaMaster do
   input requests.
   """
   def handle_input(input) do
+    Logger.debug "handling input in #{__MODULE__} - #{inspect input}"
     GenServer.cast(__MODULE__, {:handle_input, input})
   end
+
+  @doc """
+  This function enables us to fire actions off which enact changes, at
+  the OmegaMaster level, but which aren't stricly responses to user input.
+  """
+  # def action(a) do
+  #   GenServer.cast(__MODULE__, {:action, a})
+  # end
 
   ## GenServer callbacks
   ## -------------------------------------------------------------------
@@ -44,11 +53,19 @@ defmodule Flamelex.OmegaMaster do
   end
 
   def handle_cast({:handle_input, input}, omega_state) do
-    #NOTE: GUI updates are done as side-effects in the Reducer
+    #NOTE: actions may be pushed down to other buffers by Flamelex.Omega.Reducer
     new_omega_state =
-      %OmegaState{} =
-        Flamelex.Omega.Reducer.handle_input(omega_state, input)
+      omega_state
+      |> Flamelex.Omega.Reducer.handle_input(input)
 
     {:noreply, new_omega_state}
   end
+
+  # def handle_cast({:action, a}, omega_state) do
+  #   new_omega_state =
+  #     omega_state
+  #     # |> Flamelex.Omega.Reducer.process_action(a)
+
+  #   {:noreply, new_omega_state}
+  # end
 end

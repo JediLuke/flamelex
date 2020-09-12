@@ -1,20 +1,58 @@
-defmodule GUI.Structs.Frame do
+defmodule Flamelex.GUI.Structs.Frame do
   @moduledoc """
   Struct which holds relevant data for rendering a buffer frame status bar.
   """
   require Logger
   use Flamelex.CommonDeclarations
 
+  #TODO each "new/x" function should be making a new Scenic.Graph, we need
+  # to actually build one and cant just use a default struct cause it spits chips
 
   defstruct [
-    id:          nil,
-    coordinates: %Coordinates{},
-    dimensions:  %Dimensions{},
-    scenic_opts: []
+    id:            nil,               # uniquely identify frames
+    coordinates:   %Coordinates{},    # the top-left corner of the frame, referenced from top-left corner of the viewport
+    dimensions:    %Dimensions{},     # the height and width of the frame
+    scenic_opts:   [],                # Scenic options
+    # picture_graph: %Scenic.Graph{}    # The Scenic.Graph that this frame will display
+    buffer:        %Buffer{}
   ]
 
+  def new(
+    top_left_corner: %Coordinates{} = c,
+    dimensions:      %Dimensions{}  = d
+  ) do
+    %__MODULE__{
+      coordinates: c,
+      dimensions:  d
+    }
+  end
 
-  #TODO really this should accept a %Coordinates{} and a %Dimensions{}
+  #TODO do we really need an id?? (probably)
+  def new(id:              id,
+          top_left_corner: %Coordinates{} = c,
+          dimensions:      %Dimensions{}  = d
+  ) do
+    %__MODULE__{
+      id:          id,
+      coordinates: c,
+      dimensions:  d
+    }
+  end
+
+  #TODO deprecate this too
+  # def new([id: id, top_left_corner: c, dimensions: d, picture_graph: g]) do
+  def new([id: id, top_left_corner: c, dimensions: d, buffer: b]) do
+    IO.puts "Yes we went through here..."
+    %__MODULE__{
+      id: id,
+      coordinates: c |> Coordinates.new(),
+      dimensions:  d |> Dimensions.new(),
+      # picture_graph: g
+      buffer: b
+    }
+  end
+
+  #TODO deprecate these
   def new([id: id, top_left_corner: c, dimensions: d]) do
     %__MODULE__{
       id: id,
@@ -22,12 +60,14 @@ defmodule GUI.Structs.Frame do
       dimensions:  d |> Dimensions.new()
     }
   end
+
   def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d) do
     %__MODULE__{
       coordinates: c |> Coordinates.new(),
       dimensions:  d |> Dimensions.new()
     }
   end
+
   def new(%Buffer{} = _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when is_list(o) do #TODO do we need buffer here?
     %__MODULE__{
       coordinates: c |> Coordinates.new(),
@@ -44,9 +84,4 @@ defmodule GUI.Structs.Frame do
 
     %{frame|coordinates: new_coordinates}
   end
-
-  ## private functions
-  ## -------------------------------------------------------------------
-
-
 end

@@ -23,45 +23,52 @@ defmodule Flamelex.Buffer.Command do
 
   def init(%Buffer{} = buf) do
     Logger.info "Initializing #{__MODULE__}..."
-    Process.register(self(), __MODULE__)          # the Commander is a little special, doesn't use gproc
-    GUI.Component.CommandBuffer.initialize(buf)   # start the Scenic.Component process
+
+    Process.register(self(), __MODULE__)  # the Commander is a little special, doesn't use gproc
+    #TODO link to the command buffer GUI process - can we just use grpoc to talk to it??
+
     {:ok, buf}
   end
+
+  # def handle_continue(:init_gui, buf) do
+  #   GUI.Component.CommandBuffer.initialize(buf)   # start the Scenic.Component process
+  #   {:noreply, buf}
+  # end
 
 
   ## handle_cast
 
 
   def handle_cast(:activate, state) do
-    GUI.Component.CommandBuffer.activate()
+    GUI.Component.CommandBuffer.action(:show)
     {:noreply, state}
   end
 
-  def handle_cast(:deactivate, state) do
-    Flamelex.Commander.reset_text_field()
-    GUI.Component.CommandBuffer.deactivate()
-    {:noreply, state}
+  def handle_cast(:deactivate, buf) do
+    new_buf =
+      buf |> reset_text_field()
+
+    GUI.Component.CommandBuffer.action(:hide)
+    {:noreply, new_buf}
   end
 
   def handle_cast({:enter_char, char}, state) do
     new_state =
       case state.content do
-        nil                 -> %{state|content: char}
-        c when is_binary(c) -> %{state|content: state.content <> char}
+        nil                 -> %{state|content: char}                  # enter the first character
+        c when is_binary(c) -> %{state|content: state.content <> char} # append the char to current content
       end
 
     GUI.Component.CommandBuffer.action({:update_content, new_state.content})
-    GUI.Component.CommandBuffer.move_cursor()
+    GUI.Component.CommandBuffer.action(:move_cursor)
     {:noreply, new_state}
   end
 
   def handle_cast(:reset_text_field, buf) do
-    new_buffer = %{buf|content: ""}
+    new_buf =
+      buf |> reset_text_field()
 
-    GUI.Component.CommandBuffer.action({:update_content, new_buffer.content})
-    GUI.Component.CommandBuffer.action(:reset_cursor)
-
-    {:noreply, new_buffer}
+    {:noreply, new_buf}
   end
 
 
@@ -107,7 +114,7 @@ defmodule Flamelex.Buffer.Command do
 
 
   # @impl GenServer
-  # def handle_cast(:deactivate_command_buffer, state) do
+  # def handle_cast(:de_activate_command_buffer, state) do
   #   new_state = %{state|content: ""}
 
   #   GenServer.cast(__MODULE__, :reset_text_field)
@@ -170,5 +177,14 @@ defmodule Flamelex.Buffer.Command do
   def execute_command(unrecognised_command) do
     Logger.warn "#{__MODULE__} unrecognised command. Attempting to run as Elixir code... #{inspect unrecognised_command}"
     Code.eval_string(unrecognised_command)
+  end
+
+  defp reset_text_field(buf) do
+    new_buffer = %{buf|content: ""}
+
+    GUI.Component.CommandBuffer.action({:update_content, new_buffer.content})
+    GUI.Component.CommandBuffer.action(:reset_cursor)
+
+    new_buffer
   end
 end

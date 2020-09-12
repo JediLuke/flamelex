@@ -11,61 +11,74 @@ defmodule GUI.Root.Reducer do
 
   """
   require Logger
-  alias GUI.Structs.Frame
-
-  @command_buffer_height 32
+  use Flamelex.CommonDeclarations
 
 
-  def process({state, _graph}, :activate_command_buffer) do
-    # we need to do 2 separate things here,
-    #   1) Send a msg to CommandBuffer (separate process) to show itself
-    #   2) Update the state of the Scene.Root, because this state affects
-    #      what future inputs get mapped to
-    GUI.Component.CommandBuffer.activate()
-    put_in(state.input.mode, :command) |> update_state_only()
-  end
 
-  def process({state, _graph}, :deactivate_command_buffer) do
-    GUI.Component.CommandBuffer.deactivate()
-    put_in(state.input.mode, :normal) |> update_state_only()
-  end
+  # def process(%{
+  #       # graph: graph,
+  #       layout: %Flamelex.GUI.Structs.Layout{
+  #         arrangement: :floating_frames,
+  #         dimensions: %Flamelex.GUI.Structs.Dimensions{width: width, height: height}},
+  #         frames: []} = state, # no frames yet
+  #       {:show_in_gui, buf})
+  def process(state, {:show_in_gui, buf}) do
 
-  def process({%{viewport: vp} = state, graph}, {:initialize_command_buffer, buf}) do
+    #TODO we want to use frames etc. but this is more or less it!
+    %{arrangement: _arrangement,
+       dimensions: %{width: width, height: height}}
+         = state.layout
 
-    buffer_frame =
-      buf |> Frame.new(
-               top_left_corner: {0, vp.height - @command_buffer_height},
-               dimensions:      {vp.width + 1, @command_buffer_height}, opts: []) #TODO why do we need that +1?? Without it, you can definitely see a thin black line on the edge
+    new_frame = Frame.new(
+      id:              "lukes_frame",
+      top_left_corner: {25, 25},
+      dimensions:      {800, 1200},
+      buffer:          buf)
 
+        # picture_graph:   GUI.Component.TextBox.new(buf)
+        # picture_graph:   Draw.blank_graph()
+        #                  |> Draw.text("Yes yes", {100, 100}) #TODO although inelegant, this is drawing text inside the frame!!
+
+    #TODO need to make sure our ordering is correct so frames are layered on top of eachother
     new_graph =
-      graph
-      |> GUI.Component.CommandBuffer.add_to_graph(buffer_frame)
+      state.graph
+      |> GUI.Component.Frame.add_to_graph(new_frame)
 
-    update_state_and_graph(state, new_graph) #TODO do we need to update the root state at all? I hope not
+    new_state =
+      %{state|graph: new_graph}
+
+    {:redraw_root_scene, new_state}
   end
 
-  #TODO this at the moment renders a new Text frame
-  def process({state, graph}, {'NEW_FRAME', [type: :text, content: content]}) do
-    new_graph =
-      graph
-      |> GUI.Utilities.Draw.text(content) #TODO update the correct buffer GUI process, & do it from within that buffer itself (high-five!)
-
-    update_state_and_graph(state, new_graph) #TODO do we update the state??
+  def process(a, b) do
+    IO.inspect b, label: "ACTION"
+    raise "NO #{inspect a} #{inspect b}"
   end
 
-  #NOTE: moved to OmegaReducer
-  # # This function acts as a catch-all for all actions that don't match
-  # # anything. Without this, the process which calls this (which right
-  # # now is GUI.Root.Scene !!) can crash (!!) if no action matches what
-  # # is passed in.
-  # def process({_state, _graph}, action) do
-  #   Logger.warn "#{__MODULE__} received an action it did not recognise. #{inspect action}"
-  #   ignore_this_action()
+
+
+
+  # def process({_scene, graph}, {:show_in_gui, %Buffer{} = buf}) do
+  #   new_graph =
+  #     graph
+  #     |> GUI.Utilities.Draw.text(buf.content) #TODO update the correct buffer GUI process, & do it from within that buffer itself (high-five!)
+
+  #   {:update_graph, new_graph}
   # end
 
-  defp ignore_this_action(), do: :ignore_action
-  defp update_state_only(new_state), do: {:update_state, new_state}
-  defp update_state_and_graph(new_state, new_graph), do: {:update_all, {new_state, new_graph}}
+
+  #TODO this at the moment renders a new Text frame
+  # def process({state, graph}, {'NEW_FRAME', [type: :text, content: content]}) do
+  #   new_graph =
+  #     graph
+  #     |> GUI.Utilities.Draw.text(content) #TODO update the correct buffer GUI process, & do it from within that buffer itself (high-five!)
+
+  #   # update_state_and_graph(state, new_graph) #TODO do we update the state??
+  #   {:update_all, {state, new_graph}}
+  # end
+
+
+  # defp update_state_and_graph(new_state, new_graph), do: {:update_all, {new_state, new_graph}}
 end
 
 

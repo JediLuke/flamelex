@@ -65,11 +65,31 @@ defmodule GUI.Utilities.Draw do
   # end
 
   #TODO remove this hideous function, right now it just works for rending fullscreen frames, but having card-coded coords like this is just wrong
-  def text(%Scenic.Graph{} = graph, t) do
+  def text(%Scenic.Graph{} = graph, t, translate \\ {20, 20}) do
     graph
     |> Scenic.Primitives.text(t, font: @ibm_plex_mono,
-               translate: {5, 24}, # text draws from bottom-left corner?? :( also, how high is it???
-               font_size: 24, fill: :white)
+               translate: translate, # text draws from bottom-left corner?? :( also, how high is it???
+               font_size: 24, fill: :blue)
+  end
+
+  def render_inner_buffer(
+        %Scenic.Graph{} = graph,
+        %Frame{
+          dimensions:  %Dimensions{width: frame_width, height: frame_height},
+          coordinates: %Coordinates{x: frame_x, y: frame_y},
+          buffer:      %Buffer{type: :text} = buf
+        },
+        bar_height
+      ) do
+
+          #TODO right now the text runs outside of the frame! We need to use dimensions here somehow to limit the size of the draw
+          graph
+          |> Scenic.Primitives.text(
+               buf.content,
+                 font: @ibm_plex_mono,
+                 translate: {frame_x + 5, frame_y + bar_height + 22}, # text draws from bottom-left corner?? :( also, how high is it???
+                 font_size: 24,
+                 fill: :ghost_white)
   end
 
 

@@ -4,10 +4,11 @@ defmodule Flamelex.CommonDeclarations do
   defmacro __using__(_opts) do
     quote do
 
-      #NOTE: Include common aliases
-      alias Flamelex.Structs.Buffer
+      alias Flamelex.OmegaMaster, as: Omega
+
+      alias Flamelex.Structs.{Buffer}
+      alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
       alias GUI.Utilities.Draw
-      alias GUI.Structs.{Coordinates, Dimensions, Frame}
 
       defguard is_positive_integer(x)
                when is_integer(x)

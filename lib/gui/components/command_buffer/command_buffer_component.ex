@@ -3,33 +3,12 @@ defmodule GUI.Component.CommandBuffer do
   use Flamelex.CommonDeclarations
   alias GUI.Component.CommandBuffer.Reducer
   require Logger
-
-
-  ## Public API
-  ## -------------------------------------------------------------------
-
-
-  @doc """
-  The `initialize` function is a function created as a convenience (it just
-  makes sense to put it here) which requests the GUI.Root.Scene to add this
-  Scenic.Component to the scene's graph.
+  @moduledoc """
+  This module is responsible for drawing the CommandBuffer.
   """
-  def initialize(%Buffer{type: :command} = cmd_buf) do
-    #TODO so, should we send an action, or should we send a new graph???
-    GUI.Scene.Root.action({:initialize_command_buffer, cmd_buf})
-  end
 
-  @doc ~s(Make the command buffer visible.)
-  def activate,   do: action :activate_command_buffer
-  def deactivate, do: action :deactivate_command_buffer
+  @command_buffer_height 32
 
-  def redraw(%Scenic.Graph{} = g), do: GenServer.cast(__MODULE__, {:redraw, g})
-
-  ## Public functions, which are nonetheless more or less for internal use
-  ## -------------------------------------------------------------------
-
-
-  #TODO hide these Scenic functions behind a nice macro
   @impl Scenic.Component
   def verify(%Frame{} = data), do: {:ok, data}
   def verify(_else), do: :invalid_data
@@ -37,7 +16,39 @@ defmodule GUI.Component.CommandBuffer do
   @impl Scenic.Component
   def info(_data), do: ~s(Invalid data)
 
-  #NOTE: this is the one called by the RootReducer
+
+  ## Public API
+  ## -------------------------------------------------------------------
+
+
+  def draw(%Scenic.Graph{} = graph, viewport: %Dimensions{} = vp) do
+    command_buffer =
+      Frame.new(
+        id: :command_buffer_frame,
+        top_left_corner: Coordinates.new(
+                x: 0,
+                y: vp.height - @command_buffer_height),
+        dimensions: Dimensions.new(
+                width:  vp.width + 1, #TODO why do we need that +1?? Without it, you can definitely see a thin black line on the edge
+                height: @command_buffer_height))
+
+    graph
+    |> add_to_graph(command_buffer)
+  end
+
+  def action(a) do
+    GenServer.cast(__MODULE__, {:action, a})
+  end
+
+  def redraw(%Scenic.Graph{} = g) do
+    GenServer.cast(__MODULE__, {:redraw, g})
+  end
+
+
+  ## GenServer callbacks
+  ## -------------------------------------------------------------------
+
+
   @impl Scenic.Scene
   def init(%Frame{} = state, _opts) do
     Logger.info "Initializing #{__MODULE__}..."
@@ -50,26 +61,13 @@ defmodule GUI.Component.CommandBuffer do
     {:ok, {state, graph}, push: graph}
   end
 
-  def action(a) do
-    GenServer.cast(__MODULE__, {:action, a})
-  end
-
-  def move_cursor() do
-    GenServer.cast(__MODULE__, {:action, :move_cursor})
-  end
-
-
-  ## GenServer callbacks
-  ## -------------------------------------------------------------------
-
-
   def handle_cast({:redraw, new_graph}, {state, _graph}) do
     {:noreply, {state, new_graph}, push: new_graph}
   end
 
-  #TODO this should all be done by the Commander??
   @impl Scenic.Scene
   def handle_cast({:action, action}, {state, graph}) do
+    IO.puts "#{inspect action}"
     GUI.Component.CommandBuffer.Reducer.process({state, graph}, action)
     |> case do
          :ignore_action

@@ -1,4 +1,4 @@
-defmodule GUI.Structs.Coordinates do
+defmodule Flamelex.GUI.Structs.Coordinates do
   @moduledoc """
   Struct which holds 2d points.
   """
@@ -6,17 +6,18 @@ defmodule GUI.Structs.Coordinates do
 
   defstruct [x: 0, y: 0]
 
-  # def new(%__MODULE__{} = struct) do #TODO just return same struct?
-  #   struct
-  # end
+  #TODO we ought to be validating inputs better here, checking for floats/ints,
+  # and making sure they are positive
 
-  def new({x, y}) when is_positive_integer(x) and is_positive_integer(y) do
+
+  def new(x: x, y: y) do
     %__MODULE__{
       x: x,
       y: y
     }
   end
 
+  #TODO in future deprecate this, we prefer the above styling
   def new({x, y}) do
     %__MODULE__{
       x: x,

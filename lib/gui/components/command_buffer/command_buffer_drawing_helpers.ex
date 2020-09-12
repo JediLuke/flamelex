@@ -14,10 +14,10 @@ defmodule GUI.Component.CommandBuffer.DrawingHelpers do
   # @empty_command_buffer_text_prompt "Enter a command..."
 
 
-  def draw_command_prompt(graph, %GUI.Structs.Frame{
+  def draw_command_prompt(graph, %Frame{
     #NOTE: These are the coords/dimens for the whole CommandBuffer Frame
-    coordinates: %GUI.Structs.Coordinates{x: _top_left_x, y: top_left_y},
-    dimensions: %GUI.Structs.Dimensions{height: height, width: _width}
+    coordinates: %Coordinates{x: _top_left_x, y: top_left_y},
+    dimensions: %Dimensions{height: height, width: _width}
   }) do
     #NOTE: The y_offset
     #      ------------
@@ -47,10 +47,10 @@ defmodule GUI.Component.CommandBuffer.DrawingHelpers do
     |> Scenic.Primitives.triangle({point1, point2, point3}, fill: @prompt_color)
   end
 
-  def calc_textbox_frame(_buffer_frame = %GUI.Structs.Frame{
+  def calc_textbox_frame(_buffer_frame = %Frame{
     #NOTE: These are the coords/dimens for the whole CommandBuffer Frame
-    coordinates: %GUI.Structs.Coordinates{x: cmd_buf_top_left_x, y: cmd_buf_top_left_y},
-    dimensions: %GUI.Structs.Dimensions{height: cmd_buf_height, width: cmd_buf_width}
+    coordinates: %Coordinates{x: cmd_buf_top_left_x, y: cmd_buf_top_left_y},
+    dimensions: %Dimensions{height: cmd_buf_height, width: cmd_buf_width}
   }) do
     total_prompt_width = prompt_width(@prompt_size) + (2*@prompt_margin)
 
@@ -66,23 +66,23 @@ defmodule GUI.Component.CommandBuffer.DrawingHelpers do
 
     textbox_frame =
       Frame.new(
-              top_left_corner: textbox_coordinates,
-              dimensions:      textbox_dimensions)
+        top_left_corner: textbox_coordinates |> Coordinates.new(),
+        dimensions:      textbox_dimensions  |> Dimensions.new())
 
     # return
     textbox_frame
   end
 
-  def draw_input_textbox(graph, %GUI.Structs.Frame{} = textbox_frame) do
+  def draw_input_textbox(graph, %Frame{} = textbox_frame) do
     graph
-    |> GUI.Utilities.Draw.border_box(textbox_frame)
+    |> Draw.border_box(textbox_frame)
   end
 
   def draw_cursor(
         graph,
-        %GUI.Structs.Frame{
-           coordinates: %GUI.Structs.Coordinates{x: container_top_left_x, y: container_top_left_y},
-           dimensions:  %GUI.Structs.Dimensions{height: container_height, width: _container_width}
+        %Frame{
+           coordinates: %Coordinates{x: container_top_left_x, y: container_top_left_y},
+           dimensions:  %Dimensions{height: container_height, width: _container_width}
         },
         id: cursor_component_id)
   do
@@ -99,9 +99,9 @@ defmodule GUI.Component.CommandBuffer.DrawingHelpers do
   def draw_text_field(
         graph,
         content,
-        %GUI.Structs.Frame{
-           coordinates: %GUI.Structs.Coordinates{x: container_top_left_x, y: container_top_left_y},
-           dimensions:  %GUI.Structs.Dimensions{height: container_height, width: _container_width}
+        %Frame{
+           coordinates: %Coordinates{x: container_top_left_x, y: container_top_left_y},
+           dimensions:  %Dimensions{height: container_height, width: _container_width}
         },
         id: text_field_id)
   do

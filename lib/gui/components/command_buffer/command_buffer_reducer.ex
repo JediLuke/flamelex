@@ -17,11 +17,10 @@ defmodule GUI.Component.CommandBuffer.Reducer do
   @command_mode_background_color :cornflower_blue
 
   def initialize(%Frame{} = frame) do
-
-    # the textbox is internal to the command buffer, but we need the coordinates
-    # of it in a few places, so we can just pre-calculate it up here
-    %Frame{} = textbox_frame =
-      DrawingHelpers.calc_textbox_frame(frame)
+    # the textbox is internal to the command buffer, but we need the
+    # coordinates of it in a few places, so we pre-calculate it here
+    textbox_frame =
+      %Frame{} = DrawingHelpers.calc_textbox_frame(frame)
 
     Draw.blank_graph()
     |> Scenic.Primitives.group(fn graph ->
@@ -37,7 +36,7 @@ defmodule GUI.Component.CommandBuffer.Reducer do
     ])
   end
 
-  def process({_state, graph}, :activate_command_buffer) do
+  def process({_state, graph}, :show) do
     new_graph =
       graph
       |> Graph.modify(@component_id, &update_opts(&1, hidden: false))
@@ -45,7 +44,7 @@ defmodule GUI.Component.CommandBuffer.Reducer do
     {:update_graph, new_graph}
   end
 
-  def process({_state, graph}, :deactivate_command_buffer) do
+  def process({_state, graph}, :hide) do
     new_graph =
       graph
       |> Graph.modify(@component_id, &update_opts(&1, hidden: true))
@@ -53,7 +52,7 @@ defmodule GUI.Component.CommandBuffer.Reducer do
   {:update_graph, new_graph}
 end
 
-  # def process({%{mode: :command} = state, _graph}, 'DEACTIVATE_COMMAND_BUFFER') do
+  # def process({%{mode: :command} = state, _graph}, 'de_activate_command_buffer') do
   #   new_state =
   #     state
   #     |> Map.replace!(:mode, :echo)
@@ -137,8 +136,9 @@ end
   # end
 
   # #NOTE: This must go on the bottom, as it's the catch-all...
-  def process({state, _graph}, unknown_action) do
-    Logger.error "#{__MODULE__} received unknown state/action combination: action: #{inspect unknown_action}, state: #{inspect state}"
-    :ignore_action
-  end
+  # def process({state, _graph}, unknown_action) do
+  #   IO.puts "SHOW?????"
+  #   Logger.error "#{__MODULE__} received unknown state/action combination: action: #{inspect unknown_action}, state: #{inspect state}"
+  #   :ignore_action
+  # end
 end

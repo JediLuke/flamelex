@@ -19,7 +19,7 @@ defmodule Flamelex.GUI.Structs.Layout do
     %__MODULE__{
       dimensions:  dim |> Dimensions.new(),
       frames:      [],
-      arrangement: :one_frame_maximized
+      arrangement: :floating_frames
     }
   end
 

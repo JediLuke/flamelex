@@ -1,4 +1,4 @@
-defmodule Franklin.Buffer.TopLevelSupervisor do
+defmodule Flamelex.Buffer.TopLevelSupervisor do
   @moduledoc """
   This Supervisor monitors the Buffer.Manager and the Buffer.DynamicSupervisor
   """

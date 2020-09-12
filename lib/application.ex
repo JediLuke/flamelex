@@ -14,10 +14,10 @@ defmodule Franklin.Application do
     Logger.info @welcome_string
 
     children = [
-      GUI.TopLevelSupervisor, # GUI gets started first, because buffers/agents call GUI processes & we want those processes to be there #TODO is this still relevant?
+      Flamelex.GUI.TopLevelSupervisor,
       Flamelex.OmegaMaster,
-      Franklin.Buffer.TopLevelSupervisor, #TODO get rid of Franklin at the start of the module names, why do we have that? (maybe benefits for IEx??)
-      # Franklin.Agent.TopLevelSupervisor
+      Flamelex.Buffer.TopLevelSupervisor,
+      # Franklin.Agent.TopLevelSupervisor, #TODO this is just commented out to stop spamming the log with reminders atm
     ]
 
     opts = [strategy: :one_for_one, name: Franklin.Supervisor]

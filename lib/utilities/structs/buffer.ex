@@ -74,4 +74,9 @@ defmodule Flamelex.Structs.Buffer do
   # defp create_struct(:invalid_data), do: raise "Invalid data provided when initializing #{__MODULE__}."
   # defp create_struct(data), do: struct(__MODULE__, data)
 
+
+  # def update_content(%Buffer{} = buf, with: c) do
+  #   %{buf|content: c}
+  # end
+
 end

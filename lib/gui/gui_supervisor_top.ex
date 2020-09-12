@@ -1,4 +1,4 @@
-defmodule GUI.TopLevelSupervisor do
+defmodule Flamelex.GUI.TopLevelSupervisor do
   @moduledoc false
   use Supervisor
   require Logger

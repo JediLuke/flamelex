@@ -23,7 +23,7 @@ defmodule Utilities.ProcessRegistry do
     :gproc.reg({:n, :l, tag})
   end
 
-  # def via_tuple(tag) do
-  #   {:via, :gproc, {:n, :l, tag}}
-  # end
+  def via_tuple(tag) do
+    {:via, :gproc, {:n, :l, tag}}
+  end
 end

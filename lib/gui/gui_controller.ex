@@ -1,57 +1,107 @@
 defmodule GUI.Controller do
   @moduledoc """
-  This process, separate from Scenic itself, runs the GUI. It stacks
-  buffers, handles updates, etc.
+  This process is in some ways the equal-opposite of OmegaMaster. That process
+  holds all our buffers & manipulates them. This process holds the actual
+  %RootScene{} and %Layout{}, as well as keeping track of open buffers etc.
   """
   use GenServer
   use Flamelex.CommonDeclarations
   require Logger
 
 
-  def start_link([] = default_params) do
-    GenServer.start_link(__MODULE__, default_params)
+  def start_link(_params) do
+    viewport_size = Dimensions.new(:viewport_size)
+
+    init_state = %{
+         buffers: [],
+        viewport: viewport_size,
+          layout: Layout.default(viewport_size),
+           graph: Draw.blank_graph()
+      }
+
+    GenServer.start_link(__MODULE__, init_state)
   end
 
-  def register_new_buffer(args), do: GenServer.cast(__MODULE__, {:register_new_buffer, args})
+  def action(a) do
+    GenServer.cast(__MODULE__, {:action, a})
+  end
 
-  def show_fullscreen(buffer), do: GenServer.cast(__MODULE__, {:show_fullscreen, buffer})
-
-  def fetch_active_buffer(), do: GenServer.call(__MODULE__, :fetch_active_buffer)
 
   ## GenServer callbacks
   ## -------------------------------------------------------------------
 
 
-  @impl true
-  def init(_params) do
-    Logger.info "Initializing #{__MODULE__}..."
+  def init(state) do
+    Logger.info "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
-
-    initial_state = %{
-      active_buffer: nil,
-      buffer_list: []
-    }
-
-    {:ok, initial_state, {:continue, :after_init}}
+    {:ok, state, {:continue, :draw_default_gui}}
   end
 
-  @impl true
-  def handle_continue(:after_init, state) do
-    # send self(), :check_reminders
+  def handle_continue(:draw_default_gui, %{viewport: vp} = state) do
 
-    # GUI.Component.CommandBuffer.initialize() #NOTE: don't do this here, when the buffer comes up that does it
+    new_graph =
+      Draw.blank_graph()
+      |> GUI.Component.CommandBuffer.draw(viewport: vp)
+      #TODO start drawing transmutation circles
+      |> Draw.box(
+              x: vp.width  / 2,
+              y: vp.height / 2,
+          width: 100,
+        height: 100)
+
+    new_graph
+    |> GUI.Root.Scene.redraw()
+
+    new_state =
+      %{state|graph: new_graph}
 
     Logger.info("#{__MODULE__} initialization complete.")
-    {:noreply, state}
+    {:noreply, new_state}
   end
 
-  @impl true
-  def handle_call(:fetch_active_buffer, _from, state) do
-    {:reply, state.active_buffer, state}
+  # def handle_cast(:show_in_gui, %Buffer{} = buffer}, state) do
+
+  #   # the reason we need this controller is, it can keep track of all the buffers that the GUI is managing. Ok fuck it we can maybe get rid of it
+
+  #   # new_state =
+  #   #   state
+  #   #   |> Map.update!(:buffer_list, fn b -> b ++ [buffer] end)
+  #   #   |> Map.update!(:active_buffer, fn _ab -> buffer end)
+
+  #   # IO.puts "SENDING --- #{new_state.active_buffer.content}"
+  #   GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
+
+  #   {:noreply, state}
+  # end
+
+
+
+
+  def handle_cast({:action, action}, state) do
+    case GUI.Root.Reducer.process(state, action) do
+      # :ignore_action
+      #     -> {:noreply, {scene, graph}}
+      # {:update_state, new_scene} when is_map(new_scene)
+      #     -> {:noreply, {new_scene, graph}}
+      {:redraw_root_scene, %{graph: new_graph} = new_state}  ->
+        GUI.Root.Scene.redraw(new_graph)
+        {:noreply, new_state}
+      # {:update_state_and_graph, {new_scene, %Scenic.Graph{} = new_graph}} when is_map(new_scene)
+      #     -> {:noreply, {new_scene, new_graph}, push: new_graph}
+    end
   end
 
 
-  # @impl true
+
+
+
+
+
+
+
+
+
+
   # def handle_cast({:register_new_buffer, [type: :text, content: c, action: 'OPEN_FULL_SCREEN'] = args}, %{
   #   buffer_list: [] # the case where we have no open buffers
   # } = state) do
@@ -67,7 +117,6 @@ defmodule GUI.Controller do
   #   {:noreply, new_state}
   # end
 
-  @impl true
   def handle_cast({:show_fullscreen, %Buffer{} = buffer}, state) do
 
     # the reason we need this controller is, it can keep track of all the buffers that the GUI is managing. Ok fuck it we can maybe get rid of it
@@ -148,5 +197,13 @@ defmodule GUI.Controller do
   # defp ack_reminder_in_user_data_file(r) do
   #   ackd_reminder = r |> TidBit.ack_reminder()
   #   Utilities.Data.replace_tidbit(r, ackd_reminder)
+  # end
+
+  # add a new buffer to the state's buffer_list
+  # defp add_buffer(state, buf, f) do
+  #   buf_frame = {buf: buf, frame: f}
+
+  #   state
+  #   |> Map.update!(:buffers, fn buf_list -> buf_list ++ [buf_frame] end)
   # end
 end
