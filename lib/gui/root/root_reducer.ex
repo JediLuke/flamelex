@@ -15,22 +15,24 @@ defmodule GUI.Root.Reducer do
 
 
 
-  # def process(%{
-  #       # graph: graph,
-  #       layout: %Flamelex.GUI.Structs.Layout{
-  #         arrangement: :floating_frames,
-  #         dimensions: %Flamelex.GUI.Structs.Dimensions{width: width, height: height}},
-  #         frames: []} = state, # no frames yet
-  #       {:show_in_gui, buf})
-  def process(state, {:show_in_gui, buf}) do
+  def process(
+        %{
+          layout:
+            %Flamelex.GUI.Structs.Layout{
+              arrangement: :floating_frames,
+              # dimensions: %Flamelex.GUI.Structs.Dimensions{width: width, height: height},
+              frames: []
+            }
+        } = state,
+        {:show_in_gui, buf} = _action) do
 
-    #TODO we want to use frames etc. but this is more or less it!
-    %{arrangement: _arrangement,
-       dimensions: %{width: width, height: height}}
-         = state.layout
+    # #TODO we want to use frames etc. but this is more or less it!
+    # %{arrangement: _arrangement,
+    #    dimensions: %{width: width, height: height}}
+    #      = state.layout
 
     new_frame = Frame.new(
-      id:              "lukes_frame",
+      id:              1, #NOTE: This is ok, because this pattern match is for when we have no frames
       top_left_corner: {25, 25},
       dimensions:      {800, 1200},
       buffer:          buf)
@@ -44,10 +46,58 @@ defmodule GUI.Root.Reducer do
       state.graph
       |> GUI.Component.Frame.add_to_graph(new_frame)
 
+    new_layout =
+      %{state.layout|frames: state.layout.frames ++ [new_frame]}
+
     new_state =
-      %{state|graph: new_graph}
+      %{state|graph: new_graph, layout: new_layout}
 
     {:redraw_root_scene, new_state}
+  end
+
+
+  def process(
+    %{
+      layout:
+        %Flamelex.GUI.Structs.Layout{
+          arrangement: :floating_frames,
+          # dimensions: %Flamelex.GUI.Structs.Dimensions{width: width, height: height},
+          frames: [%Frame{} = f] # one frame
+        }
+    } = state,
+    {:show_in_gui, buf} = _action) do
+
+
+      new_frame = Frame.new(
+        id:              2,
+        top_left_corner: {850, 25},
+        dimensions:      {800, 1200},
+        buffer:          buf)
+
+
+      #TODO need to make sure our ordering is correct so frames are layered on top of eachother
+      new_graph =
+        state.graph
+        |> GUI.Component.Frame.add_to_graph(new_frame)
+
+      new_layout =
+        %{state.layout|frames: state.layout.frames ++ [new_frame]}
+
+      new_state =
+        %{state|graph: new_graph, layout: new_layout}
+
+      {:redraw_root_scene, new_state}
+  end
+
+  def process(
+  %{layout: %Flamelex.GUI.Structs.Layout{
+        arrangement: :floating_frames,
+        frames: frame_list}
+  } = state,
+  {:show_in_gui, buf} = _action)
+  when length(frame_list) > 2 do
+    IO.puts ""
+
   end
 
   def process(a, b) do

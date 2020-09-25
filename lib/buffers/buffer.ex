@@ -16,7 +16,9 @@ defmodule Flamelex.Buffer do
     Logger.info "Loading new text buffer for file: #{inspect filepath}"
     content = File.read!(filepath)
     Flamelex.Buffer.Supervisor.start_buffer_process(
-                      type: :text, name: filepath, content: content)
+                            type: Flamelex.Buffer.Text,
+                            name: filepath,
+                         content: content)
   end
 
   @doc """

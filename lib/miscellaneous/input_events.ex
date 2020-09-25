@@ -118,6 +118,8 @@ defmodule GUI.ScenicInputEvents do
         @bang, @question_mark, @left_bracket, @right_bracket, @quote_character,
         @colon, @percent_sign, @left_brace, @right_brace, @comma]
 
+
+      # @left_mouse {:cursor_button, {:left, :press, 0, {403.91015625, 104.5703125}}}
     end
   end
 end

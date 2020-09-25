@@ -42,7 +42,6 @@ defmodule Flamelex.GUI.Structs.Frame do
   #TODO deprecate this too
   # def new([id: id, top_left_corner: c, dimensions: d, picture_graph: g]) do
   def new([id: id, top_left_corner: c, dimensions: d, buffer: b]) do
-    IO.puts "Yes we went through here..."
     %__MODULE__{
       id: id,
       coordinates: c |> Coordinates.new(),

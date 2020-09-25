@@ -1,6 +1,9 @@
 defmodule Flamelex.Buffer.Supervisor do
   use DynamicSupervisor
 
+  @valid_buffer_types [
+    Flamelex.Buffer.Text
+  ]
 
   def start_link(args) do
     DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
@@ -12,9 +15,9 @@ defmodule Flamelex.Buffer.Supervisor do
   end
 
 
-  def start_buffer_process(type: :text, name: name, content: content) do
-    DynamicSupervisor.start_child(__MODULE__,
-                        {Flamelex.Buffer.Text, {:text, name, content}})
+  def start_buffer_process(type: buf_type, name: name, content: content)
+  when buf_type in @valid_buffer_types do
+    DynamicSupervisor.start_child(__MODULE__, {buf_type, {:text, name, content}})
   end
 
   # def start_buffer(content, of_type: :note) do

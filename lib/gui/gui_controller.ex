@@ -13,7 +13,6 @@ defmodule GUI.Controller do
     viewport_size = Dimensions.new(:viewport_size)
 
     init_state = %{
-         buffers: [],
         viewport: viewport_size,
           layout: Layout.default(viewport_size),
            graph: Draw.blank_graph()
@@ -24,6 +23,10 @@ defmodule GUI.Controller do
 
   def action(a) do
     GenServer.cast(__MODULE__, {:action, a})
+  end
+
+  def frame_stack do
+    GenServer.call(__MODULE__, :get_frame_stack)
   end
 
 
@@ -44,10 +47,11 @@ defmodule GUI.Controller do
       |> GUI.Component.CommandBuffer.draw(viewport: vp)
       #TODO start drawing transmutation circles
       |> Draw.box(
-              x: vp.width  / 2,
-              y: vp.height / 2,
-          width: 100,
-        height: 100)
+                x: vp.width  / 2,
+                y: vp.height / 2,
+            width: 100,
+           height: 100)
+      |> Scenic.Primitives.rect({vp.width, vp.height}) # rectangle used for capturing input for the scene
 
     new_graph
     |> GUI.Root.Scene.redraw()
@@ -91,6 +95,9 @@ defmodule GUI.Controller do
     end
   end
 
+  def handle_call(:get_frame_stack, _from, state) do
+    {:reply, state.layout.frames, state}
+  end
 
 
 

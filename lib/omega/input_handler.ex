@@ -1,5 +1,5 @@
 
-defmodule Flamelex.Omega.Reducer do #TODO this should be renamed InputHandler
+defmodule Flamelex.InputHandler do
   @moduledoc """
   This module acts on inputs, which when combined with an OmegaState, can
   be fed into specific functions via pattern matching. These functions
@@ -13,6 +13,7 @@ defmodule Flamelex.Omega.Reducer do #TODO this should be renamed InputHandler
 
 
   @readme "/Users/luke/workbench/elixir/franklin/README.md"
+  @dev_tools "/Users/luke/workbench/elixir/franklin/lib/utilities/dev_tools.ex"
 
 
   # def identity(%OmegaState{} = omega) do
@@ -52,11 +53,17 @@ defmodule Flamelex.Omega.Reducer do #TODO this should be renamed InputHandler
     state
   end
 
+  def handle_input(%OmegaState{mode: :normal} = state, @lowercase_d) do
+    Logger.info "Lowercase d was pressed !!"
+    Flamelex.Buffer.load(type: :text, file: @dev_tools)
+    state
+  end
+
   # This function acts as a catch-all for all actions that don't match
   # anything. Without this, the process which calls this can crash (!!)
   # if no action matches what is passed in.
   def handle_input(%OmegaState{} = state, input) do
-    Logger.warn "#{__MODULE__} recv'd unrecognised action/state combo. input: #{inspect input}, mode: #{inspect state.mode}"
+    # Logger.warn "#{__MODULE__} recv'd unrecognised action/state combo. input: #{inspect input}, mode: #{inspect state.mode}"
     state # ignore
     # |> IO.inspect(label: "-- DEBUG --")
   end

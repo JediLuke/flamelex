@@ -56,7 +56,7 @@ defmodule Flamelex.OmegaMaster do
     #NOTE: actions may be pushed down to other buffers by Flamelex.Omega.Reducer
     new_omega_state =
       omega_state
-      |> Flamelex.Omega.Reducer.handle_input(input)
+      |> Flamelex.InputHandler.handle_input(input)
 
     {:noreply, new_omega_state}
   end

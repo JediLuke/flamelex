@@ -15,11 +15,6 @@ defmodule GUI.Component.Frame do
   def info(_data), do: ~s(Invalid data)
 
 
-  # def show
-  # def hide
-  # def move
-
-
   ## GenServer callbacks
   ## -------------------------------------------------------------------
 
@@ -27,47 +22,27 @@ defmodule GUI.Component.Frame do
   @impl Scenic.Scene
   def init(%Frame{} = frame, _opts) do
     Logger.info "Initializing #{__MODULE__}..."
-    # register_process()
-
-    bar_height = 24
-
-    new_graph =
-      Scenic.Graph.build()
-      # draw header & footer before frame to get a nice "window" appearance
-      |> draw_header_bar(frame, bar_height)
-      |> draw_footer_bar(frame, bar_height)
-      #TODO draw text in header bar
-      |> Draw.border_box(frame)
-      |> Draw.render_inner_buffer(frame, bar_height)
-
-    # new_frame =
-    #   %{frame|picture_graph: new_graph}
-
-    Logger.info("#{__MODULE__} initialization complete.")
-
-    {:ok, frame, push: new_graph}
+    {:ok, frame, push: GUI.GraphConstructors.Frame.convert(frame)}
   end
 
-  defp draw_header_bar(graph, frame, height) do
-    graph
-    |> Scenic.Primitives.rect(
-         {frame.dimensions.width, height}, [
-            fill: :green,
-            translate: {
-              frame.coordinates.x,
-              frame.coordinates.y}])
+  # left-click
+  def handle_input({:cursor_button, {:left, :press, _dunno, _coords}} = action, _context, frame) do
+    # new_frame = frame |> ActionReducer.process(action)
+    new_graph = frame |> GUI.GraphConstructors.Frame.convert_2()
+    {:noreply, frame, push: new_graph}
   end
 
-  defp draw_footer_bar(graph, frame, height) do
-    graph
-    |> Scenic.Primitives.rect(
-         {frame.dimensions.width, height}, [
-            fill: :grey,
-            translate: {
-              frame.coordinates.x,
-              frame.coordinates.y + frame.dimensions.height - height}])
+  def handle_input(event, _context, state) do
+    # state = Map.put(state, :contained, true)
+    IO.puts "EVENT #{inspect event}"
+    # {:noreply, state, push: update_color(state)}
+    {:noreply, state}
   end
 
+  # def filter_event(event, _, state) do
+  #   IO.puts "EVENT #{event}"
+  #   {:cont, {:click, :transformed}, state}
+  # end
 
   # def handle_continue(:draw_frame, frame) do
 
