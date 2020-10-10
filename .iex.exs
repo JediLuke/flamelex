@@ -1,2 +1,1 @@
-use_if_available(Franklin)
-use_if_available(DevTools)
+use_if_available(Flamelex.IExAutoRun)

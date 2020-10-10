@@ -1,23 +1,23 @@
-defmodule DevTools do
+defmodule Flamelex.DevTools do
 
-  defmacro __using__(_) do
-    quote do
-      import DevTools
-      import Utilities.ProcessRegistry
-      alias Flamelex.Commander
-    end
-  end
+  # defmacro __using__(_) do
+  #   quote do
+  #     import DevTools
+  #     import Utilities.ProcessRegistry
+  #     alias Flamelex.Commander
+  #   end
+  # end
 
   # def recompile, do: IEx.Helpers.recompile
 
-  def restart_and_recompile do
-    Application.stop(:franklin)
-    IEx.Helpers.recompile
-    Application.start(:franklin)
-  end
+  # def restart_and_recompile do
+  #   Application.stop(:franklin)
+  #   IEx.Helpers.recompile
+  #   Application.start(:franklin)
+  # end
 
   def fire_dev_loop_with_restart do
-    restart_and_recompile()
+    # restart_and_recompile()
     fire_dev_loop()
   end
 
