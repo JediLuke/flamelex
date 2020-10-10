@@ -4,14 +4,9 @@ defmodule Flamelex.Memex do
   """
   use Flamelex.CommonDeclarations
 
-  def list_all() do
-    raise "this should list all the Memex entries"
+  def default_env do
+    Flamelex.Memex.Env.JediLuke
   end
-
-  def note do
-    raise "create a new tidbit aka a note"
-  end
-
 
   def random_quote do
     Enum.random(

@@ -15,6 +15,7 @@ defmodule Flamelex.IExAutoRun do
       IO.puts "Executing the code in `Flamelex.IExAutoRun`, via the `.iex.exs` file..."
 
       alias Flamelex.Memex
+      alias Flamelex.Memex.Journal
 
       import Flamelex.DevTools
       alias Flamelex.DevTools

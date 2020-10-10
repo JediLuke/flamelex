@@ -23,8 +23,13 @@ defmodule Flamelex do
   Named for the famous Alchemist, Paracelsus.
   """
   def paracelsize do
+    IO.puts "\n#{__MODULE__} stopping..."
     Application.stop(:franklin)
+
+    IO.puts "\n#{__MODULE__} recompiling..."
     IEx.Helpers.recompile
+
+    IO.puts "\n#{__MODULE__} starting...\n"
     Application.start(:franklin)
   end
 end
