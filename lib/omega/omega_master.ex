@@ -47,7 +47,7 @@ defmodule Flamelex.OmegaMaster do
 
 
   def init(%OmegaState{} = omega_state) do
-    Logger.info "Initializing #{__MODULE__}..."
+    IO.puts "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
     {:ok, omega_state}
   end

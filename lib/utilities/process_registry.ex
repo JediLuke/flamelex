@@ -18,7 +18,7 @@ defmodule Utilities.ProcessRegistry do
   end
 
   def register(tag) do
-    Logger.info "#{__MODULE__} registering #{inspect tag}..."
+    Logger.debug "#{__MODULE__} registering #{inspect tag}..."
     # :n means `name`, :l means `local`
     :gproc.reg({:n, :l, tag})
   end

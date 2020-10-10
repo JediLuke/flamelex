@@ -38,4 +38,10 @@ defmodule Flamelex.GUI.Structs.Dimensions do
   def modify(%__MODULE__{} = struct, width: new_wid, height: new_hgt) do
     %{struct|width: new_wid, height: new_hgt}
   end
+
+  def find_center(%__MODULE__{} = dimensions) do
+    Coordinates.new(
+        x: dimensions.width  / 2,
+        y: dimensions.height / 2)
+  end
 end

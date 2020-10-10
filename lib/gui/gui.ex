@@ -14,7 +14,7 @@ defmodule GUI do
   This function displays the Commander.
   """
   # def activate_command_buffer do
-  #   GenServer.cast(GUI.Controller, :activate_command_buffer)
+  #   GenServer.cast(Flamelex.GUI.Controller, :activate_command_buffer)
   # end
 
   @doc """
@@ -22,16 +22,16 @@ defmodule GUI do
   been entered into it.
   """
   # def de_activate_command_buffer do
-  #   GenServer.cast(GUI.Controller, :de_activate_command_buffer)
+  #   GenServer.cast(Flamelex.GUI.Controller, :de_activate_command_buffer)
   # end
 
   # def display_buffer(%Buffer{} = buf) do
   #   #TODO use a struct here
-  #   # def show_fullscreen(buffer), do: GUI.Controller.show_fullscreen(buffer)
+  #   # def show_fullscreen(buffer), do: Flamelex.GUI.Controller.show_fullscreen(buffer)
   #   # def show_fullscreen(buffer), do: GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
   #   # def register_new_buffer(type: :text, content: content, action: 'OPEN_FULL_SCREEN'), do: GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: content]})
-  #   # def register_new_buffer(args), do: GUI.Controller.register_new_buffer(args)
-  #   GenServer.cast(GUI.Controller, {:display_buffer, buf})
+  #   # def register_new_buffer(args), do: Flamelex.GUI.Controller.register_new_buffer(args)
+  #   GenServer.cast(Flamelex.GUI.Controller, {:display_buffer, buf})
   # end
 
   # def register_new_buffer(args), do: GenServer.cast(__MODULE__, {:register_new_buffer, args})
@@ -49,8 +49,18 @@ defmodule GUI do
       raise "rofl"
     end
 
-    def move do
-      raise "lmao"
+    def move(frame_id) do
+      Flamelex.GUI.Controller.action({:move_frame, frame_id, :right_and_down_25_px})
+    end
+  end
+
+  defmodule MenuBar do
+    def show() do
+      #TODO: request Gui.Commander to show menubar based on current layout
+    end
+
+    def hide do
+      raise "rofl"
     end
   end
 end

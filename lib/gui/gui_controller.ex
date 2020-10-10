@@ -1,4 +1,4 @@
-defmodule GUI.Controller do
+defmodule Flamelex.GUI.Controller do
   @moduledoc """
   This process is in some ways the equal-opposite of OmegaMaster. That process
   holds all our buffers & manipulates them. This process holds the actual
@@ -35,7 +35,7 @@ defmodule GUI.Controller do
 
 
   def init(state) do
-    Logger.info "#{__MODULE__} initializing..."
+    IO.puts "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
     {:ok, state, {:continue, :draw_default_gui}}
   end
@@ -45,21 +45,15 @@ defmodule GUI.Controller do
     new_graph =
       Draw.blank_graph()
       |> GUI.Component.CommandBuffer.draw(viewport: vp)
-      #TODO start drawing transmutation circles
-      |> Draw.box(
-                x: vp.width  / 2,
-                y: vp.height / 2,
-            width: 100,
-           height: 100)
+      |> GUI.Component.TransmutationCircle.draw(viewport: vp)
       |> Scenic.Primitives.rect({vp.width, vp.height}) # rectangle used for capturing input for the scene
 
     new_graph
-    |> GUI.Root.Scene.redraw()
+    |> Flamelex.GUI.Root.Scene.redraw()
 
     new_state =
       %{state|graph: new_graph}
 
-    Logger.info("#{__MODULE__} initialization complete.")
     {:noreply, new_state}
   end
 
@@ -88,7 +82,7 @@ defmodule GUI.Controller do
       # {:update_state, new_scene} when is_map(new_scene)
       #     -> {:noreply, {new_scene, graph}}
       {:redraw_root_scene, %{graph: new_graph} = new_state}  ->
-        GUI.Root.Scene.redraw(new_graph)
+        Flamelex.GUI.Root.Scene.redraw(new_graph)
         {:noreply, new_state}
       # {:update_state_and_graph, {new_scene, %Scenic.Graph{} = new_graph}} when is_map(new_scene)
       #     -> {:noreply, {new_scene, new_graph}, push: new_graph}

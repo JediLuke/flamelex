@@ -1,17 +1,11 @@
-defmodule Franklin.Application do
+defmodule Flamelex.Application do
   @moduledoc ~S(`Franklin` is a Memex & computation tool written in Elixir.)
 
   use Application
-  require Logger
-
-  @welcome_string ~s(Welcome to Franklin.
-
-  * `help`         :: Get more help.)
-
 
   def start(_type, _args) do
 
-    Logger.info @welcome_string
+    IO.puts "#{__MODULE__} initializing..."
 
     children = [
       Flamelex.GUI.TopLevelSupervisor,

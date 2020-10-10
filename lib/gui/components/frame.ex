@@ -21,7 +21,7 @@ defmodule GUI.Component.Frame do
 
   @impl Scenic.Scene
   def init(%Frame{} = frame, _opts) do
-    Logger.info "Initializing #{__MODULE__}..."
+    # IO.puts "Initializing #{__MODULE__}..."
     {:ok, frame, push: GUI.GraphConstructors.Frame.convert(frame)}
   end
 
@@ -59,7 +59,6 @@ defmodule GUI.Component.Frame do
   #   new_frame =
   #     %{frame|graph: new_graph}
 
-  #   Logger.info("#{__MODULE__} initialization complete.")
   #   {:noreply, new_frame}
   #   # {:noreply, new_frame, push: new_graph}
   # end

@@ -20,7 +20,7 @@ defmodule GUI.Initialize do
     size: {1440, 855}, # macbook pro screen res
     # size: {2560, 1395}, # 32" BenQ full screen
     # size: {800, 600}, # exactly 80 columns at size 24 font!
-    default_scene: {GUI.Root.Scene, nil},
+    default_scene: {Flamelex.GUI.Root.Scene, nil},
     drivers: [
       %{
         module: Scenic.Driver.Glfw,

@@ -22,7 +22,7 @@ defmodule Flamelex.Buffer.Command do
 
 
   def init(%Buffer{} = buf) do
-    Logger.info "Initializing #{__MODULE__}..."
+    IO.puts "#{__MODULE__} initializing...\n" # NOTE: This is the last process we boot in the initial supervision tree, so in thie special case we add a `\n` character to the log output, just for neatness.
 
     Process.register(self(), __MODULE__)  # the Commander is a little special, doesn't use gproc
     #TODO link to the command buffer GUI process - can we just use grpoc to talk to it??

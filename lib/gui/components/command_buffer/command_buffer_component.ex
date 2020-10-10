@@ -51,7 +51,7 @@ defmodule GUI.Component.CommandBuffer do
 
   @impl Scenic.Scene
   def init(%Frame{} = state, _opts) do
-    Logger.info "Initializing #{__MODULE__}..."
+    # IO.puts "Initializing #{__MODULE__}..."
 
     #TODO search for if the process is already registered, if it is, engage recovery procedure
     Process.register(self(), __MODULE__) #TODO this should be gproc

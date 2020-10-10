@@ -23,7 +23,7 @@ defmodule Flamelex.Buffer.Text do
   end
 
   def handle_cast(:show_in_gui, buf) do
-    GUI.Controller.action({:show_in_gui, buf})
+    Flamelex.GUI.Controller.action({:show_in_gui, buf})
     {:noreply, buf}
   end
 
@@ -45,7 +45,7 @@ defmodule Flamelex.Buffer.Text do
   #   IO.puts "B: #{before_update}\nN: #{before_update_new}"
 
   #   #TODO trigger re-draw
-  #   GUI.Controller.show_fullscreen(new_state)
+  #   Flamelex.GUI.Controller.show_fullscreen(new_state)
 
   #   {:noreply, new_state}
   # end

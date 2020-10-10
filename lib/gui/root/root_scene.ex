@@ -1,6 +1,5 @@
-defmodule GUI.Root.Scene do
+defmodule Flamelex.GUI.Root.Scene do
   use Scenic.Scene
-  require Logger
 
 
   ## public API
@@ -8,12 +7,19 @@ defmodule GUI.Root.Scene do
 
 
   def init(nil = _init_params, _opts) do
-    Logger.info "Initializing #{__MODULE__}..."
+    IO.puts "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
 
     GUI.Initialize.load_custom_fonts_into_global_cache()
 
-    {:ok, %{}, push: GUI.Utilities.Draw.blank_graph()}
+
+    #TODO introduce a concept here of layers - make each layer an explicit entry in the main graph, which stack on top of eachother
+    layers = [
+      {0, GUI.Utilities.Draw.blank_graph()}
+    ]
+
+
+    {:ok, push: layers |> List.first()}
   end
 
   def redraw(%Scenic.Graph{} = graph) do

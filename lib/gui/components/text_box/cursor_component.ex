@@ -48,7 +48,7 @@ defmodule GUI.Component.Cursor do
 
   @impl Scenic.Scene
   def init(%Frame{} = frame, _opts) do
-    Logger.info "Initializing #{__MODULE__}..."
+    # IO.puts "Initializing #{__MODULE__}..."
 
     Utilities.ProcessRegistry.register(frame.id)
 

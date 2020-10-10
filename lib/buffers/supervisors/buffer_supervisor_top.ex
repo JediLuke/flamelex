@@ -12,7 +12,7 @@ defmodule Flamelex.Buffer.TopLevelSupervisor do
 
 
   def init(_params) do
-    Logger.info("#{__MODULE__} initializing...")
+    IO.puts "#{__MODULE__} initializing..."
 
     children = [
       Flamelex.Buffer.Supervisor,

@@ -4,11 +4,17 @@ defmodule Flamelex.CommonDeclarations do
   defmacro __using__(_opts) do
     quote do
 
+      alias Flamelex.Memex
+
       alias Flamelex.OmegaMaster, as: Omega
 
       alias Flamelex.Structs.{Buffer}
+
       alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
       alias GUI.Utilities.Draw
+
+
+      #TODO I love having these but we should be able to put them into sub-modules
 
       defguard is_positive_integer(x)
                when is_integer(x)

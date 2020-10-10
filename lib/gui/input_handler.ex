@@ -36,17 +36,17 @@ defmodule GUI.Input.EventHandler do
 
   def process(%{input: %{mode: :command}} = state, input) when input in @valid_command_buffer_inputs do
     {:codepoint, {char, _num}} = input
-    Franklin.Buffer.Command.enter_character(char)
+    # Flamelex.Buffer.Command.enter_character(char)
     state |> add_to_input_history(input)
   end
 
   def process(%{input: %{mode: :command}} = state, @backspace_key) do
-    Franklin.Buffer.Command.backspace()
+    # Flamelex.Buffer.Command.backspace()
     state
   end
 
   def process(%{input: %{mode: :command}} = state, @enter_key) do
-    Franklin.Buffer.Command.execute_contents()
+    # Flamelex.Buffer.Command.execute_contents()
     state
   end
 
@@ -107,9 +107,9 @@ defmodule GUI.Input.EventHandler do
 
 
   def process(state, unhandled_event) do
-    # Logger.debug("#{__MODULE__} Unhandled event: #{inspect(unhandled_event)}")
+    Logger.debug("#{__MODULE__} Unhandled event: #{inspect(unhandled_event)}")
     state
-    # |> IO.inspect(label: "-- DEBUG: state --")
+    |> IO.inspect(label: "-- DEBUG: state --")
   end
 
 

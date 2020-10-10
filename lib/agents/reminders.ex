@@ -4,7 +4,7 @@ defmodule Franklin.Agent.Reminders do
   """
   use GenServer
   require Logger
-  alias Structs.TidBit
+  alias Flamelex.Structs.TidBit
 
   @default_reminder_time_in_minutes 15
 
@@ -34,7 +34,7 @@ defmodule Franklin.Agent.Reminders do
 
   @impl true
   def init(_params) do
-    Logger.info "Initializing #{__MODULE__}..."
+    IO.puts "Initializing #{__MODULE__}..."
     Process.register(self(), __MODULE__)
     {:ok, _initial_state = [], {:continue, :after_init}}
   end
@@ -42,7 +42,6 @@ defmodule Franklin.Agent.Reminders do
   @impl true
   def handle_continue(:after_init, state) do
     send self(), :check_reminders
-    Logger.info("Initialization complete.")
     {:noreply, state}
   end
 

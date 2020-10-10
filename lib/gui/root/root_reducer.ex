@@ -5,9 +5,9 @@ defmodule GUI.Root.Reducer do
   #TODO this could be a pretty nice use case for a behaviour, but I like having the automatic pattern-match we get from importing modules #TODO num2 - actually, when it comes to applying layers, pushing actions through layers of reducers (with most important last, so they apply their actions over the top of other ones) might be a good model to use...
   In Franklin, a Reducer must always return one of three values
 
-    :ignore                           -> causes GUI.Root.Scene to ignore action
-    {new_state, new_graph}            -> causes GUI.Root.Scene to update both it's internal state, & push a new graph
-    new_state when is_map(new_state)  -> causes GUI.Root.Scene to update it's internal state, but no change to the %Scenic.Graph{} is necessary
+    :ignore                           -> causes Flamelex.GUI.Root.Scene to ignore action
+    {new_state, new_graph}            -> causes Flamelex.GUI.Root.Scene to update both it's internal state, & push a new graph
+    new_state when is_map(new_state)  -> causes Flamelex.GUI.Root.Scene to update it's internal state, but no change to the %Scenic.Graph{} is necessary
 
   """
   require Logger
