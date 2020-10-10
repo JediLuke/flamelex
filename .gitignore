@@ -25,3 +25,5 @@ franklin-*.tar
 .elixir_ls
 
 /data/
+
+lib/memex/my_personal_data
