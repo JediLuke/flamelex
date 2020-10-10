@@ -29,7 +29,8 @@ defmodule Franklin.MixProject do
       {:font_metrics, "~> 0.3"},
       {:elixir_uuid, "~> 1.2"},
       {:jason, "~> 1.1"},
-      {:gproc, "~> 0.5.0"}
+      {:gproc, "~> 0.5.0"},
+      {:tzdata, "~> 1.0.4"}
     ]
   end
 end
