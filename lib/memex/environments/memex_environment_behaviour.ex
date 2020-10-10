@@ -49,4 +49,9 @@ defmodule Flamelex.Memex.Environment do
   A list of all the current reminders in this environment.
   """
   @callback reminders() :: list()
+
+  @doc """
+  Return the journal module for this environment.
+  """
+  @callback journal() :: atom()
 end

@@ -4,9 +4,11 @@ defmodule Flamelex.Memex.Journal do
   """
   use Flamelex.CommonDeclarations
 
+  @journal_month Journal.October2020
+
   def todays_entry do
-    #TODO look up current month module, then find current day function (create it if it doesn't exist)
-    raise "it should also show up in the GUI"
+    #TODO hey this is pretty neat!!!
+    Module.concat(Memex.My.memex_env(), @journal_month).friday10_text()
   end
 
   def timestamp do

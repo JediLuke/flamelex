@@ -15,4 +15,8 @@ defmodule Flamelex.Memex.Env.JediLuke do
   def reminders do
     []
   end
+
+  def journal do
+    JediLuke.Journal
+  end
 end
