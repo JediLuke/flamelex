@@ -1,8 +1,9 @@
-defmodule Utilities.ProcessRegistry do
+defmodule Flamelex.Utilities.ProcessRegistry do
   require Logger
+  use Flamelex.CommonDeclarations
 
   def fetch_buffer_pid(buffer_name),  do: fetch_pid({:buffer, buffer_name})
-  def fetch_buffer_pid!(buffer_name), do: fetch_pid!(Structs.Buffer.rego(buffer_name))
+  def fetch_buffer_pid!(buffer_name), do: fetch_pid!(Buffer.rego(buffer_name))
 
   def fetch_pid(lookup_key) do
     case :gproc.where({:n, :l, lookup_key}) do

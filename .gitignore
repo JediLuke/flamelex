@@ -24,6 +24,6 @@ franklin-*.tar
 
 .elixir_ls
 
+tags
 /data/
-
-lib/memex/my_personal_data
+lib/memex/environments/jediluke

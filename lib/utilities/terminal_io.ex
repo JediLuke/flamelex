@@ -1,4 +1,4 @@
-defmodule Utilities.ANSIWrite do
+defmodule Flamelex.Utilities.TerminalIO do
 
   def red(string) do
     ~s|#{IO.ANSI.red()}#{string}#{IO.ANSI.default_color()}|

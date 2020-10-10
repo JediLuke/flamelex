@@ -6,15 +6,18 @@ defmodule Flamelex.CommonDeclarations do
 
       alias Flamelex.Memex
 
-      alias Flamelex.OmegaMaster, as: Omega
-
+      alias Flamelex.Utilities
       alias Flamelex.Structs.{Buffer}
+      alias Flamelex.Utilities.TerminalIO
 
-      alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
+      alias Flamelex.OmegaMaster, as: Omega #TODO remove
+
       alias GUI.Utilities.Draw
+      alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
 
 
       #TODO I love having these but we should be able to put them into sub-modules
+
 
       defguard is_positive_integer(x)
                when is_integer(x)
