@@ -1,4 +1,4 @@
-defmodule Flamelex.Memex.Environment do
+defmodule Flamelex.Memex.EnvironmentBehaviour do
   @moduledoc """
   The Memex can load different environments.
   """
@@ -8,7 +8,7 @@ defmodule Flamelex.Memex.Environment do
   defmacro __using__(_params) do
 
     quote do
-      @behaviour Flamelex.Memex.Environment
+      @behaviour Flamelex.Memex.EnvironmentBehaviour
       use Flamelex.CommonDeclarations
 
 

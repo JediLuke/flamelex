@@ -2,7 +2,10 @@ defmodule Flamelex.Memex.Env.SampleEnv do
   @moduledoc """
   A sample Memex environment.
   """
-  use Flamelex.Memex.Environment
+  use Flamelex.Memex.EnvironmentBehaviour
+
+
+
 
   def timezone, do: "Etc/UTC"
 
@@ -13,5 +16,7 @@ defmodule Flamelex.Memex.Env.SampleEnv do
   ]
 
   def reminders, do: []
+
+  def journal, do: raise "Not implemented!"
 
 end
