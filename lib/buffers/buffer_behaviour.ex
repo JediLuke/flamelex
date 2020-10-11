@@ -14,12 +14,7 @@ defmodule Flamelex.BufferBehaviour do
       use GenServer
       require Logger
 
-
-      # #NOTE: This is just for convenience, so inside environment modules
-      # #      we can easily use the unique part of the environment module name
-      # alias __MODULE__
-      # alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
-      # alias Flamelex.GUI.Utilities.Draw
+      #NOTE: can't `use Flamelex.ProjectAliases` here for some reason
       alias Flamelex.GUI
       alias Flamelex.Structs.{Buffer}
 

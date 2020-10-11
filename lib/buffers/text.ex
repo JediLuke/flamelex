@@ -18,12 +18,12 @@ defmodule Flamelex.Buffer.Text do
 
   def init(%Buffer{} = buf, open_buffer? \\ true) do
     Logger.info "#{__MODULE__} initializing... type: #{inspect buf.type}, name: #{buf.name}"
-    if open_buffer?, do: GenServer.cast(self(), :show_in_gui)
+    if open_buffer?, do: GenServer.cast(self(), :show)
     {:ok, buf}
   end
 
-  def handle_cast(:show_in_gui, buf) do
-    Flamelex.GUI.Controller.action({:show_in_gui, buf})
+  def handle_cast(:show, buf) do
+    GUiControl.action({:show, buf})
     {:noreply, buf}
   end
 
