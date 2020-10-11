@@ -34,8 +34,10 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
   def draw(%Scenic.Graph{} = graph, viewport: %Dimensions{} = vp) do
     center_screen = Dimensions.find_center(vp)
 
-    graph
-    |> add_to_graph(center_screen) # REMINDER: this ends up calling verify/1 to check the params (in our case, the %Dimensions{} struct representing center-screen), which gets passed into this module's init/1
+    #NOTE: this ends up calling verify/1 to check the params (in our case,
+    #      the %Dimensions{} struct representing center-screen), which
+    #      gets passed into this module's init/1
+    graph |> add_to_graph(center_screen)
   end
 
 

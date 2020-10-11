@@ -16,7 +16,7 @@ defmodule Flamelex.GUI.Initialize do
   @custom_metrics_path @priv_dir |> Path.join("/static/fonts/IBM-Plex-Mono/IBMPlexMono-Regular.ttf.metrics")
   @custom_metrics_hash Scenic.Cache.Support.Hash.file!(@custom_metrics_path, :sha)
 
-  @root_scene Flamelex.GUI.Root.Scene
+  @root_scene Flamelex.GUI.RootScene
 
   # @size_macbook_pro1 {1680, 1005}
   @size_macbook_pro2 {1440, 855}

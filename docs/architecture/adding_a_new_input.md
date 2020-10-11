@@ -5,8 +5,8 @@ The short version is:
 * Write a function in `GUI.Input.EventHandler` matching your desired input
 * Inputs get translated into actions, processed b the `Root.Reducer`
 * The `Root.Reducer` will propagate actions to child components if needed,
-  using PIDs in the `Root.Scene` (components register themselves upon init)
-* `Root.Reducer` can update the `Root.Scene`, causing it to push a new graph
+  using PIDs in the `RootScene` (components register themselves upon init)
+* `Root.Reducer` can update the `RootScene`, causing it to push a new graph
 * `Scenic.Components` which have actions propagated to them can do the same,
   perhaps moving the logic into their own `Reducer`, or just `handle_cast`
 * The component, having processed this action, will push a new graph

@@ -72,7 +72,7 @@ defmodule Flamelex.GUI.Controller do
       # {:update_state, new_scene} when is_map(new_scene)
       #     -> {:noreply, {new_scene, graph}}
       {:redraw_root_scene, %{graph: new_graph} = new_state}  ->
-        Flamelex.GUI.Root.Scene.redraw(new_graph)
+        Flamelex.GUI.RootScene.redraw(new_graph)
         {:noreply, new_state}
       # {:update_state_and_graph, {new_scene, %Scenic.Graph{} = new_graph}} when is_map(new_scene)
       #     -> {:noreply, {new_scene, new_graph}, push: new_graph}

@@ -41,6 +41,6 @@ defmodule Flamelex.GUI do
   Re-draw the entire GUI.
   """
   def redraw(%Scenic.Graph{} = g) do
-    Flamelex.GUI.Root.Scene.redraw(g)
+    Flamelex.GUI.RootScene.redraw(g)
   end
 end

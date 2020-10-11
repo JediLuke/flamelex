@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Root.Scene do
+defmodule Flamelex.GUI.RootScene do
   @moduledoc """
   This Scenic.Scene contains the root graph. Any root-level changes to
   the UI must be done through this process. It is also responsible for
