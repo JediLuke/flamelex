@@ -2,7 +2,7 @@ defmodule Flamelex.GUI.Structs.Dimensions do
   @moduledoc """
   Struct which holds 2d points.
   """
-  use Flamelex.ProjectAliases
+  use Flamelex.{ProjectAliases, CustomGuards}
 
 
   #TODO right now this works in pixels, we ought to consider supporting lines/columns

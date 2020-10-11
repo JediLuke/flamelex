@@ -1,5 +1,5 @@
 defmodule Flamelex.GUI.Utilities.Draw do
-  use Flamelex.ProjectAliases
+  use Flamelex.{ProjectAliases, CustomGuards}
 
 
   @ibm_plex_mono Flamelex.GUI.Initialize.ibm_plex_mono_hash()
