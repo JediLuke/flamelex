@@ -1,6 +1,6 @@
 defmodule Flamelex.Structs.OmegaState do
   @moduledoc false
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
 
   @valid_modes [:normal, :command, :select]
 
