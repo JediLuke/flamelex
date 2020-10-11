@@ -11,7 +11,7 @@ defmodule GUI.Root.Reducer do
 
   """
   require Logger
-  use Flamelex.CommonDeclarations
+  use Flamelex.{ProjectAliases, CustomGuards}
 
 
 
@@ -89,16 +89,55 @@ defmodule GUI.Root.Reducer do
       {:redraw_root_scene, new_state}
   end
 
-  def process(
-  %{layout: %Flamelex.GUI.Structs.Layout{
-        arrangement: :floating_frames,
-        frames: frame_list}
-  } = state,
-  {:show_in_gui, buf} = _action)
-  when length(frame_list) > 2 do
-    IO.puts ""
+  # def process(
+  # %{layout: %Flamelex.GUI.Structs.Layout{
+  #       arrangement: :floating_frames,
+  #       frames: frame_list}
+  # } = state,
+  # {:show_in_gui, buf} = _action)
+  # when length(frame_list) > 2 do
+  #   IO.puts ""
 
+  # end
+
+  #TODO this is a protocol
+  #
+  # defprotocol Utility do
+  #   @spec type(t) :: String.t()
+  #   def type(value)
+  # end
+
+  # defimpl Utility, for: BitString do
+  #   def type(_value), do: "string"
+  # end
+
+  # defimpl Utility, for: Integer do
+  #   def type(_value), do: "integer"
+  # end
+
+
+
+
+
+  def process(state, {:show, %Buffer{} = buf}) do
+
+    new_frame = Frame.new(
+      id:              9,
+      top_left_corner: {100, 100},
+      dimensions:      {200, 200},
+      buffer:          buf)
+
+
+    new_graph =
+      state.graph
+      |> GUI.Component.Frame.add_to_graph(new_frame)
+
+    new_state =
+      %{state|graph: new_graph}
+
+    {:redraw_root_scene, new_state}
   end
+
 
   def process(a, b) do
     IO.inspect b, label: "ACTION"

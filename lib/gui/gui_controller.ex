@@ -5,33 +5,25 @@ defmodule Flamelex.GUI.Controller do
   %RootScene{} and %Layout{}, as well as keeping track of open buffers etc.
   """
   use GenServer
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
+  alias Flamelex.GUI.Structs.GUIControlState, as: State
   require Logger
 
 
   def start_link(_params) do
     viewport_size = Dimensions.new(:viewport_size)
+    initial_state = State.initialize(viewport_size)
 
-    init_state = %{
-        viewport: viewport_size,
-          layout: Layout.default(viewport_size),
-           graph: Draw.blank_graph()
-      }
-
-    GenServer.start_link(__MODULE__, init_state)
+    GenServer.start_link(__MODULE__, initial_state)
   end
 
   def action(a) do
+    Logger.debug "action: `#{inspect a}` sent to GUI.Controller..."
     GenServer.cast(__MODULE__, {:action, a})
-  end
-
-  def frame_stack do
-    GenServer.call(__MODULE__, :get_frame_stack)
   end
 
 
   ## GenServer callbacks
-  ## -------------------------------------------------------------------
 
 
   def init(state) do
@@ -40,21 +32,19 @@ defmodule Flamelex.GUI.Controller do
     {:ok, state, {:continue, :draw_default_gui}}
   end
 
-  def handle_continue(:draw_default_gui, %{viewport: vp} = state) do
+  def handle_continue(:draw_default_gui, state) do
+    new_graph = default_gui(state)
+    GUI.redraw(new_graph)
 
-    new_graph =
-      Draw.blank_graph()
-      |> GUI.Component.CommandBuffer.draw(viewport: vp)
-      |> GUI.Component.TransmutationCircle.draw(viewport: vp)
-      |> Scenic.Primitives.rect({vp.width, vp.height}) # rectangle used for capturing input for the scene
+    {:noreply, %{state|graph: new_graph}}
+  end
 
-    new_graph
-    |> Flamelex.GUI.Root.Scene.redraw()
-
-    new_state =
-      %{state|graph: new_graph}
-
-    {:noreply, new_state}
+  def default_gui(%{viewport: vp}) do
+    Draw.blank_graph()
+    # |> GUI.Component.CommandBuffer.draw(viewport: vp)
+    # |> GUI.Component.CommandBuffer.draw(state)
+    |> GUI.Component.TransmutationCircle.draw(viewport: vp)
+    # |> Scenic.Primitives.rect({vp.width, vp.height}) # rectangle used for capturing input for the scene
   end
 
   # def handle_cast(:show_in_gui, %Buffer{} = buffer}, state) do

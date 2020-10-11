@@ -1,25 +1,23 @@
 defmodule Flamelex.GUI.Root.Scene do
+  @moduledoc """
+  This Scenic.Scene contains the root graph. Any root-level changes to
+  the UI must be done through this process. It is also responsible for
+  capturing a large majority of the user-input.
+  """
   use Scenic.Scene
-
-
-  ## public API
-  ## -------------------------------------------------------------------
+  use Flamelex.ProjectAliases
 
 
   def init(nil = _init_params, _opts) do
     IO.puts "#{__MODULE__} initializing..."
-    Process.register(self(), __MODULE__)
 
+    #TODO come up with a better process registry here
+    Process.register(self(), __MODULE__)
     GUI.Initialize.load_custom_fonts_into_global_cache()
 
-
-    #TODO introduce a concept here of layers - make each layer an explicit entry in the main graph, which stack on top of eachother
-    layers = [
-      {0, GUI.Utilities.Draw.blank_graph()}
-    ]
-
-
-    {:ok, push: layers |> List.first()}
+    #NOTE: `GUI.Controller` will boot next & take control of the scene,
+    #      so we just need to initialize it with *something*
+    {:ok, push: Draw.blank_graph()}
   end
 
   def redraw(%Scenic.Graph{} = graph) do
