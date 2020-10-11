@@ -2,7 +2,7 @@ defmodule Flamelex.Buffer.Text do
   @moduledoc false
   use GenServer
   require Logger
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
 
 
   def start_link(params) do

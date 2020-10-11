@@ -7,7 +7,7 @@ defmodule Flamelex.Buffer.Command do
   CLI funtionality of Flamelex.
   """
   use GenServer
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
   require Logger
 
 

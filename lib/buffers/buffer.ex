@@ -3,7 +3,23 @@ defmodule Flamelex.Buffer do
   The interface to all the Buffer commands.
   """
   require Logger
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
+
+
+    # def display_buffer(%Buffer{} = buf) do
+  #   #TODO use a struct here
+  #   # def show_fullscreen(buffer), do: Flamelex.GUI.Controller.show_fullscreen(buffer)
+  #   # def show_fullscreen(buffer), do: GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
+  #   # def register_new_buffer(type: :text, content: content, action: 'OPEN_FULL_SCREEN'), do: GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: content]})
+  #   # def register_new_buffer(args), do: Flamelex.GUI.Controller.register_new_buffer(args)
+  #   GenServer.cast(Flamelex.GUI.Controller, {:display_buffer, buf})
+  # end
+
+  # def register_new_buffer(args), do: GenServer.cast(__MODULE__, {:register_new_buffer, args})
+
+  # def show_fullscreen(buffer), do: GenServer.cast(__MODULE__, {:show_fullscreen, buffer})
+
+  # def fetch_active_buffer(), do: GenServer.call(__MODULE__, :fetch_active_buffer)
 
 
   @doc """
