@@ -1,8 +1,8 @@
-defmodule GUI.Utilities.Draw do
-  use Flamelex.CommonDeclarations
+defmodule Flamelex.GUI.Utilities.Draw do
+  use Flamelex.ProjectAliases
 
 
-  @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash()
+  @ibm_plex_mono Flamelex.GUI.Initialize.ibm_plex_mono_hash()
   @default_text_size 24
 
 

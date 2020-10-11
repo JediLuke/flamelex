@@ -3,7 +3,7 @@ defmodule Flamelex.GUI.Structs.Frame do
   Struct which holds relevant data for rendering a buffer frame status bar.
   """
   require Logger
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
 
   #TODO each "new/x" function should be making a new Scenic.Graph, we need
   # to actually build one and cant just use a default struct cause it spits chips

@@ -158,4 +158,7 @@ Some of my main goals are:
 * Ability to do source-control inside the editor
 * Integrated with Elixir compiler
 * add MenuBar which is linked to calling functions
+& ability to read & search HexDocs
+
+NEXT is MenuBar
 

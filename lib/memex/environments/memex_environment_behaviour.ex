@@ -9,7 +9,7 @@ defmodule Flamelex.Memex.EnvironmentBehaviour do
 
     quote do
       @behaviour Flamelex.Memex.EnvironmentBehaviour
-      use Flamelex.CommonDeclarations
+      use Flamelex.ProjectAliases
 
 
       @doc """

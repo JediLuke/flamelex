@@ -2,7 +2,7 @@ defmodule Flamelex.Memex.Env.JediLuke do
   @moduledoc """
   My primary environment.
   """
-  use Flamelex.Memex.Environment
+  use Flamelex.Memex.EnvironmentBehaviour
 
   def timezone do
     Memex.Episteme.TimeZones.texas()

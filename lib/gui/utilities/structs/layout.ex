@@ -5,7 +5,7 @@ defmodule Flamelex.GUI.Structs.Layout do
   or highlight certain parts of the overall canvas.
   """
   require Logger
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
 
 
   defstruct [

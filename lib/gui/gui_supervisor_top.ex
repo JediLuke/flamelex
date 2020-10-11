@@ -8,7 +8,7 @@ defmodule Flamelex.GUI.TopLevelSupervisor do
     IO.puts "#{__MODULE__} initializing..."
 
     children = [
-      {Scenic, viewports: [GUI.Initialize.viewport_config()]},
+      {Scenic, viewports: [Flamelex.GUI.Initialize.viewport_config()]},
       Flamelex.GUI.Controller
     ]
 

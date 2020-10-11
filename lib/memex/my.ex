@@ -8,7 +8,7 @@ defmodule Flamelex.Memex.My do
   "AEST"
 
   """
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
 
   @doc """
   Return the currently loaded Memex Environment.

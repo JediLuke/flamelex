@@ -1,5 +1,5 @@
 defmodule Flamelex do
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
 
   @doc """
   Use this function to recompile, reload and restart the `Flamelex` application.
@@ -31,5 +31,14 @@ defmodule Flamelex do
 
     IO.puts "\n#{__MODULE__} starting...\n"
     Application.start(:franklin)
+  end
+
+
+  def set_log_level(l) do
+    raise "How do I set the log level??"
+  end
+
+  def help do
+    raise "no help to be found :("
   end
 end

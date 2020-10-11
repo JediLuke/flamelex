@@ -7,8 +7,9 @@ defmodule Flamelex.InputHandler do
   change, or anything really.
   """
   require Logger
-  use Flamelex.CommonDeclarations
-  use GUI.ScenicInputEvents
+  use Flamelex.ProjectAliases
+  use Flamelex.GUI.ScenicEventsDefinitions
+
   alias Flamelex.Structs.OmegaState
 
 

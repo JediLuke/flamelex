@@ -8,7 +8,7 @@ defmodule Flamelex.IExAutoRun do
 
   Note that it is a *quote*, not a function. This code
   """
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
 
   defmacro __using__(_) do
     quote do
@@ -31,8 +31,6 @@ defmodule Flamelex.IExAutoRun do
     Welcome to Flamelex
     -------------------
     v0.2.7
-
-        ***   ***   ***
 
     " <> punctuated_quote())
   end
