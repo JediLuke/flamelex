@@ -1,4 +1,4 @@
-defmodule GUI.Root.Reducer do
+defmodule Flamelex.GUI.Root.Reducer do
   @moduledoc """
   This module contains functions which process events received from the GUI.
 

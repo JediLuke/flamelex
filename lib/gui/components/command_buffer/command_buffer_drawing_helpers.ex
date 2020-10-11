@@ -1,4 +1,4 @@
-defmodule GUI.Component.CommandBuffer.DrawingHelpers do
+defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
   use Flamelex.ProjectAliases
 
 

@@ -10,11 +10,11 @@ defmodule Flamelex.GUI.Structs.Frame do
 
   defstruct [
     id:            nil,               # uniquely identify frames
-    coordinates:   %Coordinates{},    # the top-left corner of the frame, referenced from top-left corner of the viewport
-    dimensions:    %Dimensions{},     # the height and width of the frame
+    coordinates:   nil, # %Coordinates{},    # the top-left corner of the frame, referenced from top-left corner of the viewport
+    dimensions:    nil, # :w%Dimensions{},     # the height and width of the frame
     scenic_opts:   [],                # Scenic options
     # picture_graph: %Scenic.Graph{}    # The Scenic.Graph that this frame will display
-    buffer:        %Buffer{}
+    buffer:        nil
   ]
 
   def new(
@@ -25,6 +25,15 @@ defmodule Flamelex.GUI.Structs.Frame do
       coordinates: c,
       dimensions:  d
     }
+  end
+
+  def new(top_left: top_left, size: size) do
+    %__MODULE__{
+      id:          "#TODO",
+      coordinates: top_left |> Coordinates.new(),
+      dimensions:  size     |> Dimensions.new()
+    }
+
   end
 
   #TODO do we really need an id?? (probably)

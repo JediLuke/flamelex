@@ -15,9 +15,7 @@ defmodule Flamelex.BufferBehaviour do
       require Logger
 
       #NOTE: can't `use Flamelex.ProjectAliases` here for some reason
-      alias Flamelex.GUI
       alias Flamelex.Structs.{Buffer}
-
 
       @doc """
       This wrapper around GenServer.start_link/3 ensures a consistent boot
@@ -44,12 +42,12 @@ defmodule Flamelex.BufferBehaviour do
       """
       @impl GenServer
       def handle_cast(:show, buf) do
-        GUI.Controller.action({:show, buf})
+        Flamelex.GUI.Controller.action({:show, buf})
         {:noreply, buf}
       end
 
       def handle_cast(:hide, buf) do
-        GUI.Controller.action({:hide, buf})
+        Flamelex.GUI.Controller.action({:hide, buf})
         {:noreply, buf}
       end
     end

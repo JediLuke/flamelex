@@ -1,4 +1,4 @@
-defmodule GUI.Component.TextBox do
+defmodule Flamelex.GUI.Component.TextBox do
   @moduledoc false
   use Scenic.Component
   require Logger

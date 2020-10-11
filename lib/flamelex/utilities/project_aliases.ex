@@ -16,7 +16,6 @@ defmodule Flamelex.ProjectAliases do
 
       alias Flamelex.GUI
       alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
-      alias Flamelex.GUI.Controller, as: GUiControl
       alias Flamelex.GUI.Utilities.Draw
 
     end

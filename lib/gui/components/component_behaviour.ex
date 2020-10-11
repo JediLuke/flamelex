@@ -2,14 +2,20 @@ defmodule Flamelex.GUI.ComponentBehaviour do
   @moduledoc """
   The Memex can load different environments.
   """
+  alias Flamelex.GUI.Structs.Frame
 
-  #NOTE: When we call use Behaviour, we can not only enforce the behaviour
-  #      on a module, but we can automatically import functions etc.
+  #NOTE: Here's a little reminder...
+  # the __using__ macro allows us to `use ComponentBehaviour` and automatically
+  # run, not just the behaviour contract code, but a whole bunch of useful
+  # code we want automatically included in all ComponentBehaviours
   defmacro __using__(_params) do
 
     quote do
 
-      # must implement all the callbacks defined in *this* module, `Flamelex.GUI.ComponentBehaviour`
+      #NOTE: Here's a little reminder...
+      # Implementing this behaviour forces all modules which do so to
+      # implement all the callbacks defined in *this* module, that is,
+      # `Flamelex.GUI.ComponentBehaviour`
       @behaviour Flamelex.GUI.ComponentBehaviour
 
       use Scenic.Component
@@ -23,8 +29,8 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       alias Flamelex.GUI.Utilities.Draw
 
 
-      #NOTE: In our case, we always want a component to be passed in a %Frame{}
-      #      so we don't need specific ones, each component implements them
+      #NOTE: In our case, we always want a Component to be passed in a %Frame{}
+      #      so we don't need specific ones, each Component implements them
       #      the same way
       @impl Scenic.Component
       def verify(%Frame{} = data), do: {:ok, data}
@@ -34,47 +40,110 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       def info(_data), do: ~s(Invalid data)
 
 
-      #NOTE: The following functions are common to all Flamalex.GUI.Components
-      #      and they can share the same implementation
+      #NOTE: The following functions are common to all Flamelex.GUI.Components
+      #      and they can share the same implementation, so we include them here
 
       @impl Scenic.Scene
-      def init(%Frame{} = state, _opts) do
-        # IO.puts "Initializing #{__MODULE__}..."
+      def init(%Frame{} = frame, _opts) do
+        Logger.debug "Initializing #{__MODULE__}..."
 
         #TODO search for if the process is already registered, if it is, engage recovery procedure
         Process.register(self(), __MODULE__) #TODO this should be gproc
 
-        graph = Reducer.initialize(state)
+        graph = render(frame)
 
-        {:ok, {state, graph}, push: graph}
+        {:ok, {graph, frame}, push: graph}
       end
 
 
+      @doc """
+      Just like in Phoenix.LiveView, we mount our components onto an existing
+      graph. In our case this is the same for all components though so we
+      can abstract it out.
+      """
+      def mount(%Scenic.Graph{} = graph, params) do
+        graph |> add_to_graph(params)
+      end
 
       @doc """
-      All %Flamelex.GUI.Component{}'s are triggered by being cast an %Action{}.
+      All %Flamelex.GUI.Component{}'s are triggered by being cast an %Action{}. #TODO
+
+      This function allows for nice API, e.g. MenuBar.action({:click, button})
       """
       def action(a) do
         # remember, __MODULE__ will be the module which "uses" this macro
+
+        #TODO: We need some way of knowing that MenuBar has indeed been mounted
+        #      somewhere, or else the messages just go into the void (use call instead of cast?)
+
         GenServer.cast(__MODULE__, {:action, a})
       end
 
-      @doc """
-      Trigger a component to redraw itself in the form of the %Scenic.Graph{}
-      passed in as a param.
-      """
-      def redraw(%Scenic.Graph{} = g) do
-        # remember, __MODULE__ will be the module which "uses" this macro
-        GenServer.cast(__MODULE__, {:redraw, g})
+      @impl Scenic.Scene
+      # def handle_cast({:action, action}, {%Scenic.Graph{} = graph, %Frame{} = frame}) do
+      def handle_cast({:action, action}, {graph, frame}) do
+        #TODO maybe we can get away with not passing in the graph to handle_action...
+        case handle_action({graph, frame}, action) do
+          :ignore_action
+            -> {:noreply, {graph, frame}}
+          {:update_graph, %Scenic.Graph{} = new_graph}
+            -> {:noreply, {new_graph, frame}, push: new_graph}
+          {:update_frame, %Frame{} = new_frame}
+            -> {:noreply, {graph, new_frame}}
+          {:update_frame_and_graph, {%Scenic.Graph{} = new_graph, %Frame{} = new_frame}}
+            -> {:noreply, {new_graph, new_frame}, push: new_graph}
+        end
       end
     end
   end
 
 
   @doc """
-  Each Component must define it's reducer, which is the module which
-  accepts a %Scenic.Graph{} + %Action{} -> %Scenic.Graph{state: :updated}
-  """
-  @callback reducer() :: atom()
+  This is called when the scene first renders. It appends the Scene (which
+  is represented by Scenic as a reference to a `Scenic.Component` process,
+  see: #TODO-[fetch link] for more info)
 
+  We have actually implemented this in the __using__ macro, but my heart
+  tells me to leave this here anyway... maybe it'll save us some pain later.
+  """
+  @callback mount(%Scenic.Graph{}, any()) :: %Scenic.Graph{}
+
+  @doc """
+  Each Component is represented internally at the highest level by the
+  # %Frame{} datastructure. This function takes in that Component definition
+  # and returns a %Scenic.Graph{} which can be drawn by Scenic.
+  """
+  @callback render(%Frame{}) :: %Scenic.Graph{}
+
+  @doc """
+  This function may be implemented as many times as necessary, to handle
+  any variety of action. You send Components actions by calling them, e.g.char()
+
+  MenuBar.action({:click, button})
+
+  Then, the Component.MenuBar must implement a corresponding handle_action
+
+  ```
+  def handle_action({:click, button}) do
+    #   .... whatever
+    #   ....
+  ```
+
+  What happens if we don't have a corresponding handle_action? There are
+  2 cases... (if you do nothing, then you will get the second case):
+
+    1) You did implement a default handler
+
+    2) You did not implement a default handler
+
+    You are going to crash & see errors #TODO confirm this
+
+    #TODO I want to implement a default catcher, so that rather than crashing
+    # we could ignore it, but that looks too annoying for now, see: https://elixirforum.com/t/how-to-inject-macro-functions-at-end-of-module/19434
+
+  """
+  #NOTE: Phoenix.LiveView uses this callback to handle events. I want to
+  #      be compatible with that idea... I do effectively the same thing,
+  #      but I call the concept "actions".
+  @callback handle_action(tuple(), any()) :: atom() | tuple() #TODO this type def could definitely be cleaned up...
 end

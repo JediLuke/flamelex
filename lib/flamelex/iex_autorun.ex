@@ -12,14 +12,9 @@ defmodule Flamelex.IExAutoRun do
 
   defmacro __using__(_) do
     quote do
+
       IO.puts "Executing the code in `Flamelex.IExAutoRun`, via the `.iex.exs` file..."
-
-      alias Flamelex.Memex
-      alias Flamelex.Memex.Journal
-
-      import Flamelex.DevTools
-      alias Flamelex.DevTools
-
+      use Flamelex.ProjectAliases
       Flamelex.IExAutoRun.print_welcome_msg()
 
     end

@@ -10,6 +10,7 @@ defmodule Flamelex.GUI.Controller do
   require Logger
 
 
+
   def start_link(_params) do
     viewport_size = Dimensions.new(:viewport_size)
     initial_state = State.initialize(viewport_size)
@@ -33,8 +34,14 @@ defmodule Flamelex.GUI.Controller do
   end
 
   def handle_continue(:draw_default_gui, state) do
+
+    #TODO
+    #NOTE: This is here because sometimes, when we restart the app, I think
+    #      this process is trying to re-draw th GUI before the RootScene is ready
+    :timer.sleep(50)
+
     new_graph = default_gui(state)
-    GUI.redraw(new_graph)
+    Flamelex.GUI.redraw(new_graph)
 
     {:noreply, %{state|graph: new_graph}}
   end
@@ -43,8 +50,17 @@ defmodule Flamelex.GUI.Controller do
     Draw.blank_graph()
     # |> GUI.Component.CommandBuffer.draw(viewport: vp)
     # |> GUI.Component.CommandBuffer.draw(state)
+    |> mount_menubar(vp)
     |> GUI.Component.TransmutationCircle.draw(viewport: vp)
     # |> Scenic.Primitives.rect({vp.width, vp.height}) # rectangle used for capturing input for the scene
+  end
+
+  defp mount_menubar(graph, vp) do
+    graph
+    |> GUI.Component.MenuBar.mount(
+         Frame.new(
+           top_left: {0, 0},
+           size:     {vp.width, GUI.Component.MenuBar.height()}))
   end
 
   # def handle_cast(:show_in_gui, %Buffer{} = buffer}, state) do

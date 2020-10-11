@@ -13,7 +13,7 @@ defmodule Flamelex.GUI.RootScene do
 
     #TODO come up with a better process registry here
     Process.register(self(), __MODULE__)
-    GUI.Initialize.load_custom_fonts_into_global_cache()
+    Flamelex.GUI.Initialize.load_custom_fonts_into_global_cache()
 
     #NOTE: `GUI.Controller` will boot next & take control of the scene,
     #      so we just need to initialize it with *something*

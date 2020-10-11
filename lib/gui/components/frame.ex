@@ -1,4 +1,4 @@
-defmodule GUI.Component.Frame do
+defmodule Flamelex.GUI.Component.Frame do
   @moduledoc false
   use Scenic.Component
   # alias Scenic.Graph

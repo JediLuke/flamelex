@@ -1,4 +1,4 @@
-defmodule GUI.GraphConstructors.Frame do
+defmodule Flamelex.GUI.GraphConstructors.Frame do
   @moduledoc """
   This module takes in an input data source (usually a struct) and returns
   a %Scenic.Graph{} which corresponds to it.

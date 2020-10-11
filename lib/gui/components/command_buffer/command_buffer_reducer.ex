@@ -1,4 +1,4 @@
-defmodule GUI.Component.CommandBuffer.Reducer do
+defmodule Flamelex.GUI.Component.CommandBuffer.Reducer do
   @moduledoc """
   This module contains reducer functions - they take in a graph, & an
   'action' (usually a string, sometimed with some params) and return a

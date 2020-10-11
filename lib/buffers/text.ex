@@ -23,7 +23,7 @@ defmodule Flamelex.Buffer.Text do
   end
 
   def handle_cast(:show, buf) do
-    GUiControl.action({:show, buf})
+    GUIControl.action({:show, buf})
     {:noreply, buf}
   end
 

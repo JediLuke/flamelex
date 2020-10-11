@@ -10,6 +10,21 @@ defmodule Flamelex.GUI.Utilities.Draw do
     Scenic.Graph.build(font: @ibm_plex_mono, font_size: text_size)
   end
 
+  @doc """
+  Return a simple frame, doesn't contain any buffer yet.
+  """
+  def empty_frame(%{id: id, top_left: top_left, size: size}) do
+    Frame.new(
+      id: id,
+      top_left_corner: top_left, #TODO make just top_left
+      dimensions: size
+    )
+  end
+
+  def border(graph, %Frame{} = frame) do
+    border_box(graph, frame, {1, :white})
+  end
+
   def background(%Scenic.Graph{} = graph, %Frame{} = frame, color) when is_atom(color) do
     width  = frame.dimensions.width + 1 #TODO need width +1 here for some quirky reason of Scenic library
     height = frame.dimensions.height
