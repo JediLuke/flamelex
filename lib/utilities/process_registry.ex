@@ -1,6 +1,6 @@
 defmodule Flamelex.Utilities.ProcessRegistry do
   require Logger
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
 
   def fetch_buffer_pid(buffer_name),  do: fetch_pid({:buffer, buffer_name})
   def fetch_buffer_pid!(buffer_name), do: fetch_pid!(Buffer.rego(buffer_name))

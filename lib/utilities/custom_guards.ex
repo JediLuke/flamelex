@@ -1,23 +1,10 @@
-defmodule Flamelex.CommonDeclarations do
-  @moduledoc false
+defmodule Flamelex.CustomGuards do
+  @moduledoc """
+  This module makes it easy to include a whole set of very common guards.
+  """
 
   defmacro __using__(_opts) do
     quote do
-
-      alias Flamelex.Memex
-
-      alias Flamelex.Utilities
-      alias Flamelex.Structs.{Buffer}
-      alias Flamelex.Utilities.TerminalIO
-
-      alias Flamelex.OmegaMaster, as: Omega #TODO remove
-
-      alias GUI.Utilities.Draw
-      alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
-
-
-      #TODO I love having these but we should be able to put them into sub-modules
-
 
       defguard is_positive_integer(x)
                when is_integer(x)

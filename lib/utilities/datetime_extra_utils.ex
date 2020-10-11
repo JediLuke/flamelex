@@ -1,5 +1,6 @@
-defmodule Flamelex.Utilities.DataTimeExtraUtils do
+defmodule Flamelex.Utilities.DateTimeExtraUtils do
 
+  #TODO check these are correct...
   def day_name(1), do: "Sunday"
   def day_name(2), do: "Monday"
   def day_name(3), do: "Tuesday"
