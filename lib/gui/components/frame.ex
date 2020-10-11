@@ -3,7 +3,7 @@ defmodule GUI.Component.Frame do
   use Scenic.Component
   # alias Scenic.Graph
   # import Scenic.Primitives
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
   require Logger
 
 

@@ -6,7 +6,7 @@ defmodule GUI.GraphConstructors.Frame do
   Each of these is a pure function, it's a totally declarative state ->
   graph mapping.
   """
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
 
   def convert(%Frame{} = frame) do
     bar_height = 24 #TODO why is this hard-coded??

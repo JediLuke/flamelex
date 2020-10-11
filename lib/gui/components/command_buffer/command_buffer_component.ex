@@ -1,6 +1,6 @@
-defmodule GUI.Component.CommandBuffer do
+defmodule Flamelex.GUI.Component.CommandBuffer do
   use Scenic.Component
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
   alias GUI.Component.CommandBuffer.Reducer
   require Logger
   @moduledoc """

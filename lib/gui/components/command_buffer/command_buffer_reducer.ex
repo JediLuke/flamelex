@@ -8,7 +8,7 @@ defmodule GUI.Component.CommandBuffer.Reducer do
   alias GUI.Component.CommandBuffer.DrawingHelpers
   import Scenic.Primitives
   require Logger
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
 
   @component_id :command_buffer
   @cursor_component_id {:command_buffer, :cursor, 1}

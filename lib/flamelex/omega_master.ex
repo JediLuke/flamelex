@@ -10,7 +10,7 @@ defmodule Flamelex.OmegaMaster do
   """
   use GenServer
   require Logger
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
   alias Flamelex.Structs.OmegaState
 
 

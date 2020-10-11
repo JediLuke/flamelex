@@ -1,66 +1,46 @@
-defmodule GUI do
+defmodule Flamelex.GUI do
   @moduledoc """
-  This module provides an interface for controlling the Flamelex GUI.
-
-
-  One important point about this module is that it is intended to be used
-  as a library by other higher-level processes & modules, not directly
-  interacted with by the user (even though this would be easy to do via the
-  command line). For example, when putting
+  This module provides an interface for controlling the Flamelex GUI. It
+  is mostly a container for several sub-modules, which in-turn are interfaces
+  for various parts of the GUI.
   """
-  # use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
 
-  @doc """
-  This function displays the Commander.
-  """
-  # def activate_command_buffer do
-  #   GenServer.cast(Flamelex.GUI.Controller, :activate_command_buffer)
-  # end
-
-  @doc """
-  This function hides the Commander, and clears any text which had
-  been entered into it.
-  """
-  # def de_activate_command_buffer do
-  #   GenServer.cast(Flamelex.GUI.Controller, :de_activate_command_buffer)
-  # end
-
-  # def display_buffer(%Buffer{} = buf) do
-  #   #TODO use a struct here
-  #   # def show_fullscreen(buffer), do: Flamelex.GUI.Controller.show_fullscreen(buffer)
-  #   # def show_fullscreen(buffer), do: GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
-  #   # def register_new_buffer(type: :text, content: content, action: 'OPEN_FULL_SCREEN'), do: GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: content]})
-  #   # def register_new_buffer(args), do: Flamelex.GUI.Controller.register_new_buffer(args)
-  #   GenServer.cast(Flamelex.GUI.Controller, {:display_buffer, buf})
-  # end
-
-  # def register_new_buffer(args), do: GenServer.cast(__MODULE__, {:register_new_buffer, args})
-
-  # def show_fullscreen(buffer), do: GenServer.cast(__MODULE__, {:show_fullscreen, buffer})
-
-  # def fetch_active_buffer(), do: GenServer.call(__MODULE__, :fetch_active_buffer)
+  defmodule Layout do
+    def set, do: raise "Can't set a new layout!"
+  end
 
   defmodule Frame do
-    def show() do
-      raise "lol"
-    end
 
-    def hide do
-      raise "rofl"
-    end
+    # def show,                  do: GenServer.cast(@cmd_buf, :activate)
+    # def hide,                  do: GenServer.cast(@cmd_buf, :deactivate)
 
-    def move(frame_id) do
-      Flamelex.GUI.Controller.action({:move_frame, frame_id, :right_and_down_25_px})
-    end
+    def move(frame_id),        do: GUiControl.action({:move_frame, frame_id, :right_and_down_25_px})
+  end
+
+  defmodule CommandBuffer do
+    @cmd_bufr Flamelex.Buffer.Command
+
+    def show,                  do: GenServer.cast(@cmd_bufr, :activate)
+    def hide,                  do: GenServer.cast(@cmd_bufr, :deactivate)
+
+    def enter_character(char), do: GenServer.cast(@cmd_bufr, {:enter_char, char})
+    def backspace,             do: GenServer.cast(@cmd_bufr, :backspace)
+    def reset_text_field,      do: GenServer.cast(@cmd_bufr, :reset_text_field)
+    def execute_contents,      do: GenServer.cast(@cmd_bufr, :execute_contents)
   end
 
   defmodule MenuBar do
-    def show() do
-      #TODO: request Gui.Commander to show menubar based on current layout
-    end
 
-    def hide do
-      raise "rofl"
-    end
+    # def show,   do: GenServer.cast(@cmd_buf, :activate)
+    # def hide,   do: GenServer.cast(@cmd_buf, :deactivate)
+
+  end
+
+  @doc """
+  Re-draw the entire GUI.
+  """
+  def redraw(%Scenic.Graph{} = g) do
+    Flamelex.GUI.Root.Scene.redraw(g)
   end
 end

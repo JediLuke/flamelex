@@ -2,7 +2,7 @@ defmodule GUI.Component.TextBox do
   @moduledoc false
   use Scenic.Component
   require Logger
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
 
   #TODO have horizontal scrolling if we go over the line
 

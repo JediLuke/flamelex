@@ -1,5 +1,5 @@
 defmodule GUI.Component.CommandBuffer.DrawingHelpers do
-  use Flamelex.CommonDeclarations
+  use Flamelex.ProjectAliases
 
 
   @prompt_color :ghost_white
