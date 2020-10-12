@@ -1,4 +1,4 @@
-# Franklin
+# Flamelex
 
 A combination text-editor & memex written in Elixir.
 

@@ -3,7 +3,7 @@ defmodule Flamelex.GUI.FontHelpers do
   A place to put functions I need to stuff with fonts with. ‾\_(ツ)_/‾
   """
 
-  @project_root_dir "/Users/luke/workbench/elixir/franklin"
+  @project_root_dir "/Users/luke/workbench/elixir/flamelex"
   @priv_dir @project_root_dir <> "/priv"
 
   def get_max_box_for_ibm_plex(font_size_in_px) do

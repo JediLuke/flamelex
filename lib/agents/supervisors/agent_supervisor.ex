@@ -6,9 +6,9 @@ defmodule Franklin.Agent.Supervisor do
 
   def init(_args), do: DynamicSupervisor.init(strategy: :one_for_one)
 
-  def note(contents), do: start_new_buffer_process({Franklin.Buffer.Note, contents})
+  # def note(contents), do: start_new_buffer_process({Franklin.Buffer.Note, contents})
 
-  def list(:notes),   do: start_new_buffer_process({Franklin.Buffer.List, :notes})
+  # def list(:notes),   do: start_new_buffer_process({Franklin.Buffer.List, :notes})
 
 
   # private functions

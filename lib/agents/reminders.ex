@@ -1,4 +1,4 @@
-defmodule Franklin.Agent.Reminders do
+defmodule Flamelex.Agent.Reminders do
   @moduledoc """
   This agent runs & checks for reminders.
   """

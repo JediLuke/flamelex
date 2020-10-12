@@ -12,6 +12,14 @@ defmodule Flamelex.GUI.Utilities.Draw do
   end
 
   @doc """
+  Just draw a simple box at 100, 100
+  """
+  def test_draw(graph) do
+    graph
+    |> Scenic.Primitives.rect({80, 80}, fill: :white, translate: {100, 100})
+  end
+
+  @doc """
   Return a simple frame, doesn't contain any buffer yet.
   """
   def empty_frame(%{id: id, top_left: top_left, size: size}) do

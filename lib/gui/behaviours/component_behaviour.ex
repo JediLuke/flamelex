@@ -86,7 +86,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
         case handle_action({graph, frame}, action) do
           :ignore_action
             -> {:noreply, {graph, frame}}
-          {:update_graph, %Scenic.Graph{} = new_graph}
+          {:redraw_graph, %Scenic.Graph{} = new_graph}
             -> {:noreply, {new_graph, frame}, push: new_graph}
           {:update_frame, %Frame{} = new_frame}
             -> {:noreply, {graph, new_frame}}

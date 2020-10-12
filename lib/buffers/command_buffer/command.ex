@@ -162,16 +162,16 @@ defmodule Flamelex.Buffer.Command do
   end
 
   def execute_command("open") do
-    file_name = "/Users/luke/workbench/elixir/franklin/README.md"
+    file_name = "/Users/luke/workbench/elixir/flamelex/README.md"
     Logger.info "Opening a file... #{inspect file_name}"
-    Franklin.CLI.open(file: file_name) # will open as the active buffer
+    Flamelex.CLI.open(file: file_name) # will open as the active buffer
   end
 
   def execute_command("edit") do
-    file_name = "/Users/luke/workbench/elixir/franklin/README.md"
+    file_name = "/Users/luke/workbench/elixir/flamelex/README.md"
 
     string = "Luke"
-    Franklin.Buffer.Text.insert(file_name, string, after: 3)
+    Flamelex.Buffer.Text.insert(file_name, string, after: 3)
   end
 
   def execute_command(unrecognised_command) do

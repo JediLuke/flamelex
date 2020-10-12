@@ -1,8 +1,11 @@
 defmodule Flamelex.GUI.Component.Frame do
-  @moduledoc false
+  @moduledoc """
+  Frames are a very special type of Component - they are a container,
+  manipulatable by the layout of the root scene. Virtually all buffers
+  will render their corresponding Component in a Frame.
+  """
+
   use Scenic.Component
-  # alias Scenic.Graph
-  # import Scenic.Primitives
   use Flamelex.ProjectAliases
   require Logger
 

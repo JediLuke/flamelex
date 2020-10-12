@@ -1,8 +1,6 @@
 # CHANGELOG
 
-## v0.2.0
-
-First public release of Franklin.
+## v0.2.3
 
 These are the high level features that are apart of `v0.2.0`
 
@@ -18,6 +16,8 @@ These are the high level features that are apart of `v0.2.0`
 * List buffer - able to render lists (see `Actions.new_buffer(:test)`)
 
 ### v0.2.0 notes
+
+#### the `franklin_dev` branch & git history
 
 I went back & forth a lot over various design - before I totally understood
 gproc, I wasn't able to structure the GUI components in a heirarchical manner

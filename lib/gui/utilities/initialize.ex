@@ -7,7 +7,7 @@ defmodule Flamelex.GUI.Initialize do
   @title "Franklin"
 
   #TODO rename to FLamelex, even better - use an Elixir func to get project root
-  @project_root_dir "/Users/luke/workbench/elixir/franklin"
+  @project_root_dir "/Users/luke/workbench/elixir/flamelex"
   @priv_dir @project_root_dir <> "/priv"
   @font_dir @priv_dir |> Path.join("/static/fonts")
 

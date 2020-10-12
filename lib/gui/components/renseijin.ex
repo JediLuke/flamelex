@@ -46,6 +46,8 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do #TODO rename to Renseiji
 
     Draw.blank_graph()
     # |> Draw.background(frame, :purple)
+
+    # circles
     |> Scenic.Primitives.circle(radius,
                 stroke: {1, :white},
                 translate: {center.x, center.y})
@@ -55,10 +57,17 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do #TODO rename to Renseiji
     |> Scenic.Primitives.circle(radius - outer_rim + 2 * gap_size + gap_size/2,
                 stroke: {1, :white},
                 translate: {center.x, center.y})
+
+    # triangles
     |> Scenic.Primitives.triangle(
                 Trigonometry.equilateral_triangle_coords(
                   center,
                   radius),
+                stroke: {1, :white})
+    |> Scenic.Primitives.triangle(
+                Trigonometry.equilateral_triangle_coords(
+                  center,
+                  radius - outer_rim + gap_size),
                 stroke: {1, :white})
     |> Scenic.Primitives.triangle(
                 Trigonometry.equilateral_triangle_coords(
@@ -71,5 +80,9 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do #TODO rename to Renseiji
   @impl Flamelex.GUI.ComponentBehaviour
   def handle_action({_state, _graph}, :hide) do
     raise "Can't hide TransmutationCircle yet"
+  end
+
+  def kaomoji do
+    "☆*:.｡.o(≧▽≦)o.｡.:*☆"
   end
 end

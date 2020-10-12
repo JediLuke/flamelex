@@ -24,13 +24,13 @@ defmodule Flamelex do
   """
   def paracelsize do
     IO.puts "\n#{__MODULE__} stopping..."
-    Application.stop(:franklin)
+    Application.stop(:flamelex)
 
     IO.puts "\n#{__MODULE__} recompiling..."
     IEx.Helpers.recompile
 
     IO.puts "\n#{__MODULE__} starting...\n"
-    Application.start(:franklin)
+    Application.start(:flamelex)
   end
 
 

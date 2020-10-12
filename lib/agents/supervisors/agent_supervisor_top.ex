@@ -1,4 +1,4 @@
-defmodule Franklin.Agent.TopLevelSupervisor do
+defmodule Flamelex.Agent.TopLevelSupervisor do
   @moduledoc """
   This Supervisor monitors the Buffer.Manager and the Buffer.DynamicSupervisor
   """
@@ -12,9 +12,9 @@ defmodule Franklin.Agent.TopLevelSupervisor do
 
     children = [
       {DynamicSupervisor,
-            name: Franklin.Agent.DynamicSupervisor,
+            name: Flamelex.Agent.DynamicSupervisor,
             strategy: :one_for_one},
-      Franklin.Agent.Reminders
+      Flamelex.Agent.Reminders
     ]
 
     Supervisor.init(children, strategy: :one_for_all)
