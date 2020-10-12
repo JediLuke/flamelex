@@ -39,6 +39,14 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
         text: "The real alchemy consists in being able to turn gold back again into something else; and that's the secret that most of your friends have lost.",
         author: "Edith Wharton"
       }),
+      LiteraryQuote.construct(%{
+        text: ~s(Alchemy, It is the scientific technique of understanding the structure of matter, decomposing it, and then reconstructing it. If performed skillfully, it is even possible to create gold out of lead. However, as it is a science, there are some natural principles in place. Only one thing can be created from something else of a certain mass. This is the Principle of Equivalent Exchange.),
+        author: "Fullmetal Alchemist: Brotherhood, Intro"
+      }),
+      LiteraryQuote.construct(%{
+        text: ~s(As `eval`d, so `apply`d),
+        author: "Luke Taylor (a variation on “as above, so below”)"
+      }),
     ]
   end
 

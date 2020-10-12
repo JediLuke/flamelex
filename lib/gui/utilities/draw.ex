@@ -1,5 +1,6 @@
 defmodule Flamelex.GUI.Utilities.Draw do
   use Flamelex.{ProjectAliases, CustomGuards}
+  alias Flamelex.GUI.GeometryLib.Trigonometry
 
 
   @ibm_plex_mono Flamelex.GUI.Initialize.ibm_plex_mono_hash()
@@ -32,6 +33,23 @@ defmodule Flamelex.GUI.Utilities.Draw do
     graph
     |> Scenic.Primitives.rect({width, height}, fill: color, translate: {frame.coordinates.x, frame.coordinates.y})
   end
+
+  # def triangle(graph, centroid, size) do
+  #   #NOTE: How Scenic draws triangles
+  #   #      --------------------------
+  #   #      Scenic uses 3 points to draw a triangle, which look like this:
+  #   #
+  #   #           x - point1
+  #   #           |\
+  #   #           | \ x - point2 (apex of triangle)
+  #   #           | /
+  #   #           |/
+  #   #           x - point3
+  #   coords = Trigonometry.equilateral_triangle_coords(centroid, size)
+
+  #   graph
+  #   |> Scenic.Primitives.triangle(coords)
+  # end
 
   @doc """
   Example:

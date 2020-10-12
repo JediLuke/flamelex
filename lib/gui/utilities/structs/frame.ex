@@ -10,6 +10,7 @@ defmodule Flamelex.GUI.Structs.Frame do
 
   defstruct [
     id:            nil,               # uniquely identify frames
+    #TODO rename to top_left
     coordinates:   nil, # %Coordinates{},    # the top-left corner of the frame, referenced from top-left corner of the viewport
     dimensions:    nil, # :w%Dimensions{},     # the height and width of the frame
     scenic_opts:   [],                # Scenic options
@@ -84,6 +85,12 @@ defmodule Flamelex.GUI.Structs.Frame do
     }
   end
 
+  def find_center(%__MODULE__{coordinates: c, dimensions: d}) do
+    Coordinates.new([
+      x: c.x + d.width/2,
+      y: c.y + d.height/2,
+    ])
+  end
 
   def reposition(%__MODULE__{coordinates: coords} = frame, x: new_x, y: new_y) do
     new_coordinates =
