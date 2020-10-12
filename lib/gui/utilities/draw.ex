@@ -12,11 +12,23 @@ defmodule Flamelex.GUI.Utilities.Draw do
   end
 
   @doc """
-  Just draw a simple box at 100, 100
+  Draw a test pattern.
   """
-  def test_draw(graph) do
+  def test_pattern(graph) do
+
     graph
-    |> Scenic.Primitives.rect({80, 80}, fill: :white, translate: {100, 100})
+    # 1st column
+    |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
+    |> Scenic.Primitives.rect({80, 80}, fill: :green,  translate: {100, 180})
+    |> Scenic.Primitives.rect({80, 80}, fill: :red,    translate: {100, 260})
+    # 2nd column
+    |> Scenic.Primitives.rect({80, 80}, fill: :blue,   translate: {180, 100})
+    |> Scenic.Primitives.rect({80, 80}, fill: :black,  translate: {180, 180})
+    |> Scenic.Primitives.rect({80, 80}, fill: :yellow, translate: {180, 260})
+    # 3rd column
+    |> Scenic.Primitives.rect({80, 80}, fill: :pink,   translate: {260, 100})
+    |> Scenic.Primitives.rect({80, 80}, fill: :purple, translate: {260, 180})
+    |> Scenic.Primitives.rect({80, 80}, fill: :brown,  translate: {260, 260})
   end
 
   @doc """

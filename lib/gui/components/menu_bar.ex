@@ -46,18 +46,23 @@ defmodule Flamelex.GUI.Component.MenuBar do
 
     new_graph =
       graph
-      |> Draw.test_draw()
+      |> Draw.test_pattern()
 
     {:redraw_graph, new_graph}
   end
+
+  #NOTE: How to develop a component
+  #      Say I want to click on something &
 
   @impl Flamelex.GUI.ComponentBehaviour
   def handle_action({graph, frame}, :reset_and_deactivate) do
-    IO.inspect graph
-    new_graph = inactive_menubar(frame)
-    {:redraw_graph, new_graph}
+    {:redraw_graph, inactive_menubar(frame)}
   end
 
+
+
+
+  @impl Flamelex.GUI.ComponentBehaviour
   def handle_action({graph, frame}, action) do
     Logger.debug "#{__MODULE__} with frame: #{inspect frame.id} received unrecognised action: #{inspect action}"
     :ignore_action
@@ -88,6 +93,18 @@ defmodule Flamelex.GUI.Component.MenuBar do
     {:noreply, state}
   end
 
+  @impl Flamelex.GUI.ComponentBehaviour
+  def handle_input({:cursor_button, {:left, :release, _dunno, _coords}}, _context, state) do
+    MenuBar.action(:show_active)
+    {:noreply, state}
+  end
+
+  @impl Flamelex.GUI.ComponentBehaviour
+  def handle_input({:cursor_button, _anything_else}, _context, state) do
+    # ignore it...
+    {:noreply, state}
+  end
+
   def handle_input(unmatched_input, _context, state) do
     Logger.warn "#{__MODULE__} recv'd unmatched input: #{inspect unmatched_input}"
     {:noreply, state}
@@ -104,6 +121,13 @@ defmodule Flamelex.GUI.Component.MenuBar do
   def inactive_menubar(frame) do
     Draw.blank_graph()
     |> Draw.background(frame, :grey)
+    |> render_menu_buttons(frame, menu_buttons_mapping())
+    |> Draw.border(frame)
+  end
+
+  def active_menubar(frame) do
+    Draw.blank_graph()
+    |> Draw.background(frame, :blue)
     |> render_menu_buttons(frame, menu_buttons_mapping())
     |> Draw.border(frame)
   end
