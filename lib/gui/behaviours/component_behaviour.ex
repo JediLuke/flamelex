@@ -33,7 +33,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       #      so we don't need specific ones, each Component implements them
       #      the same way
       @impl Scenic.Component
-      def verify(%Frame{} = data), do: {:ok, data}
+      def verify({%Frame{} = frame, params}) when is_map(params), do: {:ok, {%Frame{} = frame, params}}
       def verify(_else), do: :invalid_data
 
       @impl Scenic.Component
@@ -43,26 +43,32 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       #NOTE: The following functions are common to all Flamelex.GUI.Components
       #      and they can share the same implementation, so we include them here
 
-      @impl Scenic.Scene
-      def init(%Frame{} = frame, _opts) do
-        Logger.debug "Initializing #{__MODULE__}..."
-
-        #TODO search for if the process is already registered, if it is, engage recovery procedure
-        Process.register(self(), __MODULE__) #TODO this should be gproc
-
-        graph = render(frame)
-
-        {:ok, {graph, frame}, push: graph}
-      end
-
 
       @doc """
       Just like in Phoenix.LiveView, we mount our components onto an existing
       graph. In our case this is the same for all components though so we
       can abstract it out.
       """
-      def mount(%Scenic.Graph{} = graph, params) do
-        graph |> add_to_graph(params)
+      def mount(%Scenic.Graph{} = graph, %Frame{} = frame, params \\ %{}) do
+        graph |> add_to_graph({frame, params}) #REMINDER: This will pass `frame` to this modules init/2
+      end
+
+      @impl Scenic.Scene
+      def init({%Frame{} = frame, params}, _opts) do
+        Logger.debug "Initializing #{__MODULE__}..."
+        register_self()
+
+        graph =
+          render(frame, params)                   #REMINDER: render/1 has to be implemented by modules using this behaviour
+          |> Frame.decorate_graph(frame, params)  #REMINDER:
+
+        {:ok, {graph, frame}, push: graph}
+      end
+
+      def register_self do
+        #TODO search for if the process is already registered, if it is, engage recovery procedure
+        Process.register(self(), __MODULE__) #TODO this should be gproc
+        #TODO this should be {:gui_component, frame.id}, or maybe other way around. It could also subscribe to the channel for this id
       end
 
       @doc """

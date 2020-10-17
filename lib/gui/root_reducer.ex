@@ -44,7 +44,7 @@ defmodule Flamelex.GUI.Root.Reducer do
     #TODO need to make sure our ordering is correct so frames are layered on top of eachother
     new_graph =
       state.graph
-      |> GUI.Component.Frame.add_to_graph(new_frame)
+      # |> GUI.Component.Frame.add_to_graph(new_frame)
 
     new_layout =
       %{state.layout|frames: state.layout.frames ++ [new_frame]}
@@ -78,7 +78,7 @@ defmodule Flamelex.GUI.Root.Reducer do
       #TODO need to make sure our ordering is correct so frames are layered on top of eachother
       new_graph =
         state.graph
-        |> GUI.Component.Frame.add_to_graph(new_frame)
+        # |> GUI.Component.Frame.add_to_graph(new_frame)
 
       new_layout =
         %{state.layout|frames: state.layout.frames ++ [new_frame]}
@@ -119,7 +119,7 @@ defmodule Flamelex.GUI.Root.Reducer do
 
 
 
-  def process(state, {:show, %Buffer{} = buf}) do
+  def process(state, {:show, buf}) do
 
     new_frame = Frame.new(
       id:              9,
@@ -130,7 +130,7 @@ defmodule Flamelex.GUI.Root.Reducer do
 
     new_graph =
       state.graph
-      |> GUI.Component.Frame.add_to_graph(new_frame)
+      # |> GUI.Component.Frame.add_to_graph(new_frame)
 
     new_state =
       %{state|graph: new_graph}

@@ -17,7 +17,7 @@ defmodule Flamelex.GUI.Component.SampleComponent do
   obviously this can get quite detailed.
   """
   @impl Flamelex.GUI.ComponentBehaviour
-  def render(%Frame{} = frame) do
+  def render(%Frame{} = frame, _params) do
 
     Draw.blank_graph()
     # |> Draw.background(frame, :green)

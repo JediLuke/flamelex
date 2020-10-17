@@ -1,10 +1,9 @@
 defmodule Flamelex.GUI.Initialize do
   @moduledoc """
-  This module is responsible for providing all the Franklin GUI interface
-  functions.
+  Contains boot logic and default configurations required by Scenic.
   """
 
-  @title "Franklin"
+  @title "Flamelex"
 
   #TODO rename to FLamelex, even better - use an Elixir func to get project root
   @project_root_dir "/Users/luke/workbench/elixir/flamelex"

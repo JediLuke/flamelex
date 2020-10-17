@@ -52,13 +52,14 @@ defmodule Flamelex.GUI.Controller do
     # |> GUI.Component.CommandBuffer.draw(state)
     |> mount_menubar(vp)
     |> draw_transmutation_circle(vp)
-    # |> Scenic.Primitives.rect({vp.width, vp.height}) # rectangle used for capturing input for the scene
   end
 
   defp mount_menubar(graph, vp) do
     graph
     |> GUI.Component.MenuBar.mount(
           Frame.new(
+            #TODO
+            # buffer: %ListBuffer{},
             top_left: {0, 0},
             size:     {vp.width, GUI.Component.MenuBar.height()}))
   end
@@ -141,7 +142,8 @@ defmodule Flamelex.GUI.Controller do
   #   {:noreply, new_state}
   # end
 
-  def handle_cast({:show_fullscreen, %Buffer{} = buffer}, state) do
+  # def handle_cast({:show_fullscreen, %Buffer{} = buffer}, state) do
+  def handle_cast({:show_fullscreen, buffer}, state) do
 
     # the reason we need this controller is, it can keep track of all the buffers that the GUI is managing. Ok fuck it we can maybe get rid of it
 

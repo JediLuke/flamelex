@@ -37,6 +37,14 @@ defmodule Flamelex.GUI do
     def hide, do: Flamelex.GUI.Component.MenuBar.action(:hide)
   end
 
+  def enable do
+    raise "cant enable/disable the GUI manually yet"
+  end
+
+  def disable do
+    raise "cant enable/disable the GUI manually yet"
+  end
+
   @doc """
   Re-draw the entire GUI.
   """
