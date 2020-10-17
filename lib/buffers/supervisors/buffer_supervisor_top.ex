@@ -15,6 +15,8 @@ defmodule Flamelex.Buffer.TopLevelSupervisor do
     IO.puts "#{__MODULE__} initializing..."
 
     children = [
+      # {Registry, keys: :unique, name: Flamelex.Buffer.ProcessRegistry},
+      Flamelex.BufferManager,
       Flamelex.Buffer.Supervisor,
       Flamelex.Buffer.Command
     ]

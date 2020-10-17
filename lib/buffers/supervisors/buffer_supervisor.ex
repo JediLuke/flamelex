@@ -1,9 +1,6 @@
 defmodule Flamelex.Buffer.Supervisor do
   use DynamicSupervisor
 
-  @valid_buffer_types [
-    Flamelex.Buffer.Text
-  ]
 
   def start_link(args) do
     DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
@@ -14,25 +11,7 @@ defmodule Flamelex.Buffer.Supervisor do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-
-  def start_buffer_process(type: buf_type, name: name, content: content)
-  when buf_type in @valid_buffer_types do
-    DynamicSupervisor.start_child(__MODULE__, {buf_type, {:text, name, content}})
-  end
-
-  # def start_buffer(content, of_type: :note) do
-  #   #TODO add extra args to GUI, but it's still a text buffer
-  #   start_new_buffer_process({TextBuffer, content})
+  # def start_buffer_process(buffer_type, opts) do
+  #   DynamicSupervisor.start_child(__MODULE__, {buffer_type, opts})
   # end
-  # def start_buffer(content, of_type: :whiteboard) do
-  #   start_new_buffer_process({WhiteboardBuffer, content})
-  # end
-  # def start_buffer(content, of_type: :list) do
-  #   start_new_buffer_process({ListBuffer, content})
-  # end
-
-  # def note(buf_mem, args),   do: start_new_buffer_process({Franklin.Buffer.Note, contents})
-  # def list(:notes),     do: start_new_buffer_process({Franklin.Buffer.List, :notes})
-  # def whiteboard(args), do: start_new_buffer_process({Franklin.Buffer.Whiteboard, args})
-
 end
