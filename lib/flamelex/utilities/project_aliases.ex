@@ -9,12 +9,14 @@ defmodule Flamelex.ProjectAliases do
 
       alias Flamelex.Structs.{Buffer}
 
+      alias Flamelex.{Buffer, GUI, Memex}
+
+      alias Flamelex.Utilities.ProcessRegistry
+
+      #TODO remove these
       alias Flamelex.Utilities
       alias Flamelex.Utilities.TerminalIO
 
-      alias Flamelex.Memex
-
-      alias Flamelex.GUI
       alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
       alias Flamelex.GUI.Utilities.Draw
 

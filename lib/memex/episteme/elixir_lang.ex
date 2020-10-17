@@ -1,10 +1,6 @@
 defmodule Flamelex.Memex.Episteme.ProgrammingLanguages.ElixirLang do
   alias Flamelex.Structs.Memex.LiteraryQuote
 
-  def description do
-    raise "Need a description!"
-  end
-
   def quotes do
     [
       LiteraryQuote.construct(%{

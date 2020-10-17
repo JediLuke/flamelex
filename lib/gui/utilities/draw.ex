@@ -99,6 +99,23 @@ defmodule Flamelex.GUI.Utilities.Draw do
     |> Scenic.Primitives.rect({width, height}, stroke: stroke, translate: {frame.coordinates.x, frame.coordinates.y})
   end
 
+  def menu_highlight(graph, {_frame, item_width, left_margin}, index, top_left: {x, y}) do
+    margin = x + item_width * index
+
+    {:ok, {_key, sub_menu}} =
+      GUI.Component.MenuBar.menu_buttons_mapping()
+      |> Enum.fetch(index)
+
+    text = case sub_menu do
+      %{"paracelsize" => _dc} -> "paracelsize"
+      %{} -> "lame sauce"
+    end
+
+    graph
+    |> Scenic.Primitives.rect({item_width, 120}, fill: :white, translate: {margin, y + GUI.Component.MenuBar.height()})
+    |> Scenic.Primitives.text(text, font: @ibm_plex_mono, fill: :blue, translate: {left_margin + margin, y + 2*GUI.Component.MenuBar.height()})
+  end
+
 
 
   # |> Scenic.Primitives.rect({100, 100}, translate: {10, 10}, fill: :cornflower_blue, stroke: {1, :ghost_white})
@@ -125,25 +142,25 @@ defmodule Flamelex.GUI.Utilities.Draw do
                font_size: 24, fill: :blue)
   end
 
-  def render_inner_buffer(
-        %Scenic.Graph{} = graph,
-        %Frame{
-          dimensions:  %Dimensions{width: frame_width, height: frame_height},
-          coordinates: %Coordinates{x: frame_x, y: frame_y},
-          buffer:      %Buffer{type: :text} = buf
-        },
-        bar_height
-      ) do
+  # def render_inner_buffer(
+  #       %Scenic.Graph{} = graph,
+  #       %Frame{
+  #         dimensions:  %Dimensions{width: frame_width, height: frame_height},
+  #         coordinates: %Coordinates{x: frame_x, y: frame_y},
+  #         buffer:      %Buffer{type: :text} = buf
+  #       },
+  #       bar_height
+  #     ) do
 
-          #TODO right now the text runs outside of the frame! We need to use dimensions here somehow to limit the size of the draw
-          graph
-          |> Scenic.Primitives.text(
-               buf.content,
-                 font: @ibm_plex_mono,
-                 translate: {frame_x + 5, frame_y + bar_height + 22}, # text draws from bottom-left corner?? :( also, how high is it???
-                 font_size: 24,
-                 fill: :ghost_white)
-  end
+  #         #TODO right now the text runs outside of the frame! We need to use dimensions here somehow to limit the size of the draw
+  #         graph
+  #         |> Scenic.Primitives.text(
+  #              buf.content,
+  #                font: @ibm_plex_mono,
+  #                translate: {frame_x + 5, frame_y + bar_height + 22}, # text draws from bottom-left corner?? :( also, how high is it???
+  #                font_size: 24,
+  #                fill: :ghost_white)
+  # end
 
 
 

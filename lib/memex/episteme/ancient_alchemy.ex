@@ -44,9 +44,9 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
         author: "Fullmetal Alchemist: Brotherhood, Intro"
       }),
       LiteraryQuote.construct(%{
-        text: ~s(As `eval`d, so `apply`d),
-        author: "Luke Taylor (a variation on “as above, so below”)"
-      }),
+        text: ~s(As `eval`d, So `apply`d),
+        author: "Luke Taylor"
+      })
     ]
   end
 

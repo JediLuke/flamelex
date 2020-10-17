@@ -37,7 +37,7 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do #TODO rename to Renseiji
   alias Flamelex.GUI.GeometryLib.Trigonometry
 
   @impl Flamelex.GUI.ComponentBehaviour
-  def render(frame) do
+  def render(frame, _params) do
     radius = frame.dimensions.width/2 # we can get the scale_factor back this way!
     center = Frame.find_center(frame)
 
