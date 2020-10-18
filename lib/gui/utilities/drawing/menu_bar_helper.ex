@@ -18,7 +18,7 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
   #   |> Draw.border(frame)
   # end
 
-  def draw_dropdown_menu(graph, frame, index, _sub_index) do
+  def draw_dropdown_menu(graph, frame, index, sub_index) do
 
     #TODO remove all other dropdowns from the graph too
 
@@ -30,7 +30,7 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
     # |> IO.inspect
 
     inactive_menubar(frame)
-    |> draw_menu_highlight(details, index, top_left: {0, 0})
+    |> draw_menu_highlight(details, index, sub_index, top_left: {0, 0})
     # |> Draw.border(frame)
   end
 
@@ -45,7 +45,7 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
     |> render_button(button_list)
   end
 
-  def draw_menu_highlight(graph, {_frame, item_width, left_margin}, index, top_left: {x, y}) do
+  def draw_menu_highlight(graph, {_frame, item_width, left_margin}, index, sub_index, top_left: {x, y}) do
     margin = x + item_width * index
 
     # {:ok, {_key, sub_menu}} =
@@ -58,12 +58,15 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
     #   %{} -> "lame sauce"
     # end
     # draw_dropdown_menu
+    menu_map = MenuBar.menu_buttons_mapping()
+    {:ok, {_top_level, sub_menu}} = MenuBar.menu_buttons_mapping() |> Enum.fetch(index)
 
-    sub_menu = ["liberty", "justice", "for_all", "farts", "popsdicle"]
+    # sub_menu = ["liberty", "justice", "for_all", "farts", "popsdicle"]
     # sub_menu = ["liberty"]
+    sub_menu = Map.keys(sub_menu)
 
     graph
-    |> draw_sub_menu(sub_menu, {{item_width, left_margin}, {x, y}, margin})
+    |> draw_sub_menu(sub_menu, {{item_width, left_margin}, {x, y}, margin}, sub_index)
     |> highlight_top_menu_item(index, margin, item_width, y)
 
   end
@@ -79,17 +82,19 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
   end
 
 
-  def draw_sub_menu(graph, menu_list, params) do
+  def draw_sub_menu(graph, menu_list, params, highlighted_sub_index) do
     {{item_width, left_margin}, {_x, y}, margin} = params
 
     height = MenuBar.height()
 
     {new_graph, _index} =
       Enum.reduce(menu_list, {graph, 0}, fn menu_item, {graph, sub_index} ->
+        color = unless sub_index == highlighted_sub_index, do: :grey, else: :red #TODO this is de way!! re-render buttons conditionally based on highlight
+
         new_graph =
           graph
           |> Scenic.Primitives.rect({item_width, height}, fill: :white, translate: {margin, y + height + height*sub_index})
-          |> Scenic.Primitives.text(menu_item, fill: :red, translate: {left_margin + margin,  y + height + height*sub_index + 24}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
+          |> Scenic.Primitives.text(menu_item, fill: color, translate: {left_margin + margin,  y + height + height*sub_index + 24}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
 
         {new_graph, sub_index+1}
       end)
@@ -124,7 +129,7 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
     if y <= MenuBar.height() do
       {:main_menubar, index}
     else
-      sub_index = (y |> floor() |> div(MenuBar.height()))
+      sub_index = (y |> floor() |> div(MenuBar.height())) - 1
       {:sub_menu, index, sub_index}
     end
   end

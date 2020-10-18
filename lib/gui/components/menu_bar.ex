@@ -31,13 +31,16 @@ defmodule Flamelex.GUI.Component.MenuBar do
     # top-level buttons
     %{
       "Flamelex" => %{
-        "paracelsize" => {Flamelex, :paracelsize, []}
+        "temet nosce" => {Flamelex, :temet_nosce, []}
       },
       "Memex" => %{
-        "random quote" => nil
+        "random quote" => {Flamelex.Memex, :random_quote, []}
       },
       "GUI" => %{}, #TODO auto-generate it from the GUI file
-      "Buffer" => %{},
+      "Buffer" => %{
+        "open README" => {Flamelex.Buffer, :open!, []},
+        "close" => {Flamelex.Buffer, :close, ["/Users/luke/workbench/elixir/flamelex/README.md"]},
+      },
       "DevTools" => %{},
       "Help" => %{},
     }
@@ -61,10 +64,15 @@ defmodule Flamelex.GUI.Component.MenuBar do
     end
   end
 
-  def handle_input({:cursor_button, {:left, :release, _dunno, _coords}}, _context, state) do
-    index = 2 #TODO
-    MenuBar.action({:activate, index})
-    {:noreply, state}
+  def handle_input({:cursor_button, {:left, :release, _dunno, coords}}, _context, frame) do
+    case coords |> hovering_over_item?() do
+      {:main_menubar, _index} ->
+          # MenuBar.action({:animate_menu, index})
+          {:noreply, frame}
+      {:sub_menu, index, sub_index} ->
+          MenuBar.action({:call_function, index, sub_index})
+          {:noreply, frame}
+    end
   end
 
   def handle_input({:cursor_exit, _some_number}, _context, state) do
@@ -103,6 +111,21 @@ defmodule Flamelex.GUI.Component.MenuBar do
   end
 
   def handle_action({_graph, frame}, :reset_and_deactivate) do
+    {:redraw_graph, inactive_menubar(frame)}
+  end
+
+  def handle_action({_graph, frame}, {:call_function, index, sub_index}) do
+
+    {:ok, {key, first_sub_menu}} = MenuBar.menu_buttons_mapping() |> Enum.fetch(index)
+    # IO.inspect key, label: "KEY"
+    # %{"paracelsize" => {Flamelex, :paracelsize, []}}
+    # IO.inspect first_sub_menu
+    {:ok, {_key, {m, f, a}}} = first_sub_menu |> Enum.fetch(sub_index)
+
+    # {:ok, {m, f, _a} = MenuBar.menu_buttons_mapping() |> Enum.fetch(index) |> Enum.fetch(sub_index)
+    Kernel.apply(m, f, a)
+    |> IO.inspect
+
     {:redraw_graph, inactive_menubar(frame)}
   end
 
