@@ -5,7 +5,7 @@ defmodule Flamelex.Buffer.Text do
   # use Flamelex.BufferBehaviour
   use GenServer, restart: :temporary
   require Logger
-  alias Flamelex.Utilities.ProcessRegistry
+  use Flamelex.ProjectAliases
 
   def start_link(params) do
     name = ProcessRegistry.via_tuple(gen_tag(params))
@@ -35,6 +35,8 @@ defmodule Flamelex.Buffer.Text do
       data: file_contents,
       unsaved_changes?: false
     }
+
+    :ok = GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
 
     send params.after_boot_callback, {self(), :successfully_opened, filepath, {:buffer, filepath}}
 

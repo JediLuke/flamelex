@@ -7,6 +7,9 @@ defmodule Flamelex.GUI do
   alias Flamelex.GUI.Controller, as: GUIControl
   alias Flamelex.Buffer.Command, as: CmdBuffer
 
+  def reset do
+    GUIControl.action(:reset)
+  end
 
   defmodule Layout do
     def set, do: raise "Can't set a new layout!"

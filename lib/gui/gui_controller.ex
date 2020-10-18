@@ -8,6 +8,7 @@ defmodule Flamelex.GUI.Controller do
   use Flamelex.ProjectAliases
   alias Flamelex.GUI.Structs.GUIControlState, as: State
   require Logger
+  import Flamelex.GUI.Utilities.ControlHelper
 
 
 
@@ -21,6 +22,10 @@ defmodule Flamelex.GUI.Controller do
   def action(a) do
     Logger.debug "action: `#{inspect a}` sent to GUI.Controller..."
     GenServer.cast(__MODULE__, {:action, a})
+  end
+
+  def show(x) do
+    GenServer.call(__MODULE__, {:show, x})
   end
 
 
@@ -46,40 +51,14 @@ defmodule Flamelex.GUI.Controller do
     {:noreply, %{state|graph: new_graph}}
   end
 
-  def default_gui(%{viewport: vp}) do
-    Draw.blank_graph()
-    |> draw_transmutation_circle(vp)
-    # |> GUI.Component.CommandBuffer.draw(viewport: vp)
-    # |> GUI.Component.CommandBuffer.draw(state)
-    |> mount_menubar(vp)
+  def handle_cast({:action, :reset}, state) do
+    new_graph = default_gui(state)
+    Flamelex.GUI.redraw(new_graph)
+    {:noreply, state}
   end
 
-  defp mount_menubar(graph, vp) do
-    graph
-    |> GUI.Component.MenuBar.mount(
-          Frame.new(
-            #TODO
-            # buffer: %ListBuffer{},
-            top_left: {0, 0},
-            size:     {vp.width, GUI.Component.MenuBar.height()}))
-  end
 
-  def draw_transmutation_circle(graph, vp) do
 
-    #NOTE: We need the Frame here, so here is where we need to calculate
-    #      how to position the TransmutationCicle in the middle of the viewport
-    center_point = Dimensions.find_center(vp)
-    scale_factor = 600 # how big the square frame becomes
-
-    top_left_x_for_centered_frame = center_point.x - scale_factor/2
-    top_left_y_for_centered_frame = center_point.y - scale_factor/2
-
-    graph
-    |> GUI.Component.TransmutationCircle.mount(
-          Frame.new(
-            top_left: {top_left_x_for_centered_frame, top_left_y_for_centered_frame},
-            size:     {scale_factor, scale_factor}))
-  end
 
   # def handle_cast(:show_in_gui, %Buffer{} = buffer}, state) do
 
@@ -117,6 +96,17 @@ defmodule Flamelex.GUI.Controller do
     {:reply, state.layout.frames, state}
   end
 
+  def handle_call({:show, {:buffer, _filename} = buf}, _from, state) do
+    new_graph =
+      state.graph
+      |> Draw.test_pattern()
+
+    Flamelex.GUI.RootScene.redraw(new_graph)
+
+    {:reply, :ok, %{state|graph: new_graph}}
+  end
+
+
 
 
 
@@ -153,7 +143,9 @@ defmodule Flamelex.GUI.Controller do
     #   |> Map.update!(:active_buffer, fn _ab -> buffer end)
 
     # IO.puts "SENDING --- #{new_state.active_buffer.content}"
-    GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
+    # GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
+
+    GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.data]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
 
     {:noreply, state}
   end
@@ -175,61 +167,4 @@ defmodule Flamelex.GUI.Controller do
   #   {:noreply, state}
   # end
 
-  # defp process_reminders([], state), do: state
-  # defp process_reminders([{_key, data} = r | rest], state) do
-  #   case reminder_already_pending?(r, state) do
-  #     true ->
-  #       # Logger.info "Reminder was already pending. #{inspect r}"
-  #       process_reminders(rest, state)
-  #     false ->
-  #       # we found a new reminder...
-  #       case data["remind_me_datetime"] do
-  #         nil ->
-  #           Logger.error "Found a reminder #{inspect r} that didn't have a reminder time."
-  #           state = set_up_reminder(r, state, @default_reminder_time_in_minutes)
-  #           process_reminders(rest, state)
-  #         _remind_me_datetime ->
-  #           Logger.info "Found a new reminder! Setting up a reminder... #{inspect r}"
-  #           state = set_up_reminder(r, state)
-  #           process_reminders(rest, state)
-  #       end
-  #   end
-  # end
-
-  # defp reminder_already_pending?(r, state) when is_list(state) do
-  #   state |> Enum.member?(r)
-  # end
-
-  # defp set_up_reminder({_key, _data} = r, state, time_in_minutes) do
-  #   Process.send_after(self(), {:reminder!, r}, time_in_minutes * (60 * 1000))
-  #   state ++ [r]
-  # end
-  # defp set_up_reminder({_key, data} = r, state) do
-  #   now_utc = DateTime.utc_now()
-  #   remind_me_datetime = data["remind_me_datetime"]
-  #   {:ok, remind_me_utc, 0} = remind_me_datetime |> DateTime.from_iso8601()
-  #   case DateTime.compare(remind_me_utc, now_utc) do
-  #     future when future in [:gt] ->
-  #       notify_delay_ms = DateTime.diff(remind_me_utc, DateTime.utc_now()) * 1000 |> IO.inspect
-  #       Process.send_after(self(), {:reminder!, r}, notify_delay_ms)
-  #       state ++ [r]
-  #     past_or_present when past_or_present in [:lt, :eq] ->
-  #       Logger.warn "This reminder is in the past! #{inspect r}"
-  #       Process.send_after(self(), {:reminder!, r}, @default_reminder_time_in_minutes * (60 * 1000))
-  #       state ++ [r]
-  #   end
-  # end
-
-  # defp ack_reminder_in_user_data_file(r) do
-  #   ackd_reminder = r |> TidBit.ack_reminder()
-  #   Utilities.Data.replace_tidbit(r, ackd_reminder)
-  # end
-
-  # add a new buffer to the state's buffer_list
-  # defp add_buffer(state, buf, f) do
-  #   buf_frame = {buf: buf, frame: f}
-
-  #   state
-  #   |> Map.update!(:buffers, fn buf_list -> buf_list ++ [buf_frame] end)
-  # end
 end
