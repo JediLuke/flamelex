@@ -63,13 +63,19 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
     # sub_menu = ["liberty"]
 
     graph
-    |> highlight_top_menu_item(index)
     |> draw_sub_menu(sub_menu, {{item_width, left_margin}, {x, y}, margin})
+    |> highlight_top_menu_item(index, margin, item_width, y)
 
   end
 
-  def highlight_top_menu_item(graph, index) do
+  def highlight_top_menu_item(graph, index, margin, item_width, y) do
+    {:ok, {text, %{}}} = MenuBar.menu_buttons_mapping() |> Enum.fetch(index)
+
     graph
+    |> Scenic.Primitives.rect({item_width, MenuBar.height()}, fill: :dark_blue, translate: {margin, 0})
+    # |> Scenic.Primitives.text(text, fill: :white, translate: {MenuBar.menu_item(:left_margin) + margin,  MenuBar.height() + 24}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
+    #TODO 28 is correct here but got it through trial & error...
+    |> Scenic.Primitives.text(text, fill: :white, translate: {MenuBar.menu_item(:left_margin) + margin, y + 28}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
   end
 
 

@@ -48,10 +48,10 @@ defmodule Flamelex.GUI.Controller do
 
   def default_gui(%{viewport: vp}) do
     Draw.blank_graph()
+    |> draw_transmutation_circle(vp)
     # |> GUI.Component.CommandBuffer.draw(viewport: vp)
     # |> GUI.Component.CommandBuffer.draw(state)
     |> mount_menubar(vp)
-    |> draw_transmutation_circle(vp)
   end
 
   defp mount_menubar(graph, vp) do
