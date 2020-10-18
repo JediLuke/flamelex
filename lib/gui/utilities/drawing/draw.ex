@@ -99,22 +99,9 @@ defmodule Flamelex.GUI.Utilities.Draw do
     |> Scenic.Primitives.rect({width, height}, stroke: stroke, translate: {frame.coordinates.x, frame.coordinates.y})
   end
 
-  def menu_highlight(graph, {_frame, item_width, left_margin}, index, top_left: {x, y}) do
-    margin = x + item_width * index
 
-    {:ok, {_key, sub_menu}} =
-      GUI.Component.MenuBar.menu_buttons_mapping()
-      |> Enum.fetch(index)
 
-    text = case sub_menu do
-      %{"paracelsize" => _dc} -> "paracelsize"
-      %{} -> "lame sauce"
-    end
 
-    graph
-    |> Scenic.Primitives.rect({item_width, 120}, fill: :white, translate: {margin, y + GUI.Component.MenuBar.height()})
-    |> Scenic.Primitives.text(text, font: @ibm_plex_mono, fill: :blue, translate: {left_margin + margin, y + 2*GUI.Component.MenuBar.height()})
-  end
 
 
 

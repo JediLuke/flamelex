@@ -7,7 +7,8 @@ defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
   @prompt_margin 12
 
   @font_size 24
-  @cursor_width GUI.FontHelpers.monospace_font_width(:ibm_plex, @font_size) #TODO get this properly
+  # @cursor_width GUI.FontHelpers.monospace_font_width(:ibm_plex, @font_size) #TODO get this properly
+  @cursor_width 16
 
   @text_field_left_margin 2 # distance between the left-hand side of the text field box, and the start of the actual text. We want a little margin here for aesthetics
   # @prompt_to_blinker_distance 22

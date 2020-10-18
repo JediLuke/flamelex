@@ -6,6 +6,9 @@ defmodule Flamelex.GUI.FontHelpers do
   @project_root_dir "/Users/luke/workbench/elixir/flamelex"
   @priv_dir @project_root_dir <> "/priv"
 
+  #TODO font stuff should probably live more in here, less in Initialize
+  def font(:ibm_plex_mono), do: GUI.Initialize.ibm_plex_mono_hash
+
   def get_max_box_for_ibm_plex(font_size_in_px) do
     font_metrics =
       @priv_dir |> Path.join("/static/fonts/IBM-Plex-Mono/IBMPlexMono-Regular.ttf.metrics")

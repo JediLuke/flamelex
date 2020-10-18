@@ -87,6 +87,7 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
 
   def decorate_graph(%Scenic.Graph{} = graph, %Frame{} = frame, params) when is_map(params) do
     Logger.debug "#{__MODULE__} framing up... frame: #{inspect frame}, params: #{inspect params}"
+    Logger.warn "Not rly framing anything yet..."
     graph
   end
 
