@@ -37,7 +37,6 @@ defmodule Flamelex.Buffer do
         from_file: filepath,
         open_in_gui?: true
       })
-    IO.inspect request_mgr
 
     case request_mgr do
       {:ok, name} ->
