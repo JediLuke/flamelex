@@ -36,44 +36,84 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do #TODO rename to Renseiji
   use Flamelex.GUI.ComponentBehaviour
   alias Flamelex.GUI.GeometryLib.Trigonometry
 
+  @primary_color :dark_violet
+
   @impl Flamelex.GUI.ComponentBehaviour
   def render(frame, _params) do
-    radius = frame.dimensions.width/2 # we can get the scale_factor back this way!
-    center = Frame.find_center(frame)
 
-    outer_rim = 42
-    gap_size = 4
+
+    # |> Draw.background(frame, @primary_color)
+
+    params = %{
+      radius: frame.dimensions.width/2, # we can get the scale_factor back this way!
+      center: Frame.find_center(frame),
+      outer_rim: 42,
+      gap_size: 4
+    }
 
     Draw.blank_graph()
-    # |> Draw.background(frame, :purple)
+    |> Scenic.Primitives.group(fn graph ->
+          graph
+          |> draw_circles(params)
+          |> draw_triangles(params)
+       end, [
+          id: __MODULE__,
+          hidden: false
+       ])
+  end
 
-    # circles
+  def draw_circles(graph, params) do
+    %{
+      radius: radius,
+      center: center,
+      outer_rim: rim,
+      gap_size: size
+    } = params
+
+    graph
     |> Scenic.Primitives.circle(radius,
-                stroke: {1, :white},
+                stroke: {1, @primary_color},
                 translate: {center.x, center.y})
-    |> Scenic.Primitives.circle(radius - outer_rim + gap_size,
-                stroke: {1, :white},
+    |> Scenic.Primitives.circle(radius - rim + size,
+                stroke: {1, @primary_color},
                 translate: {center.x, center.y})
-    |> Scenic.Primitives.circle(radius - outer_rim + 2 * gap_size + gap_size/2,
-                stroke: {1, :white},
+    |> Scenic.Primitives.circle(radius - rim + 2 * size + size/2,
+                stroke: {1, @primary_color},
                 translate: {center.x, center.y})
+  end
 
-    # triangles
+  def draw_triangles(graph, params) do
+    %{
+      radius: radius,
+      center: center,
+      outer_rim: rim,
+      gap_size: size
+    } = params
+
+    graph
     |> Scenic.Primitives.triangle(
                 Trigonometry.equilateral_triangle_coords(
                   center,
                   radius),
-                stroke: {1, :white})
+                stroke: {1, @primary_color})
     |> Scenic.Primitives.triangle(
                 Trigonometry.equilateral_triangle_coords(
                   center,
-                  radius - outer_rim + gap_size),
-                stroke: {1, :white})
+                  radius - rim + size),
+                stroke: {1, @primary_color})
     |> Scenic.Primitives.triangle(
                 Trigonometry.equilateral_triangle_coords(
                   center,
-                  radius - outer_rim + 2 * gap_size + gap_size/2),
-                stroke: {1, :white})
+                  radius - rim + 2 * size + size/2),
+                stroke: {1, @primary_color})
+  end
+
+
+  def show do
+
+  end
+
+  def hide do
 
   end
 
