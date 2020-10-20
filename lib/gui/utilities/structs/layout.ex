@@ -7,11 +7,17 @@ defmodule Flamelex.GUI.Structs.Layout do
   require Logger
   use Flamelex.ProjectAliases
 
+  @valid_layouts [
+    :maximized,
+    :split_pane,
+    :floating_frames
+  ]
 
   defstruct [
-    dimensions:  %Dimensions{},
-    frames:      [],
-    arrangement: :one_frame_maximum_size
+    dimensions:   nil,
+    frames:       [],
+    arrangement:  nil,
+    opts:         %{}
   ]
 
 
@@ -19,7 +25,8 @@ defmodule Flamelex.GUI.Structs.Layout do
     %__MODULE__{
       dimensions:  dim |> Dimensions.new(),
       frames:      [],
-      arrangement: :floating_frames
+      arrangement: :maximized,
+      opts:        %{show_menubar?: true}
     }
   end
 

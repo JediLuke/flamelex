@@ -36,15 +36,16 @@ defmodule Flamelex.Buffer.Text do
       unsaved_changes?: false
     }
 
-    :ok = GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
-
     send params.after_boot_callback, {self(), :successfully_opened, filepath, {:buffer, filepath}}
+    GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
+
 
     {:noreply, new_buf}
   end
 
   @impl GenServer
   def handle_call(:read_contents, _from, state) do
+    IO.puts "READINFD"
     {:reply, state.data, state}
   end
 

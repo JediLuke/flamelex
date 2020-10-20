@@ -7,6 +7,7 @@ defmodule Flamelex.GUI.Controller do
   use GenServer
   use Flamelex.ProjectAliases
   alias Flamelex.GUI.Structs.GUIControlState, as: State
+  alias GUI.Component.MenuBar
   require Logger
   import Flamelex.GUI.Utilities.ControlHelper
 
@@ -25,7 +26,7 @@ defmodule Flamelex.GUI.Controller do
   end
 
   def show(x) do
-    GenServer.call(__MODULE__, {:show, x})
+    GenServer.cast(__MODULE__, {:show, x})
   end
 
 
@@ -96,17 +97,52 @@ defmodule Flamelex.GUI.Controller do
     {:reply, state.layout.frames, state}
   end
 
-  def handle_call({:show, {:buffer, _filename} = buf}, _from, state) do
+  def handle_cast({:show, {:buffer, filename} = buf}, state) do
+
+    data  = Buffer.read(buf)
+    frame = calculate_framing(filename, state.layout)
+
     new_graph =
       state.graph
-      |> Draw.test_pattern()
+      |> GUI.Component.TextBox.draw({frame, data})
+      # |> Draw.test_pattern()
 
     Flamelex.GUI.RootScene.redraw(new_graph)
 
-    {:reply, :ok, %{state|graph: new_graph}}
+    {:noreply, %{state|graph: new_graph}}
   end
 
 
+
+  def calculate_framing(name, %Layout{
+    arrangement: :maximized,
+    dimensions: %Dimensions{height: h, width: w} = layout_dimens,
+    frames: [], #NOTE: No existing frames
+    opts: opts
+  }) do
+    coords = calculate_frame_position(opts)
+    dimens = calculate_frame_size(opts, layout_dimens)
+
+    Frame.new(name, coords, dimens)
+  end
+
+  def calculate_frame_position(opts) do
+    case opts |> Map.fetch(:show_menubar?) do
+      {:ok, true} ->
+        Coordinates.new(x: 0, y: MenuBar.height())
+      _otherwise ->
+        Coordinates.new(x: 0, y: 0)
+    end
+  end
+
+  def calculate_frame_size(opts, layout_dimens) do
+    case opts |> Map.fetch(:show_menubar?) do
+      {:ok, true} ->
+        Dimensions.new(width: layout_dimens.width, height: layout_dimens.height - MenuBar.height())
+      _otherwise ->
+        Dimensions.new(width: layout_dimens.width, height: layout_dimens.height)
+    end
+  end
 
 
 

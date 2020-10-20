@@ -15,79 +15,79 @@ defmodule Flamelex.GUI.Root.Reducer do
 
 
 
-  def process(
-        %{
-          layout:
-            %Flamelex.GUI.Structs.Layout{
-              arrangement: :floating_frames,
-              # dimensions: %Flamelex.GUI.Structs.Dimensions{width: width, height: height},
-              frames: []
-            }
-        } = state,
-        {:show_in_gui, buf} = _action) do
+  # def process(
+  #       %{
+  #         layout:
+  #           %Flamelex.GUI.Structs.Layout{
+  #             arrangement: :floating_frames,
+  #             # dimensions: %Flamelex.GUI.Structs.Dimensions{width: width, height: height},
+  #             frames: []
+  #           }
+  #       } = state,
+  #       {:show_in_gui, buf} = _action) do
 
-    # #TODO we want to use frames etc. but this is more or less it!
-    # %{arrangement: _arrangement,
-    #    dimensions: %{width: width, height: height}}
-    #      = state.layout
+  #   # #TODO we want to use frames etc. but this is more or less it!
+  #   # %{arrangement: _arrangement,
+  #   #    dimensions: %{width: width, height: height}}
+  #   #      = state.layout
 
-    new_frame = Frame.new(
-      id:              1, #NOTE: This is ok, because this pattern match is for when we have no frames
-      top_left_corner: {25, 25},
-      dimensions:      {800, 1200},
-      buffer:          buf)
+  #   new_frame = Frame.new(
+  #     id:              1, #NOTE: This is ok, because this pattern match is for when we have no frames
+  #     top_left_corner: {25, 25},
+  #     dimensions:      {800, 1200},
+  #     buffer:          buf)
 
-        # picture_graph:   GUI.Component.TextBox.new(buf)
-        # picture_graph:   Draw.blank_graph()
-        #                  |> Draw.text("Yes yes", {100, 100}) #TODO although inelegant, this is drawing text inside the frame!!
+  #       # picture_graph:   GUI.Component.TextBox.new(buf)
+  #       # picture_graph:   Draw.blank_graph()
+  #       #                  |> Draw.text("Yes yes", {100, 100}) #TODO although inelegant, this is drawing text inside the frame!!
 
-    #TODO need to make sure our ordering is correct so frames are layered on top of eachother
-    new_graph =
-      state.graph
-      # |> GUI.Component.Frame.add_to_graph(new_frame)
+  #   #TODO need to make sure our ordering is correct so frames are layered on top of eachother
+  #   new_graph =
+  #     state.graph
+  #     # |> GUI.Component.Frame.add_to_graph(new_frame)
 
-    new_layout =
-      %{state.layout|frames: state.layout.frames ++ [new_frame]}
+  #   new_layout =
+  #     %{state.layout|frames: state.layout.frames ++ [new_frame]}
 
-    new_state =
-      %{state|graph: new_graph, layout: new_layout}
+  #   new_state =
+  #     %{state|graph: new_graph, layout: new_layout}
 
-    {:redraw_root_scene, new_state}
-  end
-
-
-  def process(
-    %{
-      layout:
-        %Flamelex.GUI.Structs.Layout{
-          arrangement: :floating_frames,
-          # dimensions: %Flamelex.GUI.Structs.Dimensions{width: width, height: height},
-          frames: [%Frame{} = f] # one frame
-        }
-    } = state,
-    {:show_in_gui, buf} = _action) do
+  #   {:redraw_root_scene, new_state}
+  # end
 
 
-      new_frame = Frame.new(
-        id:              2,
-        top_left_corner: {850, 25},
-        dimensions:      {800, 1200},
-        buffer:          buf)
+  # def process(
+  #   %{
+  #     layout:
+  #       %Flamelex.GUI.Structs.Layout{
+  #         arrangement: :floating_frames,
+  #         # dimensions: %Flamelex.GUI.Structs.Dimensions{width: width, height: height},
+  #         frames: [%Frame{} = f] # one frame
+  #       }
+  #   } = state,
+  #   {:show_in_gui, buf} = _action) do
 
 
-      #TODO need to make sure our ordering is correct so frames are layered on top of eachother
-      new_graph =
-        state.graph
-        # |> GUI.Component.Frame.add_to_graph(new_frame)
+  #     new_frame = Frame.new(
+  #       id:              2,
+  #       top_left_corner: {850, 25},
+  #       dimensions:      {800, 1200},
+  #       buffer:          buf)
 
-      new_layout =
-        %{state.layout|frames: state.layout.frames ++ [new_frame]}
 
-      new_state =
-        %{state|graph: new_graph, layout: new_layout}
+  #     #TODO need to make sure our ordering is correct so frames are layered on top of eachother
+  #     new_graph =
+  #       state.graph
+  #       # |> GUI.Component.Frame.add_to_graph(new_frame)
 
-      {:redraw_root_scene, new_state}
-  end
+  #     new_layout =
+  #       %{state.layout|frames: state.layout.frames ++ [new_frame]}
+
+  #     new_state =
+  #       %{state|graph: new_graph, layout: new_layout}
+
+  #     {:redraw_root_scene, new_state}
+  # end
 
   # def process(
   # %{layout: %Flamelex.GUI.Structs.Layout{

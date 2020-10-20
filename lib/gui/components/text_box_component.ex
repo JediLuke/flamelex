@@ -5,9 +5,12 @@ defmodule Flamelex.GUI.Component.TextBox do
   use Flamelex.ProjectAliases
 
   #TODO have horizontal scrolling if we go over the line
+  def draw(graph, {frame, data}) do
+    add_to_graph(graph, {frame, data})
+  end
 
   @impl Scenic.Component
-  def verify(%Frame{} = data), do: {:ok, data}
+  def verify({%Frame{} = _f, _data} = params), do: {:ok, params}
   def verify(_else), do: :invalid_data
 
   def info(_data), do: ~s(Invalid data)
@@ -18,7 +21,7 @@ defmodule Flamelex.GUI.Component.TextBox do
   # end
 
   @doc false
-  def init(%Frame{} = state, _opts) do
+  def init({%Frame{} = f, data} = state, _opts) do
     Logger.info "#{__MODULE__} initializing...#{inspect state}"
 
     # GenServer.call(GUI.Scene.Root, {:register, id})
@@ -27,7 +30,7 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     graph =
       Scenic.Graph.build()
-      |> Draw.background(state, :red)
+      |> Draw.background(f, :red)
       # |> GUI.Component.Cursor.add_to_graph(data |> cursor_params())
 
 

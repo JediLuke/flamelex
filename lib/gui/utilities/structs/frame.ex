@@ -18,6 +18,21 @@ defmodule Flamelex.GUI.Structs.Frame do
     buffer:        nil
   ]
 
+  def test do
+    new("tester", {100, 100}, {100, 100})
+  end
+
+  def new(slug, %Coordinates{} = c, %Dimensions{}  = d) do
+    new(
+      id:              slug,
+      top_left_corner: %Coordinates{} = c,
+      dimensions:      %Dimensions{}  = d
+    )
+  end
+  def new(slug, coords, dimensions) do
+    new(slug, Coordinates.new(coords), Dimensions.new(dimensions))
+  end
+
   def new(
     top_left_corner: %Coordinates{} = c,
     dimensions:      %Dimensions{}  = d
