@@ -1,9 +1,9 @@
-defmodule Flamelex.GUI.Structs.Frame do
+defmodule Flamelex.GUI.Structs.Frame do #TODO rename this moduile to have utilities in it
   @moduledoc """
   Struct which holds relevant data for rendering a buffer frame status bar.
   """
   require Logger
-  use Flamelex.ProjectAliases
+  alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
 
   #TODO each "new/x" function should be making a new Scenic.Graph, we need
   # to actually build one and cant just use a default struct cause it spits chips

@@ -31,7 +31,8 @@ defmodule Flamelex.GUI.Component.MenuBar do
     # top-level buttons
     %{
       "Flamelex" => %{
-        "temet nosce" => {Flamelex, :temet_nosce, []}
+        "temet nosce" => {Flamelex, :temet_nosce, []},
+        "show cmder" => {GUI.CommandBuffer, :show, []}
       },
       "Memex" => %{
         "random quote" => {Flamelex.Memex, :random_quote, []}

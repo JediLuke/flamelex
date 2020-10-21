@@ -2,7 +2,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
   @moduledoc """
   The Memex can load different environments.
   """
-  alias Flamelex.GUI.Structs.Frame
+  # alias Flamelex.GUI.Structs.Frame
 
   #NOTE: Here's a little reminder...
   # the __using__ macro allows us to `use ComponentBehaviour` and automatically
@@ -119,7 +119,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
   # %Frame{} datastructure. This function takes in that Component definition
   # and returns a %Scenic.Graph{} which can be drawn by Scenic.
   """
-  @callback render(%Frame{}) :: %Scenic.Graph{}
+  @callback render(%Flamelex.GUI.Structs.Frame{}) :: %Scenic.Graph{}
 
   @doc """
   This function may be implemented as many times as necessary, to handle

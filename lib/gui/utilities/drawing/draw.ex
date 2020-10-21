@@ -129,26 +129,6 @@ defmodule Flamelex.GUI.Utilities.Draw do
                font_size: 24, fill: :blue)
   end
 
-  # def render_inner_buffer(
-  #       %Scenic.Graph{} = graph,
-  #       %Frame{
-  #         dimensions:  %Dimensions{width: frame_width, height: frame_height},
-  #         coordinates: %Coordinates{x: frame_x, y: frame_y},
-  #         buffer:      %Buffer{type: :text} = buf
-  #       },
-  #       bar_height
-  #     ) do
-
-  #         #TODO right now the text runs outside of the frame! We need to use dimensions here somehow to limit the size of the draw
-  #         graph
-  #         |> Scenic.Primitives.text(
-  #              buf.content,
-  #                font: @ibm_plex_mono,
-  #                translate: {frame_x + 5, frame_y + bar_height + 22}, # text draws from bottom-left corner?? :( also, how high is it???
-  #                font_size: 24,
-  #                fill: :ghost_white)
-  # end
-
 
 
   # def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}, color) when is_atom(color) do
@@ -172,15 +152,6 @@ end
 
 
 
-#   def add_buffer_frame(%Graph{} = graph, %BufferFrame{} = data) do
-#     #TODO do we need +1 for width here??
-#     frame_height = Application.fetch_env!(:franklin, :bar_height)
-#     graph
-#     # |> rect({w, h-frame_height}, stroke: {3, :cornflower_blue})
-#     |> rect({data.width + 1, frame_height}, translate: {0, data.height-frame_height}, fill: :light_blue)
-#     |> text(data.name, translate: {0+2, data.height-4}, fill: :black)
-#   end
-# end
 
 
 

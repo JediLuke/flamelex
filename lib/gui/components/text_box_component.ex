@@ -4,6 +4,8 @@ defmodule Flamelex.GUI.Component.TextBox do
   require Logger
   use Flamelex.ProjectAliases
 
+  @ibm_plex_mono GUI.FontHelpers.font(:ibm_plex_mono)
+
   #TODO have horizontal scrolling if we go over the line
   def draw(graph, {frame, data}) do
     add_to_graph(graph, {frame, data})
@@ -22,20 +24,92 @@ defmodule Flamelex.GUI.Component.TextBox do
 
   @doc false
   def init({%Frame{} = f, data} = state, _opts) do
-    Logger.info "#{__MODULE__} initializing...#{inspect state}"
+    Logger.info "#{__MODULE__} initializing..."
 
     # GenServer.call(GUI.Scene.Root, {:register, id})
     # state =
     #   data
+    left_margin = 8
 
     graph =
       Scenic.Graph.build()
       |> Draw.background(f, :red)
+      |> Scenic.Primitives.text(data,
+                 font: @ibm_plex_mono,
+                 translate: {f.coordinates.x + left_margin, f.coordinates.y + 22}, # text draws from bottom-left corner?? :( also, how high is it???
+                 font_size: 24,
+                 fill: :ghost_white)
+
       # |> GUI.Component.Cursor.add_to_graph(data |> cursor_params())
 
 
     {:ok, {state, graph}, push: graph}
   end
+
+
+  #         #TODO right now the text runs outside of the frame! We need to use dimensions here somehow to limit the size of the draw
+  #         graph
+  #         |> Scenic.Primitives.text(
+  #              buf.content,
+  #                font: @ibm_plex_mono,
+  #                translate: {frame_x + 5, frame_y + bar_height + 22}, # text draws from bottom-left corner?? :( also, how high is it???
+  #                font_size: 24,
+  #                fill: :ghost_white)
+
+
+
+
+
+#   def add_buffer_frame(%Graph{} = graph, %BufferFrame{} = data) do
+#     #TODO do we need +1 for width here??
+#     frame_height = Application.fetch_env!(:franklin, :bar_height)
+#     graph
+#     # |> rect({w, h-frame_height}, stroke: {3, :cornflower_blue})
+#     |> rect({data.width + 1, frame_height}, translate: {0, data.height-frame_height}, fill: :light_blue)
+#     |> text(data.name, translate: {0+2, data.height-4}, fill: :black)
+#   end
+# end
+
+
+
+
+    # def render_inner_buffer(
+  #       %Scenic.Graph{} = graph,
+  #       %Frame{
+  #         dimensions:  %Dimensions{width: frame_width, height: frame_height},
+  #         coordinates: %Coordinates{x: frame_x, y: frame_y},
+  #         buffer:      %Buffer{type: :text} = buf
+  #       },
+  #       bar_height
+  #     ) do
+
+  #         #TODO right now the text runs outside of the frame! We need to use dimensions here somehow to limit the size of the draw
+  #         graph
+  #         |> Scenic.Primitives.text(
+  #              buf.content,
+  #                font: @ibm_plex_mono,
+  #                translate: {frame_x + 5, frame_y + bar_height + 22}, # text draws from bottom-left corner?? :( also, how high is it???
+  #                font_size: 24,
+  #                fill: :ghost_white)
+  # end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   # def init(%{id: id, top_left_corner: {_x, _y}, dimensions: {w, h}} = data, _opts) do
   # end
 

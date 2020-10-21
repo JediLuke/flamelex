@@ -7,7 +7,7 @@ defmodule Flamelex.GUI.FontHelpers do
   @priv_dir @project_root_dir <> "/priv"
 
   #TODO font stuff should probably live more in here, less in Initialize
-  def font(:ibm_plex_mono), do: GUI.Initialize.ibm_plex_mono_hash
+  def font(:ibm_plex_mono), do: Flamelex.GUI.Initialize.ibm_plex_mono_hash
 
   def get_max_box_for_ibm_plex(font_size_in_px) do
     font_metrics =
