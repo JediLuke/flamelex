@@ -9,17 +9,14 @@ defmodule Flamelex.InputHandler do
   require Logger
   use Flamelex.ProjectAliases
   use Flamelex.GUI.ScenicEventsDefinitions
-
   alias Flamelex.Structs.OmegaState
 
 
-  @readme "/Users/luke/workbench/elixir/franklin/README.md"
-  @dev_tools "/Users/luke/workbench/elixir/franklin/lib/utilities/dev_tools.ex"
+  # @readme "/Users/luke/workbench/elixir/franklin/README.md"
+  # @dev_tools "/Users/luke/workbench/elixir/franklin/lib/utilities/dev_tools.ex"
 
 
-  # def identity(%OmegaState{} = omega) do
-  #   omega
-  # end
+  @leader_key @space_bar
 
 
   ## -------------------------------------------------------------------
@@ -39,27 +36,51 @@ defmodule Flamelex.InputHandler do
   ## -------------------------------------------------------------------
 
 
-  def handle_input(%OmegaState{mode: :normal} = state, @space_bar) do
-    # we need to do 2 separate things here,
-    # 1) Send a msg to CommandBuffer (separate process) to show itself
-    # 2) Update the state of the Scene.Root, because this state affects
-    #    what future inputs get mapped to
-    Logger.info "Space bar was pressed !!"
-    Flamelex.Commander.activate()
-    state |> OmegaState.set(mode: :command)
+  def handle_input(%OmegaState{mode: :normal} = state, @leader_key = input) do
+    Logger.info "Leader was pressed !!"
+
+    state
+    |> OmegaState.add_to_history(input)
   end
 
-  def handle_input(%OmegaState{mode: :normal} = state, @lowercase_h) do
-    Logger.info "Lowercase h was pressed !!"
-    Flamelex.Buffer.load(type: :text, file: @readme)
+  def handle_input(%OmegaState{mode: :normal, input: %{history: [@leader_key | _rest]}} = state, @lowercase_k = input) do
+    Logger.info "Activating CommandBufr..."
+    Flamelex.CommandBufr.show()
+
     state
+    |> OmegaState.add_to_history(input)
+    |> OmegaState.set(mode: :command)
   end
 
-  def handle_input(%OmegaState{mode: :normal} = state, @lowercase_d) do
-    Logger.info "Lowercase d was pressed !!"
-    Flamelex.Buffer.load(type: :text, file: @dev_tools)
-    state
-  end
+
+
+
+  # def handle_input(%OmegaState{mode: :normal} = state, @space_bar) do
+  #   # we need to do 2 separate things here,
+  #   # 1) Send a msg to CommandBuffer (separate process) to show itself
+  #   # 2) Update the state of the Scene.Root, because this state affects
+  #   #    what future inputs get mapped to
+  #   Logger.info "Space bar was pressed !!"
+  #   Flamelex.Commander.activate()
+  #   state |> OmegaState.set(mode: :command)
+  # end
+
+  # def handle_input(%OmegaState{mode: :normal} = state, @lowercase_h) do
+  #   Logger.info "Lowercase h was pressed !!"
+  #   Flamelex.Buffer.load(type: :text, file: @readme)
+  #   state
+  # end
+
+  # def handle_input(%OmegaState{mode: :normal} = state, @lowercase_d) do
+  #   Logger.info "Lowercase d was pressed !!"
+  #   Flamelex.Buffer.load(type: :text, file: @dev_tools)
+  #   state
+  # end
+
+
+
+
+
 
   # This function acts as a catch-all for all actions that don't match
   # anything. Without this, the process which calls this can crash (!!)

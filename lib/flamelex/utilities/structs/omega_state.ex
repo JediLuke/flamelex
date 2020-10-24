@@ -28,4 +28,9 @@ defmodule Flamelex.Structs.OmegaState do
     #TODO should be done with changesets...
     %{omega_state|mode: new_mode}
   end
+
+  #TODO cap the length of this list
+  def add_to_history(omega, input) do
+    put_in(omega.input.history, omega.input.history ++ [input])
+  end
 end
