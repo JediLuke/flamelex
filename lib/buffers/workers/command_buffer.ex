@@ -32,6 +32,28 @@ defmodule Flamelex.Buffer.Command do
     {:ok, buf}
   end
 
+  def show do
+    #NOTE: This function being here, on the buffer itself, is really just
+    #      for convenience for external API users. Showing or Hiding the
+    #      Command buffer doesn't have anything to do with the buffer
+    #      process itself, it's entirely controlled by the GUI.
+    # GUI.Controller.show(:command_buffer)
+    #TODO this should probably check this component exists first - not such
+    # a big deal for CommmandBuffer, but in general
+    #TODO this *does* have to go through GUI.Controller because it needs to update the mode
+    GUI.Controller.show_cmd_buf()
+    # GenServer.cast(Flamelex.GUI.Component.CommandBuffer, :show)
+  end
+
+  def hide do
+    GUI.Controller.hide_cmd_buf()
+  end
+
+  # def handle_cast(:show, state) do
+  #   # deactivate() #TODO this will send :update_content and :reset_cursor again!!
+  #   {:noreply, state}
+  # end
+
   # def handle_continue(:init_gui, buf) do
   #   GUI.Component.CommandBuffer.initialize(buf)   # start the Scenic.Component process
   #   {:noreply, buf}

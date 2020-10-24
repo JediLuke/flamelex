@@ -4,14 +4,19 @@ defmodule Flamelex.GUI.Structs.GUIControlState do
   """
   use Flamelex.ProjectAliases
 
-
-  @fields [
-    viewport: %Dimensions{},
-      layout: %Layout{},
-       graph: %Scenic.Graph{}
+  @valid_modes [
+    :edit, :command, :select
   ]
 
-  defstruct @fields
+
+  @components [
+    viewport: nil, # %Dimensions{},
+      layout: nil, # %Layout{},
+       graph: nil, # %Scenic.Graph{},
+        mode: nil
+  ]
+
+  defstruct @components
 
   @doc """
   Return the default initial state for the `GUI.Controller`
@@ -20,7 +25,8 @@ defmodule Flamelex.GUI.Structs.GUIControlState do
     %__MODULE__{
       viewport: vp,
       layout: Layout.default(vp),
-      graph: Draw.blank_graph()
+      graph: Draw.blank_graph(),
+      mode: :edit
     }
   end
 end

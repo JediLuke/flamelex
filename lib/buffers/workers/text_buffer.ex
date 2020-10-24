@@ -49,7 +49,6 @@ defmodule Flamelex.Buffer.Text do
     {:reply, state.data, state}
   end
 
-  @impl GenServer
   def handle_call({:modify, {:insert, new_text, insertion_site}}, _from, state) do
 
     insert_text_function =
@@ -63,8 +62,26 @@ defmodule Flamelex.Buffer.Text do
         |> Map.update!(:data, insert_text_function)
         |> Map.put(:unsaved_changes?, true)
 
-    #TODO make the modifications appear in GUI
-    #   Flamelex.GUI.Controller.show_fullscreen(new_state)
+    GUI.Controller.refresh({:buffer, state.name})
+    # GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
+
+    {:reply, :ok, new_state}
+  end
+
+  #TODO so now we have the question, is the first position 0 or 1???
+  def handle_call({:modify, {:delete, [from: a, to: b]}}, _from, state) when b >= a and a >= 0 do
+
+    {before_split, _after_split} = state.data |> String.split_at(a)
+    {_before_split, after_split} = state.data |> String.split_at(b)
+
+    text_after_deletion = before_split <> after_split
+
+    new_state =
+        state
+        |> Map.put(:data, text_after_deletion)
+
+    GUI.Controller.refresh({:buffer, state.name})
+
     {:reply, :ok, new_state}
   end
 

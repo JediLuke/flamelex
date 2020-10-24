@@ -6,9 +6,17 @@ defmodule Flamelex.Memex.Journal do
 
   @journal_month Journal.October2020
 
+  @my_memex Flamelex.Memex.My.memex_env()
+
+  def today do
+    @my_memex.timezone
+    |> DateTime.now!()
+  end
+
   def todays_entry do
     #TODO hey this is pretty neat!!!
-    Module.concat(Memex.My.memex_env(), @journal_month).friday10_text()
+    #TODO would be cooler if auto-loadable at runtime ?
+    Module.concat(@my_memex, @journal_month).friday10_text()
   end
 
   def timestamp do

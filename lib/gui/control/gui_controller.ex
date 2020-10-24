@@ -10,6 +10,7 @@ defmodule Flamelex.GUI.Controller do
   alias GUI.Component.MenuBar
   require Logger
   import Flamelex.GUI.Utilities.ControlHelper
+  import Scenic.Primitives
 
 
 
@@ -28,6 +29,19 @@ defmodule Flamelex.GUI.Controller do
   def show(x) do
     GenServer.cast(__MODULE__, {:show, x})
   end
+
+  def refresh(buf) do
+    GenServer.cast(__MODULE__, {:refresh, buf})
+  end
+
+  def show_cmd_buf do
+    GenServer.cast(__MODULE__, {:show, :command_buffer})
+  end
+
+  def hide_cmd_buf do
+    GenServer.cast(__MODULE__, {:hide, :command_buffer})
+  end
+
 
 
   ## GenServer callbacks
@@ -97,7 +111,63 @@ defmodule Flamelex.GUI.Controller do
     {:reply, state.layout.frames, state}
   end
 
+  def handle_cast({:show, :command_buffer}, state) do
+
+
+    #NOTE: Ok, so, this approach was wrong...
+    #      our issue is that we need to change the mode to :command, and the
+    #      instinct is to modify the graph here too - this is incorrect.
+    #      CommandBufr is a Scenic.Component responsible for managing it's
+    #      own graph, so we have to forward on a msg to that component to
+    #      make the change, but we can't actually do it here.
+
+    # IO.puts "SHOW CMD BUF"
+    # new_graph =
+    #   state.graph
+    #   |> IO.inspect(label: "LABEL: GRAPH")
+    #   |> Scenic.Graph.modify(:command_buffer, &update_opts(&1, hidden: false))
+    #   #TODO find where we add this group to this levels' graph & give it an id
+    #   # |> Scenic.Graph.modify(:command_buffer, fn x ->
+    #   #       IO.puts "WE'RE DOING IT"
+    #   #       IO.inspect x
+    #   # end)
+
+    # Flamelex.GUI.RootScene.redraw(new_graph)
+    GUI.Component.CommandBuffer.show
+
+    {:noreply, %{state|mode: :command}}
+  end
+
+  def handle_cast({:hide, :command_buffer}, state) do
+
+    new_graph =
+      state.graph
+      |> Scenic.Graph.modify(:command_buffer, &update_opts(&1, hidden: true))
+
+    Flamelex.GUI.RootScene.redraw(new_graph)
+
+    {:noreply, %{state|graph: new_graph, mode: :normal}}
+  end
+
   def handle_cast({:show, {:buffer, filename} = buf}, state) do
+
+    data  = Buffer.read(buf)
+    frame = calculate_framing(filename, state.layout)
+
+    new_graph =
+      state.graph
+      |> GUI.Component.TextBox.draw({frame, data})
+      # |> Draw.test_pattern()
+
+    Flamelex.GUI.RootScene.redraw(new_graph)
+
+    {:noreply, %{state|graph: new_graph}}
+  end
+
+
+  #TODO so, I'm pretty sure this is just adding more & more shit to the graph,
+  # never taking it away...
+  def handle_cast({:refresh, {:buffer, filename} = buf}, state) do
 
     data  = Buffer.read(buf)
     frame = calculate_framing(filename, state.layout)
@@ -145,7 +215,21 @@ defmodule Flamelex.GUI.Controller do
   end
 
 
+    # new_graph =
+    #   state.graph
+    #   |> GUI.Component.TextBox.draw({frame, data})
 
+
+    # case GUI.Root.Reducer.process(state, action) do
+    #   # :ignore_action
+    #   #     -> {:noreply, {scene, graph}}
+    #   # {:update_state, new_scene} when is_map(new_scene)
+    #   #     -> {:noreply, {new_scene, graph}}
+    #   {:redraw_root_scene, %{graph: new_graph} = new_state}  ->
+    #     Flamelex.GUI.RootScene.redraw(new_graph)
+    #     {:noreply, new_state}
+    #   # {:update_state_and_graph, {new_scene, %Scenic.Graph{} = new_graph}} when is_map(new_scene)
+    #   #     -> {:noreply, {new_scene, new_graph}, push: new_graph}
 
 
 

@@ -8,6 +8,7 @@ defmodule Flamelex.GUI.Utilities.ControlHelper do
     # |> GUI.Component.CommandBuffer.draw(viewport: vp)
     # |> GUI.Component.CommandBuffer.draw(state)
     |> mount_menubar(vp)
+    |> mount_command_buffer(vp)
   end
 
 
@@ -36,6 +37,16 @@ defmodule Flamelex.GUI.Utilities.ControlHelper do
             #TODO
             # buffer: %ListBuffer{},
             top_left: {0, 0},
+            size:     {vp.width, GUI.Component.MenuBar.height()}))
+  end
+
+  defp mount_command_buffer(graph, vp) do
+    graph
+    #DEVELOPING a new component
+    # Step 1 - figure out where you want to mount the component. #TODO this should be a layer I guess...
+    |> GUI.Component.CommandBuffer.mount(
+          Frame.new(
+            top_left: {0, vp.height - GUI.Component.MenuBar.height()},
             size:     {vp.width, GUI.Component.MenuBar.height()}))
   end
 end

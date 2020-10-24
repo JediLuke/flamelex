@@ -5,14 +5,16 @@ defmodule Flamelex.GUI.Component.CommandBuffer.Reducer do
   mutated state and/or graph.
   """
   alias Scenic.Graph
-  alias GUI.Component.CommandBuffer.DrawingHelpers
+  alias Flamelex.GUI.Component.CommandBuffer.DrawingHelpers
   import Scenic.Primitives
   require Logger
   use Flamelex.ProjectAliases
 
+
   @component_id :command_buffer
-  @cursor_component_id {:command_buffer, :cursor, 1}
-  @text_field_id {:command_buffer, :text_field}
+
+  @cursor_component_id {@component_id, :cursor, 1}
+  @text_field_id {@component_id, :text_field}
 
   @command_mode_background_color :cornflower_blue
 

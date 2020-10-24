@@ -35,7 +35,8 @@ defmodule Flamelex.GUI.Component.MenuBar do
         "show cmder" => {GUI.CommandBuffer, :show, []}
       },
       "Memex" => %{
-        "random quote" => {Flamelex.Memex, :random_quote, []}
+        "random quote" => {Flamelex.Memex, :random_quote, []},
+        "journal" => {Flamelex.Memex.Journal, :today, []}
       },
       "GUI" => %{}, #TODO auto-generate it from the GUI file
       "Buffer" => %{
