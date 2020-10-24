@@ -9,6 +9,7 @@ defmodule Flamelex.Buffer.Text do
 
   def start_link(params) do
     name = ProcessRegistry.via_tuple(gen_tag(params))
+    # name = ProcessRegistry.register({:buffer, gen_tag(params)})
     GenServer.start_link(__MODULE__, params, name: name)
   end
 

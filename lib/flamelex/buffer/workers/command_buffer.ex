@@ -10,10 +10,12 @@ defmodule Flamelex.Buffer.Command do
   use Flamelex.ProjectAliases
   require Logger
 
+  @buffer_id :command_buffer
 
   def start_link([] = _default_params) do
     # initial_buffer_state = Buffer.new(:command)
-    initial_state = %{}
+    initial_state = %{data: ""}
+    # name = ProcessRegistry.register2(:buffer, @buffer_id)
     GenServer.start_link(__MODULE__, initial_state)
   end
 
@@ -26,29 +28,23 @@ defmodule Flamelex.Buffer.Command do
   def init(buf) do
     IO.puts "#{__MODULE__} initializing...\n" # NOTE: This is the last process we boot in the initial supervision tree, so in thie special case we add a `\n` character to the log output, just for neatness.
 
-    Process.register(self(), __MODULE__)  # the Commander is a little special, doesn't use gproc
+    # Process.register(self(), __MODULE__)  # the Commander is a little special, doesn't use gproc
     #TODO link to the command buffer GUI process - can we just use grpoc to talk to it??
+
+    #TODO do this via via_tuple??
+    ProcessRegistry.register2(:buffer, @buffer_id)
 
     {:ok, buf}
   end
 
-  def show do
-    #NOTE: This function being here, on the buffer itself, is really just
-    #      for convenience for external API users. Showing or Hiding the
-    #      Command buffer doesn't have anything to do with the buffer
-    #      process itself, it's entirely controlled by the GUI.
-    # GUI.Controller.show(:command_buffer)
-    #TODO this should probably check this component exists first - not such
-    # a big deal for CommmandBuffer, but in general
-    #TODO this *does* have to go through GUI.Controller because it needs to update the mode
-    GUI.Controller.show_cmd_buf()
-    # GenServer.cast(Flamelex.GUI.Component.CommandBuffer, :show)
-  end
 
-  def hide do
-    GUI.Controller.hide_cmd_buf()
-  end
+  # def handle_call(:read_contents, _from, %{data: nil} = state) do
+  #   {:reply, "", state}
+  # end
 
+  def handle_call(:read_contents, _from, %{data: data} = state) do
+    {:reply, data, state}
+  end
   # def handle_cast(:show, state) do
   #   # deactivate() #TODO this will send :update_content and :reset_cursor again!!
   #   {:noreply, state}

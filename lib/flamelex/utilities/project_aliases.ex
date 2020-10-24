@@ -10,9 +10,11 @@ defmodule Flamelex.ProjectAliases do
       alias Flamelex.Structs.{Buffer}
 
       alias Flamelex.{Buffer, GUI, Memex}
-      alias Flamelex.Buffer.Command, as: CommandBufr #TODO just rename this everywhere
 
       alias Flamelex.Memex.Journal
+
+      # alias Flamelex.Buffer.Command, as: CommandBufr #TODO just rename this everywhere
+      alias Flamelex.CommandBufr
 
       alias Flamelex.Utilities.ProcessRegistry
 

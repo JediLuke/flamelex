@@ -23,18 +23,6 @@ defmodule Flamelex.GUI do
     def move(frame_id),        do: GUIControl.action({:move_frame, frame_id, :right_and_down_25_px})
   end
 
-  defmodule CommandBuffer do
-
-    #TODO this is failing
-    def show,                  do: GenServer.cast(CmdBuffer, :show)
-    def hide,                  do: GenServer.cast(CmdBuffer, :hide)
-
-    def enter_character(char), do: GenServer.cast(CmdBuffer, {:enter_char, char})
-    def backspace,             do: GenServer.cast(CmdBuffer, :backspace)
-    def reset_text_field,      do: GenServer.cast(CmdBuffer, :reset_text_field)
-    def execute_contents,      do: GenServer.cast(CmdBuffer, :execute_contents)
-  end
-
   defmodule MenuBar do
     def show, do: Flamelex.GUI.Component.MenuBar.action(:show)
     def hide, do: Flamelex.GUI.Component.MenuBar.action(:hide)

@@ -111,7 +111,7 @@ defmodule Flamelex.GUI.Controller do
     {:reply, state.layout.frames, state}
   end
 
-  def handle_cast({:show, :command_buffer}, state) do
+  def handle_cast({:show, {:command_buffer, _data}}, state) do
 
 
     #NOTE: Ok, so, this approach was wrong...

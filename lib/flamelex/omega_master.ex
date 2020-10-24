@@ -7,6 +7,15 @@ defmodule Flamelex.OmegaMaster do
 
   All inputs get sent here, & then thrown into the Omega.Reducer (along with
   the OmegaState, which represents the global-variables for Flamelex).
+
+  What belongs in the domain of OmegaState? Anything which affects both
+  buffers & GUI components. e.g. opening the Command buffer requires:
+
+  * changing the input mode
+  * checking the contents of `Flamelex.Buffer.Command`
+  * rendering the GUI.Component
+
+
   """
   use GenServer
   require Logger
@@ -17,6 +26,14 @@ defmodule Flamelex.OmegaMaster do
   def start_link(_params) do
     initial_state = OmegaState.init()
     GenServer.start_link(__MODULE__, initial_state)
+  end
+
+  def show(:command_buffer = x) do
+    GenServer.cast(__MODULE__, {:show, x})
+  end
+
+  def hide(:command_buffer = x) do
+    GenServer.cast(__MODULE__, {:hide, x})
   end
 
   @doc """
@@ -59,6 +76,31 @@ defmodule Flamelex.OmegaMaster do
       |> Flamelex.InputHandler.handle_input(input)
 
     {:noreply, new_omega_state}
+  end
+
+  def handle_cast({:show, :command_buffer = _x}, omega_state) do
+    # IO.inspect omega_state, label: "PS"
+    case Buffer.read(:command_buffer) do
+      data when is_bitstring(data) ->
+        #TODO so this should then be responsible for managing the buffer process (starting/stopping/finding if sleeping) nd causing it to refresh, whilst also making it visible by forcing a redraw
+        GUI.Controller.show({:command_buffer, data})
+        {:noreply, %{omega_state|mode: :command}}
+      e ->
+        raise "Unable to read Buffer.Command. #{inspect e}"
+    end
+  end
+
+  def handle_cast({:hide, :command_buffer = _x}, omega_state) do
+    #NOTE: This function being here, on the buffer itself, is really just
+    #      for convenience for external API users. Showing or Hiding the
+    #      Command buffer doesn't have anything to do with the buffer
+    #      process itself, it's entirely controlled by the GUI.
+    # GUI.Controller.show(:command_buffer)
+    #TODO this should probably check this component exists first - not such
+    # a big deal for CommmandBuffer, but in general
+    #TODO this *does* have to go through GUI.Controller because it needs to update the mode
+    GUI.Controller.show_cmd_buf()
+    # GenServer.cast(Flamelex.GUI.Component.CommandBuffer, :show)
   end
 
   # def handle_cast({:action, a}, omega_state) do
