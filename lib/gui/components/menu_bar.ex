@@ -32,7 +32,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
     %{
       "Flamelex" => %{
         "temet nosce" => {Flamelex, :temet_nosce, []},
-        "show cmder" => {GUI.CommandBuffer, :show, []}
+        "show cmder" => {Flamelex.CommandBufr, :show, []}
       },
       "Memex" => %{
         "random quote" => {Flamelex.Memex, :random_quote, []},

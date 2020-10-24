@@ -78,29 +78,24 @@ defmodule Flamelex.OmegaMaster do
     {:noreply, new_omega_state}
   end
 
-  def handle_cast({:show, :command_buffer = _x}, omega_state) do
-    # IO.inspect omega_state, label: "PS"
+  #TODO maybe x will be worth considering eventually???
+  def handle_cast({:show, :command_buffer}, omega_state) do
+    IO.puts "SHOWING BUFF"
     case Buffer.read(:command_buffer) do
       data when is_bitstring(data) ->
         #TODO so this should then be responsible for managing the buffer process (starting/stopping/finding if sleeping) nd causing it to refresh, whilst also making it visible by forcing a redraw
-        GUI.Controller.show({:command_buffer, data})
+        # GUI.Controller.show({:command_buffer, data})
+        Flamelex.GUI.Component.CommandBuffer.show()
         {:noreply, %{omega_state|mode: :command}}
       e ->
         raise "Unable to read Buffer.Command. #{inspect e}"
     end
   end
 
-  def handle_cast({:hide, :command_buffer = _x}, omega_state) do
-    #NOTE: This function being here, on the buffer itself, is really just
-    #      for convenience for external API users. Showing or Hiding the
-    #      Command buffer doesn't have anything to do with the buffer
-    #      process itself, it's entirely controlled by the GUI.
-    # GUI.Controller.show(:command_buffer)
-    #TODO this should probably check this component exists first - not such
-    # a big deal for CommmandBuffer, but in general
-    #TODO this *does* have to go through GUI.Controller because it needs to update the mode
-    GUI.Controller.show_cmd_buf()
-    # GenServer.cast(Flamelex.GUI.Component.CommandBuffer, :show)
+  def handle_cast({:hide, :command_buffer}, omega_state) do
+    # GUI.Controller.hide(:command_buffer)
+    Flamelex.GUI.Component.CommandBuffer.hide()
+    {:noreply, %{omega_state|mode: :normal}}
   end
 
   # def handle_cast({:action, a}, omega_state) do

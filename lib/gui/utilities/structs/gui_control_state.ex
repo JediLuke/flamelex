@@ -1,6 +1,14 @@
 defmodule Flamelex.GUI.Structs.GUIControlState do
   @moduledoc """
   Struct which holds the state of the `GUI.Controller`.
+
+  ## A quick note on modes
+
+  Resist the temptation to put a mode here! I have tried it, and it is a
+  bad idea. If you find yourself leaning that way, look to put the functionality
+  in the OmegaMaster instead. The GUI has no modes - only the application.
+  GUI very simply module, with big warm fuzzy secret job - it just renders
+  the GUI.
   """
   use Flamelex.ProjectAliases
 
@@ -12,8 +20,7 @@ defmodule Flamelex.GUI.Structs.GUIControlState do
   @components [
     viewport: nil, # %Dimensions{},
       layout: nil, # %Layout{},
-       graph: nil, # %Scenic.Graph{},
-        mode: nil
+       graph: nil, # %Scenic.Graph{}
   ]
 
   defstruct @components
@@ -25,8 +32,7 @@ defmodule Flamelex.GUI.Structs.GUIControlState do
     %__MODULE__{
       viewport: vp,
       layout: Layout.default(vp),
-      graph: Draw.blank_graph(),
-      mode: :edit
+      graph: Draw.blank_graph()
     }
   end
 end

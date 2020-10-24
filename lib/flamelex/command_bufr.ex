@@ -4,31 +4,41 @@ defmodule Flamelex.CommandBufr do
   to the CommandBufr.
   """
 
+  @doc """
+  Make the CommandBufr visible.
+  """
   def show do
-    IO.puts "HWRE"
+    #TODO we should be checking the process is alive or something??
     Flamelex.OmegaMaster.show(:command_buffer)
+  end
+
+  @doc """
+  The difference between this function and hide is that hide simply makes
+  the CommandBufr invisible in the GUI, but usually when we want it to go
+  away we also want to forget all the state in the CommandBuffer - like
+  when you mash escape to go back to :edit mode
+  """
+  def deactivate do
+    clear()
+    hide()
+  end
+
+  @doc """
+  Resets the text field to an empty string.
+  """
+  def clear do
+    Flamelex.Buffer.Command.clear()
   end
 
   def hide do
     Flamelex.OmegaMaster.hide(:command_buffer)
   end
+
+  def input(x) when is_bitstring(x) do
+    Flamelex.Buffer.Command.cast({:input, x})
+  end
+
+  #   def backspace,             do: GenServer.cast(CmdBuffer, :backspace)
+  #   def execute_contents,      do: GenServer.cast(CmdBuffer, :execute_contents)
+
 end
-
-# defmodule CommandBufr do
-
-#   #TODO this is failing
-#   #TODO publish to this, then both GUI.Controller must handle it & Buffer.Manager
-#   # def show,                  do: how
-
-#   def show do
-#     GUIControl.
-#   end
-
-
-#   def hide,                  do: GenServer.cast(CmdBuffer, :hide)
-
-#   def enter_character(char), do: GenServer.cast(CmdBuffer, {:enter_char, char})
-#   def backspace,             do: GenServer.cast(CmdBuffer, :backspace)
-#   def reset_text_field,      do: GenServer.cast(CmdBuffer, :reset_text_field)
-#   def execute_contents,      do: GenServer.cast(CmdBuffer, :execute_contents)
-# end

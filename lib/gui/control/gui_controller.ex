@@ -30,6 +30,10 @@ defmodule Flamelex.GUI.Controller do
     GenServer.cast(__MODULE__, {:show, x})
   end
 
+  def hide(x) do
+    GenServer.cast(__MODULE__, {:hide, x})
+  end
+
   def refresh(buf) do
     GenServer.cast(__MODULE__, {:refresh, buf})
   end
@@ -135,19 +139,19 @@ defmodule Flamelex.GUI.Controller do
     # Flamelex.GUI.RootScene.redraw(new_graph)
     GUI.Component.CommandBuffer.show
 
-    {:noreply, %{state|mode: :command}}
+    {:noreply, state}
   end
 
-  def handle_cast({:hide, :command_buffer}, state) do
+  # def handle_cast({:hide, :command_buffer}, state) do
 
-    new_graph =
-      state.graph
-      |> Scenic.Graph.modify(:command_buffer, &update_opts(&1, hidden: true))
+  #   new_graph =
+  #     state.graph
+  #     |> Scenic.Graph.modify(:command_buffer, &update_opts(&1, hidden: true))
 
-    Flamelex.GUI.RootScene.redraw(new_graph)
+  #   Flamelex.GUI.RootScene.redraw(new_graph)
 
-    {:noreply, %{state|graph: new_graph, mode: :normal}}
-  end
+  #   {:noreply, %{state|graph: new_graph}}
+  # end
 
   def handle_cast({:show, {:buffer, filename} = buf}, state) do
 

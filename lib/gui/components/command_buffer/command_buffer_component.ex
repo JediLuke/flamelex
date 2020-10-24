@@ -35,7 +35,13 @@ defmodule Flamelex.GUI.Component.CommandBuffer do
   end
 
   def show do
+    #TODO this should be checking if the process exists (& will be, when we wrap it all up into component behaviour)
     GenServer.cast(__MODULE__, :show)
+  end
+
+  def hide do
+    #TODO this should be checking if the process exists (& will be, when we wrap it all up into component behaviour)
+    GenServer.cast(__MODULE__, :hide)
   end
 
 
@@ -70,17 +76,22 @@ defmodule Flamelex.GUI.Component.CommandBuffer do
   #   |> add_to_graph(command_buffer)
   # end
   def handle_cast(:show, {state, graph}) do
+    IO.puts "FINAL SHOW????"
     new_graph =
       graph
-      |> Scenic.Graph.modify(:command_buffer, &update_opts(&1, hidden: false))
+      |> Scenic.Graph.modify(@component_id, &update_opts(&1, hidden: false))
+      |> Scenic.Graph.modify(@component_id, fn x ->
+        IO.inspect x, label: "COMPONENT ID"
+      end)
 
     {:noreply, {state, new_graph}, push: new_graph}
   end
 
   def handle_cast(:hide, {state, graph}) do
+    IO.puts "HIDE"
     new_graph =
       graph
-      |> Scenic.Graph.modify(:command_buffer, &update_opts(&1, hidden: true))
+      |> Scenic.Graph.modify(@component_id, &update_opts(&1, hidden: true))
 
     {:noreply, {state, new_graph}, push: new_graph}
   end

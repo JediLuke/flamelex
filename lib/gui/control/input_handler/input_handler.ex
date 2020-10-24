@@ -28,9 +28,8 @@ defmodule Flamelex.InputHandler do
 
 
   def handle_input(%OmegaState{mode: :command} = state, @escape_key) do
-    # Flamelex.Commander.deactivate()
-    Flamelex.Buffer.Command.hide()
-
+    IO.puts "ESCAPE IN CMD MODE"
+    Flamelex.CommandBufr.deactivate()
     state |> OmegaState.set(mode: :normal)
   end
 
@@ -68,6 +67,6 @@ defmodule Flamelex.InputHandler do
   def handle_input(%OmegaState{} = state, input) do
     Logger.warn "#{__MODULE__} recv'd unrecognised action/state combo. input: #{inspect input}, mode: #{inspect state.mode}"
     state # ignore
-    # |> IO.inspect(label: "-- DEBUG --")
+    |> IO.inspect(label: "-- DEBUG --")
   end
 end

@@ -19,6 +19,21 @@ defmodule Flamelex.Buffer.Command do
     GenServer.start_link(__MODULE__, initial_state)
   end
 
+  def find_pid do
+    ProcessRegistry.find!({:buffer, @buffer_id})
+  end
+
+  @doc """
+  Empty out the contents of the buffer.
+  """
+  def clear do
+    find_pid() |> GenServer.cast(:clear)
+  end
+
+  def cast(x) do
+    find_pid() |> GenServer.cast(x)
+  end
+
 
   ## GenServer callbacks
   ## -------------------------------------------------------------------
@@ -45,6 +60,28 @@ defmodule Flamelex.Buffer.Command do
   def handle_call(:read_contents, _from, %{data: data} = state) do
     {:reply, data, state}
   end
+
+  def handle_cast(:clear, state) do
+    {:noreply, %{state|data: ""}}
+  end
+
+  def handle_cast({:input, ii}, state) do
+    # new_state =
+    #   case state.data do
+    #     nil                   -> %{state|data: ii}                # enter the first character
+    #     ii when is_binary(ii) -> %{state|data: state.data <> ii}  # append the char to current content
+    #   end
+
+    # GUI.Component.CommandBuffer.action({:update_content, new_state.content})
+    # GUI.Component.CommandBuffer.action(:move_cursor)
+
+    {:noreply, case state.data do
+      nil                   -> %{state|data: ii}                # enter the first character
+      ii when is_binary(ii) -> %{state|data: state.data <> ii}  # append the char to current content
+    end}
+  end
+
+
   # def handle_cast(:show, state) do
   #   # deactivate() #TODO this will send :update_content and :reset_cursor again!!
   #   {:noreply, state}
@@ -72,17 +109,6 @@ defmodule Flamelex.Buffer.Command do
   #   {:noreply, new_buf}
   # end
 
-  # def handle_cast({:enter_char, char}, state) do
-  #   new_state =
-  #     case state.content do
-  #       nil                 -> %{state|content: char}                  # enter the first character
-  #       c when is_binary(c) -> %{state|content: state.content <> char} # append the char to current content
-  #     end
-
-  #   GUI.Component.CommandBuffer.action({:update_content, new_state.content})
-  #   GUI.Component.CommandBuffer.action(:move_cursor)
-  #   {:noreply, new_state}
-  # end
 
   # def handle_cast(:reset_text_field, buf) do
   #   new_buf =
