@@ -8,7 +8,6 @@ defmodule Flamelex.CommandBufr do
   Make the CommandBufr visible.
   """
   def show do
-    #TODO we should be checking the process is alive or something??
     Flamelex.OmegaMaster.show(:command_buffer)
   end
 
@@ -23,6 +22,10 @@ defmodule Flamelex.CommandBufr do
     hide()
   end
 
+  def hide do
+    Flamelex.OmegaMaster.hide(:command_buffer)
+  end
+
   @doc """
   Resets the text field to an empty string.
   """
@@ -30,15 +33,20 @@ defmodule Flamelex.CommandBufr do
     Flamelex.Buffer.Command.clear()
   end
 
-  def hide do
-    Flamelex.OmegaMaster.hide(:command_buffer)
-  end
-
-  def input(x) when is_bitstring(x) do
+  @doc """
+  Send input to the CommandBufr
+  """
+  def input(x) do
     Flamelex.Buffer.Command.cast({:input, x})
   end
 
+  @doc """
+  Execute the command in the CommandBufr
+  """
+  def execute do
+    Flamelex.Buffer.Command.cast(:execute)
+  end
+
   #   def backspace,             do: GenServer.cast(CmdBuffer, :backspace)
-  #   def execute_contents,      do: GenServer.cast(CmdBuffer, :execute_contents)
 
 end

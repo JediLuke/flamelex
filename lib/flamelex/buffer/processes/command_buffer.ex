@@ -9,6 +9,7 @@ defmodule Flamelex.Buffer.Command do
   use GenServer
   use Flamelex.ProjectAliases
   require Logger
+  alias Flamelex.GUI.Component.CommandBuffer, as: GUIComponent
 
   @buffer_id :command_buffer
 
@@ -35,6 +36,14 @@ defmodule Flamelex.Buffer.Command do
   end
 
 
+  #TODO how do we know when the pid of our counterpart GUI.Comnponent is?? Is it booted yet??
+    # def handle_continue(:init_gui, buf) do
+  #   GUI.Component.CommandBuffer.initialize(buf)   # start the Scenic.Component process
+  #   {:noreply, buf}
+  # end
+
+
+
   ## GenServer callbacks
   ## -------------------------------------------------------------------
 
@@ -57,29 +66,103 @@ defmodule Flamelex.Buffer.Command do
   #   {:reply, "", state}
   # end
 
-  def handle_call(:read_contents, _from, %{data: data} = state) do
+  def handle_call(:read, _from, %{data: data} = state) do
     {:reply, data, state}
   end
 
   def handle_cast(:clear, state) do
+
+  # defp reset_text_field(buf) do
+  #   new_buffer = %{buf|content: ""}
+
+  #   GUI.Component.CommandBuffer.action({:update_content, new_buffer.content})
+  #   GUI.Component.CommandBuffer.action(:reset_cursor)
+
+  #   new_buffer
+  # end
     {:noreply, %{state|data: ""}}
   end
 
-  def handle_cast({:input, ii}, state) do
+  def handle_cast(:execute, state) do
+    execute_command(state.data)
+    {:noreply, %{state|data: ""}}
+  end
+
+  def execute_command("temet nosce") do
+    IO.puts "!! Rebooting Flamelex !!"
+    Flamelex.temet_nosce()
+  end
+
+  def execute_command("new " <> something) do
+    case something do
+      "note" ->
+        raise "can't do new notes@!"
+      otherwise ->
+        IO.inspect otherwise
+        IO.puts "Making new things all the time!! What a lovething #{inspect something}"
+    end
+  end
+
+
+
+  # def execute_command("open") do
+  #   file_name = "/Users/luke/workbench/elixir/flamelex/README.md"
+  #   Logger.info "Opening a file... #{inspect file_name}"
+  #   Flamelex.CLI.open(file: file_name) # will open as the active buffer
+  # end
+
+  # def execute_command("edit") do
+  #   file_name = "/Users/luke/workbench/elixir/flamelex/README.md"
+
+  #   string = "Luke"
+  #   Flamelex.Buffer.Text.insert(file_name, string, after: 3)
+  # end
+
+
+
+
+  def execute_command(unrecognised_command) do
+    Logger.warn "#{__MODULE__} unrecognised command. Attempting to run as Elixir code... #{inspect unrecognised_command}"
+    Code.eval_string(unrecognised_command)
+  end
+
+
+
+
+
+  #TODO this input handling here is fkin stupid, should just be getting events by this stage
+  def handle_cast({:input, {:key, {_letter, :press, _num}}}, state) do
+
     # new_state =
     #   case state.data do
-    #     nil                   -> %{state|data: ii}                # enter the first character
-    #     ii when is_binary(ii) -> %{state|data: state.data <> ii}  # append the char to current content
+    #     nil                   -> %{state|data: letter}                # enter the first character
+    #     ii when is_binary(ii) -> %{state|data: state.data <> letter}  # append the char to current content
     #   end
 
+    # GUIComponent.update({:text, new_state.data})
     # GUI.Component.CommandBuffer.action({:update_content, new_state.content})
     # GUI.Component.CommandBuffer.action(:move_cursor)
 
-    {:noreply, case state.data do
-      nil                   -> %{state|data: ii}                # enter the first character
-      ii when is_binary(ii) -> %{state|data: state.data <> ii}  # append the char to current content
-    end}
+    # {:noreply, new_state}
+    {:noreply, state}
   end
+
+  def handle_cast({:input, {:codepoint, {letter, _num}}}, state) do
+
+    IO.puts "CODEPOINT"
+    new_state =
+      case state.data do
+        nil                   -> %{state|data: letter}                # enter the first character
+        ii when is_binary(ii) -> %{state|data: state.data <> letter}  # append the char to current content
+      end
+
+    GUIComponent.update({:text, new_state.data})
+    # GUI.Component.CommandBuffer.action({:update_content, new_state.content})
+    # GUI.Component.CommandBuffer.action(:move_cursor)
+
+    {:noreply, new_state}
+  end
+
 
 
   # def handle_cast(:show, state) do
@@ -87,35 +170,12 @@ defmodule Flamelex.Buffer.Command do
   #   {:noreply, state}
   # end
 
-  # def handle_continue(:init_gui, buf) do
-  #   GUI.Component.CommandBuffer.initialize(buf)   # start the Scenic.Component process
-  #   {:noreply, buf}
-  # end
+
+
 
 
   ## handle_cast
 
-
-  # def handle_cast(:activate, state) do
-  #   GUI.Component.CommandBuffer.action(:show)
-  #   {:noreply, state}
-  # end
-
-  # def handle_cast(:deactivate, buf) do
-  #   new_buf =
-  #     buf |> reset_text_field()
-
-  #   GUI.Component.CommandBuffer.action(:hide)
-  #   {:noreply, new_buf}
-  # end
-
-
-  # def handle_cast(:reset_text_field, buf) do
-  #   new_buf =
-  #     buf |> reset_text_field()
-
-  #   {:noreply, new_buf}
-  # end
 
 
   # # def handle_cast(:backspace, %Buffer{content: ""} = buf) do
@@ -174,11 +234,6 @@ defmodule Flamelex.Buffer.Command do
 
   # # end
 
-  # def handle_cast(:execute_contents, state) do
-  #   execute_command(state.content)
-  #   # deactivate() #TODO this will send :update_content and :reset_cursor again!!
-  #   {:noreply, state}
-  # end
 
   # # def new_note do
   # #   Franklin.BufferSupervisor.note(%{title: "", text: ""})
@@ -188,49 +243,6 @@ defmodule Flamelex.Buffer.Command do
   # #   Franklin.BufferSupervisor.list(:notes)
   # # end
 
-  # def execute_command("reboot") do
-  #   IO.puts "!! Rebooting Flamelex !!"
-  #   DevTools.restart_and_recompile()
-  # end
 
-  # # def execute_command("new_note") do #TODO change to tidbit, with note tags
-  # # def execute_command("list_notes") do
-  # # def execute_command("reload") do
-  # #         Logger.warn "Sending `kill` to GUI.Scene.Root..."
-  # #         IEx.Helpers.recompile
-  # #         Process.exit(Process.whereis(GUI.Scene.Root), :kill)
-  # #         {:noreply, state}
-  # # end
-  # # def execute_command("restart") do
-  # def execute_command("note") do
-  #   IO.puts "A new note!!"
-  #   :ok
-  # end
 
-  # def execute_command("open") do
-  #   file_name = "/Users/luke/workbench/elixir/flamelex/README.md"
-  #   Logger.info "Opening a file... #{inspect file_name}"
-  #   Flamelex.CLI.open(file: file_name) # will open as the active buffer
-  # end
-
-  # def execute_command("edit") do
-  #   file_name = "/Users/luke/workbench/elixir/flamelex/README.md"
-
-  #   string = "Luke"
-  #   Flamelex.Buffer.Text.insert(file_name, string, after: 3)
-  # end
-
-  # def execute_command(unrecognised_command) do
-  #   Logger.warn "#{__MODULE__} unrecognised command. Attempting to run as Elixir code... #{inspect unrecognised_command}"
-  #   Code.eval_string(unrecognised_command)
-  # end
-
-  # defp reset_text_field(buf) do
-  #   new_buffer = %{buf|content: ""}
-
-  #   GUI.Component.CommandBuffer.action({:update_content, new_buffer.content})
-  #   GUI.Component.CommandBuffer.action(:reset_cursor)
-
-  #   new_buffer
-  # end
 end

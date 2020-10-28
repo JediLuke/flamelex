@@ -8,6 +8,17 @@ defmodule Flamelex.Memex.Journal do
 
   @my_memex Flamelex.Memex.My.memex_env()
 
+  def now do
+    IO.puts hd(Flamelex.Memex.Episteme.EckhartTolle.quotes()).text
+
+
+    #TODO here, cut it in here
+
+    # This needs to find todays Journal entry & open it in a text buffer
+    Buffer.load(:text, "This is my Journal!", open_in_gui?: true)
+
+  end
+
   def today do
     @my_memex.timezone
     |> DateTime.now!()

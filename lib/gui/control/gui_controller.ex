@@ -155,7 +155,9 @@ defmodule Flamelex.GUI.Controller do
 
   def handle_cast({:show, {:buffer, filename} = buf}, state) do
 
+    IO.puts "KLIDS IN HE CAR"
     data  = Buffer.read(buf)
+    IO.inspect data
     frame = calculate_framing(filename, state.layout)
 
     new_graph =

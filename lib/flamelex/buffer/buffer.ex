@@ -31,19 +31,28 @@ defmodule Flamelex.Buffer do
   def open!(filepath) do
     Logger.info "Loading new text buffer for file: #{inspect filepath}..."
 
-    request_mgr =
-      BufferManager.open_buffer(%{
-        type: :text,
-        from_file: filepath,
-        open_in_gui?: true
-      })
+    open_buffer_result =
+        BufferManager.open_buffer(%{
+          type: :text,
+          from_file: filepath,
+          open_in_gui?: true
+        })
 
-    case request_mgr do
+    case open_buffer_result do
       {:ok, name} ->
         name
-      {:error, {:already_started, pid}} ->
+      {:error, {:already_started, _pid}} ->
         raise "Here we should just link to the alrdy open pid"
     end
+  end
+
+
+  def load(:text, data, open_in_gui?: gui?) do
+    BufferManager.open_buffer(%{
+      type: :text,
+      data: data,
+      open_in_gui?: gui?
+    })
   end
 
 
@@ -51,10 +60,16 @@ defmodule Flamelex.Buffer do
   @doc """
   Return the contents of a buffer.
   """
-
+  def read({:buffer, _id} = lookup_key) do
+    IO.puts "READ 2"
+    ProcessRegistry.find!(lookup_key)
+    |> IO.inspect(label: "pid")
+    |> GenServer.call(:read)
+  end
+  #NOTE: putting this first is a CLASSIC BLUNDER - infinite recursion
   def read(id) do
-    ProcessRegistry.find!({:buffer, id})
-    |> GenServer.call(:read_contents) #TODO rename this to just read
+    IO.puts "READ 1"
+    read({:buffer, id})
   end
   # def read(pid) when is_pid(pid) do
   #   pid

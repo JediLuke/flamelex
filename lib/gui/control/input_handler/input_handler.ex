@@ -25,7 +25,20 @@ defmodule Flamelex.InputHandler do
 
 
   def handle_input(%OmegaState{mode: :command} = state, @escape_key) do
-    IO.puts "ESCAPE IN CMD MODE"
+    IO.puts "11111"
+    Flamelex.CommandBufr.deactivate()
+    state |> OmegaState.set(mode: :normal)
+  end
+
+  def handle_input(%OmegaState{mode: :command} = state, input) when input in @valid_command_buffer_inputs do
+    IO.puts "22222"
+    Flamelex.CommandBufr.input(input)
+    state
+  end
+
+  def handle_input(%OmegaState{mode: :command} = state, @enter_key) do
+    IO.puts "33333"
+    Flamelex.CommandBufr.execute()
     Flamelex.CommandBufr.deactivate()
     state |> OmegaState.set(mode: :normal)
   end
@@ -39,31 +52,28 @@ defmodule Flamelex.InputHandler do
   def handle_input(%OmegaState{mode: :normal} = state, @leader_key = input) do
     Logger.info "Leader was pressed !!"
 
+    IO.puts "44444"
     state
     |> OmegaState.add_to_history(input)
   end
 
-  def handle_input(%OmegaState{mode: :normal, input: %{history: [@leader_key | _rest]}} = state, @lowercase_k = input) do
-    Logger.info "Activating CommandBufr..."
-    Flamelex.CommandBufr.show()
+  ## leader bindings
 
-    state
-    |> OmegaState.add_to_history(input)
-    |> OmegaState.set(mode: :command)
+  def handle_input(%OmegaState{mode: :normal, input: %{history: [@leader_key | _rest]}} = state, input) do
+    IO.puts "5555"
+
+    if input == @lowercase_k do
+            Logger.info "Activating CommandBufr..."
+            Flamelex.CommandBufr.show()
+            state
+            |> OmegaState.add_to_history(input)
+            |> OmegaState.set(mode: :command)
+    else
+      state |> OmegaState.add_to_history(input)
+    end
   end
 
 
-
-
-  # def handle_input(%OmegaState{mode: :normal} = state, @space_bar) do
-  #   # we need to do 2 separate things here,
-  #   # 1) Send a msg to CommandBuffer (separate process) to show itself
-  #   # 2) Update the state of the Scene.Root, because this state affects
-  #   #    what future inputs get mapped to
-  #   Logger.info "Space bar was pressed !!"
-  #   Flamelex.Commander.activate()
-  #   state |> OmegaState.set(mode: :command)
-  # end
 
   # def handle_input(%OmegaState{mode: :normal} = state, @lowercase_h) do
   #   Logger.info "Lowercase h was pressed !!"
@@ -86,6 +96,7 @@ defmodule Flamelex.InputHandler do
   # anything. Without this, the process which calls this can crash (!!)
   # if no action matches what is passed in.
   def handle_input(%OmegaState{} = state, input) do
+    IO.puts "7777"
     Logger.warn "#{__MODULE__} recv'd unrecognised action/state combo. input: #{inspect input}, mode: #{inspect state.mode}"
     state # ignore
     |> IO.inspect(label: "-- DEBUG --")

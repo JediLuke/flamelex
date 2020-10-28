@@ -47,7 +47,6 @@ defmodule Flamelex.OmegaMaster do
   input requests.
   """
   def handle_input(input) do
-    Logger.debug "handling input in #{__MODULE__} - #{inspect input}"
     GenServer.cast(__MODULE__, {:handle_input, input})
   end
 
@@ -69,14 +68,19 @@ defmodule Flamelex.OmegaMaster do
     {:ok, omega_state}
   end
 
+
+
   def handle_cast({:handle_input, input}, omega_state) do
-    #NOTE: actions may be pushed down to other buffers by Flamelex.Omega.Reducer
+
+    #REMINDER: actions may be pushed down to other buffers
+    #          by Flamelex.Omega.Reducer
     new_omega_state =
-      omega_state
-      |> Flamelex.InputHandler.handle_input(input)
+        omega_state |> Flamelex.InputHandler.handle_input(input)
 
     {:noreply, new_omega_state}
   end
+
+
 
   #TODO maybe x will be worth considering eventually???
   def handle_cast({:show, :command_buffer}, omega_state) do

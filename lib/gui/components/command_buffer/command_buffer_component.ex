@@ -25,6 +25,7 @@ defmodule Flamelex.GUI.Component.CommandBuffer do
   def info(_data), do: ~s(Invalid data)
 
   @component_id :command_buffer
+  @text_field_id {@component_id, :text_field}
 
   ## Public API
   ## -------------------------------------------------------------------
@@ -35,6 +36,7 @@ defmodule Flamelex.GUI.Component.CommandBuffer do
   end
 
   def show do
+    IO.puts "COMPONENT SHOW???"
     #TODO this should be checking if the process exists (& will be, when we wrap it all up into component behaviour)
     GenServer.cast(__MODULE__, :show)
   end
@@ -42,6 +44,14 @@ defmodule Flamelex.GUI.Component.CommandBuffer do
   def hide do
     #TODO this should be checking if the process exists (& will be, when we wrap it all up into component behaviour)
     GenServer.cast(__MODULE__, :hide)
+  end
+
+  def cast(x) do
+    GenServer.cast(__MODULE__, x)
+  end
+
+  def update(x) do
+    GenServer.cast(__MODULE__, {:update, x})
   end
 
 
@@ -60,6 +70,50 @@ defmodule Flamelex.GUI.Component.CommandBuffer do
   def handle_cast({:redraw, new_graph}, {state, _graph}) do
     {:noreply, {state, new_graph}, push: new_graph}
   end
+
+  # {:key, {"K", :release, 0}}
+  def handle_cast({:input, {:key, {_letter, :release, _num?}}}, state) do
+    {:noreply, state} # ignore key releases
+  end
+
+  def handle_cast({:update, {:text, new_text}}, {state, graph}) do
+
+    IO.puts "UPDATING TEXT"
+
+    new_graph =
+      graph
+      |> Scenic.Graph.modify(@text_field_id, &text(&1, new_text))
+      |> Scenic.Graph.modify(@text_field_id, fn x ->
+
+        IO.puts "YES #{inspect x}"
+        x
+      end)
+
+    {:noreply, {state, new_graph}, push: new_graph}
+  end
+
+  # {:key, {"K", :release, 0}}
+  # def handle_cast({:input, {:key, {letter, something, num}}}, {state, graph}) do
+  #   # new_data = state.data <>
+  #   IO.inspect something
+  #   IO.inspect num
+
+  #   new_text = "Drugs!!~~~~~" <> letter
+
+  #   new_graph =
+  #     graph |> Scenic.Graph.modify(@text_field_id, &text(&1, new_text))
+
+  #   {:noreply, {state, new_graph}, push: new_graph}
+  # end
+
+  # def handle_cast({:input, {:codepoint, {letter, num}}}) do
+  #   new_text = "Drugs!!~~~~~" <> letter
+  # end
+
+  # def handle_cast({:input, {:viewport_exit, _coords}}, state) do
+  #   {:noreply, state} # ignore
+  # end
+
 
   # def draw(%Scenic.Graph{} = graph, viewport: %Dimensions{} = vp) do
   #   command_buffer =

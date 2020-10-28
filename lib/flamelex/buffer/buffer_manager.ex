@@ -45,7 +45,17 @@ defmodule Flamelex.BufferManager do
     {:ok, _initial_state = []}
   end
 
+  def handle_call({:open_buffer, %{
+        type: :text, data: data, open_in_gui?: true } = params
+        }, _from, state) when is_bitstring(data) do
 
+    case start_buffer_process(params) do
+      {:ok, new_buf} ->
+        {:reply, {:ok, new_buf}, state ++ [new_buf]}
+      {:error, reason} ->
+        {:reply, {:error, reason}, state}
+    end
+  end
 
   def handle_call({:open_buffer, params}, _from, state) do
     case really_open_buffer(params) do
@@ -118,5 +128,14 @@ defmodule Flamelex.BufferManager do
       {:error, reason} ->
             {:error, reason}
     end
+  end
+
+  def start_buffer_process(%{type: :text, data: data, open_in_gui?: gui?}) do
+    DynamicSupervisor.start_child(
+      Flamelex.Buffer.Supervisor,
+        {Buffer.Text, %{
+          data: data,
+          open_in_gui?: gui?
+        }})
   end
 end

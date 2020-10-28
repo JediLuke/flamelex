@@ -13,9 +13,14 @@ defmodule Flamelex.Buffer.Text do
     GenServer.start_link(__MODULE__, params, name: name)
   end
 
+  def gen_tag(%{data: data}) do
+    {:buffer, "unnamed-buf"}
+  end
+
   def gen_tag(%{from_file: name}) do
     {:buffer, name}
   end
+
 
   @doc """
   All Buffers essentially start the same way.
@@ -24,6 +29,24 @@ defmodule Flamelex.Buffer.Text do
   def init(%{from_file: _filepath, open_in_gui?: true} = params) do
     Logger.debug "#{__MODULE__} initializing... params: #{inspect params}"
     {:ok, params, {:continue, :open_file_on_disk}}
+  end
+
+  def init(%{data: data, open_in_gui?: true}) do
+    Logger.debug "#{__MODULE__} initializing..."
+
+    IO.puts "YYYYYYYYYYYYYYYYYYY"
+
+    name = "unnamed-buf" #TODO something clever here
+
+    new_buf = %{
+      name: name,
+      data: data,
+      unsaved_changes?: false
+    }
+
+    GUI.Controller.show({:buffer, name})
+
+    {:ok, new_buf, {:continue, :show_in_gui}}
   end
 
   @impl GenServer
@@ -41,11 +64,18 @@ defmodule Flamelex.Buffer.Text do
     GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
 
 
+    # {:noreply, new_buf, {:continue, :show_in_gui}} #TODO try this
     {:noreply, new_buf}
   end
 
+  def handle_continue(:show_in_gui, state) do
+    IO.puts "SHOW IN FUI"
+    GUI.Controller.show({:buffer, state.name})
+    {:noreply, state}
+  end
+
   @impl GenServer
-  def handle_call(:read_contents, _from, state) do
+  def handle_call(:read, _from, state) do
     IO.puts "READINFD"
     {:reply, state.data, state}
   end
