@@ -47,12 +47,11 @@ defmodule Flamelex.Buffer do
   end
 
 
-  def load(:text, data, open_in_gui?: gui?) do
+  def load(:text, data, opts) when is_map(opts) do
     BufferManager.open_buffer(%{
       type: :text,
-      data: data,
-      open_in_gui?: gui?
-    })
+      data: data
+    } |> Map.merge(opts))
   end
 
 

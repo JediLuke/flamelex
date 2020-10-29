@@ -45,8 +45,9 @@ defmodule Flamelex.BufferManager do
     {:ok, _initial_state = []}
   end
 
+
   def handle_call({:open_buffer, %{
-        type: :text, data: data, open_in_gui?: true } = params
+        type: :text, data: data, name: name } = params
         }, _from, state) when is_bitstring(data) do
 
     case start_buffer_process(params) do
@@ -55,6 +56,13 @@ defmodule Flamelex.BufferManager do
       {:error, reason} ->
         {:reply, {:error, reason}, state}
     end
+  end
+
+  #NOTE: no `name` param
+  def handle_call({:open_buffer, %{type: :text} = params}, from, state) do
+    Logger.warn "Opening a buffer without a name..."
+    new_params = params |> Map.merge(%{name: "unnamed-buf"})
+    handle_call({:open_buffer, new_params}, from, state)
   end
 
   def handle_call({:open_buffer, params}, _from, state) do
@@ -130,10 +138,11 @@ defmodule Flamelex.BufferManager do
     end
   end
 
-  def start_buffer_process(%{type: :text, data: data, open_in_gui?: gui?}) do
+  def start_buffer_process(%{type: :text, data: data, open_in_gui?: gui?, name: name}) do
     DynamicSupervisor.start_child(
       Flamelex.Buffer.Supervisor,
         {Buffer.Text, %{
+          name: name,
           data: data,
           open_in_gui?: gui?
         }})

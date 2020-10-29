@@ -3,7 +3,7 @@ defmodule Flamelex.GUI.Structs.Frame do #TODO rename this moduile to have utilit
   Struct which holds relevant data for rendering a buffer frame status bar.
   """
   require Logger
-  alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
+  use Flamelex.ProjectAliases
 
   #TODO each "new/x" function should be making a new Scenic.Graph, we need
   # to actually build one and cant just use a default struct cause it spits chips
@@ -37,14 +37,14 @@ defmodule Flamelex.GUI.Structs.Frame do #TODO rename this moduile to have utilit
     top_left_corner: %Coordinates{} = c,
     dimensions:      %Dimensions{}  = d
   ) do
-    %__MODULE__{
+    %Frame{
       coordinates: c,
       dimensions:  d
     }
   end
 
   def new(top_left: top_left, size: size) do
-    %__MODULE__{
+    %Frame{
       id:          "#TODO",
       coordinates: top_left |> Coordinates.new(),
       dimensions:  size     |> Dimensions.new()
@@ -57,7 +57,7 @@ defmodule Flamelex.GUI.Structs.Frame do #TODO rename this moduile to have utilit
           top_left_corner: %Coordinates{} = c,
           dimensions:      %Dimensions{}  = d
   ) do
-    %__MODULE__{
+    %Frame{
       id:          id,
       coordinates: c,
       dimensions:  d
@@ -67,7 +67,7 @@ defmodule Flamelex.GUI.Structs.Frame do #TODO rename this moduile to have utilit
   #TODO deprecate this too
   # def new([id: id, top_left_corner: c, dimensions: d, picture_graph: g]) do
   def new([id: id, top_left_corner: c, dimensions: d, buffer: b]) do
-    %__MODULE__{
+    %Frame{
       id: id,
       coordinates: c |> Coordinates.new(),
       dimensions:  d |> Dimensions.new(),
@@ -78,7 +78,7 @@ defmodule Flamelex.GUI.Structs.Frame do #TODO rename this moduile to have utilit
 
   #TODO deprecate these
   def new([id: id, top_left_corner: c, dimensions: d]) do
-    %__MODULE__{
+    %Frame{
       id: id,
       coordinates: c |> Coordinates.new(),
       dimensions:  d |> Dimensions.new()
@@ -86,14 +86,14 @@ defmodule Flamelex.GUI.Structs.Frame do #TODO rename this moduile to have utilit
   end
 
   def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d) do
-    %__MODULE__{
+    %Frame{
       coordinates: c |> Coordinates.new(),
       dimensions:  d |> Dimensions.new()
     }
   end
 
 def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when is_list(o) do #TODO do we need buffer here?
-    %__MODULE__{
+    %Frame{
       coordinates: c |> Coordinates.new(),
       dimensions:  d |> Dimensions.new(),
       scenic_opts: o
@@ -106,19 +106,36 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     graph
   end
 
-  def find_center(%__MODULE__{coordinates: c, dimensions: d}) do
+  def find_center(%Frame{coordinates: c, dimensions: d}) do
     Coordinates.new([
       x: c.x + d.width/2,
       y: c.y + d.height/2,
     ])
   end
 
-  def reposition(%__MODULE__{coordinates: coords} = frame, x: new_x, y: new_y) do
+  def reposition(%Frame{coordinates: coords} = frame, x: new_x, y: new_y) do
     new_coordinates =
       coords
       |> Coordinates.modify(x: new_x, y: new_y)
 
     %{frame|coordinates: new_coordinates}
+  end
+
+  def draw(%Scenic.Graph{} = graph, %Frame{} = frame) do
+    graph
+    |> Draw.border_box(frame)
+    |> draw_frame_footer(frame)
+  end
+
+  def draw_frame_footer(graph, frame) do
+    w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
+    h = Flamelex.GUI.Component.MenuBar.height()
+    x = frame.coordinates.x
+    y = frame.dimensions.height # go to the bottom & back up how high the bar will be
+    c = :white
+
+    graph
+    |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
   end
 end
 

@@ -15,7 +15,7 @@ defmodule Flamelex.Memex.Journal do
     #TODO here, cut it in here
 
     # This needs to find todays Journal entry & open it in a text buffer
-    Buffer.load(:text, "This is my Journal!", open_in_gui?: true)
+    Buffer.load(:text, "This is my Journal!", %{name: "journal-now", open_in_gui?: true})
 
   end
 

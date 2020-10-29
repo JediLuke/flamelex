@@ -6,6 +6,27 @@ defmodule Flamelex.Utilities.ProcessRegistry do
     :buffer, :gui_component
   ]
 
+
+  def new_buffer_name_tuple(Flamelex.Buffer.Text, %{from_file: filename}) do
+    buffer_tag =
+      {:buffer, filename}
+    gproc_name_registration_tuple =
+      {:via, :gproc, {:n, :l, buffer_tag}}
+
+    {:ok, gproc_name_registration_tuple}
+  end
+
+  def new_buffer_name_tuple(Flamelex.Buffer.Text, %{name: name}) do
+    buffer_tag =
+      {:buffer, name}
+    gproc_name_registration_tuple =
+      {:via, :gproc, {:n, :l, buffer_tag}}
+
+    {:ok, gproc_name_registration_tuple}
+  end
+
+
+
   #TODO make this register 1
   def register2(:buffer, id) do
     IO.puts "REG2 buf id: #{inspect id}"

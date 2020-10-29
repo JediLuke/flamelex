@@ -36,7 +36,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
       },
       "Memex" => %{
         "random quote" => {Flamelex.Memex, :random_quote, []},
-        "journal" => {Flamelex.Memex.Journal, :today, []}
+        "journal" => {Flamelex.Memex.Journal, :now, []}
       },
       "GUI" => %{}, #TODO auto-generate it from the GUI file
       "Buffer" => %{

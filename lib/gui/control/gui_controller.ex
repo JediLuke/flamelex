@@ -10,7 +10,7 @@ defmodule Flamelex.GUI.Controller do
   alias GUI.Component.MenuBar
   require Logger
   import Flamelex.GUI.Utilities.ControlHelper
-  import Scenic.Primitives
+  # import Scenic.Primitives
 
 
 
@@ -153,16 +153,15 @@ defmodule Flamelex.GUI.Controller do
   #   {:noreply, %{state|graph: new_graph}}
   # end
 
-  def handle_cast({:show, {:buffer, filename} = buf}, state) do
+  def handle_cast({:show, {:buffer, name} = buf}, state) do
 
-    IO.puts "KLIDS IN HE CAR"
     data  = Buffer.read(buf)
-    IO.inspect data
-    frame = calculate_framing(filename, state.layout)
+    frame = calculate_framing(name, state.layout)
 
     new_graph =
       state.graph
       |> GUI.Component.TextBox.draw({frame, data})
+      |> Frame.draw(frame)
       # |> Draw.test_pattern()
 
     Flamelex.GUI.RootScene.redraw(new_graph)
@@ -192,7 +191,7 @@ defmodule Flamelex.GUI.Controller do
 
   def calculate_framing(name, %Layout{
     arrangement: :maximized,
-    dimensions: %Dimensions{height: h, width: w} = layout_dimens,
+    dimensions: %Dimensions{} = layout_dimens,
     frames: [], #NOTE: No existing frames
     opts: opts
   }) do

@@ -78,16 +78,14 @@ defmodule Flamelex.GUI.Component.CommandBuffer do
 
   def handle_cast({:update, {:text, new_text}}, {state, graph}) do
 
-    IO.puts "UPDATING TEXT"
-
     new_graph =
       graph
       |> Scenic.Graph.modify(@text_field_id, &text(&1, new_text))
-      |> Scenic.Graph.modify(@text_field_id, fn x ->
+      # |> Scenic.Graph.modify(@text_field_id, fn x ->
 
-        IO.puts "YES #{inspect x}"
-        x
-      end)
+      #   IO.puts "YES #{inspect x}"
+      #   x
+      # end)
 
     {:noreply, {state, new_graph}, push: new_graph}
   end
@@ -129,26 +127,29 @@ defmodule Flamelex.GUI.Component.CommandBuffer do
   #   graph
   #   |> add_to_graph(command_buffer)
   # end
-  def handle_cast(:show, {state, graph}) do
-    IO.puts "FINAL SHOW????"
-    new_graph =
-      graph
-      |> Scenic.Graph.modify(@component_id, &update_opts(&1, hidden: false))
-      |> Scenic.Graph.modify(@component_id, fn x ->
-        IO.inspect x, label: "COMPONENT ID"
-      end)
 
+  def handle_cast(:show, {state, graph}) do
+    new_graph = graph |> set_visibility(@component_id, :show)
     {:noreply, {state, new_graph}, push: new_graph}
   end
 
   def handle_cast(:hide, {state, graph}) do
-    IO.puts "HIDE"
-    new_graph =
-      graph
-      |> Scenic.Graph.modify(@component_id, &update_opts(&1, hidden: true))
-
+    new_graph = graph |> set_visibility(@component_id, :hide)
     {:noreply, {state, new_graph}, push: new_graph}
   end
+
+  def set_visibility(graph, component_id, :show) do
+    graph |> set_visibility(component_id, _hidden? = false)
+  end
+  def set_visibility(graph, component_id, :hide) do
+    graph |> set_visibility(component_id, _hidden? = true)
+  end
+  def set_visibility(graph, component_id, hidden?) when is_boolean(hidden?) do
+    graph |> Scenic.Graph.modify(
+                            component_id,
+                            &update_opts(&1, hidden: hidden?))
+  end
+
 
   # def action(a) do
   #   GenServer.cast(__MODULE__, {:action, a})

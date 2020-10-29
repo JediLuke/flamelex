@@ -1,6 +1,8 @@
 defmodule Flamelex.GUI.Utilities.Draw do
   use Flamelex.{ProjectAliases, CustomGuards}
-  alias Flamelex.GUI.GeometryLib.Trigonometry
+  # alias Flamelex.GUI.GeometryLib.Trigonometry
+  # alias Flamelex.GUI.Component.CommandBuffer
+  alias Flamelex.GUI.Component.MenuBar
 
 
   @ibm_plex_mono Flamelex.GUI.Initialize.ibm_plex_mono_hash()
@@ -89,14 +91,21 @@ defmodule Flamelex.GUI.Utilities.Draw do
   end
 
   def border_box(%Scenic.Graph{} = graph, %Frame{} = frame) do
-    border_box(graph, frame, {1, :white})
+    width = 2
+    color = :black
+    border_box(graph, frame, {width, color})
   end
   def border_box(%Scenic.Graph{} = graph, %Frame{} = frame, {size, color} = stroke) when is_positive_integer(size) and is_atom(color) do
-    width  = frame.dimensions.width + 1 #TODO need width +1 here for some quirky reason of Scenic library
-    height = frame.dimensions.height
+
+    #TODO-NOTE need + or - 1 here for some reason to do with Scenic quirks...
+
+    x_coord = frame.coordinates.x + size - 1
+    y_coord = frame.coordinates.y
+    width   = frame.dimensions.width - 1
+    height  = frame.dimensions.height - MenuBar.height() - size + 1
 
     graph
-    |> Scenic.Primitives.rect({width, height}, stroke: stroke, translate: {frame.coordinates.x, frame.coordinates.y})
+    |> Scenic.Primitives.rect({width, height}, stroke: stroke, translate: {x_coord, y_coord})
   end
 
 

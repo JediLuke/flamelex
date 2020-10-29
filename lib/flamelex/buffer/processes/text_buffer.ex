@@ -2,41 +2,29 @@ defmodule Flamelex.Buffer.Text do
   @moduledoc """
   A buffer to hold & manipulate text.
   """
+
   # use Flamelex.BufferBehaviour
+
   use GenServer, restart: :temporary
   require Logger
   use Flamelex.ProjectAliases
 
-  def start_link(params) do
-    name = ProcessRegistry.via_tuple(gen_tag(params))
-    # name = ProcessRegistry.register({:buffer, gen_tag(params)})
-    GenServer.start_link(__MODULE__, params, name: name)
-  end
+  def start_link(%{name: _name} = params) do
+    {:ok, buffer_name_tuple} =
+      ProcessRegistry.new_buffer_name_tuple(__MODULE__, params)
 
-  def gen_tag(%{data: data}) do
-    {:buffer, "unnamed-buf"}
-  end
-
-  def gen_tag(%{from_file: name}) do
-    {:buffer, name}
+    GenServer.start_link(__MODULE__, params, name: buffer_name_tuple)
   end
 
 
-  @doc """
-  All Buffers essentially start the same way.
-  """
   @impl GenServer
   def init(%{from_file: _filepath, open_in_gui?: true} = params) do
     Logger.debug "#{__MODULE__} initializing... params: #{inspect params}"
     {:ok, params, {:continue, :open_file_on_disk}}
   end
 
-  def init(%{data: data, open_in_gui?: true}) do
+  def init(%{name: name, data: data, open_in_gui?: true}) do
     Logger.debug "#{__MODULE__} initializing..."
-
-    IO.puts "YYYYYYYYYYYYYYYYYYY"
-
-    name = "unnamed-buf" #TODO something clever here
 
     new_buf = %{
       name: name,
