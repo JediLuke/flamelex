@@ -51,8 +51,8 @@ defmodule Flamelex.BufferManager do
         }, _from, state) when is_bitstring(data) do
 
     case start_buffer_process(params) do
-      {:ok, new_buf} ->
-        {:reply, {:ok, new_buf}, state ++ [new_buf]}
+      {:ok, _pid} ->
+        {:reply, {:ok, name}, state ++ [name]} #TODO do we just store a list of buffer names? What about numbers? order??
       {:error, reason} ->
         {:reply, {:error, reason}, state}
     end
@@ -101,10 +101,8 @@ defmodule Flamelex.BufferManager do
 
   @file_open_timeout 3_000
   def really_open_buffer(%{
-    #TODO don't hard-code these, but also DONT CHANGE THEM UNTIL IT"S TIME)
     type: :text,
-    from_file: filepath,
-    open_in_gui?: true
+    from_file: filepath
   }) do
 
     start_process_attempt =
@@ -112,7 +110,6 @@ defmodule Flamelex.BufferManager do
         Flamelex.Buffer.Supervisor,
           {Buffer.Text, %{
             from_file: filepath,
-            open_in_gui?: true,
             after_boot_callback: self()
           }})
 
@@ -122,7 +119,7 @@ defmodule Flamelex.BufferManager do
             #      process!), but not inside the init/1 callback - because then
             #      if it fails to read the file, the init will fail... instead
             receive do
-              {^pid, :successfully_opened, filepath, buf_name} ->
+              {^pid, :successfully_opened, ^filepath, buf_name} ->
                 {:ok, buf_name}
             after
               @file_open_timeout ->
@@ -130,9 +127,10 @@ defmodule Flamelex.BufferManager do
                 Process.exit(pid, :kill)
                 {:error, "Timed out waiting for the Buffer to open a file."}
             end
-      {:error, {:function_clause, _details_list} = reason} ->
-            IO.puts "FUNCTION CLAUSE ERROR"
-            {:error, reason}
+      # {:error, {:function_clause, _details_list} = reason} ->
+      #       IO.puts "FUNCTION CLAUSE ERROR"
+      #       Logger.error
+      #       {:error, reason}
       {:error, reason} ->
             {:error, reason}
     end

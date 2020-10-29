@@ -10,7 +10,6 @@ defmodule Flamelex.GUI.Controller do
   alias GUI.Component.MenuBar
   require Logger
   import Flamelex.GUI.Utilities.ControlHelper
-  # import Scenic.Primitives
 
 
 
@@ -28,6 +27,10 @@ defmodule Flamelex.GUI.Controller do
 
   def show(x) do
     GenServer.cast(__MODULE__, {:show, x})
+  end
+
+  def show(x, omega_state) do
+    GenServer.cast(__MODULE__, {:show, x, omega_state})
   end
 
   def hide(x) do
@@ -113,6 +116,22 @@ defmodule Flamelex.GUI.Controller do
 
   def handle_call(:get_frame_stack, _from, state) do
     {:reply, state.layout.frames, state}
+  end
+
+  def handle_cast({:show, {:buffer, name},  omega_state}, gui_state) do
+
+    data  = Buffer.read(name)
+    frame = calculate_framing(name, gui_state.layout)
+
+    new_graph =
+      gui_state.graph #TODO root_graph
+      |> GUI.Component.TextBox.draw({frame, data})
+      |> Frame.draw(frame, omega_state)
+      # |> Draw.test_pattern()
+
+    Flamelex.GUI.RootScene.redraw(new_graph)
+
+    {:noreply, %{gui_state|graph: new_graph}}
   end
 
   def handle_cast({:show, {:command_buffer, _data}}, state) do
@@ -210,10 +229,11 @@ defmodule Flamelex.GUI.Controller do
     end
   end
 
+  #TODO lol whats going on here
   def calculate_frame_size(opts, layout_dimens) do
     case opts |> Map.fetch(:show_menubar?) do
       {:ok, true} ->
-        Dimensions.new(width: layout_dimens.width, height: layout_dimens.height - MenuBar.height())
+        Dimensions.new(width: layout_dimens.width, height: layout_dimens.height)
       _otherwise ->
         Dimensions.new(width: layout_dimens.width, height: layout_dimens.height)
     end

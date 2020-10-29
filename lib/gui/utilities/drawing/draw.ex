@@ -48,7 +48,7 @@ defmodule Flamelex.GUI.Utilities.Draw do
     border_box(graph, frame, {1, :white})
   end
 
-  def background(%Scenic.Graph{} = graph, %Frame{} = frame, color) when is_atom(color) do
+  def background(%Scenic.Graph{} = graph, %Frame{} = frame, color) do
     width  = frame.dimensions.width + 1 #TODO need width +1 here for some quirky reason of Scenic library
     height = frame.dimensions.height
 

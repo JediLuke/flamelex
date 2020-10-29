@@ -7,6 +7,9 @@ defmodule Flamelex.ProjectAliases do
   defmacro __using__(_opts) do
     quote do
 
+      alias Flamelex.OmegaMaster
+      alias Flamelex.Structs.OmegaState
+
       alias Flamelex.Structs.{Buffer}
 
       alias Flamelex.{Buffer, GUI, Memex}

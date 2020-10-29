@@ -48,7 +48,7 @@ defmodule Flamelex.Buffer do
 
 
   def load(:text, data, opts) when is_map(opts) do
-    BufferManager.open_buffer(%{
+    OmegaMaster.open_buffer(%{
       type: :text,
       data: data
     } |> Map.merge(opts))
@@ -59,34 +59,17 @@ defmodule Flamelex.Buffer do
   @doc """
   Return the contents of a buffer.
   """
+  def read(pid) when is_pid(pid) do
+    pid |> GenServer.call(:read)
+  end
   def read({:buffer, _id} = lookup_key) do
-    IO.puts "READ 2"
     ProcessRegistry.find!(lookup_key)
-    |> IO.inspect(label: "pid")
     |> GenServer.call(:read)
   end
   #NOTE: putting this first is a CLASSIC BLUNDER - infinite recursion
   def read(id) do
-    IO.puts "READ 1"
     read({:buffer, id})
   end
-  # def read(pid) when is_pid(pid) do
-  #   pid
-
-  # end
-  # def read({:buffer, _name} = buffer) do
-  #   {:ok, pid} = ProcessRegistry.find(buffer)
-  #   pid |> read()
-  # end
-  # def read({:error, reason}) do
-  #   #NOTE: this can be matched if ProcessRegistry fails...
-  #   {:error, reason}
-  # end
-  # def read(buf_id) do
-  #   IO.inspect buf_id, label: "LBF"
-  #   ProcessRegistry.find({:buffer, buf_id})
-  #   |> read()
-  # end
 
 
 

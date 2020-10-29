@@ -21,11 +21,16 @@ defmodule Flamelex.OmegaMaster do
   require Logger
   use Flamelex.ProjectAliases
   alias Flamelex.Structs.OmegaState
+  alias Flamelex.BufferManager
 
 
   def start_link(_params) do
     initial_state = OmegaState.init()
     GenServer.start_link(__MODULE__, initial_state)
+  end
+
+  def open_buffer(params) do
+    GenServer.call(__MODULE__, {:open_buffer, params})
   end
 
   def show(:command_buffer = x) do
@@ -84,13 +89,12 @@ defmodule Flamelex.OmegaMaster do
 
   #TODO maybe x will be worth considering eventually???
   def handle_cast({:show, :command_buffer}, omega_state) do
-    IO.puts "SHOWING BUFF"
     case Buffer.read(:command_buffer) do
       data when is_bitstring(data) ->
+        new_omega_state = %{omega_state|mode: :command}
         #TODO so this should then be responsible for managing the buffer process (starting/stopping/finding if sleeping) nd causing it to refresh, whilst also making it visible by forcing a redraw
-        # GUI.Controller.show({:command_buffer, data})
         Flamelex.GUI.Component.CommandBuffer.show()
-        {:noreply, %{omega_state|mode: :command}}
+        {:noreply, new_omega_state}
       e ->
         raise "Unable to read Buffer.Command. #{inspect e}"
     end
@@ -100,6 +104,15 @@ defmodule Flamelex.OmegaMaster do
     # GUI.Controller.hide(:command_buffer)
     Flamelex.GUI.Component.CommandBuffer.hide()
     {:noreply, %{omega_state|mode: :normal}}
+  end
+
+  def handle_call({:open_buffer, %{name: name, open_in_gui?: true} = params}, _from, omega_state) do
+
+    {:ok, new_buf} = BufferManager.open_buffer(params)
+
+    :ok = GUI.Controller.show({:buffer, name}, omega_state)
+
+    {:reply, {:ok, new_buf}, omega_state}
   end
 
   # def handle_cast({:action, a}, omega_state) do

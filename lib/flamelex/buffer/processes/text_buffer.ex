@@ -18,12 +18,12 @@ defmodule Flamelex.Buffer.Text do
 
 
   @impl GenServer
-  def init(%{from_file: _filepath, open_in_gui?: true} = params) do
+  def init(%{from_file: _filepath} = params) do
     Logger.debug "#{__MODULE__} initializing... params: #{inspect params}"
     {:ok, params, {:continue, :open_file_on_disk}}
   end
 
-  def init(%{name: name, data: data, open_in_gui?: true}) do
+  def init(%{name: name, data: data}) do
     Logger.debug "#{__MODULE__} initializing..."
 
     new_buf = %{
@@ -32,9 +32,7 @@ defmodule Flamelex.Buffer.Text do
       unsaved_changes?: false
     }
 
-    GUI.Controller.show({:buffer, name})
-
-    {:ok, new_buf, {:continue, :show_in_gui}}
+    {:ok, new_buf}
   end
 
   @impl GenServer
@@ -48,18 +46,13 @@ defmodule Flamelex.Buffer.Text do
       unsaved_changes?: false
     }
 
-    send params.after_boot_callback, {self(), :successfully_opened, filepath, {:buffer, filepath}}
-    GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
+    # callback to the process which booted this one, to say that we successfully loaded the file from disk
+    send(
+      params.after_boot_callback,
+      {self(), :successfully_opened, filepath, {:buffer, filepath}}
+    )
 
-
-    # {:noreply, new_buf, {:continue, :show_in_gui}} #TODO try this
     {:noreply, new_buf}
-  end
-
-  def handle_continue(:show_in_gui, state) do
-    IO.puts "SHOW IN FUI"
-    GUI.Controller.show({:buffer, state.name})
-    {:noreply, state}
   end
 
   @impl GenServer

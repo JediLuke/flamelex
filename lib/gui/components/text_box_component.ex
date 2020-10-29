@@ -31,14 +31,17 @@ defmodule Flamelex.GUI.Component.TextBox do
     #   data
     left_margin = 8
 
+    background_color = GUI.Colors.background()
+    text_color = GUI.Colors.foreground()
+
     graph =
       Scenic.Graph.build()
-      |> Draw.background(f, :red)
+      |> Draw.background(f, background_color)
       |> Scenic.Primitives.text(data,
                  font: @ibm_plex_mono,
                  translate: {f.coordinates.x + left_margin, f.coordinates.y + 22}, # text draws from bottom-left corner?? :( also, how high is it???
                  font_size: 24,
-                 fill: :ghost_white)
+                 fill: text_color)
 
       # |> GUI.Component.Cursor.add_to_graph(data |> cursor_params())
 
