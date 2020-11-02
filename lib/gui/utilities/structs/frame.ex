@@ -127,10 +127,27 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     |> draw_frame_footer(frame)
   end
 
-  def draw(%Scenic.Graph{} = graph, %Frame{} = frame, omega_state) do
+  def draw(%Scenic.Graph{} = graph, %Frame{} = frame, opts) when is_map(opts) do
+    graph
+    # |> draw_frame_footer(frame, opts)
+    # |> Draw.border_box(frame)
+  end
+
+  def draw(%Scenic.Graph{} = graph, %Frame{} = frame, %OmegaState{} = omega_state) do
     graph
     |> draw_frame_footer(frame, omega_state)
     |> Draw.border_box(frame)
+  end
+
+  def draw_frame_footer(graph, frame, %{mode: :normal} = opts) when is_map(opts) do
+    w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
+    h = Flamelex.GUI.Component.MenuBar.height()
+    x = frame.coordinates.x
+    y = frame.dimensions.height # go to the bottom & back up how high the bar will be
+    c = GUI.Colors.menu_bar()
+
+    graph
+    |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
   end
 
   def draw_frame_footer(graph, frame) do
@@ -151,7 +168,7 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
     c = GUI.Colors.menu_bar()
 
-    font_size = 24
+    font_size = Flamelex.GUI.Fonts.size()
 
     graph
     |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)

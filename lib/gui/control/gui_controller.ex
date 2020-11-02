@@ -133,14 +133,14 @@ defmodule Flamelex.GUI.Controller do
 
   def handle_cast({:show, {:buffer, name},  omega_state}, gui_state) do
 
-    data  = Buffer.read(name)
     frame = calculate_framing(name, gui_state.layout)
+    data  = Buffer.read(name)
+    opts  = %{mode: :normal}
 
     new_graph =
-      gui_state.graph #TODO root_graph
-      |> GUI.Component.TextBox.draw({frame, data})
-      |> Frame.draw(frame, omega_state)
-      # |> Draw.test_pattern()
+      gui_state.graph #TODO root_graph - look at actual graph & update it, don't just keep drawing on top of it
+      # Draw.blank_graph()
+      |> GUI.Component.TextBox.draw({frame, data, opts})
 
     Flamelex.GUI.RootScene.redraw(new_graph)
 

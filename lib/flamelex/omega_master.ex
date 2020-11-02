@@ -91,8 +91,13 @@ defmodule Flamelex.OmegaMaster do
   end
 
   def handle_cast({:switch_mode, m}, omega_state) do
+    IO.puts "Now we need to know how to switch modes somehow"
 
-    :ok = GUI.Controller.switch_mode(m)
+    {:gui_component, omega_state.active_buffer}
+    |> ProcessRegistry.find!
+    |> GenServer.cast({:switch_mode, m})
+
+    # :ok = GUI.Controller.switch_mode(m)
 
     {:noreply, %{omega_state|mode: m}}
   end

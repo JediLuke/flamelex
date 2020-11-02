@@ -10,18 +10,18 @@ defmodule Flamelex.GUI.Component.TextBox do
 
   #TODO have horizontal scrolling if we go over the line
 
-  def draw(graph, {frame, data}) do
-    add_to_graph(graph, {frame, data})
+  def draw(graph, params) do
+    add_to_graph(graph, params)
   end
 
-  def verify({%Frame{} = _f, _data} = params), do: {:ok, params}
+  def verify({%Frame{} = _f, _data, opts} = params) when is_map(opts), do: {:ok, params}
   def verify(_else), do: :invalid_data
 
   def info(_data), do: ~s(Invalid data)
 
 
   @doc false
-  def init({%Frame{} = frame, text} = state, _opts) do
+  def init({%Frame{} = frame, text, opts}, _opts) do
 
     Logger.info "#{__MODULE__} initializing..."
 
@@ -40,6 +40,7 @@ defmodule Flamelex.GUI.Component.TextBox do
            cursor_position: cursor_position,
            cursor_blink?: false
          })
+      |> Frame.draw(frame, opts)
 
     new_state = %{
       graph: graph,
@@ -78,6 +79,10 @@ defmodule Flamelex.GUI.Component.TextBox do
                          cursor_position: new_cursor_position }
 
     {:noreply, new_state, push: new_graph}
+  end
+
+  def handle_cast({:switch_mode, m}, state) do
+
   end
 
   def handle_info(:blink, state) do

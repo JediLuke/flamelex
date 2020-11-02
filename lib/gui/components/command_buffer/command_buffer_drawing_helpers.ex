@@ -6,7 +6,7 @@ defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
   @prompt_size 18
   @prompt_margin 12
 
-  @font_size 24
+  @font_size Flamelex.GUI.Fonts.size()
   # @cursor_width GUI.FontHelpers.monospace_font_width(:ibm_plex, @font_size) #TODO get this properly
   @cursor_width 16
 

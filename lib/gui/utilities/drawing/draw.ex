@@ -6,10 +6,11 @@ defmodule Flamelex.GUI.Utilities.Draw do
 
 
   @ibm_plex_mono Flamelex.GUI.FontHelpers.font_hash(:ibm_plex_mono)
-  @default_text_size 24
+  @default_text_size Flamelex.GUI.Fonts.size()
 
 
   def blank_graph(text_size \\ @default_text_size) when is_integer(text_size) do
+    IO.inspect @ibm_plex_mono
     Scenic.Graph.build(font: @ibm_plex_mono, font_size: text_size)
   end
 
@@ -135,7 +136,7 @@ defmodule Flamelex.GUI.Utilities.Draw do
     graph
     |> Scenic.Primitives.text(t, font: @ibm_plex_mono,
                translate: translate, # text draws from bottom-left corner?? :( also, how high is it???
-               font_size: 24, fill: :blue)
+               font_size: Flamelex.GUI.Fonts.size(), fill: :blue)
   end
 
 

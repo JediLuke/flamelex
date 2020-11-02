@@ -187,29 +187,6 @@ end
 
 
 
-
-
-
-
-
-#   # def initialize(%{buffers: [%{id: :command_buffer}, %{id: {:text_editor, 1, :untitled}, active: true}]} = state) do
-#   #   %{viewport: %{width: w, height: h}} = state
-#   #   command_buffer = state.buffers |> hd()
-
-#   #   graph =
-#   #     Scenic.Graph.build(font: @ibm_plex_mono, font_size: @text_size)
-#   #     # |> GUI.Component.TextEditor.add_to_graph(%{
-#   #     #     id: {:text_editor, 1, :untitled},
-#   #     #     top_left_corner: {0, 0},
-#   #     #     dimensions: {w, h - command_buffer.data.height},
-#   #     #     contents: "This is an editor buffer.\n\nYou are using Franklin."
-#   #     #   })
-
-
-
-#   #     #TODO we do want this just not here
-
-
 #   #   {state, graph}
 #   # end
 
