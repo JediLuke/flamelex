@@ -8,15 +8,27 @@ defmodule Flamelex.Memex.Journal do
 
   @my_memex Flamelex.Memex.My.memex_env()
 
+  def punctuated_quote do
+    q = Memex.random_quote()
+
+    ~s(“#{q.text}”
+     - #{q.author}
+
+    )
+  end
+
   def now do
-    IO.puts hd(Flamelex.Memex.Episteme.EckhartTolle.quotes()).text
+
+    #TODO This needs to find todays Journal entry & open it in a text buffer
+    # journal_entry = hd(Flamelex.Memex.Episteme.EckhartTolle.quotes()).text
+    journal_entry = punctuated_quote()
 
 
-    #TODO here, cut it in here
 
-    # This needs to find todays Journal entry & open it in a text buffer
-    Buffer.load(:text, "This is my Journal!", %{name: "journal-now", open_in_gui?: true})
-
+    Buffer.load(:text, journal_entry, %{
+      name: "journal-now",
+      open_in_gui?: true
+    })
   end
 
   def today do
