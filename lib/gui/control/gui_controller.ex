@@ -6,7 +6,7 @@ defmodule Flamelex.GUI.Controller do
   """
   use GenServer
   use Flamelex.ProjectAliases
-  alias Flamelex.GUI.Structs.GUIControlState, as: State
+  alias Flamelex.GUI.Structs.GUIRootState, as: State
   alias GUI.Component.MenuBar
   require Logger
   import Flamelex.GUI.Utilities.ControlHelper
@@ -49,6 +49,10 @@ defmodule Flamelex.GUI.Controller do
     GenServer.cast(__MODULE__, {:hide, :command_buffer})
   end
 
+  def switch_mode(m) do
+    GenServer.cast(__MODULE__, {:switch_mode, m})
+  end
+
 
 
   ## GenServer callbacks
@@ -77,6 +81,15 @@ defmodule Flamelex.GUI.Controller do
     new_graph = default_gui(state)
     Flamelex.GUI.redraw(new_graph)
     {:noreply, state}
+  end
+
+  def handle_cast({:switch_mode, m}, gui_state) do
+
+
+
+    new_graph = gui_state.graph |> Draw.test_pattern()
+    Flamelex.GUI.redraw(new_graph)
+    {:noreply, gui_state}
   end
 
 

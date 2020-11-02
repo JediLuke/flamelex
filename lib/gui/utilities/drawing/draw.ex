@@ -5,7 +5,7 @@ defmodule Flamelex.GUI.Utilities.Draw do
   alias Flamelex.GUI.Component.MenuBar
 
 
-  @ibm_plex_mono Flamelex.GUI.Initialize.ibm_plex_mono_hash()
+  @ibm_plex_mono Flamelex.GUI.FontHelpers.font_hash(:ibm_plex_mono)
   @default_text_size 24
 
 

@@ -25,7 +25,7 @@ defmodule Flamelex.GUI.Control.UserInput.Handler do
   ## -------------------------------------------------------------------
 
 
-  def handle_input(%OmegaState{mode: :command} = state, @escape_key) do
+  def handle_input(%OmegaState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
     Flamelex.CommandBufr.deactivate()
     state |> OmegaState.set(mode: :normal)
   end
@@ -51,20 +51,25 @@ defmodule Flamelex.GUI.Control.UserInput.Handler do
     state |> OmegaState.add_to_history(input)
   end
 
-  def handle_input(%OmegaState{mode: :normal, active_buffer: buf} = state, input) do
+  def handle_input(%OmegaState{mode: :normal, active_buffer: active_buf} = state, input) do
     Logger.debug "received some input whilst in :normal mode... #{inspect input}"
-    IO.inspect buf, label: "BUFBUF"
+    # buf = Buffer.details(active_buf)
     case KeyMapping.lookup_action(state, input) do
       :ignore_input ->
-          state |> OmegaState.add_to_history(input)
-      {:action, {mod, func, args}} ->
-          IO.inspect state
-          Logger.info "found an action for input, going to apply it..."
-          Kernel.apply(mod, func, args) |> IO.inspect
+          state
+          |> OmegaState.add_to_history(input)
+      {:apply_mfa, {module, function, args}} ->
+          Kernel.apply(module, function, args)
+            |> IO.inspect
           state |> OmegaState.add_to_history(input)
     end
   end
 
+
+  def handle_input(%OmegaState{mode: :insert} = state, input) do
+    Logger.debug "received some input whilst in :insert mode"
+    state |> OmegaState.add_to_history(input)
+  end
 
 
 

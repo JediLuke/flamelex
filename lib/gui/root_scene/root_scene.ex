@@ -5,14 +5,14 @@ defmodule Flamelex.GUI.RootScene do
   capturing a large majority of the user-input.
   """
   use Scenic.Scene
-  use Flamelex.ProjectAliases
+  alias Flamelex.Utilities.ProcessRegistry
+  alias Flamelex.GUI.Utilities.Draw
 
 
   def init(nil = _init_params, _opts) do
     IO.puts "#{__MODULE__} initializing..."
 
-    #TODO come up with a better process registry here
-    Process.register(self(), __MODULE__)
+    ProcessRegistry.gproc_register(__MODULE__)
     Flamelex.GUI.Initialize.load_custom_fonts_into_global_cache()
 
     #NOTE: `GUI.Controller` will boot next & take control of the scene,
@@ -21,7 +21,8 @@ defmodule Flamelex.GUI.RootScene do
   end
 
   def redraw(%Scenic.Graph{} = graph) do
-    GenServer.cast(__MODULE__, {:redraw, graph})
+    ProcessRegistry.find!(__MODULE__)
+    |> GenServer.cast({:redraw, graph})
   end
 
 

@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Structs.GUIControlState do
+defmodule Flamelex.GUI.Structs.GUIRootState do
   @moduledoc """
   Struct which holds the state of the `GUI.Controller`.
 

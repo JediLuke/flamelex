@@ -29,6 +29,10 @@ defmodule Flamelex.OmegaMaster do
     GenServer.start_link(__MODULE__, initial_state)
   end
 
+  def switch_mode(m) do
+    GenServer.cast(__MODULE__, {:switch_mode, m})
+  end
+
   def open_buffer(params) do
     GenServer.call(__MODULE__, {:open_buffer, params})
   end
@@ -75,6 +79,8 @@ defmodule Flamelex.OmegaMaster do
 
 
 
+
+
   def handle_cast({:handle_input, input}, omega_state) do
 
     new_omega_state =
@@ -82,6 +88,13 @@ defmodule Flamelex.OmegaMaster do
       |> Flamelex.GUI.Control.UserInput.Handler.handle_input(input)
 
     {:noreply, new_omega_state}
+  end
+
+  def handle_cast({:switch_mode, m}, omega_state) do
+
+    :ok = GUI.Controller.switch_mode(m)
+
+    {:noreply, %{omega_state|mode: m}}
   end
 
 

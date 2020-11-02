@@ -3,11 +3,30 @@ defmodule Flamelex.GUI.FontHelpers do
   A place to put functions I need to stuff with fonts with. ‾\_(ツ)_/‾
   """
 
+
+  #TODO programatically get this instead of hard-coding it
   @project_root_dir "/Users/luke/workbench/elixir/flamelex"
   @priv_dir @project_root_dir <> "/priv"
+  @font_dir @priv_dir |> Path.join("/static/fonts")
 
-  #TODO font stuff should probably live more in here, less in Initialize
-  def font(:ibm_plex_mono), do: Flamelex.GUI.Initialize.ibm_plex_mono_hash
+
+  def project_font_directory, do: @font_dir
+
+  def font_hash(:ibm_plex_mono) do
+    "TONjLhOjY1tqOeQUm7JnTog8VlzC_xss7NO2VKDBblA"
+  end
+
+  def metrics_path(:ibm_plex_mono) do
+    @priv_dir
+    |> Path.join("/static/fonts/IBM-Plex-Mono/IBMPlexMono-Regular.ttf.metrics")
+  end
+
+  def metrics_hash(font) do
+    font
+    |> metrics_path()
+    |> Scenic.Cache.Support.Hash.file!(:sha)
+  end
+
 
   @doc """
   Get the box size for a font.

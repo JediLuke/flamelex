@@ -5,22 +5,15 @@ defmodule Flamelex.GUI.Initialize do
 
   @title "Flamelex"
 
-  #TODO rename to FLamelex, even better - use an Elixir func to get project root
-  @project_root_dir "/Users/luke/workbench/elixir/flamelex"
-  @priv_dir @project_root_dir <> "/priv"
-  @font_dir @priv_dir |> Path.join("/static/fonts")
-
-  # IBM-Plex-Mono-Regular
-  @custom_font_hash "TONjLhOjY1tqOeQUm7JnTog8VlzC_xss7NO2VKDBblA"
-  @custom_metrics_path @priv_dir |> Path.join("/static/fonts/IBM-Plex-Mono/IBMPlexMono-Regular.ttf.metrics")
-  @custom_metrics_hash Scenic.Cache.Support.Hash.file!(@custom_metrics_path, :sha)
-
-  @root_scene Flamelex.GUI.RootScene
-
+  # viewport sizes for various screens
   # @size_macbook_pro1 {1680, 1005}
   @size_macbook_pro2 {1440, 855}
   # @size_32inch_montr {2560, 1395}
   # @size_80col_termnl {800, 600}     # with size 24 font
+
+
+  @root_scene Flamelex.GUI.RootScene
+
 
   @main_viewport_config %{
     name: :main_viewport,
@@ -44,10 +37,15 @@ defmodule Flamelex.GUI.Initialize do
   end
 
   def load_custom_fonts_into_global_cache do
-    Scenic.Cache.Static.Font.load(@font_dir, @custom_font_hash, scope: :global)
-    Scenic.Cache.Static.FontMetrics.load(@custom_metrics_path, @custom_metrics_hash, scope: :global)
-  end
+    font = :ibm_plex_mono
 
-  def ibm_plex_mono_hash, do: @custom_metrics_hash
+    font_path    = Flamelex.GUI.FontHelpers.project_font_directory()
+    font_hash    = Flamelex.GUI.FontHelpers.font_hash(font)
+    metrics_path = Flamelex.GUI.FontHelpers.metrics_path(font)
+    metrics_hash = Flamelex.GUI.FontHelpers.metrics_hash(font)
+
+    Scenic.Cache.Static.Font.load(font_path, font_hash, scope: :global)
+    Scenic.Cache.Static.FontMetrics.load(metrics_path, metrics_hash, scope: :global)
+  end
 
 end

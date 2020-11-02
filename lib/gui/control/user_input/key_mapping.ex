@@ -3,14 +3,16 @@ defmodule Flamelex.GUI.Control.Input.KeyMapping do
   use Flamelex.GUI.ScenicEventsDefinitions
   alias Flamelex.Structs.OmegaState
 
-  def lookup_action(%OmegaState{mode: :normal, active_buffer: buf} = state, input) do
-    IO.inspect buf, label: "BB"
-    normal_action(state.input.history, buf, input)
+  def lookup_action(%OmegaState{mode: :normal, active_buffer: active_buf} = state, input) do
+    normal_action(state.input.history, active_buf, input)
   end
 
   def normal_action(_history, active_buf, @lowercase_k) do
-    # {:action, {Flamelex.Memex, :random_quote, []}}
-    {:action, {Flamelex.Buffer.Text, :move_cursor, [active_buf, :right]}}
+    {:apply_mfa, {Flamelex.Buffer.Text, :move_cursor, [active_buf, :right]}}
+  end
+
+  def normal_action(_history, _active_buf, @lowercase_i) do
+    {:apply_mfa, {OmegaMaster, :switch_mode, [:insert]}}
   end
 
   def normal_action(_history, _buf, _input) do
