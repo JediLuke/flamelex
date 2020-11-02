@@ -27,6 +27,7 @@ defmodule Flamelex.GUI.Control.UserInput.Handler do
 
   def handle_input(%OmegaState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
     Flamelex.CommandBufr.deactivate()
+    Flamelex.OmegaMaster.switch_mode(:normal)
     state |> OmegaState.set(mode: :normal)
   end
 
@@ -65,6 +66,10 @@ defmodule Flamelex.GUI.Control.UserInput.Handler do
     end
   end
 
+  def handle_input(%OmegaState{mode: :insert} = state, input) do
+    Logger.debug "received some input whilst in :insert mode"
+    state |> OmegaState.add_to_history(input)
+  end
 
   def handle_input(%OmegaState{mode: :insert} = state, input) do
     Logger.debug "received some input whilst in :insert mode"

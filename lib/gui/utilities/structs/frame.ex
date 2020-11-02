@@ -129,8 +129,8 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
 
   def draw(%Scenic.Graph{} = graph, %Frame{} = frame, opts) when is_map(opts) do
     graph
-    # |> draw_frame_footer(frame, opts)
-    # |> Draw.border_box(frame)
+    |> draw_frame_footer(frame, opts)
+    |> Draw.border_box(frame)
   end
 
   def draw(%Scenic.Graph{} = graph, %Frame{} = frame, %OmegaState{} = omega_state) do
@@ -143,11 +143,45 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
     h = Flamelex.GUI.Component.MenuBar.height()
     x = frame.coordinates.x
-    y = frame.dimensions.height # go to the bottom & back up how high the bar will be
+    y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
     c = GUI.Colors.menu_bar()
+
+    font_size = Flamelex.GUI.Fonts.size()
 
     graph
     |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
+    |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: GUI.Colors.mode(:normal))
+    |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
+    |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
+    |> Scenic.Primitives.text("NORMAL-MODE", font: GUI.Fonts.primary(),
+                translate: {x + 25, y + font_size + 2}, # text draws from bottom-left corner??
+                font_size: font_size, fill: :black)
+    |> Scenic.Primitives.text(frame.id, font: GUI.Fonts.primary(), #TODO should be frame.name ??
+                translate: {x + 200, y + font_size + 2}, # text draws from bottom-left corner??
+                font_size: font_size, fill: :black)
+  end
+
+
+  def draw_frame_footer(graph, frame, %{mode: :insert} = opts) when is_map(opts) do
+    w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
+    h = Flamelex.GUI.Component.MenuBar.height()
+    x = frame.coordinates.x
+    y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
+    c = GUI.Colors.menu_bar()
+
+    font_size = Flamelex.GUI.Fonts.size()
+
+    graph
+    |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
+    |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: GUI.Colors.mode(:insert))
+    |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
+    |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
+    |> Scenic.Primitives.text("INSERT-MODE", font: GUI.Fonts.primary(),
+                translate: {x + 25, y + font_size + 2}, # text draws from bottom-left corner??
+                font_size: font_size, fill: :black)
+    |> Scenic.Primitives.text(frame.id, font: GUI.Fonts.primary(), #TODO should be frame.name ??
+                translate: {x + 200, y + font_size + 2}, # text draws from bottom-left corner??
+                font_size: font_size, fill: :black)
   end
 
   def draw_frame_footer(graph, frame) do

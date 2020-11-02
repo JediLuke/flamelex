@@ -5,12 +5,11 @@ defmodule Flamelex.GUI.Utilities.Draw do
   alias Flamelex.GUI.Component.MenuBar
 
 
-  @ibm_plex_mono Flamelex.GUI.FontHelpers.font_hash(:ibm_plex_mono)
+  @ibm_plex_mono Flamelex.GUI.FontHelpers.metrics_hash(:ibm_plex_mono) #NOTE: we use the metrics-hash here, not the font-hash
   @default_text_size Flamelex.GUI.Fonts.size()
 
 
   def blank_graph(text_size \\ @default_text_size) when is_integer(text_size) do
-    IO.inspect @ibm_plex_mono
     Scenic.Graph.build(font: @ibm_plex_mono, font_size: text_size)
   end
 

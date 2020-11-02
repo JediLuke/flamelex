@@ -21,8 +21,6 @@ defmodule Flamelex.GUI.FontHelpers do
     |> Path.join("/static/fonts/IBM-Plex-Mono/IBMPlexMono-Regular.ttf.metrics")
   end
 
-
-
   def metrics_hash(font) do
     font
     |> metrics_path()

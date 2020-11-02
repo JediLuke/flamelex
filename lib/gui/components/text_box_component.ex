@@ -46,6 +46,7 @@ defmodule Flamelex.GUI.Component.TextBox do
       graph: graph,
       frame: frame,
       text: text,
+      mode: :normal,
       cursor_position: cursor_position,
       cursor_blink?: false,
       timer: nil
@@ -74,6 +75,7 @@ defmodule Flamelex.GUI.Component.TextBox do
            cursor_position: new_cursor_position,
            cursor_blink?: state.cursor_blink?
          })
+      |> Frame.draw(state.frame, %{mode: :normal})
 
     new_state = %{state| graph: new_graph,
                          cursor_position: new_cursor_position }
@@ -82,7 +84,21 @@ defmodule Flamelex.GUI.Component.TextBox do
   end
 
   def handle_cast({:switch_mode, m}, state) do
+    IO.puts "SWITCHIN MODES!!!"
+    new_graph =
+      Draw.blank_graph()
+      |> Draw.background(state.frame, GUI.Colors.background())
+      |> TextBoxDraw.render_text_grid(%{
+           frame: state.frame,
+           text: state.text,
+           cursor_position: state.cursor_position,
+           cursor_blink?: state.cursor_blink?
+         })
+      |> Frame.draw(state.frame, %{mode: m})
 
+    new_state = %{state| graph: new_graph, mode: m}
+
+    {:noreply, new_state, push: new_graph}
   end
 
   def handle_info(:blink, state) do
@@ -98,6 +114,7 @@ defmodule Flamelex.GUI.Component.TextBox do
            cursor_position: state.cursor_position,
            cursor_blink?: new_blink
          })
+      |> Frame.draw(state.frame, %{mode: state.mode})
 
     new_state =
       %{state|graph: new_graph, cursor_blink?: new_blink}

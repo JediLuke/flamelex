@@ -91,7 +91,6 @@ defmodule Flamelex.OmegaMaster do
   end
 
   def handle_cast({:switch_mode, m}, omega_state) do
-    IO.puts "Now we need to know how to switch modes somehow"
 
     {:gui_component, omega_state.active_buffer}
     |> ProcessRegistry.find!

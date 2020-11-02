@@ -44,8 +44,6 @@ defmodule Flamelex.GUI.Initialize do
     metrics_path = Flamelex.GUI.FontHelpers.metrics_path(font)
     metrics_hash = Flamelex.GUI.FontHelpers.metrics_hash(font)
 
-    IO.inspect font_hash, label: "HASH"
-
     Scenic.Cache.Static.Font.load(font_path, font_hash, scope: :global)
     Scenic.Cache.Static.FontMetrics.load(metrics_path, metrics_hash, scope: :global)
   end
