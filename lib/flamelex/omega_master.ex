@@ -77,10 +77,9 @@ defmodule Flamelex.OmegaMaster do
 
   def handle_cast({:handle_input, input}, omega_state) do
 
-    #REMINDER: actions may be pushed down to other buffers
-    #          by Flamelex.Omega.Reducer
     new_omega_state =
-        omega_state |> Flamelex.InputHandler.handle_input(input)
+      omega_state #REMINDER: actions may be pushed down to other buffers by this reducer
+      |> Flamelex.GUI.Control.UserInput.Handler.handle_input(input)
 
     {:noreply, new_omega_state}
   end
@@ -112,7 +111,7 @@ defmodule Flamelex.OmegaMaster do
 
     :ok = GUI.Controller.show({:buffer, name}, omega_state)
 
-    {:reply, {:ok, new_buf}, omega_state}
+    {:reply, {:ok, new_buf}, %{omega_state|active_buffer: new_buf}}
   end
 
   # def handle_cast({:action, a}, omega_state) do

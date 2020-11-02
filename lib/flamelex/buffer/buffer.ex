@@ -77,27 +77,23 @@ defmodule Flamelex.Buffer do
     pid
     |> GenServer.call({:modify, modification})
   end
-  def modify({:buffer, _name} = buffer, modification) do
-    {:ok, pid} = ProcessRegistry.find(buffer)
-    pid |> modify(modification)
+  def modify({:buffer, _id} = lookup_key, modification) do
+    ProcessRegistry.find!(lookup_key)
+    |> GenServer.call({:modify, modification})
   end
-  def modify({:error, reason}, _modification) do
-    #NOTE: this can be matched if ProcessRegistry fails...
-    {:error, reason}
-  end
-  def modify(buf_name, modification) do
-    ProcessRegistry.find({:buffer, buf_name})
-    |> read()
+  #NOTE: putting this first is a CLASSIC BLUNDER - infinite recursion
+  def modify(id, modification) do
+    modify({:buffer, id}, modification)
   end
 
 
 
-  def save(buf) do
-    case ProcessRegistry.find_buffer(buf) do
-      {:ok,       pid} -> pid |> GenServer.call(:save)
-      {:error, reason} -> {:error, reason}
-    end
-  end
+  # def save(buf) do
+  #   case ProcessRegistry.find_buffer(buf) do
+  #     {:ok,       pid} -> pid |> GenServer.call(:save)
+  #     {:error, reason} -> {:error, reason}
+  #   end
+  # end
 
 
   def close(buf) do

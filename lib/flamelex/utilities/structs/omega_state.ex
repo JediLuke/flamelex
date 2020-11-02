@@ -5,11 +5,11 @@ defmodule Flamelex.Structs.OmegaState do
   @valid_modes [:normal, :command, :select]
 
   defstruct [
-    mode:       :normal,                # The input mode
-    # buffers:    [],                     # This is a list of buffers
+    mode:       :normal,   # The input mode
     input: %{
-      history:  []                      # A list of all previous input events
-    }
+      history:  []         # A list of all previous input events
+    },
+    active_buffer: nil     # We need to know the active buffer
   ]
 
   def init do

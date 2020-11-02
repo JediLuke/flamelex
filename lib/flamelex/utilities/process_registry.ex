@@ -52,7 +52,7 @@ defmodule Flamelex.Utilities.ProcessRegistry do
     end
   end
 
-  defp gproc_register(tag) do
+  def gproc_register(tag) do
     Logger.debug "#{__MODULE__} registering #{inspect tag}..."
     # :n means `name`, :l means `local`
     :gproc.reg({:n, :l, tag})

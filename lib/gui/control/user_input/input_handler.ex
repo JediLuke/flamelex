@@ -1,5 +1,5 @@
 
-defmodule Flamelex.InputHandler do
+defmodule Flamelex.GUI.Control.UserInput.Handler do
   @moduledoc """
   This module acts on inputs, which when combined with an OmegaState, can
   be fed into specific functions via pattern matching. These functions
@@ -10,6 +10,7 @@ defmodule Flamelex.InputHandler do
   use Flamelex.ProjectAliases
   use Flamelex.GUI.ScenicEventsDefinitions
   alias Flamelex.Structs.OmegaState
+  alias Flamelex.GUI.Control.Input.KeyMapping
 
 
   # @readme "/Users/luke/workbench/elixir/franklin/README.md"
@@ -25,19 +26,16 @@ defmodule Flamelex.InputHandler do
 
 
   def handle_input(%OmegaState{mode: :command} = state, @escape_key) do
-    IO.puts "11111"
     Flamelex.CommandBufr.deactivate()
     state |> OmegaState.set(mode: :normal)
   end
 
   def handle_input(%OmegaState{mode: :command} = state, input) when input in @valid_command_buffer_inputs do
-    IO.puts "22222"
     Flamelex.CommandBufr.input(input)
     state
   end
 
   def handle_input(%OmegaState{mode: :command} = state, @enter_key) do
-    IO.puts "33333"
     Flamelex.CommandBufr.execute()
     Flamelex.CommandBufr.deactivate()
     state |> OmegaState.set(mode: :normal)
@@ -48,30 +46,25 @@ defmodule Flamelex.InputHandler do
   ## Normal mode
   ## -------------------------------------------------------------------
 
-
-  def handle_input(%OmegaState{mode: :normal} = state, @leader_key = input) do
-    Logger.info "Leader was pressed !!"
-
-    IO.puts "44444"
-    state
-    |> OmegaState.add_to_history(input)
+  def handle_input(%OmegaState{mode: :normal, active_buffer: nil} = state, input) do
+    Logger.debug "received some input whilst in :normal mode, but ignoring it because there's no active buffer... #{inspect input}"
+    state |> OmegaState.add_to_history(input)
   end
 
-  ## leader bindings
-
-  def handle_input(%OmegaState{mode: :normal, input: %{history: [@leader_key | _rest]}} = state, input) do
-    IO.puts "5555"
-
-    if input == @lowercase_k do
-            Logger.info "Activating CommandBufr..."
-            Flamelex.CommandBufr.show()
-            state
-            |> OmegaState.add_to_history(input)
-            |> OmegaState.set(mode: :command)
-    else
-      state |> OmegaState.add_to_history(input)
+  def handle_input(%OmegaState{mode: :normal, active_buffer: buf} = state, input) do
+    Logger.debug "received some input whilst in :normal mode... #{inspect input}"
+    IO.inspect buf, label: "BUFBUF"
+    case KeyMapping.lookup_action(state, input) do
+      :ignore_input ->
+          state |> OmegaState.add_to_history(input)
+      {:action, {mod, func, args}} ->
+          IO.inspect state
+          Logger.info "found an action for input, going to apply it..."
+          Kernel.apply(mod, func, args) |> IO.inspect
+          state |> OmegaState.add_to_history(input)
     end
   end
+
 
 
 
@@ -95,10 +88,9 @@ defmodule Flamelex.InputHandler do
   # This function acts as a catch-all for all actions that don't match
   # anything. Without this, the process which calls this can crash (!!)
   # if no action matches what is passed in.
-  def handle_input(%OmegaState{} = state, input) do
-    IO.puts "7777"
-    Logger.warn "#{__MODULE__} recv'd unrecognised action/state combo. input: #{inspect input}, mode: #{inspect state.mode}"
-    state # ignore
-    |> IO.inspect(label: "-- DEBUG --")
-  end
+  # def handle_input(%OmegaState{} = state, input) do
+  #   Logger.warn "#{__MODULE__} recv'd unrecognised action/state combo. input: #{inspect input}, mode: #{inspect state.mode}"
+  #   state # ignore
+  #   |> IO.inspect(label: "-- DEBUG --")
+  # end
 end

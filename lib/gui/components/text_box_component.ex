@@ -25,6 +25,8 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     Logger.info "#{__MODULE__} initializing..."
 
+    ProcessRegistry.gproc_register({:gui_component, frame.id})
+
     cursor_position = %{row: 0, col: 0}
 
     GenServer.cast(self(), :start_blink)
@@ -55,6 +57,27 @@ defmodule Flamelex.GUI.Component.TextBox do
     {:ok, timer} = :timer.send_interval(@blink_ms, :blink)
     new_state = %{state | timer: timer}
     {:noreply, new_state}
+  end
+
+  def handle_cast(:move_cursor_right, state) do
+
+    _old_cursr_position = %{row: rr, col: cc} = state.cursor_position
+    new_cursor_position = %{row: rr, col: cc+1}
+
+    new_graph =
+      Draw.blank_graph()
+      |> Draw.background(state.frame, GUI.Colors.background())
+      |> TextBoxDraw.render_text_grid(%{
+           frame: state.frame,
+           text: state.text,
+           cursor_position: new_cursor_position,
+           cursor_blink?: state.cursor_blink?
+         })
+
+    new_state = %{state| graph: new_graph,
+                         cursor_position: new_cursor_position }
+
+    {:noreply, new_state, push: new_graph}
   end
 
   def handle_info(:blink, state) do

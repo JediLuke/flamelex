@@ -16,6 +16,13 @@ defmodule Flamelex.Buffer.Text do
     GenServer.start_link(__MODULE__, params, name: buffer_name_tuple)
   end
 
+  # when we need to *do* stuff with it, then we'll have to get this component
+  # to talk to the buffer I guess
+  def move_cursor(buf, :right) do
+    ProcessRegistry.find!({:gui_component, buf})
+    |> GenServer.cast(:move_cursor_right)
+  end
+
 
   @impl GenServer
   def init(%{from_file: _filepath} = params) do
@@ -57,7 +64,6 @@ defmodule Flamelex.Buffer.Text do
 
   @impl GenServer
   def handle_call(:read, _from, state) do
-    IO.puts "READINFD"
     {:reply, state.data, state}
   end
 
