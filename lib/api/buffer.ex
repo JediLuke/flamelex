@@ -32,7 +32,7 @@ defmodule Flamelex.Buffer do
     Logger.info "Loading new text buffer for file: #{inspect filepath}..."
 
     open_buffer_result =
-        BufferManager.open_buffer(%{
+        OmegaMaster.open_buffer(%{
           type: :text,
           from_file: filepath,
           open_in_gui?: true

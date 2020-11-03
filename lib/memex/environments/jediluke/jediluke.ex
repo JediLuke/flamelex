@@ -16,9 +16,9 @@ defmodule Flamelex.Memex.Env.JediLuke do
     []
   end
 
-  def journal do
-    JediLuke.Journal
-  end
+  # def journal do
+  #   JediLuke.Journal
+  # end
 
   def on_simple_software do
     ~s(There are some factors which make software simple:

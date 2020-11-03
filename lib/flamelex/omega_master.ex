@@ -29,6 +29,7 @@ defmodule Flamelex.OmegaMaster do
     GenServer.start_link(__MODULE__, initial_state)
   end
 
+  #TODO having these here, is just noise... this is not an interface module
   def switch_mode(m) do
     GenServer.cast(__MODULE__, {:switch_mode, m})
   end
@@ -120,6 +121,19 @@ defmodule Flamelex.OmegaMaster do
     # GUI.Controller.hide(:command_buffer)
     Flamelex.GUI.Component.CommandBuffer.hide()
     {:noreply, %{omega_state|mode: :normal}}
+  end
+
+  def handle_call({:open_buffer, %{
+    type: :text,
+    from_file: filepath,
+    open_in_gui?: true
+  } = params}, _from, omega_state) do
+
+    {:ok, new_buf} = BufferManager.open_buffer(params)
+
+    :ok = GUI.Controller.show({:buffer, filepath}, omega_state)
+
+    {:reply, {:ok, new_buf}, %{omega_state|active_buffer: new_buf}}
   end
 
   def handle_call({:open_buffer, %{name: name, open_in_gui?: true} = params}, _from, omega_state) do

@@ -58,20 +58,23 @@ defmodule Flamelex.BufferManager do
     end
   end
 
-  #NOTE: no `name` param
-  def handle_call({:open_buffer, %{type: :text} = params}, from, state) do
-    Logger.warn "Opening a buffer without a name..."
-    new_params = params |> Map.merge(%{name: "unnamed-buf"})
-    handle_call({:open_buffer, new_params}, from, state)
-  end
-
-  def handle_call({:open_buffer, params}, _from, state) do
+  def handle_call({:open_buffer, %{
+    type: :text,
+    from_file: filepath
+  } = params}, _from, state) do
     case really_open_buffer(params) do
       {:ok, new_buf} ->
         {:reply, {:ok, new_buf}, state ++ [new_buf]}
       {:error, reason} ->
         {:reply, {:error, reason}, state}
     end
+  end
+
+  #NOTE: no `name` param
+  def handle_call({:open_buffer, %{type: :text} = params}, from, state) do
+    Logger.warn "Opening a buffer without a name..."
+    new_params = params |> Map.merge(%{name: "unnamed-buf"})
+    handle_call({:open_buffer, new_params}, from, state)
   end
 
   def handle_call(:count_buffers, _from, state) do

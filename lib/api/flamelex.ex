@@ -1,5 +1,10 @@
 defmodule Flamelex do
+  @moduledoc """
+  The main interface to the Flamelex application.
+  """
   use Flamelex.ProjectAliases
+
+  @valid_modes [:command, :insert, :visual_select]
 
   @doc """
   `Know Thyself`
@@ -25,6 +30,10 @@ defmodule Flamelex do
 
     IO.puts "\n#{__MODULE__} starting...\n"
     Application.start(:flamelex)
+  end
+
+  def switch_mode(m) when m in @valid_modes do
+    GenServer.cast(Flamelex.OmegaMaster, {:switch_mode, m})
   end
 
 

@@ -9,7 +9,7 @@ defmodule Flamelex.Buffer.Text do
   require Logger
   use Flamelex.ProjectAliases
 
-  def start_link(%{name: _name} = params) do
+  def start_link(params) do
     {:ok, buffer_name_tuple} =
       ProcessRegistry.new_buffer_name_tuple(__MODULE__, params)
 
@@ -18,8 +18,8 @@ defmodule Flamelex.Buffer.Text do
 
   # when we need to *do* stuff with it, then we'll have to get this component
   # to talk to the buffer I guess
-  def move_cursor(buf, {direction, distance}) do
-    ProcessRegistry.find!({:gui_component, buf})
+  def move_cursor({:buffer, name}, {direction, distance}) do
+    ProcessRegistry.find!({:gui_component, name})
     |> GenServer.cast({:move_cursor, direction, distance})
   end
 
@@ -48,7 +48,7 @@ defmodule Flamelex.Buffer.Text do
   end
 
   @impl GenServer
-  def handle_continue(:open_file_on_disk, %{from_file: filepath, open_in_gui?: true} = params) do
+  def handle_continue(:open_file_on_disk, %{from_file: filepath} = params) do
 
     {:ok, file_contents} = File.read(filepath)
 

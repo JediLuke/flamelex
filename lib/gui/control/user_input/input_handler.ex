@@ -17,7 +17,6 @@ defmodule Flamelex.GUI.Control.UserInput.Handler do
   # @dev_tools "/Users/luke/workbench/elixir/franklin/lib/utilities/dev_tools.ex"
 
 
-  @leader_key @space_bar
 
 
   ## -------------------------------------------------------------------

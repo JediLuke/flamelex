@@ -4,37 +4,66 @@ defmodule Flamelex.Memex.Journal do
   """
   use Flamelex.ProjectAliases
 
-  @journal_month Journal.October2020
+  # @journal_month Journal.October2020
 
-  @my_memex Flamelex.Memex.My.memex_env()
+  # @my_memex Flamelex.Memex.My.memex_env()
+
+
+  #TODO programatically get this instead of hard-coding it
+  @project_root_dir "/Users/luke/workbench/elixir/flamelex"
+  @memex_environment_dir @project_root_dir |> Path.join("/lib/memex/environments/jediluke")
+  @journal_dir @memex_environment_dir |> Path.join("/journal")
+
+  # /Users/luke/workbench/elixir/flamelex/
 
   def punctuated_quote do
     q = Memex.random_quote()
 
-    ~s(“#{q.text}”
-     - #{q.author}
-
-    )
+    ~s(“#{q.text}”\n   - #{q.author}\n\n)
   end
 
   def now do
+    now = Memex.My.current_time()
 
-    #TODO This needs to find todays Journal entry & open it in a text buffer
-    # journal_entry = hd(Flamelex.Memex.Episteme.EckhartTolle.quotes()).text
-    journal_entry = punctuated_quote()
+    minute            = now.minute |> digit_to_string()
+    hour              = now.hour   |> digit_to_string()
+    month             = now.month  |> Utilities.DateTimeExtraUtils.month_name()
+    year              = now.year   |> Integer.to_string()
+    day_of_the_month  = now.day    |> digit_to_string()
+    day_of_the_week   = now        |> DateTime.to_date()
+                                   |> Date.day_of_week()
+                                   |> Utilities.DateTimeExtraUtils.day_name()
+
+    #TODO scan the file, look for most recent timestamp - if it's more than 15? minutes, append a new one
+
+    current_journal_dir = @journal_dir |> Path.join(year <> "/" <> month)
+
+    if not (current_journal_dir |> File.exists?()) do
+      File.mkdir_p(current_journal_dir)
+    end
+
+    todays_day = day_of_the_week <> day_of_the_month
+    todays_journal_entry_file = current_journal_dir |> Path.join("/" <> todays_day)
 
 
+    if todays_journal_entry_file |> File.exists?() do
+      Buffer.open!(todays_journal_entry_file)
+    else
+      # need to create the entry
+      journal_entry = punctuated_quote() <> day_of_the_week <> ", " <> day_of_the_month <> " of " <> month <> "\n\n" <> hour <> ":" <> minute <> "\n\n"
 
-    Buffer.load(:text, journal_entry, %{
-      name: "journal-now",
-      open_in_gui?: true
-    })
+      {:ok, file} = File.open(todays_journal_entry_file, [:write])
+      IO.binwrite(file, journal_entry)
+      :ok = File.close(file)
+
+      Buffer.open!(todays_journal_entry_file)
+    end
   end
 
-  def today do
-    @my_memex.timezone
-    |> DateTime.now!()
-  end
+  # def today do
+  #   @my_memex.timezone
+  #   |> DateTime.now!()
+  # end
 
   def todays_entry do
     #TODO hey this is pretty neat!!!
