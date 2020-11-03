@@ -18,9 +18,14 @@ defmodule Flamelex.Buffer.Text do
 
   # when we need to *do* stuff with it, then we'll have to get this component
   # to talk to the buffer I guess
-  def move_cursor(buf, :right) do
+  def move_cursor(buf, {direction, distance}) do
     ProcessRegistry.find!({:gui_component, buf})
-    |> GenServer.cast(:move_cursor_right)
+    |> GenServer.cast({:move_cursor, direction, distance})
+  end
+
+  def move_cursor(buf, position) when is_map(position) do
+    ProcessRegistry.find!({:gui_component, buf})
+    |> GenServer.cast({:move_cursor, position})
   end
 
 
@@ -93,7 +98,7 @@ defmodule Flamelex.Buffer.Text do
     |> ProcessRegistry.find!()
     |> GenServer.cast({:refresh, new_state})
 
-    move_cursor(new_state.name, :right)
+    move_cursor(new_state.name, %{row: cursor_x+1, col: 0})
 
     # GUI.Controller.refresh({:buffer, state.name})
     # GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this

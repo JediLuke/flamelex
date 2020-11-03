@@ -73,10 +73,16 @@ defmodule Flamelex.GUI.Component.TextBox do
     {:noreply, new_state, push: new_graph}
   end
 
-  def handle_cast(:move_cursor_right, state) do
+  def handle_cast({:move_cursor, direction, _dist}, state) do
 
     _old_cursr_position = %{row: rr, col: cc} = state.cursor_position
-    new_cursor_position = %{row: rr, col: cc+1}
+    new_cursor_position =
+      case direction do
+        :left  -> %{row: rr,   col: cc-1}
+        :down  -> %{row: rr-1, col: cc}
+        :up    -> %{row: rr+1, col: cc}
+        :right -> %{row: rr,   col: cc+1}
+      end
 
     new_graph =
       Draw.blank_graph()
@@ -88,6 +94,25 @@ defmodule Flamelex.GUI.Component.TextBox do
            cursor_blink?: state.cursor_blink?
          })
       |> Frame.draw(state.frame, %{mode: :normal})
+
+    new_state = %{state| graph: new_graph,
+                         cursor_position: new_cursor_position }
+
+    {:noreply, new_state, push: new_graph}
+  end
+
+  def handle_cast({:move_cursor, new_cursor_position}, state) do
+
+    new_graph =
+      Draw.blank_graph()
+      |> Draw.background(state.frame, GUI.Colors.background())
+      |> TextBoxDraw.render_text_grid(%{
+           frame: state.frame,
+           text: state.text,
+           cursor_position: new_cursor_position,
+           cursor_blink?: state.cursor_blink?
+         })
+      |> Frame.draw(state.frame, %{mode: state.mode})
 
     new_state = %{state| graph: new_graph,
                          cursor_position: new_cursor_position }

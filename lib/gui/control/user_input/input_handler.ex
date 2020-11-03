@@ -66,6 +66,17 @@ defmodule Flamelex.GUI.Control.UserInput.Handler do
     end
   end
 
+  def handle_input(%OmegaState{mode: :insert} = state, @enter_key = input) do
+    cursor_pos =
+      {:gui_component, state.active_buffer}
+      |> ProcessRegistry.find!()
+      |> GenServer.call(:get_cursor_position)
+
+    Buffer.modify(state.active_buffer, {:insert, "\n", cursor_pos})
+
+    state |> OmegaState.add_to_history(input)
+  end
+
   def handle_input(%OmegaState{mode: :insert} = state, input) when input in @all_letters do
     cursor_pos =
       {:gui_component, state.active_buffer}

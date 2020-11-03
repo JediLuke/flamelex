@@ -7,8 +7,21 @@ defmodule Flamelex.GUI.Control.Input.KeyMapping do
     normal_action(state.input.history, active_buf, input)
   end
 
+
+  def normal_action(_history, active_buf, @lowercase_h) do
+    {:apply_mfa, {Flamelex.Buffer.Text, :move_cursor, [active_buf, {:left, 1}]}}
+  end
+
+  def normal_action(_history, active_buf, @lowercase_j) do
+    {:apply_mfa, {Flamelex.Buffer.Text, :move_cursor, [active_buf, {:down, 1}]}}
+  end
+
   def normal_action(_history, active_buf, @lowercase_k) do
-    {:apply_mfa, {Flamelex.Buffer.Text, :move_cursor, [active_buf, :right]}}
+    {:apply_mfa, {Flamelex.Buffer.Text, :move_cursor, [active_buf, {:up, 1}]}}
+  end
+
+  def normal_action(_history, active_buf, @lowercase_l) do
+    {:apply_mfa, {Flamelex.Buffer.Text, :move_cursor, [active_buf, {:right, 1}]}}
   end
 
   def normal_action(_history, _active_buf, @lowercase_i) do
