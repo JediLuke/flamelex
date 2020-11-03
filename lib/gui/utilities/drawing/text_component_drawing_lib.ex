@@ -6,11 +6,13 @@ defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
   @left_margin 4
 
 
+
   def render_text_grid(graph, %{
         frame: frame,
         text: text,
         cursor_position: cursor_position,
-        cursor_blink?: blink?
+        cursor_blink?: blink?,
+        mode: mode
   }) do
 
     font_size = Flamelex.GUI.Fonts.size()
@@ -31,10 +33,26 @@ defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
     opts = %{ block_width: block_width,
               block_height: block_height,
               cursor: cursor_position,
-              cursor_blink?: blink? }
+              cursor_blink?: blink?,
+              mode: mode }
 
     graph
     |> render_tiles(frame, tiles, opts)
+  end
+
+  def render_text_grid(graph, %{
+    frame: frame,
+    text: text,
+    cursor_position: cursor_position,
+    cursor_blink?: blink?
+  }) do
+    render_text_grid(graph, %{
+      frame: frame,
+      text: text,
+      cursor_position: cursor_position,
+      cursor_blink?: blink?,
+      mode: :normal #NOTE: add this in when this pattern-match hits #TODO remove this though
+    })
   end
 
   # def render_text_grid(graph, frame, data, cursor_position) do
@@ -141,20 +159,77 @@ defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
     block_position = {block_position_x, block_position_y}
     text_position  = {block_position_x, block_position_y + (block_height-text_bottom_buffer)} # need to add the `block_height` offset, because Scenic draws text from the bottom for some reason...
 
-    %{background_color: background_color, text_color: text_color} =
+    if opts.mode == :insert do
+      if is_cursor_tile?(tile, opts) and opts.cursor_blink? do
+
+        background_color = GUI.Colors.background()
+        text_color = GUI.Colors.foreground()
+
+        blinking_line_cursor_dimensions = {2, block_height}
+
+        new_graph =
+          graph
+          |> Scenic.Primitives.rect(block_dimensions,
+                        translate: block_position,
+                             fill: background_color)
+          # blinking cursor
+          |> Scenic.Primitives.rect(blinking_line_cursor_dimensions,
+                        translate: block_position,
+                             fill: text_color)
+          |> Scenic.Primitives.text(tile.character,
+                        translate: text_position,
+                             fill: text_color)
+
+        render_tiles(new_graph, frame, rest_of_the_tiles, opts)
+
+      else
+
+        background_color = GUI.Colors.background()
+        text_color = GUI.Colors.foreground()
+
+        new_graph =
+          graph
+          |> Scenic.Primitives.rect(block_dimensions,
+                      translate: block_position,
+                          fill: background_color)
+          |> Scenic.Primitives.text(tile.character,
+                      translate: text_position,
+                          fill: text_color)
+
+        render_tiles(new_graph, frame, rest_of_the_tiles, opts)
+
+      end
+    else
+      %{background_color: background_color, text_color: text_color} =
         tile_colors(tile, opts)
 
-    new_graph =
-      graph
-      |> Scenic.Primitives.rect(block_dimensions,
-                  translate: block_position,
-                       fill: background_color)
-      |> Scenic.Primitives.text(tile.character,
-                  translate: text_position,
-                       fill: text_color)
+      new_graph =
+        graph
+        |> Scenic.Primitives.rect(block_dimensions,
+                    translate: block_position,
+                        fill: background_color)
+        |> Scenic.Primitives.text(tile.character,
+                    translate: text_position,
+                        fill: text_color)
 
-    render_tiles(new_graph, frame, rest_of_the_tiles, opts)
+      render_tiles(new_graph, frame, rest_of_the_tiles, opts)
+    end
   end
+
+
+  # def tile_colors(tile, %{mode: :insert} = opts) do
+  #   if is_cursor_tile?(tile, opts) and opts.cursor_blink? do
+  #     %{
+  #       background_color: GUI.Colors.foreground(),
+  #       text_color: GUI.Colors.background()
+  #     }
+  #   else
+  #     %{
+  #       background_color: GUI.Colors.background(),
+  #       text_color: GUI.Colors.foreground()
+  #     }
+  #   end
+  # end
 
   def tile_colors(tile, opts) do
     if is_cursor_tile?(tile, opts) and opts.cursor_blink? do

@@ -55,10 +55,22 @@ defmodule Flamelex.GUI.Component.TextBox do
     {:ok, new_state, push: graph}
   end
 
+
+  def handle_call(:get_cursor_position, _from, state) do
+    {:reply, state.cursor_position, state}
+  end
+
   def handle_cast(:start_blink, state) do
     {:ok, timer} = :timer.send_interval(@blink_ms, :blink)
     new_state = %{state | timer: timer}
     {:noreply, new_state}
+  end
+
+  def handle_cast({:refresh, buf}, state) do
+    state = %{state|text: buf.data}
+    new_graph = render_graph(state)
+    new_state = %{state| graph: new_graph}
+    {:noreply, new_state, push: new_graph}
   end
 
   def handle_cast(:move_cursor_right, state) do
@@ -84,7 +96,6 @@ defmodule Flamelex.GUI.Component.TextBox do
   end
 
   def handle_cast({:switch_mode, m}, state) do
-    IO.puts "SWITCHIN MODES!!!"
     new_graph =
       Draw.blank_graph()
       |> Draw.background(state.frame, GUI.Colors.background())
@@ -92,7 +103,8 @@ defmodule Flamelex.GUI.Component.TextBox do
            frame: state.frame,
            text: state.text,
            cursor_position: state.cursor_position,
-           cursor_blink?: state.cursor_blink?
+           cursor_blink?: state.cursor_blink?,
+           mode: m
          })
       |> Frame.draw(state.frame, %{mode: m})
 
@@ -112,7 +124,8 @@ defmodule Flamelex.GUI.Component.TextBox do
            frame: state.frame,
            text: state.text,
            cursor_position: state.cursor_position,
-           cursor_blink?: new_blink
+           cursor_blink?: new_blink,
+           mode: state.mode
          })
       |> Frame.draw(state.frame, %{mode: state.mode})
 
@@ -122,6 +135,19 @@ defmodule Flamelex.GUI.Component.TextBox do
     {:noreply, new_state, push: new_graph}
   end
 
+
+  def render_graph(state) do
+    Draw.blank_graph()
+    |> Draw.background(state.frame, GUI.Colors.background())
+    |> TextBoxDraw.render_text_grid(%{
+          frame: state.frame,
+          text: state.text,
+          cursor_position: state.cursor_position,
+          cursor_blink?: state.cursor_blink?,
+          mode: state.mode
+        })
+    |> Frame.draw(state.frame, %{mode: state.mode})
+  end
 
 
   # defp add_notes(graph, contents) do

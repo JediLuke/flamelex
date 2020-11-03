@@ -67,7 +67,43 @@ defmodule Flamelex.Buffer.Text do
     {:reply, state.data, state}
   end
 
+  def handle_call({:modify, {:insert, new_text, %{col: cursor_x, row: cursor_y}}}, _from, state) do
+
+    insert_text_function =
+        fn string ->
+          list_of_text_lines = String.split(string, "\n")
+
+          {this_line, _other_lines} = list_of_text_lines |> List.pop_at(cursor_y)
+
+          {before_split, after_split} = this_line |> String.split_at(cursor_x)
+
+          updated_line = before_split <> new_text <> after_split
+
+          updated_list_of_text_lines = list_of_text_lines |> List.replace_at(cursor_y, updated_line)
+
+          updated_list_of_text_lines |> Enum.join()
+        end
+
+    new_state =
+        state
+        |> Map.update!(:data, insert_text_function)
+        |> Map.put(:unsaved_changes?, true)
+
+    {:gui_component, new_state.name}
+    |> ProcessRegistry.find!()
+    |> GenServer.cast({:refresh, new_state})
+
+    move_cursor(new_state.name, :right)
+
+    # GUI.Controller.refresh({:buffer, state.name})
+    # GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
+
+    {:reply, :ok, new_state}
+  end
+
   def handle_call({:modify, {:insert, new_text, insertion_site}}, _from, state) do
+
+
 
     insert_text_function =
         fn string ->

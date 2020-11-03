@@ -100,6 +100,8 @@ defmodule Flamelex.GUI.ScenicEventsDefinitions do
         @uppercase_Z
       ]
 
+      @all_letters @lowercase_letters ++ @uppercase_letters
+
       @period {:codepoint, {".", 0}}
       @bang {:codepoint, {"!", 1}}
       @question_mark {:codepoint, {"?", 1}}
@@ -112,14 +114,10 @@ defmodule Flamelex.GUI.ScenicEventsDefinitions do
       @right_brace {:codepoint, {"}", 1}}
       @comma {:codepoint, {",", 0}}
 
-      @all_letters @lowercase_letters ++ @uppercase_letters
-
       @valid_command_buffer_inputs @all_letters ++ [@space_bar, @period,
         @bang, @question_mark, @left_bracket, @right_bracket, @quote_character,
         @colon, @percent_sign, @left_brace, @right_brace, @comma]
 
-
-      # @left_mouse {:cursor_button, {:left, :press, 0, {403.91015625, 104.5703125}}}
     end
   end
 end
