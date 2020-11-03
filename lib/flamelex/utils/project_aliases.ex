@@ -7,23 +7,25 @@ defmodule Flamelex.ProjectAliases do
   defmacro __using__(_opts) do
     quote do
 
-      alias Flamelex.OmegaMaster
-      alias Flamelex.Structs.OmegaState
 
-      alias Flamelex.Structs.{Buffer}
-
-      alias Flamelex.{Buffer, GUI, Memex}
+      alias Flamelex.{Buffer, GUI}
 
       alias Flamelex.Memex.Journal
-
-      # alias Flamelex.Buffer.Command, as: CommandBufr #TODO just rename this everywhere
       alias Flamelex.CommandBufr
+      # alias Flamelex.Buffer.Command, as: CommandBufr #TODO just rename this everywhere
 
-      alias Flamelex.Utilities.ProcessRegistry
+
+      alias Flamelex.OmegaMaster #TODO remove
+      alias Flamelex.Structs.OmegaState
+
+      # alias Flamelex.Structs.{Buffer} #TODO remove but do we still need it??
+
 
       #TODO remove these
       alias Flamelex.Utilities
       alias Flamelex.Utilities.TerminalIO
+
+      alias Flamelex.Utilities.ProcessRegistry
 
       alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
       alias Flamelex.GUI.Utilities.Draw
