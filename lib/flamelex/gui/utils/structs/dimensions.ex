@@ -13,7 +13,7 @@ defmodule Flamelex.GUI.Structs.Dimensions do
 
 
   def new(:viewport_size) do
-    %{size: dimensions} = GUI.Initialize.viewport_config()
+    %{size: dimensions} = Flamelex.GUI.Initialize.viewport_config()
     new(dimensions)
   end
 

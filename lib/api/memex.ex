@@ -1,4 +1,4 @@
-defmodule Flamelex.Memex do
+defmodule Flamelex.API.Memex do
   @moduledoc """
   The interface to the Memex.
   """
@@ -22,9 +22,9 @@ defmodule Flamelex.Memex do
   """
   def random_quote do
     Enum.random(
-         Memex.Episteme.AncientAlchemy.quotes()
-      ++ Memex.Episteme.BenjaminFranklin.quotes()
-      ++ Memex.Episteme.ProgrammingLanguages.ElixirLang.quotes()
+         Flamelex.Memex.Episteme.AncientAlchemy.quotes()
+      ++ Flamelex.Memex.Episteme.BenjaminFranklin.quotes()
+      ++ Flamelex.Memex.Episteme.ProgrammingLanguages.ElixirLang.quotes()
     )
   end
 end

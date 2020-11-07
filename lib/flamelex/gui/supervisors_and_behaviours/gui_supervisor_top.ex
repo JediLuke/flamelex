@@ -7,7 +7,7 @@ defmodule Flamelex.GUI.TopLevelSupervisor do
   def init(_params) do
     IO.puts "#{__MODULE__} initializing..."
 
-    # Flamelex.GUI.Initialize.load_custom_fonts_into_global_cache()
+    # Flamelex.Flamelex.GUI.Initialize.load_custom_fonts_into_global_cache()
 
     children = [
       {Scenic, viewports: [Flamelex.GUI.Initialize.viewport_config()]},

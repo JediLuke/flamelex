@@ -1,6 +1,6 @@
-defmodule Flamelex.Memex.Journal do
+defmodule Flamelex.API.Journal do
   @moduledoc """
-  The interface to the Memex.
+  The interface to the Memex journal.
   """
   use Flamelex.ProjectAliases
 

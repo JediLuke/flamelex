@@ -1,11 +1,11 @@
-defmodule Flamelex.CommandBufr do
+defmodule Flamelex.API.CommandBuffer do
   @moduledoc """
   This module is really just an API of convenience for all this related
-  to the CommandBufr.
+  to the API.CommandBuffer.
   """
 
   @doc """
-  Make the CommandBufr visible.
+  Make the API.CommandBuffer visible.
   """
   def show do
     Flamelex.OmegaMaster.show(:command_buffer)
@@ -13,7 +13,7 @@ defmodule Flamelex.CommandBufr do
 
   @doc """
   The difference between this function and hide is that hide simply makes
-  the CommandBufr invisible in the GUI, but usually when we want it to go
+  the API.CommandBuffer invisible in the GUI, but usually when we want it to go
   away we also want to forget all the state in the CommandBuffer - like
   when you mash escape to go back to :edit mode
   """
@@ -34,14 +34,14 @@ defmodule Flamelex.CommandBufr do
   end
 
   @doc """
-  Send input to the CommandBufr
+  Send input to the API.CommandBuffer
   """
   def input(x) do
     Flamelex.Buffer.Command.cast({:input, x})
   end
 
   @doc """
-  Execute the command in the CommandBufr
+  Execute the command in the API.CommandBuffer
   """
   def execute do
     Flamelex.Buffer.Command.cast(:execute)

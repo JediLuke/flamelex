@@ -13,7 +13,7 @@ defmodule Flamelex.Structs.OmegaState do
   ]
 
   def init do
-    viewport_size = Dimensions.new(:viewport_size)
+    _viewport_size = Dimensions.new(:viewport_size)
 
     %__MODULE__{
       # gui: %{

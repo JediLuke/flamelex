@@ -23,7 +23,7 @@ defmodule Flamelex.GUI.Utilities.ControlHelper do
     top_left_y_for_centered_frame = center_point.y - scale_factor/2
 
     graph
-    |> GUI.Component.TransmutationCircle.mount(
+    |> Flamelex.GUI.Component.TransmutationCircle.mount(
           Frame.new(
             top_left: {top_left_x_for_centered_frame, top_left_y_for_centered_frame},
             size:     {scale_factor, scale_factor}))

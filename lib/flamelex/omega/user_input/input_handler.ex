@@ -25,19 +25,19 @@ defmodule Flamelex.GUI.Control.UserInput.Handler do
 
 
   def handle_input(%OmegaState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
-    Flamelex.CommandBufr.deactivate()
+    Flamelex.API.CommandBuffer.deactivate()
     Flamelex.OmegaMaster.switch_mode(:normal)
     state |> OmegaState.set(mode: :normal)
   end
 
   def handle_input(%OmegaState{mode: :command} = state, input) when input in @valid_command_buffer_inputs do
-    Flamelex.CommandBufr.input(input)
+    Flamelex.API.CommandBuffer.input(input)
     state
   end
 
   def handle_input(%OmegaState{mode: :command} = state, @enter_key) do
-    Flamelex.CommandBufr.execute()
-    Flamelex.CommandBufr.deactivate()
+    Flamelex.API.CommandBuffer.execute()
+    Flamelex.API.CommandBuffer.deactivate()
     state |> OmegaState.set(mode: :normal)
   end
 

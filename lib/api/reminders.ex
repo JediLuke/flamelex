@@ -1,6 +1,6 @@
 defmodule Flamelex.Reminders do
 
-  def ack(reminder) do
+  def ack(%Flamelex.Memex.Structs.Reminder{} = _reminder) do
     raise "Can't ack reminders yet!!"
   end
 

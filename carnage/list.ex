@@ -5,7 +5,7 @@
 #   # import Components.Utilities.CommonDrawingFunctions
 #   alias GUI.Structs.Frame
 
-#   @ibm_plex_mono GUI.Initialize.ibm_plex_mono_hash
+#   @ibm_plex_mono Flamelex.GUI.Initialize.ibm_plex_mono_hash
 
 #   def verify(%{
 #     id: _id,

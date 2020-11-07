@@ -5,7 +5,9 @@ defmodule Flamelex.GUI.FontHelpers do
 
 
   #TODO programatically get this instead of hard-coding it
-  @project_root_dir "/Users/luke/workbench/elixir/flamelex"
+  #Application.app_dir(:recording_services)
+  # @project_root_dir "/Users/luke/workbench/elixir/flamelex"
+  @project_root_dir Application.app_dir(:flamelex)
   @priv_dir @project_root_dir <> "/priv"
   @font_dir @priv_dir |> Path.join("/static/fonts")
 

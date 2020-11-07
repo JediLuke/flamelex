@@ -153,7 +153,7 @@ defmodule Flamelex.GUI.Controller do
     #NOTE: Ok, so, this approach was wrong...
     #      our issue is that we need to change the mode to :command, and the
     #      instinct is to modify the graph here too - this is incorrect.
-    #      CommandBufr is a Scenic.Component responsible for managing it's
+    #      API.CommandBuffer is a Scenic.Component responsible for managing it's
     #      own graph, so we have to forward on a msg to that component to
     #      make the change, but we can't actually do it here.
 

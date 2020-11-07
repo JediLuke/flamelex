@@ -1,11 +1,10 @@
-defmodule Flamelex.GUI do
+defmodule Flamelex.API.GUI do
   @moduledoc """
   This module provides an interface for controlling the Flamelex GUI. It
   is mostly a container for several sub-modules, which in-turn are interfaces
   for various parts of the GUI.
   """
   alias Flamelex.GUI.Controller, as: GUIControl
-  alias Flamelex.Buffer.Command, as: CmdBuffer
 
   def reset do
     GUIControl.action(:reset)

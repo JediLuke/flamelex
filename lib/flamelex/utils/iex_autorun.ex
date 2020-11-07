@@ -14,10 +14,8 @@ defmodule Flamelex.IExAutoRun do
     quote do
 
       IO.puts "Executing the code in `Flamelex.IExAutoRun`, via the `.iex.exs` file..."
-      use Flamelex.ProjectAliases
 
-      import Flamelex
-      import Flamelex.Buffer
+      use Flamelex.ProjectAliases
 
       Flamelex.IExAutoRun.print_welcome_msg()
 

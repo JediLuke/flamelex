@@ -1,4 +1,4 @@
-defmodule Flamelex.Buffer do
+defmodule Flamelex.API.Buffer do
   @moduledoc """
   The interface to all the Buffer commands.
   """
