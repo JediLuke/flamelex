@@ -1,6 +1,6 @@
 defmodule Flamelex.API.GUI.Utilities.Drawing.MenuBarHelper do
   alias Flamelex.API.GUI.Component.MenuBar
-  # alias Flamelex.API.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
+  # alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
   alias Flamelex.API.GUI.Utilities.Draw
 
 

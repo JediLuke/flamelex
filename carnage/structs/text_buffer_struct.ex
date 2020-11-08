@@ -4,7 +4,7 @@
 
 
 
-#   # Utilities.ProcessRegistry.fetch_buffer_pid!(file_name) |> Franklin.Buffer.Text.insert("WooLoo", [after: 3])
+#   # Utilities.ProcessRegistry.fetch_buffer_pid!(file_name) |> Franklin.Flamelex.Buffer.Text.insert("WooLoo", [after: 3])
 
 #   # def initialize(data), do: validate(data) |> create_struct()
 

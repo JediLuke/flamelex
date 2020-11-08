@@ -100,8 +100,8 @@ defmodule Flamelex.Buffer.Text do
 
     move_cursor(new_state.name, %{row: cursor_x+1, col: 0})
 
-    # GUI.Controller.refresh({:buffer, state.name})
-    # GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
+    # Flamelex.GUI.Controller.refresh({:buffer, state.name})
+    # Flamelex.GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
 
     {:reply, :ok, new_state}
   end
@@ -121,8 +121,8 @@ defmodule Flamelex.Buffer.Text do
         |> Map.update!(:data, insert_text_function)
         |> Map.put(:unsaved_changes?, true)
 
-    GUI.Controller.refresh({:buffer, state.name})
-    # GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
+    Flamelex.GUI.Controller.refresh({:buffer, state.name})
+    # Flamelex.GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
 
     {:reply, :ok, new_state}
   end
@@ -139,7 +139,7 @@ defmodule Flamelex.Buffer.Text do
         state
         |> Map.put(:data, text_after_deletion)
 
-    GUI.Controller.refresh({:buffer, state.name})
+    Flamelex.GUI.Controller.refresh({:buffer, state.name})
 
     {:reply, :ok, new_state}
   end

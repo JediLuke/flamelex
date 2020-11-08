@@ -8,6 +8,7 @@ defmodule Flamelex.API.CommandBuffer do
   Make the API.CommandBuffer visible.
   """
   def show do
+    IO.puts "SHOW"
     Flamelex.OmegaMaster.show(:command_buffer)
   end
 

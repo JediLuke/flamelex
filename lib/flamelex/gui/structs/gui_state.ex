@@ -1,6 +1,6 @@
-defmodule Flamelex.API.GUI.Structs.GUIRootState do
+defmodule Flamelex.GUI.Structs.GUIState do
   @moduledoc """
-  Struct which holds the state of the `GUI.Controller`.
+  Struct which holds the state of the `Flamelex.GUI.Controller`.
 
   ## A quick note on modes
 
@@ -26,7 +26,7 @@ defmodule Flamelex.API.GUI.Structs.GUIRootState do
   defstruct @components
 
   @doc """
-  Return the default initial state for the `GUI.Controller`
+  Return the default initial state for the `Flamelex.GUI.Controller`
   """
   def initialize(%Dimensions{} = vp) do
     %__MODULE__{

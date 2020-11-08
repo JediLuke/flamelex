@@ -2,7 +2,7 @@ defmodule Flamelex.API.GUI.ComponentBehaviour do
   @moduledoc """
   The Memex can load different environments.
   """
-  # alias Flamelex.API.GUI.Structs.Frame
+  # alias Flamelex.GUI.Structs.Frame
 
   #NOTE: Here's a little reminder...
   # the __using__ macro allows us to `use ComponentBehaviour` and automatically
@@ -25,7 +25,7 @@ defmodule Flamelex.API.GUI.ComponentBehaviour do
       #NOTE: This is just for convenience, so inside environment modules
       #      we can easily use the unique part of the environment module name
       alias __MODULE__
-      alias Flamelex.API.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
+      alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
       alias Flamelex.API.GUI.Utilities.Draw
 
 
@@ -119,7 +119,7 @@ defmodule Flamelex.API.GUI.ComponentBehaviour do
   # %Frame{} datastructure. This function takes in that Component definition
   # and returns a %Scenic.Graph{} which can be drawn by Scenic.
   """
-  @callback render(%Flamelex.API.GUI.Structs.Frame{}) :: %Scenic.Graph{}
+  @callback render(%Flamelex.GUI.Structs.Frame{}) :: %Scenic.Graph{}
 
   @doc """
   This function may be implemented as many times as necessary, to handle

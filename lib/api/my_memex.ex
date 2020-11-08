@@ -17,7 +17,7 @@ defmodule Flamelex.Memex.My do
   environment (it uses Flamelex.Memex.Environment, and thus must implement
   that behaviour)
   """
-  def memex_env, do: Memex.default_env()
+  def memex_env, do: Flamelex.API.Memex.default_env()
 
   def current_time do
     memex_env().timezone() |> DateTime.now!()

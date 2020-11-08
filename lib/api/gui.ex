@@ -4,7 +4,7 @@ defmodule Flamelex.API.GUI do
   is mostly a container for several sub-modules, which in-turn are interfaces
   for various parts of the GUI.
   """
-  alias Flamelex.API.GUI.Controller, as: GUIControl
+  alias Flamelex.GUI.Controller, as: GUIControl
 
   def reset do
     GUIControl.action(:reset)

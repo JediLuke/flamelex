@@ -1,4 +1,4 @@
-defmodule Flamelex.API.GUI.Structs.Frame do #TODO rename this moduile to have utilities in it
+defmodule Flamelex.GUI.Structs.Frame do #TODO rename this moduile to have utilities in it
   @moduledoc """
   Struct which holds relevant data for rendering a buffer frame status bar.
   """

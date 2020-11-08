@@ -18,9 +18,9 @@
 #   # def process(
 #   #       %{
 #   #         layout:
-#   #           %Flamelex.API.GUI.Structs.Layout{
+#   #           %Flamelex.GUI.Structs.Layout{
 #   #             arrangement: :floating_frames,
-#   #             # dimensions: %Flamelex.API.GUI.Structs.Dimensions{width: width, height: height},
+#   #             # dimensions: %Flamelex.GUI.Structs.Dimensions{width: width, height: height},
 #   #             frames: []
 #   #           }
 #   #       } = state,
@@ -59,9 +59,9 @@
 #   # def process(
 #   #   %{
 #   #     layout:
-#   #       %Flamelex.API.GUI.Structs.Layout{
+#   #       %Flamelex.GUI.Structs.Layout{
 #   #         arrangement: :floating_frames,
-#   #         # dimensions: %Flamelex.API.GUI.Structs.Dimensions{width: width, height: height},
+#   #         # dimensions: %Flamelex.GUI.Structs.Dimensions{width: width, height: height},
 #   #         frames: [%Frame{} = f] # one frame
 #   #       }
 #   #   } = state,
@@ -90,7 +90,7 @@
 #   # end
 
 #   # def process(
-#   # %{layout: %Flamelex.API.GUI.Structs.Layout{
+#   # %{layout: %Flamelex.GUI.Structs.Layout{
 #   #       arrangement: :floating_frames,
 #   #       frames: frame_list}
 #   # } = state,
@@ -241,7 +241,7 @@
 
 # #     {new_state, new_graph}
 
-# #     # ibm_plex_mono = Flamelex.API.GUI.Initialize.ibm_plex_mono_hash()
+# #     # ibm_plex_mono = Flamelex.GUI.Initialize.ibm_plex_mono_hash()
 
 # #     # add_notes =
 # #     #   fn(graph, notes) ->

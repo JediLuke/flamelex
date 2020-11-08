@@ -7,7 +7,7 @@ defmodule Flamelex.BufferManager do
   use Flamelex.ProjectAliases
   require Logger
 
-  #TODO if a buffer crashes, need to catch it & alert GUI.Controller
+  #TODO if a buffer crashes, need to catch it & alert Flamelex.GUI.Controller
   #TODO idea: the GUI should turn grey, with an x through it - but it has memory (text etc) in it - maybe it can be used to recover the Buffer state...
 
 
@@ -111,7 +111,7 @@ defmodule Flamelex.BufferManager do
     start_process_attempt =
       DynamicSupervisor.start_child(
         Flamelex.Buffer.Supervisor,
-          {Buffer.Text, %{
+          {Flamelex.Buffer.Text, %{
             from_file: filepath,
             after_boot_callback: self()
           }})
@@ -142,7 +142,7 @@ defmodule Flamelex.BufferManager do
   def start_buffer_process(%{type: :text, data: data, open_in_gui?: gui?, name: name}) do
     DynamicSupervisor.start_child(
       Flamelex.Buffer.Supervisor,
-        {Buffer.Text, %{
+        {Flamelex.Buffer.Text, %{
           name: name,
           data: data,
           open_in_gui?: gui?

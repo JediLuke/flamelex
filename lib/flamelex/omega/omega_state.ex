@@ -5,22 +5,17 @@ defmodule Flamelex.Structs.OmegaState do
   @valid_modes [:normal, :command, :select]
 
   defstruct [
-    mode:       :normal,   # The input mode
+    mode:           :normal,    # The input mode
+    #TODO just a list of input_history, no need for the map
     input: %{
-      history:  []         # A list of all previous input events
+      history:      []          # A list of all previous input events
     },
-    active_buffer: nil     # We need to know the active buffer
+    active_buffer:  nil         # We need to know the active buffer
   ]
 
   def init do
-    _viewport_size = Dimensions.new(:viewport_size)
-
     %__MODULE__{
-      # gui: %{
-      #   viewport: viewport_size,
-      #     layout: Layout.default(viewport_size),
-      #      graph: Draw.blank_graph()
-      # }
+      mode: :normal
     }
   end
 

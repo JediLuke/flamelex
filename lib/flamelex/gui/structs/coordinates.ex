@@ -1,4 +1,4 @@
-defmodule Flamelex.API.GUI.Structs.Coordinates do
+defmodule Flamelex.GUI.Structs.Coordinates do
   @moduledoc """
   Struct which holds 2d points.
   """

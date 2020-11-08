@@ -26,12 +26,12 @@ defmodule Franklin.OldCLI do
   # # def edit(buffer: :active, insert: string, after: x) when x >= 0 do
   # #   #
   # #   # find the active buffer & insert a character where the cursor is
-  # #   # Flamelex.API.GUI.Controller.fetch_active_buffer()
-  # #   Franklin.Buffer.Text.insert(:active_buffer, string, after: 7)
+  # #   # Flamelex.GUI.Controller.fetch_active_buffer()
+  # #   Franklin.Flamelex.Buffer.Text.insert(:active_buffer, string, after: 7)
 
   # #   # fetch_buffer_pid!("unnamed")
   # #   # |> IO.inspect(label: "Active buf")
-  # #   # |> Franklin.Buffer.Text.insert(char, after: 7)
+  # #   # |> Franklin.Flamelex.Buffer.Text.insert(char, after: 7)
   # # end
 
   # def scroll(buffer: :active, direction: :down) do
@@ -155,10 +155,10 @@ defmodule Flamelex.DevTools do
 
     string = "Luke"
 
-    Franklin.Buffer.Text.insert(file_name, string, after: 3)
+    Franklin.Flamelex.Buffer.Text.insert(file_name, string, after: 3)
 
     # fetch_buffer_pid!(file_name)
-    # |> Franklin.Buffer.Text.insert(string, [after: 7])
+    # |> Franklin.Flamelex.Buffer.Text.insert(string, [after: 7])
 
     :ok
   end

@@ -5,7 +5,7 @@ defmodule Flamelex.Memex.Env.JediLuke do
   use Flamelex.Memex.EnvironmentBehaviour
 
   def timezone do
-    Memex.Episteme.TimeZones.texas()
+    Flamelex.Memex.Episteme.TimeZones.texas()
   end
 
   def todo_list do

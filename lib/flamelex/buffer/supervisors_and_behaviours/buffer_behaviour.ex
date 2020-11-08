@@ -90,12 +90,12 @@ defmodule Flamelex.BufferBehaviour do
       """
       @impl GenServer
       def handle_cast(:show, buf) do
-        Flamelex.API.GUI.Controller.action({:show, buf})
+        Flamelex.GUI.Controller.action({:show, buf})
         {:noreply, buf}
       end
 
       def handle_cast(:hide, buf) do
-        Flamelex.API.GUI.Controller.action({:hide, buf})
+        Flamelex.GUI.Controller.action({:hide, buf})
         {:noreply, buf}
       end
 

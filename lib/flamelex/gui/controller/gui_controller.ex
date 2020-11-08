@@ -1,4 +1,4 @@
-defmodule Flamelex.API.GUI.Controller do
+defmodule Flamelex.GUI.Controller do
   @moduledoc """
   This process is in some ways the equal-opposite of OmegaMaster. That process
   holds all our buffers & manipulates them. This process holds the actual
@@ -6,7 +6,7 @@ defmodule Flamelex.API.GUI.Controller do
   """
   use GenServer
   use Flamelex.ProjectAliases
-  alias Flamelex.API.GUI.Structs.GUIRootState, as: State
+  alias Flamelex.GUI.Structs.GUIState
   alias Flamelex.API.GUI.Component.MenuBar
   require Logger
   import Flamelex.API.GUI.Utilities.ControlHelper
@@ -15,13 +15,12 @@ defmodule Flamelex.API.GUI.Controller do
 
   def start_link(_params) do
     viewport_size = Dimensions.new(:viewport_size)
-    initial_state = State.initialize(viewport_size)
+    initial_state = GUIState.initialize(viewport_size)
 
     GenServer.start_link(__MODULE__, initial_state)
   end
 
   def action(a) do
-    Logger.debug "action: `#{inspect a}` sent to GUI.Controller..."
     GenServer.cast(__MODULE__, {:action, a})
   end
 

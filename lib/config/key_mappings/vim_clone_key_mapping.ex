@@ -1,7 +1,7 @@
 defmodule Flamelex.Config.KeyMapping.VimClone do
   use Flamelex.ProjectAliases
   use Flamelex.API.GUI.ScenicEventsDefinitions
-  alias Flamelex.Structs.OmegaState
+
 
   #TODO should be a behaviour...
 
@@ -9,12 +9,10 @@ defmodule Flamelex.Config.KeyMapping.VimClone do
   @active_keybinding :vim_inspired_flamelex
 
 
-
   @doc """
   This function defines which key acts as the `leader`.
   """
   def leader, do: @space_bar
-
 
 
   @doc """
@@ -45,6 +43,7 @@ defmodule Flamelex.Config.KeyMapping.VimClone do
   """
   def lookup(%Flamelex.Structs.OmegaState{input: %{history: [last_key | _rest]}} = omega_state, input) do #NOTE: last key pressed was leader
     if last_key == leader() do
+      IO.puts "LEADER"
       binding(@active_keybinding, omega_state)[leader()][input]
     else
       binding(@active_keybinding, omega_state)[input]

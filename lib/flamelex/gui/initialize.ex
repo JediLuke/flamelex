@@ -1,4 +1,4 @@
-defmodule Flamelex.API.GUI.Initialize do
+defmodule Flamelex.GUI.Initialize do
   @moduledoc """
   Contains boot logic and default configurations required by Scenic.
   """

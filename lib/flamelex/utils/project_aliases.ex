@@ -15,7 +15,7 @@ defmodule Flamelex.ProjectAliases do
 
       # alias Flamelex.Memex.Structs.LiteraryQuote
 
-      alias Flamelex.API.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
+      alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
       alias Flamelex.API.GUI.Utilities.Draw
 
     end

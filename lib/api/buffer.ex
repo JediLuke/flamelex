@@ -32,7 +32,7 @@ defmodule Flamelex.API.Buffer do
     Logger.info "Loading new text buffer for file: #{inspect filepath}..."
 
     open_buffer_result =
-        OmegaMaster.open_buffer(%{
+        Flamelex.OmegaMaster.open_buffer(%{
           type: :text,
           from_file: filepath,
           open_in_gui?: true
@@ -48,7 +48,7 @@ defmodule Flamelex.API.Buffer do
 
 
   def load(:text, data, opts) when is_map(opts) do
-    OmegaMaster.open_buffer(%{
+    Flamelex.OmegaMaster.open_buffer(%{
       type: :text,
       data: data
     } |> Map.merge(opts))

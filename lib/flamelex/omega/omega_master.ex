@@ -18,32 +18,15 @@ defmodule Flamelex.OmegaMaster do
 
   """
   use GenServer
-  require Logger
   use Flamelex.ProjectAliases
-  alias Flamelex.Structs.OmegaState
   alias Flamelex.BufferManager
+  alias Flamelex.Structs.OmegaState
+  require Logger
 
 
   def start_link(_params) do
     initial_state = OmegaState.init()
     GenServer.start_link(__MODULE__, initial_state)
-  end
-
-  #TODO having these here, is just noise... this is not an interface module
-  def switch_mode(m) do
-    GenServer.cast(__MODULE__, {:switch_mode, m})
-  end
-
-  def open_buffer(params) do
-    GenServer.call(__MODULE__, {:open_buffer, params})
-  end
-
-  def show(:command_buffer = x) do
-    GenServer.cast(__MODULE__, {:show, x})
-  end
-
-  def hide(:command_buffer = x) do
-    GenServer.cast(__MODULE__, {:hide, x})
   end
 
   @doc """
@@ -64,13 +47,35 @@ defmodule Flamelex.OmegaMaster do
   This function enables us to fire actions off which enact changes, at
   the OmegaMaster level, but which aren't stricly responses to user input.
   """
-  # def action(a) do
-  #   GenServer.cast(__MODULE__, {:action, a})
-  # end
+  def action(a) do
+    GenServer.cast(__MODULE__, {:action, a})
+  end
+
+  #TODO deprecate these
+  def switch_mode(m), do: GenServer.cast(__MODULE__, {:switch_mode, m})
+  def open_buffer(params), do: GenServer.call(__MODULE__, {:open_buffer, params})
+  def show(:command_buffer = x), do: GenServer.cast(__MODULE__, {:show, x})
+  def hide(:command_buffer = x), do: GenServer.cast(__MODULE__, {:hide, x})
+
 
   ## GenServer callbacks
   ## -------------------------------------------------------------------
 
+
+
+  # def handle_input(%Flamelex.Structs.OmegaState{mode: :normal, active_buffer: active_buf} = state, input) do
+  #   Logger.debug "received some input whilst in :normal mode... #{inspect input}"
+  #   # buf = Buffer.details(active_buf)
+  #   case KeyMapping.lookup_action(state, input) do
+  #     :ignore_input ->
+  #         state
+  #         |> OmegaState.add_to_history(input)
+  #     {:apply_mfa, {module, function, args}} ->
+  #         Kernel.apply(module, function, args)
+  #           |> IO.inspect
+  #         state |> OmegaState.add_to_history(input)
+  #   end
+  # end
 
   def init(%Flamelex.Structs.OmegaState{} = omega_state) do
     IO.puts "#{__MODULE__} initializing..."
@@ -81,12 +86,12 @@ defmodule Flamelex.OmegaMaster do
 
 
 
-
   def handle_cast({:handle_input, input}, omega_state) do
 
     new_omega_state =
-      omega_state #REMINDER: actions may be pushed down to other buffers by this reducer
-      |> Flamelex.API.GUI.Control.UserInput.Handler.handle_input(input)
+      omega_state
+      #REMINDER: actions may be pushed down to other buffers by this reducer
+      |> Flamelex.GUI.UserInputHandler.handle_input(input)
 
     {:noreply, new_omega_state}
   end
@@ -97,7 +102,7 @@ defmodule Flamelex.OmegaMaster do
     |> ProcessRegistry.find!
     |> GenServer.cast({:switch_mode, m})
 
-    # :ok = GUI.Controller.switch_mode(m)
+    # :ok = Flamelex.GUI.Controller.switch_mode(m)
 
     {:noreply, %{omega_state|mode: m}}
   end
@@ -118,7 +123,7 @@ defmodule Flamelex.OmegaMaster do
   end
 
   def handle_cast({:hide, :command_buffer}, omega_state) do
-    # GUI.Controller.hide(:command_buffer)
+    # Flamelex.GUI.Controller.hide(:command_buffer)
     Flamelex.API.GUI.Component.CommandBuffer.hide()
     {:noreply, %{omega_state|mode: :normal}}
   end
@@ -131,7 +136,7 @@ defmodule Flamelex.OmegaMaster do
 
     {:ok, new_buf} = BufferManager.open_buffer(params)
 
-    :ok = GUI.Controller.show({:buffer, filepath}, omega_state)
+    :ok = Flamelex.GUI.Controller.show({:buffer, filepath}, omega_state)
 
     {:reply, {:ok, new_buf}, %{omega_state|active_buffer: new_buf}}
   end
@@ -140,7 +145,7 @@ defmodule Flamelex.OmegaMaster do
 
     {:ok, new_buf} = BufferManager.open_buffer(params)
 
-    :ok = GUI.Controller.show({:buffer, name}, omega_state)
+    :ok = Flamelex.GUI.Controller.show({:buffer, name}, omega_state)
 
     {:reply, {:ok, new_buf}, %{omega_state|active_buffer: new_buf}}
   end
