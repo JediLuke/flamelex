@@ -27,7 +27,7 @@ defmodule Flamelex.Application do
 
   defp boot_gui_process_tree do
     [
-      Flamelex.GUI.TopLevelSupervisor
+      Flamelex.API.GUI.TopLevelSupervisor
     ]
   end
 

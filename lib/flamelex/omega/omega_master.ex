@@ -72,7 +72,7 @@ defmodule Flamelex.OmegaMaster do
   ## -------------------------------------------------------------------
 
 
-  def init(%OmegaState{} = omega_state) do
+  def init(%Flamelex.Structs.OmegaState{} = omega_state) do
     IO.puts "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
     {:ok, omega_state}
@@ -86,7 +86,7 @@ defmodule Flamelex.OmegaMaster do
 
     new_omega_state =
       omega_state #REMINDER: actions may be pushed down to other buffers by this reducer
-      |> Flamelex.GUI.Control.UserInput.Handler.handle_input(input)
+      |> Flamelex.API.GUI.Control.UserInput.Handler.handle_input(input)
 
     {:noreply, new_omega_state}
   end
@@ -110,7 +110,7 @@ defmodule Flamelex.OmegaMaster do
       data when is_bitstring(data) ->
         new_omega_state = %{omega_state|mode: :command}
         #TODO so this should then be responsible for managing the buffer process (starting/stopping/finding if sleeping) nd causing it to refresh, whilst also making it visible by forcing a redraw
-        Flamelex.GUI.Component.CommandBuffer.show()
+        Flamelex.API.GUI.Component.CommandBuffer.show()
         {:noreply, new_omega_state}
       e ->
         raise "Unable to read Buffer.Command. #{inspect e}"
@@ -119,7 +119,7 @@ defmodule Flamelex.OmegaMaster do
 
   def handle_cast({:hide, :command_buffer}, omega_state) do
     # GUI.Controller.hide(:command_buffer)
-    Flamelex.GUI.Component.CommandBuffer.hide()
+    Flamelex.API.GUI.Component.CommandBuffer.hide()
     {:noreply, %{omega_state|mode: :normal}}
   end
 

@@ -23,16 +23,16 @@ defmodule Flamelex.API.Journal do
   end
 
   def now do
-    now = Memex.My.current_time()
+    now = Flamelex.Memex.My.current_time()
 
     minute            = now.minute |> digit_to_string()
     hour              = now.hour   |> digit_to_string()
-    month             = now.month  |> Utilities.DateTimeExtraUtils.month_name()
+    month             = now.month  |> Flamelex.Utilities.DateTimeExtraUtils.month_name()
     year              = now.year   |> Integer.to_string()
     day_of_the_month  = now.day    |> digit_to_string()
     day_of_the_week   = now        |> DateTime.to_date()
                                    |> Date.day_of_week()
-                                   |> Utilities.DateTimeExtraUtils.day_name()
+                                   |> Flamelex.Utilities.DateTimeExtraUtils.day_name()
 
     #TODO scan the file, look for most recent timestamp - if it's more than 15? minutes, append a new one
 

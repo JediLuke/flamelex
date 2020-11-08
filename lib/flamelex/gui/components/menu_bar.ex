@@ -1,13 +1,13 @@
-defmodule Flamelex.GUI.Component.MenuBar do
+defmodule Flamelex.API.GUI.Component.MenuBar do
   @moduledoc """
   This module is responsible for drawing the MenuBar.
 
   The Menubar displays a tree-like structure of specific functions, enabling
   them to be triggered via the GUI.
   """
-  use Flamelex.GUI.ComponentBehaviour
+  use Flamelex.API.GUI.ComponentBehaviour
 
-  import Flamelex.GUI.Utilities.Drawing.MenuBarHelper
+  import Flamelex.API.GUI.Utilities.Drawing.MenuBarHelper
 
   #TODO deprecate these, but also come up eith a better name!!
   @left_margin 15
@@ -18,7 +18,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
   def menu_item_width, do: 190
 
 
-  @impl Flamelex.GUI.ComponentBehaviour
+  @impl Flamelex.API.GUI.ComponentBehaviour
   def render(frame, _params) do
     frame |> inactive_menubar()
   end
@@ -107,7 +107,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
   #      Say I want to click on something &
 
 
-  @impl Flamelex.GUI.ComponentBehaviour
+  @impl Flamelex.API.GUI.ComponentBehaviour
   def handle_action({graph, frame}, {:hover, tab}) do
     {:redraw_graph, graph |> Draw.test_pattern()}
   end

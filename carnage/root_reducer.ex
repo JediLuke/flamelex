@@ -1,13 +1,13 @@
-# defmodule Flamelex.GUI.Root.Reducer do
+# defmodule Flamelex.API.GUI.Root.Reducer do
 #   @moduledoc """
 #   This module contains functions which process events received from the GUI.
 
 #   #TODO this could be a pretty nice use case for a behaviour, but I like having the automatic pattern-match we get from importing modules #TODO num2 - actually, when it comes to applying layers, pushing actions through layers of reducers (with most important last, so they apply their actions over the top of other ones) might be a good model to use...
 #   In Franklin, a Reducer must always return one of three values
 
-#     :ignore                           -> causes Flamelex.GUI.RootScene to ignore action
-#     {new_state, new_graph}            -> causes Flamelex.GUI.RootScene to update both it's internal state, & push a new graph
-#     new_state when is_map(new_state)  -> causes Flamelex.GUI.RootScene to update it's internal state, but no change to the %Scenic.Graph{} is necessary
+#     :ignore                           -> causes Flamelex.API.GUI.RootScene to ignore action
+#     {new_state, new_graph}            -> causes Flamelex.API.GUI.RootScene to update both it's internal state, & push a new graph
+#     new_state when is_map(new_state)  -> causes Flamelex.API.GUI.RootScene to update it's internal state, but no change to the %Scenic.Graph{} is necessary
 
 #   """
 #   require Logger
@@ -18,9 +18,9 @@
 #   # def process(
 #   #       %{
 #   #         layout:
-#   #           %Flamelex.GUI.Structs.Layout{
+#   #           %Flamelex.API.GUI.Structs.Layout{
 #   #             arrangement: :floating_frames,
-#   #             # dimensions: %Flamelex.GUI.Structs.Dimensions{width: width, height: height},
+#   #             # dimensions: %Flamelex.API.GUI.Structs.Dimensions{width: width, height: height},
 #   #             frames: []
 #   #           }
 #   #       } = state,
@@ -59,9 +59,9 @@
 #   # def process(
 #   #   %{
 #   #     layout:
-#   #       %Flamelex.GUI.Structs.Layout{
+#   #       %Flamelex.API.GUI.Structs.Layout{
 #   #         arrangement: :floating_frames,
-#   #         # dimensions: %Flamelex.GUI.Structs.Dimensions{width: width, height: height},
+#   #         # dimensions: %Flamelex.API.GUI.Structs.Dimensions{width: width, height: height},
 #   #         frames: [%Frame{} = f] # one frame
 #   #       }
 #   #   } = state,
@@ -90,7 +90,7 @@
 #   # end
 
 #   # def process(
-#   # %{layout: %Flamelex.GUI.Structs.Layout{
+#   # %{layout: %Flamelex.API.GUI.Structs.Layout{
 #   #       arrangement: :floating_frames,
 #   #       frames: frame_list}
 #   # } = state,
@@ -241,7 +241,7 @@
 
 # #     {new_state, new_graph}
 
-# #     # ibm_plex_mono = Flamelex.GUI.Initialize.ibm_plex_mono_hash()
+# #     # ibm_plex_mono = Flamelex.API.GUI.Initialize.ibm_plex_mono_hash()
 
 # #     # add_notes =
 # #     #   fn(graph, notes) ->

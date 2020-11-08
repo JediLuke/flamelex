@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Controller do
+defmodule Flamelex.API.GUI.Controller do
   @moduledoc """
   This process is in some ways the equal-opposite of OmegaMaster. That process
   holds all our buffers & manipulates them. This process holds the actual
@@ -6,10 +6,10 @@ defmodule Flamelex.GUI.Controller do
   """
   use GenServer
   use Flamelex.ProjectAliases
-  alias Flamelex.GUI.Structs.GUIRootState, as: State
-  alias GUI.Component.MenuBar
+  alias Flamelex.API.GUI.Structs.GUIRootState, as: State
+  alias Flamelex.API.GUI.Component.MenuBar
   require Logger
-  import Flamelex.GUI.Utilities.ControlHelper
+  import Flamelex.API.GUI.Utilities.ControlHelper
 
 
 
@@ -72,14 +72,14 @@ defmodule Flamelex.GUI.Controller do
     :timer.sleep(50)
 
     new_graph = default_gui(state)
-    Flamelex.GUI.redraw(new_graph)
+    Flamelex.API.GUI.redraw(new_graph)
 
     {:noreply, %{state|graph: new_graph}}
   end
 
   def handle_cast({:action, :reset}, state) do
     new_graph = default_gui(state)
-    Flamelex.GUI.redraw(new_graph)
+    Flamelex.API.GUI.redraw(new_graph)
     {:noreply, state}
   end
 
@@ -88,7 +88,7 @@ defmodule Flamelex.GUI.Controller do
 
 
     new_graph = gui_state.graph |> Draw.test_pattern()
-    Flamelex.GUI.redraw(new_graph)
+    Flamelex.API.GUI.redraw(new_graph)
     {:noreply, gui_state}
   end
 
@@ -120,7 +120,7 @@ defmodule Flamelex.GUI.Controller do
       # {:update_state, new_scene} when is_map(new_scene)
       #     -> {:noreply, {new_scene, graph}}
       {:redraw_root_scene, %{graph: new_graph} = new_state}  ->
-        Flamelex.GUI.RootScene.redraw(new_graph)
+        Flamelex.API.GUI.RootScene.redraw(new_graph)
         {:noreply, new_state}
       # {:update_state_and_graph, {new_scene, %Scenic.Graph{} = new_graph}} when is_map(new_scene)
       #     -> {:noreply, {new_scene, new_graph}, push: new_graph}
@@ -142,7 +142,7 @@ defmodule Flamelex.GUI.Controller do
       # Draw.blank_graph()
       |> GUI.Component.TextBox.draw({frame, data, opts})
 
-    Flamelex.GUI.RootScene.redraw(new_graph)
+    Flamelex.API.GUI.RootScene.redraw(new_graph)
 
     {:noreply, %{gui_state|graph: new_graph}}
   end
@@ -168,7 +168,7 @@ defmodule Flamelex.GUI.Controller do
     #   #       IO.inspect x
     #   # end)
 
-    # Flamelex.GUI.RootScene.redraw(new_graph)
+    # Flamelex.API.GUI.RootScene.redraw(new_graph)
     GUI.Component.CommandBuffer.show
 
     {:noreply, state}
@@ -180,7 +180,7 @@ defmodule Flamelex.GUI.Controller do
   #     state.graph
   #     |> Scenic.Graph.modify(:command_buffer, &update_opts(&1, hidden: true))
 
-  #   Flamelex.GUI.RootScene.redraw(new_graph)
+  #   Flamelex.API.GUI.RootScene.redraw(new_graph)
 
   #   {:noreply, %{state|graph: new_graph}}
   # end
@@ -196,7 +196,7 @@ defmodule Flamelex.GUI.Controller do
       |> Frame.draw(frame)
       # |> Draw.test_pattern()
 
-    Flamelex.GUI.RootScene.redraw(new_graph)
+    Flamelex.API.GUI.RootScene.redraw(new_graph)
 
     {:noreply, %{state|graph: new_graph}}
   end
@@ -221,7 +221,7 @@ defmodule Flamelex.GUI.Controller do
   #     # |> GUI.Component.TextBox.draw({frame, data, %{}})
   #     # |> Draw.test_pattern()
 
-  #   Flamelex.GUI.RootScene.redraw(new_graph)
+  #   Flamelex.API.GUI.RootScene.redraw(new_graph)
 
   #   {:noreply, %{state|graph: new_graph}}
   # end
@@ -271,7 +271,7 @@ defmodule Flamelex.GUI.Controller do
     #   # {:update_state, new_scene} when is_map(new_scene)
     #   #     -> {:noreply, {new_scene, graph}}
     #   {:redraw_root_scene, %{graph: new_graph} = new_state}  ->
-    #     Flamelex.GUI.RootScene.redraw(new_graph)
+    #     Flamelex.API.GUI.RootScene.redraw(new_graph)
     #     {:noreply, new_state}
     #   # {:update_state_and_graph, {new_scene, %Scenic.Graph{} = new_graph}} when is_map(new_scene)
     #   #     -> {:noreply, {new_scene, new_graph}, push: new_graph}

@@ -1,8 +1,8 @@
-defmodule Flamelex.GUI.ComponentBehaviour do
+defmodule Flamelex.API.GUI.ComponentBehaviour do
   @moduledoc """
   The Memex can load different environments.
   """
-  # alias Flamelex.GUI.Structs.Frame
+  # alias Flamelex.API.GUI.Structs.Frame
 
   #NOTE: Here's a little reminder...
   # the __using__ macro allows us to `use ComponentBehaviour` and automatically
@@ -15,8 +15,8 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       #NOTE: Here's a little reminder...
       # Implementing this behaviour forces all modules which do so to
       # implement all the callbacks defined in *this* module, that is,
-      # `Flamelex.GUI.ComponentBehaviour`
-      @behaviour Flamelex.GUI.ComponentBehaviour
+      # `Flamelex.API.GUI.ComponentBehaviour`
+      @behaviour Flamelex.API.GUI.ComponentBehaviour
 
       use Scenic.Component
       require Logger
@@ -25,8 +25,8 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       #NOTE: This is just for convenience, so inside environment modules
       #      we can easily use the unique part of the environment module name
       alias __MODULE__
-      alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
-      alias Flamelex.GUI.Utilities.Draw
+      alias Flamelex.API.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
+      alias Flamelex.API.GUI.Utilities.Draw
 
 
       #NOTE: In our case, we always want a Component to be passed in a %Frame{}
@@ -40,7 +40,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       def info(_data), do: ~s(Invalid data)
 
 
-      #NOTE: The following functions are common to all Flamelex.GUI.Components
+      #NOTE: The following functions are common to all Flamelex.API.GUI.Components
       #      and they can share the same implementation, so we include them here
 
 
@@ -72,7 +72,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       end
 
       @doc """
-      All %Flamelex.GUI.Component{}'s are triggered by being cast an %Action{}. #TODO
+      All %Flamelex.API.GUI.Component{}'s are triggered by being cast an %Action{}. #TODO
 
       This function allows for nice API, e.g. MenuBar.action({:click, button})
       """
@@ -119,7 +119,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
   # %Frame{} datastructure. This function takes in that Component definition
   # and returns a %Scenic.Graph{} which can be drawn by Scenic.
   """
-  @callback render(%Flamelex.GUI.Structs.Frame{}) :: %Scenic.Graph{}
+  @callback render(%Flamelex.API.GUI.Structs.Frame{}) :: %Scenic.Graph{}
 
   @doc """
   This function may be implemented as many times as necessary, to handle

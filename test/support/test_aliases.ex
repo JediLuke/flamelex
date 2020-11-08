@@ -15,8 +15,8 @@ defmodule Flamelex.Test.Support.TestAliases do
       # alias Flamelex.Utilities
       # alias Flamelex.Utilities.TerminalIO
 
-      # alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
-      # alias Flamelex.GUI.Utilities.Draw
+      # alias Flamelex.API.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
+      # alias Flamelex.API.GUI.Utilities.Draw
 
     end
   end

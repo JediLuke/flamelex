@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.ColorsPalletes.Obiwan do
+defmodule Flamelex.API.GUI.ColorsPalletes.Obiwan do
   #TODO we should have a behaviour here probs
 
   # https://vimcolors.org/

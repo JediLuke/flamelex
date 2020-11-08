@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Structs.Layout do
+defmodule Flamelex.API.GUI.Structs.Layout do
   @moduledoc """
   A layout contains many frames, and their spacial arrangement on the
   screen. It also can show/hide frames, animate frames or frame-decorations,

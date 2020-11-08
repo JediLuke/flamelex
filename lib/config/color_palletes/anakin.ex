@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.ColorsPalletes.Anakin do
+defmodule Flamelex.API.GUI.ColorsPalletes.Anakin do
   #TODO we should have a behaviour here probs
 
   # https://vimcolors.org/

@@ -4,7 +4,7 @@ defmodule Flamelex.API.GUI do
   is mostly a container for several sub-modules, which in-turn are interfaces
   for various parts of the GUI.
   """
-  alias Flamelex.GUI.Controller, as: GUIControl
+  alias Flamelex.API.GUI.Controller, as: GUIControl
 
   def reset do
     GUIControl.action(:reset)
@@ -23,8 +23,8 @@ defmodule Flamelex.API.GUI do
   end
 
   defmodule MenuBar do
-    def show, do: Flamelex.GUI.Component.MenuBar.action(:show)
-    def hide, do: Flamelex.GUI.Component.MenuBar.action(:hide)
+    def show, do: Flamelex.API.GUI.Component.MenuBar.action(:show)
+    def hide, do: Flamelex.API.GUI.Component.MenuBar.action(:hide)
   end
 
   def enable do
@@ -39,6 +39,6 @@ defmodule Flamelex.API.GUI do
   Re-draw the entire GUI.
   """
   def redraw(%Scenic.Graph{} = g) do
-    Flamelex.GUI.RootScene.redraw(g)
+    Flamelex.API.GUI.RootScene.redraw(g)
   end
 end

@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Initialize do
+defmodule Flamelex.API.GUI.Initialize do
   @moduledoc """
   Contains boot logic and default configurations required by Scenic.
   """
@@ -12,7 +12,7 @@ defmodule Flamelex.GUI.Initialize do
   # @size_80col_termnl {800, 600}     # with size 24 font
 
 
-  @root_scene Flamelex.GUI.RootScene
+  @root_scene Flamelex.API.GUI.RootScene
 
 
   @main_viewport_config %{
@@ -39,10 +39,10 @@ defmodule Flamelex.GUI.Initialize do
   def load_custom_fonts_into_global_cache do
     font = :ibm_plex_mono
 
-    font_path    = Flamelex.GUI.FontHelpers.project_font_directory()
-    font_hash    = Flamelex.GUI.FontHelpers.font_hash(font)
-    metrics_path = Flamelex.GUI.FontHelpers.metrics_path(font)
-    metrics_hash = Flamelex.GUI.FontHelpers.metrics_hash(font)
+    font_path    = Flamelex.API.GUI.FontHelpers.project_font_directory()
+    font_hash    = Flamelex.API.GUI.FontHelpers.font_hash(font)
+    metrics_path = Flamelex.API.GUI.FontHelpers.metrics_path(font)
+    metrics_hash = Flamelex.API.GUI.FontHelpers.metrics_hash(font)
 
     Scenic.Cache.Static.Font.load(font_path, font_hash, scope: :global)
     Scenic.Cache.Static.FontMetrics.load(metrics_path, metrics_hash, scope: :global)

@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Structs.Frame do #TODO rename this moduile to have utilities in it
+defmodule Flamelex.API.GUI.Structs.Frame do #TODO rename this moduile to have utilities in it
   @moduledoc """
   Struct which holds relevant data for rendering a buffer frame status bar.
   """
@@ -133,7 +133,7 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     |> Draw.border_box(frame)
   end
 
-  def draw(%Scenic.Graph{} = graph, %Frame{} = frame, %OmegaState{} = omega_state) do
+  def draw(%Scenic.Graph{} = graph, %Frame{} = frame, %Flamelex.Structs.OmegaState{} = omega_state) do
     graph
     |> draw_frame_footer(frame, omega_state)
     |> Draw.border_box(frame)
@@ -141,12 +141,12 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
 
   def draw_frame_footer(graph, frame, %{mode: :normal} = opts) when is_map(opts) do
     w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
-    h = Flamelex.GUI.Component.MenuBar.height()
+    h = Flamelex.API.GUI.Component.MenuBar.height()
     x = frame.coordinates.x
     y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
     c = GUI.Colors.menu_bar()
 
-    font_size = Flamelex.GUI.Fonts.size()
+    font_size = Flamelex.API.GUI.Fonts.size()
 
     graph
     |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
@@ -164,12 +164,12 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
 
   def draw_frame_footer(graph, frame, %{mode: :insert} = opts) when is_map(opts) do
     w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
-    h = Flamelex.GUI.Component.MenuBar.height()
+    h = Flamelex.API.GUI.Component.MenuBar.height()
     x = frame.coordinates.x
     y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
     c = GUI.Colors.menu_bar()
 
-    font_size = Flamelex.GUI.Fonts.size()
+    font_size = Flamelex.API.GUI.Fonts.size()
 
     graph
     |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
@@ -186,7 +186,7 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
 
   def draw_frame_footer(graph, frame) do
     w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
-    h = Flamelex.GUI.Component.MenuBar.height()
+    h = Flamelex.API.GUI.Component.MenuBar.height()
     x = frame.coordinates.x
     y = frame.dimensions.height # go to the bottom & back up how high the bar will be
     c = GUI.Colors.menu_bar()
@@ -195,14 +195,14 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
   end
 
-  def draw_frame_footer(graph, frame, %OmegaState{mode: :normal}) do
+  def draw_frame_footer(graph, frame, %Flamelex.Structs.OmegaState{mode: :normal}) do
     w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
-    h = Flamelex.GUI.Component.MenuBar.height()
+    h = Flamelex.API.GUI.Component.MenuBar.height()
     x = frame.coordinates.x
     y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
     c = GUI.Colors.menu_bar()
 
-    font_size = Flamelex.GUI.Fonts.size()
+    font_size = Flamelex.API.GUI.Fonts.size()
 
     graph
     |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
@@ -227,7 +227,7 @@ end
 
 
 
-# defmodule Flamelex.GUI.Component.Frame do
+# defmodule Flamelex.API.GUI.Component.Frame do
 #   @moduledoc """
 #   Frames are a very special type of Component - they are a container,
 #   manipulatable by the layout of the root scene. Virtually all buffers

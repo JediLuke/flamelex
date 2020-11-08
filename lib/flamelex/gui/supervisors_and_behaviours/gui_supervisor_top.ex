@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.TopLevelSupervisor do
+defmodule Flamelex.API.GUI.TopLevelSupervisor do
   @moduledoc false
   use Supervisor
 
@@ -7,11 +7,11 @@ defmodule Flamelex.GUI.TopLevelSupervisor do
   def init(_params) do
     IO.puts "#{__MODULE__} initializing..."
 
-    # Flamelex.Flamelex.GUI.Initialize.load_custom_fonts_into_global_cache()
+    # Flamelex.API.GUI.Initialize.load_custom_fonts_into_global_cache()
 
     children = [
-      {Scenic, viewports: [Flamelex.GUI.Initialize.viewport_config()]},
-      Flamelex.GUI.Controller
+      {Scenic, viewports: [Flamelex.API.GUI.Initialize.viewport_config()]},
+      Flamelex.API.GUI.Controller
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

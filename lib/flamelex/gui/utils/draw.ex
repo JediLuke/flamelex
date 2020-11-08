@@ -1,12 +1,12 @@
-defmodule Flamelex.GUI.Utilities.Draw do
+defmodule Flamelex.API.GUI.Utilities.Draw do
   use Flamelex.{ProjectAliases, CustomGuards}
-  # alias Flamelex.GUI.GeometryLib.Trigonometry
-  # alias Flamelex.GUI.Component.CommandBuffer
-  alias Flamelex.GUI.Component.MenuBar
+  # alias Flamelex.API.GUI.GeometryLib.Trigonometry
+  # alias Flamelex.API.GUI.Component.CommandBuffer
+  alias Flamelex.API.GUI.Component.MenuBar
 
 
-  @ibm_plex_mono Flamelex.GUI.FontHelpers.metrics_hash(:ibm_plex_mono) #NOTE: we use the metrics-hash here, not the font-hash
-  @default_text_size Flamelex.GUI.Fonts.size()
+  @ibm_plex_mono Flamelex.API.GUI.FontHelpers.metrics_hash(:ibm_plex_mono) #NOTE: we use the metrics-hash here, not the font-hash
+  @default_text_size Flamelex.API.GUI.Fonts.size()
 
 
   def blank_graph(text_size \\ @default_text_size) when is_integer(text_size) do
@@ -135,7 +135,7 @@ defmodule Flamelex.GUI.Utilities.Draw do
     graph
     |> Scenic.Primitives.text(t, font: @ibm_plex_mono,
                translate: translate, # text draws from bottom-left corner?? :( also, how high is it???
-               font_size: Flamelex.GUI.Fonts.size(), fill: :blue)
+               font_size: Flamelex.API.GUI.Fonts.size(), fill: :blue)
   end
 
 

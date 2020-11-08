@@ -1,8 +1,8 @@
-defmodule Flamelex.GUI.Colors do
+defmodule Flamelex.API.GUI.Colors do
 
   def pallete do
-    Flamelex.GUI.ColorsPalletes.Anakin
-    # Flamelex.GUI.ColorsPalletes.Obiwan
+    Flamelex.API.GUI.ColorsPalletes.Anakin
+    # Flamelex.API.GUI.ColorsPalletes.Obiwan
   end
 
   def background do

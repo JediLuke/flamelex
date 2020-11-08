@@ -6,7 +6,7 @@
 #   require Logger
 #   # import Utilities.ComponentUtils
 
-#   @ibm_plex_mono Flamelex.GUI.Initialize.ibm_plex_mono_hash
+#   @ibm_plex_mono Flamelex.API.GUI.Initialize.ibm_plex_mono_hash
 
 #   @title_font_size 48
 

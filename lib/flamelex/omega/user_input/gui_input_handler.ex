@@ -1,9 +1,9 @@
-defmodule Flamelex.GUI.Input.EventHandler do
+defmodule Flamelex.API.GUI.Input.EventHandler do
   @moduledoc """
   This module contains functions which process events received from the GUI.
   """
   require Logger
-  use Flamelex.GUI.ScenicEventsDefinitions
+  use Flamelex.API.GUI.ScenicEventsDefinitions
 
 
   # eliminate the don't cares

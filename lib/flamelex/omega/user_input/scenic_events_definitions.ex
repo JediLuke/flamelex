@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.ScenicEventsDefinitions do
+defmodule Flamelex.API.GUI.ScenicEventsDefinitions do
   @moduledoc """
   Contains module attribute definitions of all the Scenic input events.
   """

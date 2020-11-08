@@ -26,7 +26,7 @@ defmodule Franklin.OldCLI do
   # # def edit(buffer: :active, insert: string, after: x) when x >= 0 do
   # #   #
   # #   # find the active buffer & insert a character where the cursor is
-  # #   # Flamelex.GUI.Controller.fetch_active_buffer()
+  # #   # Flamelex.API.GUI.Controller.fetch_active_buffer()
   # #   Franklin.Buffer.Text.insert(:active_buffer, string, after: 7)
 
   # #   # fetch_buffer_pid!("unnamed")

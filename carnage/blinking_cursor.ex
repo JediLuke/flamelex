@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Component.Cursor do
+defmodule Flamelex.API.GUI.Component.Cursor do
   @moduledoc """
   Add a blinking text-input caret to a graph.
 

@@ -23,7 +23,7 @@ defmodule Flamelex.BufferBehaviour do
                         # a GUI.Component when the Buffer loads
       ]
 
-      # must implement all the callbacks defined in *this* module, `Flamelex.GUI.ComponentBehaviour`
+      # must implement all the callbacks defined in *this* module, `Flamelex.API.GUI.ComponentBehaviour`
       # @behaviour Flamelex.BufferBehaviour
 
       use GenServer
@@ -90,12 +90,12 @@ defmodule Flamelex.BufferBehaviour do
       """
       @impl GenServer
       def handle_cast(:show, buf) do
-        Flamelex.GUI.Controller.action({:show, buf})
+        Flamelex.API.GUI.Controller.action({:show, buf})
         {:noreply, buf}
       end
 
       def handle_cast(:hide, buf) do
-        Flamelex.GUI.Controller.action({:hide, buf})
+        Flamelex.API.GUI.Controller.action({:hide, buf})
         {:noreply, buf}
       end
 

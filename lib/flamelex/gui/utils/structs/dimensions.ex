@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Structs.Dimensions do
+defmodule Flamelex.API.GUI.Structs.Dimensions do
   @moduledoc """
   Struct which holds 2d points.
   """
@@ -13,7 +13,7 @@ defmodule Flamelex.GUI.Structs.Dimensions do
 
 
   def new(:viewport_size) do
-    %{size: dimensions} = Flamelex.GUI.Initialize.viewport_config()
+    %{size: dimensions} = Flamelex.API.GUI.Initialize.viewport_config()
     new(dimensions)
   end
 

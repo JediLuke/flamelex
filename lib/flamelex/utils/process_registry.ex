@@ -2,10 +2,6 @@ defmodule Flamelex.Utilities.ProcessRegistry do
   require Logger
   use Flamelex.ProjectAliases
 
-  @valid_process_types [
-    :buffer, :gui_component
-  ]
-
 
   def new_buffer_name_tuple(Flamelex.Buffer.Text, %{from_file: filename}) do
     buffer_tag =
@@ -29,7 +25,6 @@ defmodule Flamelex.Utilities.ProcessRegistry do
 
   #TODO make this register 1
   def register2(:buffer, id) do
-    IO.puts "REG2 buf id: #{inspect id}"
     gproc_register({:buffer, id})
   end
 

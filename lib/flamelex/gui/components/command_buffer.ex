@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Component.CommandBuffer do
+defmodule Flamelex.API.GUI.Component.CommandBuffer do
   use Scenic.Component
   use Flamelex.ProjectAliases
   alias GUI.Component.CommandBuffer.Reducer

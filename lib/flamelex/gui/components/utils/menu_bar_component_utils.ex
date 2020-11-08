@@ -1,7 +1,7 @@
-defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
-  alias Flamelex.GUI.Component.MenuBar
-  alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
-  alias Flamelex.GUI.Utilities.Draw
+defmodule Flamelex.API.GUI.Utilities.Drawing.MenuBarHelper do
+  alias Flamelex.API.GUI.Component.MenuBar
+  # alias Flamelex.API.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
+  alias Flamelex.API.GUI.Utilities.Draw
 
 
   def inactive_menubar(frame) do
@@ -49,7 +49,7 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
     margin = x + item_width * index
 
     # {:ok, {_key, sub_menu}} =
-    #   GUI.Component.MenuBar.menu_buttons_mapping()
+    #   Flamelex.API.GUI.Component.MenuBar.menu_buttons_mapping()
     #   |> Enum.fetch(index)
 
     #TODO real text
@@ -103,8 +103,8 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
     # graph
     # |> (fn graph ->
 
-    # |> Scenic.Primitives.rect({item_width, 120}, fill: :white, translate: {margin, y + GUI.Component.MenuBar.height()})
-    # |> Scenic.Primitives.text(text, font: @ibm_plex_mono, fill: :blue, translate: {left_margin + margin, y + 2*GUI.Component.MenuBar.height()})
+    # |> Scenic.Primitives.rect({item_width, 120}, fill: :white, translate: {margin, y + Flamelex.API.GUI.Component.MenuBar.height()})
+    # |> Scenic.Primitives.text(text, font: @ibm_plex_mono, fill: :blue, translate: {left_margin + margin, y + 2*Flamelex.API.GUI.Component.MenuBar.height()})
   end
 
 

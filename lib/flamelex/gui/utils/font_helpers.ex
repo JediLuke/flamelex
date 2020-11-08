@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.FontHelpers do
+defmodule Flamelex.API.GUI.FontHelpers do
   @moduledoc """
   A place to put functions I need to stuff with fonts with. ‾\_(ツ)_/‾
   """
