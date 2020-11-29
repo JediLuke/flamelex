@@ -88,7 +88,12 @@ defmodule Flamelex.BufferManager do
 
   def handle_call({:close_buffer, buf}, _from, state) do
     if state |> Enum.member?(buf) do
+      #TODO this needs cleanup...
       case ProcessRegistry.find_buffer(buf) do
+        pid when is_pid(pid) ->
+          pid |> GenServer.cast(:close)
+          new_state = state |> Enum.reject(& &1 == buf)
+          {:reply, :ok, new_state}
         {:ok, pid} ->
           pid |> GenServer.cast(:close)
           new_state = state |> Enum.reject(& &1 == buf)
