@@ -25,19 +25,28 @@ defmodule Flamelex.API.GUI.Utilities.Drawing.TextComponentDrawingLib do
     num_rows = frame.dimensions.height / block_height |> Float.ceil() |> trunc()
     num_cols = frame.dimensions.width  / block_width  |> Float.ceil() |> trunc()
 
-    tiles = generate_tiles(%{
-              text: text,
-              row: num_rows, #TODO rename to max
-              col: num_cols })
+    #TODO - this is the drawing part that needs fixing - bite num 2
 
-    opts = %{ block_width: block_width,
-              block_height: block_height,
-              cursor: cursor_position,
-              cursor_blink?: blink?,
-              mode: mode }
+    # tiles = generate_tiles(%{
+    #           text: text,
+    #           row: num_rows, #TODO rename to max
+    #           col: num_cols })
+
+    # IO.inspect tiles, label: "TTT"
+
+    # opts = %{ block_width: block_width,
+    #           block_height: block_height,
+    #           cursor: cursor_position,
+    #           cursor_blink?: blink?,
+    #           mode: mode }
+
+    # graph
+    # |> render_tiles(frame, tiles, opts)
+
+    # lines = break_text_into_lines(text)
 
     graph
-    |> render_tiles(frame, tiles, opts)
+    # |> render_lines(frame, lines, opts)
   end
 
   def render_text_grid(graph, %{
