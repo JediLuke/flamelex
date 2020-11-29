@@ -1,3 +1,9 @@
+defmodule Flamelex.Test.API.CommandBufferTest do
+  use ExUnit.Case
+
+end
+
+
 # defmodule Franklin.Test.CommandBuffer do
 #   use ExUnit.Case
 
