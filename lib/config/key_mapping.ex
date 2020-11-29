@@ -42,11 +42,20 @@ defmodule Flamelex.API.GUI.Control.Input.KeyMapping do
   @doc """
   This function is called by OmegaMaster to handle any user input.
   """
+  #TODO - next bite is coming out of here!!
   def lookup(%Flamelex.Structs.OmegaState{input: %{history: [last_key | _rest]}} = omega_state, input) do #NOTE: last key pressed was leader
     if last_key == leader() do
-      binding(@active_keybinding, omega_state)[leader()][input]
+      if binding(@active_keybinding, omega_state)[leader()][input] != nil do
+        binding(@active_keybinding, omega_state)[leader()][input]
+      else
+        :ignore_input
+      end
     else
-      binding(@active_keybinding, omega_state)[input]
+      if binding(@active_keybinding, omega_state)[input] != nil do
+        binding(@active_keybinding, omega_state)[input]
+      else
+        :ignore_input
+      end
     end
   end
 
