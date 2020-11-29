@@ -203,27 +203,27 @@ defmodule Flamelex.GUI.Controller do
 
   # #TODO so, I'm pretty sure this is just adding more & more shit to the graph,
   # # never taking it away...
-  # def handle_cast({:refresh, {:buffer, filename} = buf}, state) do
+  def handle_cast({:refresh, {:buffer, filename} = buf}, state) do
 
-  #   data  = Buffer.read(buf)
-  #   frame = calculate_framing(filename, state.layout)
-
-
+    data  = Buffer.read(buf)
+    frame = calculate_framing(filename, state.layout)
 
 
-  #   new_graph =
-  #     state.graph
-  #     |> Scenic.Graph.modify(@text_field_id, fn x ->
-  #       IO.puts "YES #{inspect x}"
-  #       x
-  #     end)
-  #     # |> GUI.Component.TextBox.draw({frame, data, %{}})
-  #     # |> Draw.test_pattern()
 
-  #   Flamelex.API.GUI.RootScene.redraw(new_graph)
 
-  #   {:noreply, %{state|graph: new_graph}}
-  # end
+    new_graph =
+      state.graph
+      |> Scenic.Graph.modify(@text_field_id, fn x ->
+        IO.puts "YES #{inspect x}"
+        x
+      end)
+      # |> GUI.Component.TextBox.draw({frame, data, %{}})
+      # |> Draw.test_pattern()
+
+    Flamelex.API.GUI.RootScene.redraw(new_graph)
+
+    {:noreply, %{state|graph: new_graph}}
+  end
 
 
 
