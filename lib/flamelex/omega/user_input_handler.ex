@@ -49,13 +49,11 @@ defmodule Flamelex.GUI.UserInputHandler do
     state |> OmegaState.add_to_history(input)
   end
 
-  def handle_input(%Flamelex.Structs.OmegaState{mode: :normal, active_buffer: active_buf} = state, input) do
+  def handle_input(%Flamelex.Structs.OmegaState{mode: :normal} = state, input) do
     Logger.debug "received some input whilst in :normal mode... #{inspect input}"
-    # buf = Buffer.details(active_buf)
-    case KeyMapping.lookup_action(state, input) do
+    case KeyMapping.lookup(state, input) do
       :ignore_input ->
-          state
-          |> OmegaState.add_to_history(input)
+          state |> OmegaState.add_to_history(input)
       {:apply_mfa, {module, function, args}} ->
           Kernel.apply(module, function, args)
             |> IO.inspect
