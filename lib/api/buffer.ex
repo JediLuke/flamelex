@@ -5,7 +5,6 @@ defmodule Flamelex.API.Buffer do
   require Logger
   use Flamelex.ProjectAliases
   alias Flamelex.BufferManager
-  alias Flamelex.Utilities.ProcessRegistry
 
 
 
@@ -81,19 +80,23 @@ defmodule Flamelex.API.Buffer do
     ProcessRegistry.find!(lookup_key)
     |> GenServer.call({:modify, modification})
   end
-  #NOTE: putting this first is a CLASSIC BLUNDER - infinite recursion
   def modify(id, modification) do
     modify({:buffer, id}, modification)
   end
 
 
 
-  # def save(buf) do
-  #   case ProcessRegistry.find_buffer(buf) do
-  #     {:ok,       pid} -> pid |> GenServer.call(:save)
-  #     {:error, reason} -> {:error, reason}
-  #   end
-  # end
+  def save(pid) when is_pid(pid) do
+    pid |> GenServer.call(:save)
+  end
+  def save({:buffer, _id} = lookup_key) do
+    ProcessRegistry.find!(lookup_key)
+    |> GenServer.call(:save)
+  end
+  def save(buf) do
+    save({:buffer, buf})
+  end
+
 
 
   def close(buf) do
