@@ -1,19 +1,15 @@
 defmodule Flamelex.API.GUI.Control.Input.KeyMapping do
   use Flamelex.ProjectAliases
   use Flamelex.API.GUI.ScenicEventsDefinitions
-  alias Flamelex.Structs.OmegaState
-
 
 
   @active_keybinding :vim_inspired_flamelex
-
 
 
   @doc """
   This function defines which key acts as the `leader`.
   """
   def leader, do: @space_bar
-
 
 
   @doc """
@@ -38,27 +34,35 @@ defmodule Flamelex.API.GUI.Control.Input.KeyMapping do
   end
 
 
-
   @doc """
   This function is called by OmegaMaster to handle any user input.
   """
-  #TODO - next bite is coming out of here!!
-  def lookup(%Flamelex.Structs.OmegaState{input: %{history: [last_key | _rest]}} = omega_state, input) do #NOTE: last key pressed was leader
+  def lookup(%Flamelex.Structs.OmegaState{input: %{history: [last_key | _rest]}} = omega_state, input) do
     if last_key == leader() do
-      if binding(@active_keybinding, omega_state)[leader()][input] != nil do
-        binding(@active_keybinding, omega_state)[leader()][input]
-      else
-        :ignore_input
-      end
+      fetch_leader_mapping(omega_state, input)
     else
-      if binding(@active_keybinding, omega_state)[input] != nil do
-        binding(@active_keybinding, omega_state)[input]
-      else
-        :ignore_input
-      end
+      fetch_mapping(omega_state, input)
     end
   end
 
+
+  defp fetch_leader_mapping(omega_state, input) do
+    if b = binding(@active_keybinding, omega_state)[leader()][input] != nil do
+      IO.inspect b, label: "BBBB"
+      binding(@active_keybinding, omega_state)[leader()][input]
+    else
+      :ignore_input
+    end
+  end
+
+
+  defp fetch_mapping(omega_state, input) do
+    if binding(@active_keybinding, omega_state)[input] != nil do
+      binding(@active_keybinding, omega_state)[input]
+    else
+      :ignore_input
+    end
+  end
 
 
   defp move_cursor(active_text_bufr, {direction, x}) do
