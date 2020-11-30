@@ -8,7 +8,8 @@ defmodule Flamelex.MixProject do
       elixir: "~> 1.9",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      docs: docs()
     ]
   end
 
@@ -35,7 +36,18 @@ defmodule Flamelex.MixProject do
       {:elixir_uuid, "~> 1.2"},
       {:jason, "~> 1.1"},
       {:gproc, "~> 0.5.0"}, #TODO remove gproc, use Registry
-      {:tzdata, "~> 1.0.4"}
+      {:tzdata, "~> 1.0.4"},
+      {:ex_doc, "~> 0.23", only: :dev, runtime: false}
+    ]
+  end
+
+  defp docs do
+    [
+      # source_url: "https://github.com/YourAcct/project",
+      extras: ["README.md"]
+      # groups_for_modules: groups_for_modules(),
+      # extras: extras(),
+      # groups_for_extras: groups_for_extras()
     ]
   end
 end
