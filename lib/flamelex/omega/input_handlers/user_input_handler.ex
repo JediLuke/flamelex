@@ -27,24 +27,52 @@ defmodule Flamelex.GUI.UserInputHandler do
   end
 
 
-  #TODO how can we know what input requres waiting (because we awant to change some OmegaState atomically), and what doesnt?
-  defp we_need_to_update_omega_state_atomically_when_processing_this?(_input) do
-    false  #TODO
-  end
-
-
-  defp spawn_new_syncronous_task_handler do
+  def spawn_new_syncronous_task_handler do
     raise "woops!"
     # Task.Supervisor.async(MyApp.TaskSupervisor, fn ->
     #   # Do something
     # end)
   end
 
-  defp spawn_new_async_task_handler(omega_state, input) do
+
+  def spawn_new_async_task_handler(omega_state, input) do
     Flamelex.Omega.UserInput.TaskSupervisor
     |> Task.Supervisor.start_child(
-         key_mapping(),        # module
-         :async_handle_input,  # function
-         [omega_state, input]) # args
+         __MODULE__,                            # module
+         :async_handle_input,                   # function
+         [key_mapping(), omega_state, input])   # args
   end
+
+
+  def async_handle_input(key_mapping, %OmegaState{} = omega_state, input) do
+    IO.puts "This thread #{inspect self()} is handling sync inpuit!! #{inspect input}"
+    # case lookup() do
+
+
+  # case KeyMapping.lookup(state, input) do
+  #   :ignore_input ->
+  #       state |> OmegaState.add_to_history(input)
+  #   {:apply_mfa, {module, function, args}} ->
+  #       Kernel.apply(module, function, args)
+  #         |> IO.inspect
+  #       state |> OmegaState.add_to_history(input)
+  # end
+
+
+
+    # end
+    # Kernel.apply(m, f, a)
+    # |> IO.inspect
+
+    :timer.sleep(15_000)
+    IO.puts "ok time to die..."
+    #TODO can fire actions here!!
+  end
+
+  #TODO how can we know what input requres waiting (because we awant to change some OmegaState atomically), and what doesnt?
+  defp we_need_to_update_omega_state_atomically_when_processing_this?(_input) do
+    false  #TODO
+  end
+
+
 end

@@ -125,7 +125,6 @@ defmodule Flamelex.OmegaMaster do
   end
 
   def handle_cast({:user_input, input}, omega_state) do
-
     Logger.debug "#{__MODULE__} handling input: #{inspect input}"
 
     new_omega_state =

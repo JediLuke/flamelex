@@ -15,27 +15,6 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
 
 
 
-  # case KeyMapping.lookup(state, input) do
-  #   :ignore_input ->
-  #       state |> OmegaState.add_to_history(input)
-  #   {:apply_mfa, {module, function, args}} ->
-  #       Kernel.apply(module, function, args)
-  #         |> IO.inspect
-  #       state |> OmegaState.add_to_history(input)
-  # end
-
-  def async_handle_input(%OmegaState{} = omega_state, input) do
-    IO.puts "This thread #{inspect self()} is handling sync inpuit!! #{inspect input}"
-    # case lookup() do
-
-    # end
-    # Kernel.apply(m, f, a)
-    # |> IO.inspect
-
-    :timer.sleep(15_000)
-    IO.puts "ok time to die..."
-    #TODO can fire actions here!!
-  end
 
   # @doc """
   # This map defines the effect of pressing a key, to a function call.
