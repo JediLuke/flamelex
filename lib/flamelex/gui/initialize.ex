@@ -12,7 +12,7 @@ defmodule Flamelex.GUI.Initialize do
   # @size_80col_termnl {800, 600}     # with size 24 font
 
 
-  @root_scene Flamelex.API.GUI.RootScene
+  @root_scene Flamelex.GUI.RootScene
 
 
   @main_viewport_config %{

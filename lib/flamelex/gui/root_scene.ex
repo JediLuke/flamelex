@@ -1,20 +1,23 @@
-defmodule Flamelex.API.GUI.RootScene do
-  @moduledoc """
-  This Scenic.Scene contains the root graph. It is also responsible for
-  capturing user-input.
-  """
+defmodule Flamelex.GUI.RootScene do
+  @moduledoc false
   use Scenic.Scene
   alias Flamelex.API.GUI.Utilities.Draw
 
+  # This Scenic.Scene contains the root graph. In the end, to re-draw
+  # to the screen, we must update this process. It is also responsible
+  # for capturing user-input (this is just how Scenic behaves),
+  # which then gets forwarded to OmegaMaster, so it can be handled within
+  # the context of the global state.
 
-  def init(nil = _init_params, _opts) do
+
+  def init(_params, _opts) do
     IO.puts "#{__MODULE__} initializing..."
 
     Process.register(self(), __MODULE__)
     Flamelex.GUI.Initialize.load_custom_fonts_into_global_cache()
 
-    #NOTE: `Flamelex.GUI.Controller` will boot next & take control of the scene,
-    #      so we just need to initialize it with *something*
+    #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
+    #      the scene, so we just need to initialize it with *something*
     {:ok, push: Draw.blank_graph()}
   end
 
@@ -28,7 +31,7 @@ defmodule Flamelex.API.GUI.RootScene do
 
 
   def handle_input(input, _context, state) do
-    Flamelex.OmegaMaster.handle_input(input)
+    Flamelex.OmegaMaster |> GenServer.cast({:user_input, input})
     {:noreply, state}
   end
 

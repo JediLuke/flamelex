@@ -1,81 +1,104 @@
+# omega_master.ex
+# author: Luke Taylor
+#
+# This file contains 2 modules:
+#   - OmegaState      # the struct which holds the state for OmegaMaster
+#   - OmegaMaster     # a GenServer which holds the highest-level state
+
+defmodule Flamelex.Structs.OmegaState do
+  @moduledoc false
+  use Flamelex.ProjectAliases
+
+  # restrict possible modes to those within this list
+  @modes [:normal, :command]
+
+  defstruct [
+    mode:           :normal,    # The input mode
+    #TODO just a list of input_history, no need for the map
+    # input: %{
+    #   history:      []          # A list of all previous input events
+    # },
+    # active_buffer:  nil         # We need to know the active buffer
+  ]
+
+  def new do
+    %__MODULE__{
+      mode: :normal
+    }
+  end
+
+  #TODO should be done with changesets...
+  def set(%__MODULE__{} = omega, mode: m) when m in @modes do
+    %{omega|mode: m}
+  end
+
+  #TODO cap the length of this list
+  # def add_to_history(%__MODULE__{} = omega, input) do
+  #   put_in(omega.input.history, omega.input.history ++ [input])
+  # end
+end
+
+
 defmodule Flamelex.OmegaMaster do
   @moduledoc """
-  The OmegaMaster holds all global state, acts as a conduit for all
-  user-input, and manages modes. We need a single junction-point where
-  all the data required to make decisions can be combined & acted upon -
-  this is it.
+  The OmegaMaster holds the highest-level flamelex state.
 
-  All inputs get sent here, & then thrown into the Omega.Reducer (along with
-  the OmegaState, which represents the global-variables for Flamelex).
+  The OmegaMaster holds all global state, including:
+    - the user-input mode
+    - the input history (both keystrokes, & commands)
+    - it acts as a conduit for all user-input (which got sent
+      here by `Flamelex.GUI.RootScene`)
+
+  We need a single junction-point
+  where all the data required to make decisions can be combined & acted
+  upon - this is it.
 
   What belongs in the domain of OmegaState? Anything which affects both
   buffers & GUI components. e.g. opening the Command buffer requires:
-
   * changing the input mode
   * checking the contents of `Flamelex.Buffer.Command`
   * rendering the GUI.Component
+  * etc...
+  changing the input mode alone requires that we make our changes at the
+  OmegaMaster level, so we might as well just put the rest as side-effects
+  in the reducer at this level. This makes sense because it's a heirarchy -
+  since we need to change the input it's an OmegaMaster level change, so
+  the function to open the Command buffer must be implemented at this level.
+  If we don't need to alter anything at this level, then do not implement
+  it in a reducer/handler at this level, handle it somewhere lower.
 
+  #TODO
+  When we need to trigger something at the Omega level, we can use actions.
+  Actions get passed to the reducer.
 
+  User input also gets funneled through this process - the OmegaState (which
+  includes the user-input history) and the input itself are handled by
+  one of the InputHandler functions, which operate in basically the same
+  manner as reducers.
   """
   use GenServer
   use Flamelex.ProjectAliases
-  alias Flamelex.BufferManager
+  use Flamelex.GUI.ScenicEventsDefinitions
   alias Flamelex.Structs.OmegaState
   require Logger
 
 
   def start_link(_params) do
-    initial_state = OmegaState.init()
+    initial_state = OmegaState.new()
     GenServer.start_link(__MODULE__, initial_state)
   end
 
-  @doc """
-  This function handles user input. All input from the entire GUI routes
-  through here.
-
-  We use the state of the root scene (which may include global variables
-  such as which mode we are in, and the recent input history, to allow
-  chaining of keystrokes), as well as the input itself, to compute the new
-  state, as well as fire off any secondary events or updates that this
-  input requests.
-  """
-  def handle_input(input) do
-    GenServer.cast(__MODULE__, {:handle_input, input})
-  end
 
   @doc """
   This function enables us to fire actions off which enact changes, at
   the OmegaMaster level, but which aren't stricly responses to user input.
   """
-  def action(a) do
-    GenServer.cast(__MODULE__, {:action, a})
-  end
-
-  #TODO deprecate these
-  def switch_mode(m), do: GenServer.cast(__MODULE__, {:switch_mode, m})
-  def open_buffer(params), do: GenServer.call(__MODULE__, {:open_buffer, params})
-  def show(:command_buffer = x), do: GenServer.cast(__MODULE__, {:show, x})
-  def hide(:command_buffer = x), do: GenServer.cast(__MODULE__, {:hide, x})
+  def action(a), do: GenServer.cast(__MODULE__, {:action, a})
 
 
   ## GenServer callbacks
   ## -------------------------------------------------------------------
 
-
-
-  # def handle_input(%Flamelex.Structs.OmegaState{mode: :normal, active_buffer: active_buf} = state, input) do
-  #   Logger.debug "received some input whilst in :normal mode... #{inspect input}"
-  #   # buf = Buffer.details(active_buf)
-  #   case KeyMapping.lookup_action(state, input) do
-  #     :ignore_input ->
-  #         state
-  #         |> OmegaState.add_to_history(input)
-  #     {:apply_mfa, {module, function, args}} ->
-  #         Kernel.apply(module, function, args)
-  #           |> IO.inspect
-  #         state |> OmegaState.add_to_history(input)
-  #   end
-  # end
 
   def init(%Flamelex.Structs.OmegaState{} = omega_state) do
     IO.puts "#{__MODULE__} initializing..."
@@ -84,77 +107,41 @@ defmodule Flamelex.OmegaMaster do
   end
 
 
+  # This function handles user input. All input from the entire GUI
+  # gets routed through here (it gets sent here by
+  # Flamelex.GUI.RootScene.handle_input/3)
+  #
+  # We use the state of the root scene (which may include global variables
+  # such as which mode we are in, and the recent input history, to allow
+  # chaining of keystrokes), as well as the input itself, to compute the
+  # new state, as well as fire off any secondary events or updates that
+  # this input requests.
+  # REMINDER: actions may be fired by this reducer, causing side-effects
 
+  # eliminate the don't cares
+  def handle_cast({:user_input, input}, omega_state) when input in @inputs_we_dont_care_about do
+    IO.puts "IGNORING #{inspect input}"
+    omega_state # pass through unaltered state (do nothing)
+  end
 
-  def handle_cast({:handle_input, input}, omega_state) do
+  def handle_cast({:user_input, input}, omega_state) do
+
+    Logger.debug "#{__MODULE__} handling input: #{inspect input}"
 
     new_omega_state =
       omega_state
-      #REMINDER: actions may be pushed down to other buffers by this reducer
       |> Flamelex.GUI.UserInputHandler.handle_input(input)
+      # |> OmegaState.add_to_history(input) #TODO
 
     {:noreply, new_omega_state}
   end
 
-  def handle_cast({:switch_mode, m}, omega_state) do
 
-    {:gui_component, omega_state.active_buffer}
-    |> ProcessRegistry.find!
-    |> GenServer.cast({:switch_mode, m})
+  def handle_cast({:action, a}, omega_state) do
+    new_omega_state =
+      omega_state
+      |> Flamelex.Omega.Reducer.process_action(a)
 
-    # :ok = Flamelex.GUI.Controller.switch_mode(m)
-
-    {:noreply, %{omega_state|mode: m}}
+    {:noreply, new_omega_state}
   end
-
-
-
-  #TODO maybe x will be worth considering eventually???
-  def handle_cast({:show, :command_buffer}, omega_state) do
-    case Buffer.read(:command_buffer) do
-      data when is_bitstring(data) ->
-        new_omega_state = %{omega_state|mode: :command}
-        #TODO so this should then be responsible for managing the buffer process (starting/stopping/finding if sleeping) nd causing it to refresh, whilst also making it visible by forcing a redraw
-        Flamelex.API.GUI.Component.CommandBuffer.show()
-        {:noreply, new_omega_state}
-      e ->
-        raise "Unable to read Buffer.Command. #{inspect e}"
-    end
-  end
-
-  def handle_cast({:hide, :command_buffer}, omega_state) do
-    # Flamelex.GUI.Controller.hide(:command_buffer)
-    Flamelex.API.GUI.Component.CommandBuffer.hide()
-    {:noreply, %{omega_state|mode: :normal}}
-  end
-
-  def handle_call({:open_buffer, %{
-    type: :text,
-    from_file: filepath,
-    open_in_gui?: true
-  } = params}, _from, omega_state) do
-
-    {:ok, new_buf} = BufferManager.open_buffer(params)
-
-    :ok = Flamelex.GUI.Controller.show({:buffer, filepath}, omega_state)
-
-    {:reply, {:ok, new_buf}, %{omega_state|active_buffer: new_buf}}
-  end
-
-  def handle_call({:open_buffer, %{name: name, open_in_gui?: true} = params}, _from, omega_state) do
-
-    {:ok, new_buf} = BufferManager.open_buffer(params)
-
-    :ok = Flamelex.GUI.Controller.show({:buffer, name}, omega_state)
-
-    {:reply, {:ok, new_buf}, %{omega_state|active_buffer: new_buf}}
-  end
-
-  # def handle_cast({:action, a}, omega_state) do
-  #   new_omega_state =
-  #     omega_state
-  #     # |> Flamelex.Omega.Reducer.process_action(a)
-
-  #   {:noreply, new_omega_state}
-  # end
 end

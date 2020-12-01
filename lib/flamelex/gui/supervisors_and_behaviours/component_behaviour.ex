@@ -119,7 +119,8 @@ defmodule Flamelex.API.GUI.ComponentBehaviour do
   # %Frame{} datastructure. This function takes in that Component definition
   # and returns a %Scenic.Graph{} which can be drawn by Scenic.
   """
-  @callback render(%Flamelex.GUI.Structs.Frame{}) :: %Scenic.Graph{}
+  #TODO
+  # @callback render(%Flamelex.GUI.Structs.Frame{}) :: %Scenic.Graph{}
 
   @doc """
   This function may be implemented as many times as necessary, to handle
