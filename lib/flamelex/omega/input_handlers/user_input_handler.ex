@@ -45,34 +45,17 @@ defmodule Flamelex.GUI.UserInputHandler do
 
 
   def async_handle_input(key_mapping, %OmegaState{} = omega_state, input) do
-    IO.puts "This thread #{inspect self()} is handling sync inpuit!! #{inspect input}"
-    # case lookup() do
-
-
-  # case KeyMapping.lookup(state, input) do
-  #   :ignore_input ->
-  #       state |> OmegaState.add_to_history(input)
-  #   {:apply_mfa, {module, function, args}} ->
-  #       Kernel.apply(module, function, args)
-  #         |> IO.inspect
-  #       state |> OmegaState.add_to_history(input)
-  # end
-
-
-
-    # end
-    # Kernel.apply(m, f, a)
-    # |> IO.inspect
-
-    :timer.sleep(15_000)
-    IO.puts "ok time to die..."
-    #TODO can fire actions here!!
+    case key_mapping.lookup(omega_state, input) do
+      :ignore_input ->
+          :ok
+      {:apply_mfa, {module, function, args}} ->
+          Kernel.apply(module, function, args) |> IO.inspect
+          :ok
+    end
   end
 
   #TODO how can we know what input requres waiting (because we awant to change some OmegaState atomically), and what doesnt?
   defp we_need_to_update_omega_state_atomically_when_processing_this?(_input) do
     false  #TODO
   end
-
-
 end

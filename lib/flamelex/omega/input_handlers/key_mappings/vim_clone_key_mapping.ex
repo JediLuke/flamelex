@@ -43,14 +43,16 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
   # This function is called by OmegaMaster to handle any user input.
   # """
   # # def lookup(%Flamelex.Structs.OmegaState{input: %{history: [last_key | _rest]}} = omega_state, input) do #NOTE: last key pressed was leader
-  # def lookup(%OmegaState{} = omega_state, input) do
-  #   # if last_key == leader() do
-  #   #   IO.puts "LEADER"
-  #   #   binding(@active_keybinding, omega_state)[leader()][input]
-  #   # else
-  #     binding(@active_keybinding, omega_state)[input]
-  #   # end
-  # end
+  def lookup(%OmegaState{} = omega_state, input) do
+    # if last_key == leader() do
+    #   IO.puts "LEADER"
+    #   binding(@active_keybinding, omega_state)[leader()][input]
+    # else
+      # binding(@active_keybinding, omega_state)[input]
+    # end
+    IO.puts "Vim clone - ignoring input: #{inspect input}, mode: #{inspect omega_state.mode}"
+    :ignore_input
+  end
 
 
 
