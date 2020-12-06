@@ -3,7 +3,7 @@ defmodule Flamelex.GUI.InputHandler.InsertMode do
   use Flamelex.ProjectAliases
   use Flamelex.GUI.ScenicEventsDefinitions
   alias Flamelex.Structs.OmegaState
-  alias Flamelex.API.GUI.Control.Input.KeyMapping
+  alias Flamelex.GUI.Control.Input.KeyMapping
 
   def handle(%OmegaState{} = state, input) when input in @valid_command_buffer_inputs do
     case KeyMapping.lookup(state, input) do

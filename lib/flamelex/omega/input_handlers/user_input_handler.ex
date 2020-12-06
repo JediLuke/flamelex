@@ -43,14 +43,24 @@ defmodule Flamelex.GUI.UserInputHandler do
          [key_mapping(), omega_state, input])   # args
   end
 
-
+  #NOTE: key_mapping is an Elixir module implementing the KeyMapping behaviour #TODO
   def async_handle_input(key_mapping, %OmegaState{} = omega_state, input) do
+    Logger.debug "processing input... #{inspect input}"
     case key_mapping.lookup(omega_state, input) do
       :ignore_input ->
           :ok
       {:apply_mfa, {module, function, args}} ->
-          Kernel.apply(module, function, args) |> IO.inspect
-          :ok
+          #TODO use this try/catch
+          # try do
+          #   Kernel.apply(module, function, args)
+          #   |> IO.inspect
+          # rescue
+          #   _e in UndefinedFunctionError ->
+          #     #TODO print this in red - & remove all calls to Logger
+          #     IO.puts "Attempted to apply MFA on an undefined MFA"
+          # end
+          Kernel.apply(module, function, args)
+          |> IO.inspect
     end
   end
 

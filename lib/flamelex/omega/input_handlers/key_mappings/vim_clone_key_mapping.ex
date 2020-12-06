@@ -7,76 +7,75 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
   #TODO should be a behaviour...
 
 
+  @doc """
+  This function is called by OmegaMaster to handle any user input.
+  """
+  def lookup(%OmegaState{mode: m} = omega_state, input) when m in [:normal, :command] do
+    if input == leader_key() do
+      :ignore_input
+    else
+      lookup_keystroke(omega_state, leader_key(), input)
+    end
+  end
+
 
   @doc """
   This function defines which key acts as the `leader`.
   """
-  def leader, do: @space_bar
+  def leader_key, do: @space_bar
 
 
+  def lookup_keystroke(%OmegaState{mode: m} = omega_state, leader, input) when m in [:normal, :command] do
+    lookup_result =
+      if omega_state |> OmegaState.last_keystroke() == leader_key() do
+        keymap(omega_state)[leader][input]
+      else
+        keymap(omega_state)[input]
+      end
 
-
-  # @doc """
-  # This map defines the effect of pressing a key, to a function call.
-  # """
-  # def binding(:vim_inspired_flamelex, %{mode: :normal, active_buffer: buf}) do #TODO we want to be bassing buffer structs around here...
-  #   %{
-  #     # normal mode navigation
-  #     @lowercase_h => move_cursor(buf, {:left,  1}),
-  #     @lowercase_j => move_cursor(buf, {:down,  1}),
-  #     @lowercase_k => move_cursor(buf, {:up,    1}),
-  #     @lowercase_l => move_cursor(buf, {:right, 1}),
-
-  #     # switch modes
-  #     @lowercase_i => {:apply_mfa, {Flamelex, :switch_mode, [:insert]}},
-
-  #     # leader keys
-  #     leader() => %{
-  #       @lowercase_k => {:apply_mfa, {Flamelex.API.CommandBuffer, :show, []}}
-  #     }
-  #   }
-  # end
-
-
-
-  # @doc """
-  # This function is called by OmegaMaster to handle any user input.
-  # """
-  # # def lookup(%Flamelex.Structs.OmegaState{input: %{history: [last_key | _rest]}} = omega_state, input) do #NOTE: last key pressed was leader
-  def lookup(%OmegaState{} = omega_state, input) do
-    # if last_key == leader() do
-    #   IO.puts "LEADER"
-    #   binding(@active_keybinding, omega_state)[leader()][input]
-    # else
-      # binding(@active_keybinding, omega_state)[input]
-    # end
-    IO.puts "Vim clone - ignoring input: #{inspect input}, mode: #{inspect omega_state.mode}"
-    :ignore_input
+    if lookup_result == nil do
+      :ignore_input
+    else
+      lookup_result
+    end
   end
 
 
 
-  defp move_cursor(active_text_bufr, {direction, x}) do
-    {:apply_mfa, {Flamelex.Buffer.Text, :move_cursor, [active_text_bufr, {direction,  x}]}}
+  @doc """
+  This map defines the effect of pressing a key, to a function call.
+  """
+  def keymap(%OmegaState{}) do
+    %{
+      # normal mode navigation
+      # @lowercase_h => move_cursor(omega_state, {:left,  1}),
+      # @lowercase_j => move_cursor(omega_state, {:down,  1}),
+      # @lowercase_k => move_cursor(omega_state, {:up,    1}),
+      # @lowercase_l => move_cursor(omega_state, {:right, 1}),
+
+      # switch modes
+      # @lowercase_i => {:apply_mfa, {Flamelex, :switch_mode, [:insert]}},
+
+      # leader keys
+      leader_key() => %{
+        @lowercase_j => {:apply_mfa, {Flamelex.API.Journal, :today, []}},
+        @lowercase_k => {:apply_mfa, {Flamelex.API.CommandBuffer, :show, []}}
+      }
+    }
+  end
+
+
+
+
+
+
+  defp move_cursor(%OmegaState{} = omega_state, {direction, x}) do
+    raise "lol"
+    # {:apply_mfa, {Flamelex.Buffer.Text, :move_cursor, [active_text_bufr, {direction,  x}]}}
   end
 end
 
 
-
-
-
-
-
-
-  # # # @readme "/Users/luke/workbench/elixir/franklin/README.md"
-  # # # @dev_tools "/Users/luke/workbench/elixir/franklin/lib/utilities/dev_tools.ex"
-
-
-
-
-  # # ## -------------------------------------------------------------------
-  # # ## Command mode
-  # # ## -------------------------------------------------------------------
 
 
   # # def handle_input(%Flamelex.Structs.OmegaState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
@@ -200,7 +199,7 @@ end
 
 
 
-  # defmodule Flamelex.API.GUI.Control.Input.KeyMapping do
+  # defmodule Flamelex.GUI.Control.Input.KeyMapping do
   #   use Flamelex.ProjectAliases
   #   use Flamelex.GUI.ScenicEventsDefinitions
   #   alias Flamelex.Structs.OmegaState
