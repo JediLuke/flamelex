@@ -1,4 +1,4 @@
-defmodule Flamelex.API.GUI.Component.CommandBuffer.DrawingHelpers do
+defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
   use Flamelex.ProjectAliases
 
 
@@ -6,7 +6,7 @@ defmodule Flamelex.API.GUI.Component.CommandBuffer.DrawingHelpers do
   @prompt_size 18
   @prompt_margin 12
 
-  @font_size Flamelex.API.GUI.Fonts.size()
+  @font_size Flamelex.GUI.Fonts.size()
   # @cursor_width GUI.FontHelpers.monospace_font_width(:ibm_plex, @font_size) #TODO get this properly
   @cursor_width 16
 
@@ -127,14 +127,14 @@ end
 
 
 
-# defmodule Flamelex.API.GUI.Utilities.Drawing.CommandBufferDrawingLib do
+# defmodule Flamelex.GUI.Utilities.Drawing.CommandBufferDrawingLib do
 #   use Flamelex.ProjectAliases
 
 #   def frame(%Dimensions{} = viewport, name \\ "CommandBuffer") do
 #     Frame.new(
 #       name:     name,
 #       top_left: {0, 0},
-#       size:     {viewport.width, Flamelex.API.GUI.Component.MenuBar.height()})
+#       size:     {viewport.width, Flamelex.GUI.Component.MenuBar.height()})
 #   end
 # end
 
@@ -146,7 +146,7 @@ end
 
 
 
-# defmodule Flamelex.API.GUI.Component.CommandBuffer.DrawingHelpers do
+# defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
 #   use Flamelex.ProjectAliases
 
 
@@ -154,7 +154,7 @@ end
 #   @prompt_size 18
 #   @prompt_margin 12
 
-#   @font_size Flamelex.API.GUI.Fonts.size()
+#   @font_size Flamelex.GUI.Fonts.size()
 #   # @cursor_width GUI.FontHelpers.monospace_font_width(:ibm_plex, @font_size) #TODO get this properly
 #   @cursor_width 16
 
@@ -278,14 +278,14 @@ end
 
 
 
-# defmodule Flamelex.API.GUI.Component.CommandBuffer.Reducer do
+# defmodule Flamelex.GUI.Component.CommandBuffer.Reducer do
 #   @moduledoc """
 #   This module contains reducer functions - they take in a graph, & an
 #   'action' (usually a string, sometimed with some params) and return a
 #   mutated state and/or graph.
 #   """
 #   alias Scenic.Graph
-#   alias Flamelex.API.GUI.Component.CommandBuffer.DrawingHelpers
+#   alias Flamelex.GUI.Component.CommandBuffer.DrawingHelpers
 #   import Scenic.Primitives
 #   require Logger
 #   use Flamelex.ProjectAliases

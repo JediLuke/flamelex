@@ -1,7 +1,7 @@
 defmodule Flamelex.GUI.RootScene do
   @moduledoc false
   use Scenic.Scene
-  alias Flamelex.API.GUI.Utilities.Draw
+  alias Flamelex.GUI.Utilities.Draw
 
   # This Scenic.Scene contains the root graph. In the end, to re-draw
   # to the screen, we must update this process. It is also responsible

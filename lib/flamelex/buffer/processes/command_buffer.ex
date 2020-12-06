@@ -9,7 +9,7 @@ defmodule Flamelex.Buffer.Command do
   use GenServer
   use Flamelex.ProjectAliases
   require Logger
-  alias Flamelex.API.GUI.Component.CommandBuffer, as: GUIComponent
+  alias Flamelex.GUI.Component.CommandBuffer, as: GUIComponent
 
   @buffer_id :command_buffer
 

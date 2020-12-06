@@ -1,7 +1,7 @@
-defmodule Flamelex.API.GUI.Fonts do
+defmodule Flamelex.GUI.Fonts do
 
   def primary do
-    Flamelex.API.GUI.FontHelpers.font_hash(:ibm_plex_mono)
+    Flamelex.GUI.FontHelpers.font_hash(:ibm_plex_mono)
   end
 
   @doc """

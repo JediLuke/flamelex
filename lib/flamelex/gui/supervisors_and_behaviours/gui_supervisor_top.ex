@@ -1,4 +1,4 @@
-defmodule Flamelex.API.GUI.TopLevelSupervisor do
+defmodule Flamelex.GUI.TopLevelSupervisor do
   @moduledoc false
   use Supervisor
 

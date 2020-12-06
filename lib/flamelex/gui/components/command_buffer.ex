@@ -1,7 +1,7 @@
-defmodule Flamelex.API.GUI.Component.CommandBuffer do
+defmodule Flamelex.GUI.Component.CommandBuffer do
   use Scenic.Component
   use Flamelex.ProjectAliases
-  alias GUI.Component.CommandBuffer.Reducer
+  alias Flamelex.GUI.Component.CommandBuffer.DrawingHelpers
   require Logger
   @moduledoc """
   This module is responsible for drawing the CommandBuffer.
@@ -62,7 +62,7 @@ defmodule Flamelex.API.GUI.Component.CommandBuffer do
     #TODO search for if the process is already registered, if it is, engage recovery procedure
     Process.register(self(), __MODULE__) #TODO this should be gproc
 
-    graph = Reducer.initialize(state)
+    graph = initialize(state)
 
     {:ok, {state, graph}, push: graph}
   end
@@ -129,6 +129,7 @@ defmodule Flamelex.API.GUI.Component.CommandBuffer do
   # end
 
   def handle_cast(:show, {state, graph}) do
+    IO.puts "SHOWING!!!"
     new_graph = graph |> set_visibility(@component_id, :show)
     {:noreply, {state, new_graph}, push: new_graph}
   end
@@ -216,5 +217,35 @@ defmodule Flamelex.API.GUI.Component.CommandBuffer do
   #   })
   # end
 
+
+
+
+
+
+
+  def initialize(%Frame{} = frame) do
+    # the textbox is internal to the command buffer, but we need the
+    # coordinates of it in a few places, so we pre-calculate it here
+    textbox_frame =
+      %Frame{} = DrawingHelpers.calc_textbox_frame(frame)
+
+    command_mode_background_color = :cornflower_blue
+    component_id = :command_buffer
+    cursor_component_id  = {component_id, :cursor, 1}
+    text_field_id = {component_id, :text_field}
+
+    Draw.blank_graph()
+    |> Scenic.Primitives.group(fn graph ->
+         graph
+         |> Draw.background(frame, command_mode_background_color)
+         |> DrawingHelpers.draw_command_prompt(frame)
+         |> DrawingHelpers.draw_input_textbox(textbox_frame)
+        #  |> DrawingHelpers.draw_cursor(textbox_frame, id: cursor_component_id)
+         |> DrawingHelpers.draw_text_field("", textbox_frame, id: text_field_id) #NOTE: Start with an empty string
+    end, [
+      id: component_id,
+      hidden: true
+    ])
+  end
 
 end

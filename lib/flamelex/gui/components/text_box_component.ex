@@ -1,9 +1,9 @@
-defmodule Flamelex.API.GUI.Component.TextBox do
+defmodule Flamelex.GUI.Component.TextBox do
   @moduledoc false
   use Scenic.Component
   require Logger
   use Flamelex.ProjectAliases
-  alias Flamelex.API.GUI.Utilities.Drawing.TextComponentDrawingLib, as: TextBoxDraw
+  alias Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib, as: TextBoxDraw
 
   @blink_ms trunc(500) # blink speed in hertz
 

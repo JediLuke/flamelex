@@ -1,4 +1,4 @@
-defmodule Flamelex.API.GUI.Component.ColoredBox do
+defmodule Flamelex.GUI.Component.ColoredBox do
   @moduledoc false
 
 

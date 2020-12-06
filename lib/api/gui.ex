@@ -23,8 +23,8 @@ defmodule Flamelex.API.GUI do
   end
 
   defmodule MenuBar do
-    def show, do: Flamelex.API.GUI.Component.MenuBar.action(:show)
-    def hide, do: Flamelex.API.GUI.Component.MenuBar.action(:hide)
+    def show, do: Flamelex.GUI.Component.MenuBar.action(:show)
+    def hide, do: Flamelex.GUI.Component.MenuBar.action(:hide)
   end
 
   def enable do

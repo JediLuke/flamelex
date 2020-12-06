@@ -1,4 +1,4 @@
-defmodule Flamelex.API.GUI.GeometryLib.Trigonometry do
+defmodule Flamelex.GUI.GeometryLib.Trigonometry do
   use Flamelex.ProjectAliases
 
 

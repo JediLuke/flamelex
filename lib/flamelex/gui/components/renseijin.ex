@@ -1,4 +1,4 @@
-defmodule Flamelex.API.GUI.Component.TransmutationCircle do #TODO rename to Renseijin
+defmodule Flamelex.GUI.Component.TransmutationCircle do #TODO rename to Renseijin
   @moduledoc """
   In order to begin an alchemical transmutation, a symbol called a
   Transmutation Circle (錬成陣, Renseijin) is necessary. A Transmutation
@@ -33,12 +33,12 @@ defmodule Flamelex.API.GUI.Component.TransmutationCircle do #TODO rename to Rens
 
     - https://fma.fandom.com/wiki/Alchemy
   """
-  use Flamelex.API.GUI.ComponentBehaviour
-  alias Flamelex.API.GUI.GeometryLib.Trigonometry
+  use Flamelex.GUI.ComponentBehaviour
+  alias Flamelex.GUI.GeometryLib.Trigonometry
 
   @primary_color :dark_violet
 
-  @impl Flamelex.API.GUI.ComponentBehaviour
+  @impl Flamelex.GUI.ComponentBehaviour
   def render(frame, _params) do
 
 
@@ -117,7 +117,7 @@ defmodule Flamelex.API.GUI.Component.TransmutationCircle do #TODO rename to Rens
 
   end
 
-  @impl Flamelex.API.GUI.ComponentBehaviour
+  @impl Flamelex.GUI.ComponentBehaviour
   def handle_action({_state, _graph}, :hide) do
     raise "Can't hide TransmutationCircle yet"
   end

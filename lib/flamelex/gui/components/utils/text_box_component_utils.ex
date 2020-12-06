@@ -1,4 +1,4 @@
-defmodule Flamelex.API.GUI.Utilities.Drawing.TextComponentDrawingLib do
+defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
   use Flamelex.ProjectAliases
 
 
@@ -15,7 +15,7 @@ defmodule Flamelex.API.GUI.Utilities.Drawing.TextComponentDrawingLib do
         mode: mode
   }) do
 
-    font_size = Flamelex.API.GUI.Fonts.size()
+    font_size = Flamelex.GUI.Fonts.size()
 
     # maybe we make each box, just slightly bigger than a character...
     box_buffer    = 1

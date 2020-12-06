@@ -1,8 +1,8 @@
-defmodule Flamelex.API.GUI.Component.SampleComponent do
+defmodule Flamelex.GUI.Component.SampleComponent do
   @moduledoc """
   This module is just an example. Copy & modify it.
   """
-  use Flamelex.API.GUI.ComponentBehaviour
+  use Flamelex.GUI.ComponentBehaviour
 
 
   @doc """
@@ -16,7 +16,7 @@ defmodule Flamelex.API.GUI.Component.SampleComponent do
   In this simple case, we will just draw a border around the Frame, but
   obviously this can get quite detailed.
   """
-  @impl Flamelex.API.GUI.ComponentBehaviour
+  @impl Flamelex.GUI.ComponentBehaviour
   def render(%Frame{} = frame, _params) do
 
     Draw.blank_graph()
@@ -34,7 +34,7 @@ defmodule Flamelex.API.GUI.Component.SampleComponent do
 
   This is the current... (#TODO finish this)
   """
-  @impl Flamelex.API.GUI.ComponentBehaviour
+  @impl Flamelex.GUI.ComponentBehaviour
   def handle_action({graph, _state}, {:sample_action, _some_params}) do
     :ignore_action
   end
@@ -53,7 +53,7 @@ defmodule Flamelex.API.GUI.Component.SampleComponent do
   a "catch-all", by pattern-matching on all actions that weren't matched
   in a `handle_action/2` callback defined above.
   """
-  # @impl Flamelex.API.GUI.ComponentBehaviour
+  # @impl Flamelex.GUI.ComponentBehaviour
   # def handle_action({graph, _state}, action) do
   #   Logger.debug "#{__MODULE__} with id: #{inspect state.id} received unrecognised action: #{inspect action}"
   #   :ignore_action

@@ -7,9 +7,9 @@ defmodule Flamelex.GUI.Controller do
   use GenServer
   use Flamelex.ProjectAliases
   alias Flamelex.GUI.Structs.GUIState
-  alias Flamelex.API.GUI.Component.MenuBar
+  alias Flamelex.GUI.Component.MenuBar
   require Logger
-  import Flamelex.API.GUI.Utilities.ControlHelper
+  import Flamelex.GUI.Utilities.ControlHelper
 
 
 

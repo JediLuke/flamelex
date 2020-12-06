@@ -23,8 +23,11 @@ defmodule Flamelex.BufferBehaviour do
                         # a GUI.Component when the Buffer loads
       ]
 
-      # must implement all the callbacks defined in *this* module, `Flamelex.API.GUI.ComponentBehaviour`
-      # @behaviour Flamelex.BufferBehaviour
+      #REMINDER: including this @behaviour in the __using__ macro here means
+      #          that any module which calls `use Flamelex.BufferBehaviour`
+      #          must implement all the callbacks defined in *this* module,
+      #          `Flamelex.GUI.ComponentBehaviour`, or else a warning is raised.
+      @behaviour Flamelex.BufferBehaviour
 
       use GenServer
       require Logger
@@ -46,7 +49,8 @@ defmodule Flamelex.BufferBehaviour do
       Return a Buffer struct.
       """
       #TODO this should use changesets...
-      #NOTE: The only mandatory key when creating a buffer is a name (which is supposed to be unique... this is handled by BufferManager)
+      #NOTE: The only mandatory key when creating a buffer is a name (which
+      #      is supposed to be unique... this is handled by BufferManager)
       def new(%{name: name} = params) do
 
         # check params for keys
@@ -70,7 +74,7 @@ defmodule Flamelex.BufferBehaviour do
       @impl GenServer
       def init({%__MODULE__{} = buf, opts}) do
         Logger.info "#{__MODULE__} initializing... opts: #{inspect opts}"
-        if open_in_gui?(opts), do: GenServer.cast(self(), :show)
+        # if open_in_gui?(opts), do: GenServer.cast(self(), :show)
         {:ok, buf}
       end
 
@@ -98,6 +102,10 @@ defmodule Flamelex.BufferBehaviour do
         Flamelex.GUI.Controller.action({:hide, buf})
         {:noreply, buf}
       end
+
+        # def clear do
+      #   find_pid() |> GenServer.cast(:clear)
+      # end
 
       ## private functions
 

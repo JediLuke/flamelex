@@ -1,4 +1,4 @@
-defmodule Flamelex.API.GUI.Utilities.ControlHelper do
+defmodule Flamelex.GUI.Utilities.ControlHelper do
   use Flamelex.ProjectAliases
 
 
@@ -8,7 +8,7 @@ defmodule Flamelex.API.GUI.Utilities.ControlHelper do
     # |> GUI.Component.CommandBuffer.draw(viewport: vp)
     # |> GUI.Component.CommandBuffer.draw(state)
     |> mount_menubar(vp)
-    # |> mount_command_buffer(vp)
+    |> mount_command_buffer(vp)
   end
 
 
@@ -23,7 +23,7 @@ defmodule Flamelex.API.GUI.Utilities.ControlHelper do
     top_left_y_for_centered_frame = center_point.y - scale_factor/2
 
     graph
-    |> Flamelex.API.GUI.Component.TransmutationCircle.mount(
+    |> Flamelex.GUI.Component.TransmutationCircle.mount(
           Frame.new(
             top_left: {top_left_x_for_centered_frame, top_left_y_for_centered_frame},
             size:     {scale_factor, scale_factor}))
@@ -32,21 +32,21 @@ defmodule Flamelex.API.GUI.Utilities.ControlHelper do
 
   defp mount_menubar(graph, vp) do
     graph
-    |> Flamelex.API.GUI.Component.MenuBar.mount(
+    |> Flamelex.GUI.Component.MenuBar.mount(
           Frame.new(
             #TODO
             # buffer: %ListBuffer{},
             top_left: {0, 0},
-            size:     {vp.width, Flamelex.API.GUI.Component.MenuBar.height()}))
+            size:     {vp.width, Flamelex.GUI.Component.MenuBar.height()}))
   end
 
   defp mount_command_buffer(graph, vp) do
     graph
     #DEVELOPING a new component
     # Step 1 - figure out where you want to mount the component. #TODO this should be a layer I guess...
-    |> GUI.Component.CommandBuffer.mount(
+    |> Flamelex.GUI.Component.CommandBuffer.mount(
           Frame.new(
-            top_left: {0, vp.height - Flamelex.API.GUI.Component.MenuBar.height()},
-            size:     {vp.width, Flamelex.API.GUI.Component.MenuBar.height()}))
+            top_left: {0, vp.height - Flamelex.GUI.Component.MenuBar.height()},
+            size:     {vp.width, Flamelex.GUI.Component.MenuBar.height()}))
   end
 end
