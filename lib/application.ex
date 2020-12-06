@@ -27,7 +27,7 @@ defmodule Flamelex.Application do
 
   defp boot_gui_process_tree do
     [
-      Flamelex.API.GUI.TopLevelSupervisor
+      Flamelex.GUI.TopLevelSupervisor
     ]
   end
 
@@ -36,6 +36,8 @@ defmodule Flamelex.Application do
       Flamelex.Omega.TopLevelSupervisor,
       Flamelex.Buffer.TopLevelSupervisor,
       # Flamelex.Agent.TopLevelSupervisor, #TODO this is just commented out to stop spamming the log with reminders atm
+
+      Flamelex.Utilities.PubSub
     ]
   end
 end

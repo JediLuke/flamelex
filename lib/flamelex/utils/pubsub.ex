@@ -6,8 +6,8 @@ defmodule Flamelex.Utilities.PubSub do
 
   end
 
-  def publish() do
-
+  def publish(topic, msg) do
+    GenServer.call(__MODULE__, {:publish, topic, msg})
   end
 
   def unsubscribe() do
@@ -25,5 +25,9 @@ defmodule Flamelex.Utilities.PubSub do
     IO.puts "Initializing #{__MODULE__}..."
     Process.register(self(), __MODULE__)
     {:ok, _initial_state = %{}}
+  end
+
+  def handle_call() do
+
   end
 end
