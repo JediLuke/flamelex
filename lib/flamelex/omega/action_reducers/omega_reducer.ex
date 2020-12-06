@@ -1,31 +1,19 @@
 defmodule Flamelex.Omega.Reducer do
   alias Flamelex.Structs.OmegaState
+  use Flamelex.ProjectAliases
 
-  def process_action(%OmegaState{mode: :normal} = state, {:switch_mode, m}) do
-    IO.puts "Omega reducing!! #{inspect m}"
-    state
+  # do pattern-match check on params
+  def process_action(%OmegaState{} = omega_state, action, opts) when is_tuple(action) and is_list(opts) do
+    do_process_action(omega_state, action, opts)
   end
 
-  # def switch_mode(m), do: GenServer.cast(__MODULE__, {:switch_mode, m})
-  # def open_buffer(params), do: GenServer.call(__MODULE__, {:open_buffer, params})
-  # def show(:command_buffer = x), do: GenServer.cast(__MODULE__, {:show, x})
-  # def hide(:command_buffer = x), do: GenServer.cast(__MODULE__, {:hide, x
 
-
-
-
-  # def handle_cast({:switch_mode, m}, omega_state) do
-
-  #   {:gui_component, omega_state.active_buffer}
-  #   |> ProcessRegistry.find!
-  #   |> GenServer.cast({:switch_mode, m})
-
-  #   # :ok = Flamelex.GUI.Controller.switch_mode(m)
-
-  #   {:noreply, %{omega_state|mode: m}}
-  # end
-
-
+  def do_process_action(omega_state, {:show, :command_buffer}, opts) do
+    #NOTE: both the buffer, and the GUI.Component, should be registered to this topic!!
+    Flamelex.GUI.Component.CommandBuffer.show()
+    # PubSub.publish(:command_buffer, :show)
+    omega_state |> OmegaState.set(mode: :command)
+  end
 
   # #TODO maybe x will be worth considering eventually???
   # def handle_cast({:show, :command_buffer}, omega_state) do
@@ -46,25 +34,23 @@ defmodule Flamelex.Omega.Reducer do
   #   {:noreply, %{omega_state|mode: :normal}}
   # end
 
+
+
+
+
   # def handle_call({:open_buffer, %{
   #   type: :text,
   #   from_file: filepath,
   #   open_in_gui?: true
   # } = params}, _from, omega_state) do
-
   #   {:ok, new_buf} = BufferManager.open_buffer(params)
-
   #   :ok = Flamelex.GUI.Controller.show({:buffer, filepath}, omega_state)
-
   #   {:reply, {:ok, new_buf}, %{omega_state|active_buffer: new_buf}}
   # end
 
   # def handle_call({:open_buffer, %{name: name, open_in_gui?: true} = params}, _from, omega_state) do
-
   #   {:ok, new_buf} = BufferManager.open_buffer(params)
-
   #   :ok = Flamelex.GUI.Controller.show({:buffer, name}, omega_state)
-
   #   {:reply, {:ok, new_buf}, %{omega_state|active_buffer: new_buf}}
   # end
 end

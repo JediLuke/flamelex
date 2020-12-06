@@ -144,19 +144,19 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     h = Flamelex.GUI.Component.MenuBar.height()
     x = frame.coordinates.x
     y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
-    c = GUI.Colors.menu_bar()
+    c = Flamelex.GUI.Colors.menu_bar()
 
     font_size = Flamelex.GUI.Fonts.size()
 
     graph
     |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
-    |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: GUI.Colors.mode(:normal))
+    |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: Flamelex.GUI.Colors.mode(:normal))
     |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
     |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
-    |> Scenic.Primitives.text("NORMAL-MODE", font: GUI.Fonts.primary(),
+    |> Scenic.Primitives.text("NORMAL-MODE", font: Flamelex.GUI.Fonts.primary(),
                 translate: {x + 25, y + font_size + 2}, # text draws from bottom-left corner??
                 font_size: font_size, fill: :black)
-    |> Scenic.Primitives.text(frame.id, font: GUI.Fonts.primary(), #TODO should be frame.name ??
+    |> Scenic.Primitives.text(frame.id, font: Flamelex.GUI.Fonts.primary(), #TODO should be frame.name ??
                 translate: {x + 200, y + font_size + 2}, # text draws from bottom-left corner??
                 font_size: font_size, fill: :black)
   end
@@ -167,19 +167,19 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     h = Flamelex.GUI.Component.MenuBar.height()
     x = frame.coordinates.x
     y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
-    c = GUI.Colors.menu_bar()
+    c = Flamelex.GUI.Colors.menu_bar()
 
     font_size = Flamelex.GUI.Fonts.size()
 
     graph
     |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
-    |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: GUI.Colors.mode(:insert))
+    |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: Flamelex.GUI.Colors.mode(:insert))
     |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
     |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
-    |> Scenic.Primitives.text("INSERT-MODE", font: GUI.Fonts.primary(),
+    |> Scenic.Primitives.text("INSERT-MODE", font: Flamelex.GUI.Fonts.primary(),
                 translate: {x + 25, y + font_size + 2}, # text draws from bottom-left corner??
                 font_size: font_size, fill: :black)
-    |> Scenic.Primitives.text(frame.id, font: GUI.Fonts.primary(), #TODO should be frame.name ??
+    |> Scenic.Primitives.text(frame.id, font: Flamelex.GUI.Fonts.primary(), #TODO should be frame.name ??
                 translate: {x + 200, y + font_size + 2}, # text draws from bottom-left corner??
                 font_size: font_size, fill: :black)
   end
@@ -189,7 +189,7 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     h = Flamelex.GUI.Component.MenuBar.height()
     x = frame.coordinates.x
     y = frame.dimensions.height # go to the bottom & back up how high the bar will be
-    c = GUI.Colors.menu_bar()
+    c = Flamelex.GUI.Colors.menu_bar()
 
     graph
     |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
@@ -200,19 +200,19 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     h = Flamelex.GUI.Component.MenuBar.height()
     x = frame.coordinates.x
     y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
-    c = GUI.Colors.menu_bar()
+    c = Flamelex.GUI.Colors.menu_bar()
 
     font_size = Flamelex.GUI.Fonts.size()
 
     graph
     |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
-    |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: GUI.Colors.mode(:normal))
+    |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: Flamelex.GUI.Colors.mode(:normal))
     |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
     |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
-    |> Scenic.Primitives.text("NORMAL-MODE", font: GUI.Fonts.primary(),
+    |> Scenic.Primitives.text("NORMAL-MODE", font: Flamelex.GUI.Fonts.primary(),
                 translate: {x + 25, y + font_size + 2}, # text draws from bottom-left corner??
                 font_size: font_size, fill: :black)
-    |> Scenic.Primitives.text(frame.id, font: GUI.Fonts.primary(), #TODO should be frame.name ??
+    |> Scenic.Primitives.text(frame.id, font: Flamelex.GUI.Fonts.primary(), #TODO should be frame.name ??
                 translate: {x + 200, y + font_size + 2}, # text draws from bottom-left corner??
                 font_size: font_size, fill: :black)
   end

@@ -1,44 +1,3 @@
-# omega_master.ex
-# author: Luke Taylor
-#
-# This file contains 2 modules:
-#   - OmegaState      # the struct which holds the state for OmegaMaster
-#   - OmegaMaster     # a GenServer which holds the highest-level state
-
-defmodule Flamelex.Structs.OmegaState do
-  @moduledoc false
-  use Flamelex.ProjectAliases
-
-  # restrict possible modes to those within this list
-  @modes [:normal, :command]
-
-  defstruct [
-    mode:           :normal,    # The input mode
-    #TODO just a list of input_history, no need for the map
-    # input: %{
-    #   history:      []          # A list of all previous input events
-    # },
-    # active_buffer:  nil         # We need to know the active buffer
-  ]
-
-  def new do
-    %__MODULE__{
-      mode: :normal
-    }
-  end
-
-  #TODO should be done with changesets...
-  def set(%__MODULE__{} = omega, mode: m) when m in @modes do
-    %{omega|mode: m}
-  end
-
-  #TODO cap the length of this list
-  # def add_to_history(%__MODULE__{} = omega, input) do
-  #   put_in(omega.input.history, omega.input.history ++ [input])
-  # end
-end
-
-
 defmodule Flamelex.OmegaMaster do
   @moduledoc """
   The OmegaMaster holds the highest-level flamelex state.
@@ -82,30 +41,44 @@ defmodule Flamelex.OmegaMaster do
   alias Flamelex.Structs.OmegaState
   require Logger
 
+  # @action_callback_timeout 1_000
+
 
   def start_link(_params) do
     initial_state = OmegaState.new()
     GenServer.start_link(__MODULE__, initial_state)
   end
 
-
   @doc """
   This function enables us to fire actions off which enact changes, at
   the OmegaMaster level, but which aren't stricly responses to user input.
   """
-  def action(a), do: GenServer.cast(__MODULE__, {:action, a})
+  def action(a) do
+    GenServer.cast(__MODULE__, {:action, a, []})
+  end
+  # def action(a, await_callback?: true) do
+  #   GenServer.cast(__MODULE__, {:action, a, callback_pid: self()})
+  #   receive do
+  #     callback ->
+  #       callback
+  #   after
+  #     @action_callback_timeout ->
+  #       {:error, "timed out waiting for the action to callback"}
+  #   end
+  # end
+
+  def debug(d), do: GenServer.cast(__MODULE__, {:debug, d})
 
 
-  ## GenServer callbacks
-  ## -------------------------------------------------------------------
+  # GenServer callbacks
 
 
-  def init(%Flamelex.Structs.OmegaState{} = omega_state) do
+  def init(%Flamelex.Structs.OmegaState{} = omega_state)
+  do
     IO.puts "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
     {:ok, omega_state}
   end
-
 
   # This function handles user input. All input from the entire GUI
   # gets routed through here (it gets sent here by
@@ -117,30 +90,34 @@ defmodule Flamelex.OmegaMaster do
   # new state, as well as fire off any secondary events or updates that
   # this input requests.
   # REMINDER: actions may be fired by this reducer, causing side-effects
-
-  # eliminate the don't cares
-  def handle_cast({:user_input, input}, omega_state) when input in @inputs_we_dont_care_about do
-    IO.puts "IGNORING #{inspect input}"
-    omega_state # pass through unaltered state (do nothing)
-  end
-
-  def handle_cast({:user_input, input}, omega_state) do
-    Logger.debug "#{__MODULE__} handling input: #{inspect input}"
-
+  # NOTE: ignore all inputs which aren't codepoints
+  def handle_cast({:user_input, {:codepoint, _codepoint} = input}, omega_state)
+  do
     new_omega_state =
       omega_state
       |> Flamelex.GUI.UserInputHandler.handle_input(input)
-      # |> OmegaState.add_to_history(input) #TODO
+      |> OmegaState.record(keystroke: input)
+
+    {:noreply, new_omega_state}
+  end
+  def handle_cast({:user_input, _input}, omega_state)
+  do
+    #NOTE: just ignore non :codepoint input
+    {:noreply, omega_state}
+  end
+
+  def handle_cast({:action, a, opts}, omega_state)
+  do
+    new_omega_state =
+        omega_state
+        |> Flamelex.Omega.Reducer.process_action(a, opts)
+        |> OmegaState.record(action: a)
 
     {:noreply, new_omega_state}
   end
 
-
-  def handle_cast({:action, a}, omega_state) do
-    new_omega_state =
-      omega_state
-      |> Flamelex.Omega.Reducer.process_action(a)
-
-    {:noreply, new_omega_state}
+  def handle_cast({:debug, d}, omega_state) do
+    IO.puts "DEBUG: #{inspect d}, omega_state: #{inspect omega_state.keystroke_history}"
+    {:noreply, omega_state}
   end
 end

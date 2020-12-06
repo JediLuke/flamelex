@@ -11,7 +11,7 @@ defmodule Flamelex.API.Buffer do
   @doc """
   List all the open buffers.
   """
-  def list, do: BufferManager.list_open_buffers()
+  def list, do: BufferManager |> GenServer.call(:list_buffers)
 
 
 
@@ -30,27 +30,25 @@ defmodule Flamelex.API.Buffer do
   def open!(filepath) do
     Logger.info "Loading new text buffer for file: #{inspect filepath}..."
 
-    open_buffer_result =
-        Flamelex.OmegaMaster.open_buffer(%{
-          type: :text,
-          from_file: filepath,
-          open_in_gui?: true
-        })
-
-    case open_buffer_result do
-      {:ok, name} ->
-        name
-      {:error, {:already_started, _pid}} ->
-        raise "Here we should just link to the alrdy open pid"
+    case BufferManager |> GenServer.call({:open_buffer, %{
+           type: :text,
+           from_file: filepath,
+           open_in_gui?: true
+    }}) do
+         {:ok, name} ->
+           name
+         {:error, {:already_started, _pid}} ->
+           raise "Here we should just link to the alrdy open pid"
+         {:error, _reason} ->
+           raise "dunno lol"
     end
   end
 
 
   def load(:text, data, opts) when is_map(opts) do
-    Flamelex.OmegaMaster.open_buffer(%{
-      type: :text,
-      data: data
-    } |> Map.merge(opts))
+    Flamelex.OmegaMaster.action({:open_buffer,
+      opts |> Map.merge(%{ type: :text, data: data })
+    })
   end
 
 

@@ -33,7 +33,7 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     graph =
       Draw.blank_graph()
-      |> Draw.background(frame, GUI.Colors.background())
+      |> Draw.background(frame, Flamelex.GUI.Colors.background())
       |> TextBoxDraw.render_text_grid(%{
            frame: frame,
            text: text,
@@ -86,7 +86,7 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     new_graph =
       Draw.blank_graph()
-      |> Draw.background(state.frame, GUI.Colors.background())
+      |> Draw.background(state.frame, Flamelex.GUI.Colors.background())
       |> TextBoxDraw.render_text_grid(%{
            frame: state.frame,
            text: state.text,
@@ -105,7 +105,7 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     new_graph =
       Draw.blank_graph()
-      |> Draw.background(state.frame, GUI.Colors.background())
+      |> Draw.background(state.frame, Flamelex.GUI.Colors.background())
       |> TextBoxDraw.render_text_grid(%{
            frame: state.frame,
            text: state.text,
@@ -123,7 +123,7 @@ defmodule Flamelex.GUI.Component.TextBox do
   def handle_cast({:switch_mode, m}, state) do
     new_graph =
       Draw.blank_graph()
-      |> Draw.background(state.frame, GUI.Colors.background())
+      |> Draw.background(state.frame, Flamelex.GUI.Colors.background())
       |> TextBoxDraw.render_text_grid(%{
            frame: state.frame,
            text: state.text,
@@ -144,7 +144,7 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     new_graph =
       Draw.blank_graph()
-      |> Draw.background(state.frame, GUI.Colors.background())
+      |> Draw.background(state.frame, Flamelex.GUI.Colors.background())
       |> TextBoxDraw.render_text_grid(%{
            frame: state.frame,
            text: state.text,
@@ -163,7 +163,7 @@ defmodule Flamelex.GUI.Component.TextBox do
 
   def render_graph(state) do
     Draw.blank_graph()
-    |> Draw.background(state.frame, GUI.Colors.background())
+    |> Draw.background(state.frame, Flamelex.GUI.Colors.background())
     |> TextBoxDraw.render_text_grid(%{
           frame: state.frame,
           text: state.text,

@@ -1,15 +1,21 @@
 defmodule Flamelex.API.CommandBuffer do
   @moduledoc """
-  This module is really just an API of convenience for all this related
-  to the API.CommandBuffer.
+  This API module is the interface for all functionality relating to the
+  CommandBuffer.
   """
 
   @doc """
-  Make the API.CommandBuffer visible.
+  Make the CommandBuffer visible, and put us in :command mode.
   """
   def show do
-    IO.puts "SHOW"
-    Flamelex.OmegaMaster.show(:command_buffer)
+    Flamelex.OmegaMaster.action({:show, :command_buffer})
+  end
+
+  @doc """
+  Make the CommandBuffer not-visible, and put us in :normal mode.
+  """
+  def hide do
+    Flamelex.OmegaMaster.action({:hide, :command_buffer})
   end
 
   @doc """
@@ -23,9 +29,6 @@ defmodule Flamelex.API.CommandBuffer do
     hide()
   end
 
-  def hide do
-    Flamelex.OmegaMaster.hide(:command_buffer)
-  end
 
   @doc """
   Resets the text field to an empty string.

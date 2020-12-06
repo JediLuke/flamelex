@@ -76,6 +76,10 @@ defmodule Flamelex.GUI.Controller do
     {:noreply, %{state|graph: new_graph}}
   end
 
+  def handle_call(:get_frame_stack, _from, state) do
+    {:reply, state.layout.frames, state}
+  end
+
   def handle_cast({:action, :reset}, state) do
     new_graph = default_gui(state)
     Flamelex.API.GUI.redraw(new_graph)
@@ -104,7 +108,7 @@ defmodule Flamelex.GUI.Controller do
   #   #   |> Map.update!(:active_buffer, fn _ab -> buffer end)
 
   #   # IO.puts "SENDING --- #{new_state.active_buffer.content}"
-  #   GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
+  #   Flamelex.GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
 
   #   {:noreply, state}
   # end
@@ -112,26 +116,23 @@ defmodule Flamelex.GUI.Controller do
 
 
 
-  def handle_cast({:action, action}, state) do
-    case GUI.Root.Reducer.process(state, action) do
-      # :ignore_action
-      #     -> {:noreply, {scene, graph}}
-      # {:update_state, new_scene} when is_map(new_scene)
-      #     -> {:noreply, {new_scene, graph}}
-      {:redraw_root_scene, %{graph: new_graph} = new_state}  ->
-        Flamelex.GUI.RootScene.redraw(new_graph)
-        {:noreply, new_state}
-      # {:update_state_and_graph, {new_scene, %Scenic.Graph{} = new_graph}} when is_map(new_scene)
-      #     -> {:noreply, {new_scene, new_graph}, push: new_graph}
-    end
-  end
+  # def handle_cast({:action, action}, state) do
+  #   case Flamelex.GUI.Root.Reducer.process(state, action) do
+  #     # :ignore_action
+  #     #     -> {:noreply, {scene, graph}}
+  #     # {:update_state, new_scene} when is_map(new_scene)
+  #     #     -> {:noreply, {new_scene, graph}}
+  #     {:redraw_root_scene, %{graph: new_graph} = new_state}  ->
+  #       Flamelex.GUI.RootScene.redraw(new_graph)
+  #       {:noreply, new_state}
+  #     # {:update_state_and_graph, {new_scene, %Scenic.Graph{} = new_graph}} when is_map(new_scene)
+  #     #     -> {:noreply, {new_scene, new_graph}, push: new_graph}
+  #   end
+  # end
 
-  def handle_call(:get_frame_stack, _from, state) do
-    {:reply, state.layout.frames, state}
-  end
 
-  def handle_cast({:show, {:buffer, name},  omega_state}, gui_state) do
 
+  def handle_cast({:show, {:buffer, name}}, gui_state) do
     frame = calculate_framing(name, gui_state.layout)
     data  = Buffer.read(name)
     opts  = %{mode: :normal}
@@ -139,7 +140,7 @@ defmodule Flamelex.GUI.Controller do
     new_graph =
       gui_state.graph #TODO root_graph - look at actual graph & update it, don't just keep drawing on top of it
       # Draw.blank_graph()
-      |> GUI.Component.TextBox.draw({frame, data, opts})
+      |> Flamelex.GUI.Component.TextBox.draw({frame, data, opts})
 
     Flamelex.GUI.RootScene.redraw(new_graph)
 
@@ -168,7 +169,7 @@ defmodule Flamelex.GUI.Controller do
     #   # end)
 
     # Flamelex.GUI.RootScene.redraw(new_graph)
-    GUI.Component.CommandBuffer.show
+    Flamelex.GUI.Component.CommandBuffer.show
 
     {:noreply, state}
   end
@@ -191,7 +192,7 @@ defmodule Flamelex.GUI.Controller do
 
     new_graph =
       state.graph
-      |> GUI.Component.TextBox.draw({frame, data, %{}})
+      |> Flamelex.GUI.Component.TextBox.draw({frame, data, %{}})
       |> Frame.draw(frame)
       # |> Draw.test_pattern()
 
@@ -217,7 +218,7 @@ defmodule Flamelex.GUI.Controller do
         IO.puts "YES #{inspect x}"
         x
       end)
-      # |> GUI.Component.TextBox.draw({frame, data, %{}})
+      # |> Flamelex.GUI.Component.TextBox.draw({frame, data, %{}})
       # |> Draw.test_pattern()
 
     Flamelex.GUI.RootScene.redraw(new_graph)
@@ -261,10 +262,10 @@ defmodule Flamelex.GUI.Controller do
 
     # new_graph =
     #   state.graph
-    #   |> GUI.Component.TextBox.draw({frame, data})
+    #   |> Flamelex.GUI.Component.TextBox.draw({frame, data})
 
 
-    # case GUI.Root.Reducer.process(state, action) do
+    # case Flamelex.GUI.Root.Reducer.process(state, action) do
     #   # :ignore_action
     #   #     -> {:noreply, {scene, graph}}
     #   # {:update_state, new_scene} when is_map(new_scene)
@@ -291,7 +292,7 @@ defmodule Flamelex.GUI.Controller do
   #     |> Map.update!(:buffer_list, fn _b -> [1] end) #TODO have a buffer struct I guess...
 
   #   #TODO call Scenic GUI component process (registered to this topic/whatever) &
-  #   GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: c]})
+  #   Flamelex.GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: c]})
 
   #   {:noreply, new_state}
   # end
@@ -307,9 +308,9 @@ defmodule Flamelex.GUI.Controller do
     #   |> Map.update!(:active_buffer, fn _ab -> buffer end)
 
     # IO.puts "SENDING --- #{new_state.active_buffer.content}"
-    # GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
+    # Flamelex.GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
 
-    GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.data]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
+    Flamelex.GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.data]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
 
     {:noreply, state}
   end

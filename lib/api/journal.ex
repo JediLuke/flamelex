@@ -22,6 +22,10 @@ defmodule Flamelex.API.Journal do
     ~s(“#{q.text}”\n   - #{q.author}\n\n)
   end
 
+  def today do
+    now()
+  end
+
   def now do
     now = Flamelex.Memex.My.current_time()
 
@@ -50,6 +54,7 @@ defmodule Flamelex.API.Journal do
       Buffer.open!(todays_journal_entry_file)
     else
       # need to create the entry
+      IO.puts "NEED TO CREATE THE ENTRY"
       journal_entry = punctuated_quote() <> day_of_the_week <> ", " <> day_of_the_month <> " of " <> month <> "\n\n" <> hour <> ":" <> minute <> "\n\n"
 
       {:ok, file} = File.open(todays_journal_entry_file, [:write])

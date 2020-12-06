@@ -19,8 +19,8 @@ defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
 
     # maybe we make each box, just slightly bigger than a character...
     box_buffer    = 1
-    block_width   = box_buffer + GUI.FontHelpers.monospace_font_width(:ibm_plex_mono, font_size)
-    block_height  = box_buffer + GUI.FontHelpers.monospace_font_height(:ibm_plex_mono, font_size)
+    block_width   = box_buffer + Flamelex.GUI.FontHelpers.monospace_font_width(:ibm_plex_mono, font_size)
+    block_height  = box_buffer + Flamelex.GUI.FontHelpers.monospace_font_height(:ibm_plex_mono, font_size)
 
     num_rows = frame.dimensions.height / block_height |> Float.ceil() |> trunc()
     num_cols = frame.dimensions.width  / block_width  |> Float.ceil() |> trunc()
@@ -42,6 +42,8 @@ defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
 
     # graph
     # |> render_tiles(frame, tiles, opts)
+
+    #TODO here - this is where we break text into lines !! Very next!!
 
     # lines = break_text_into_lines(text)
 
@@ -171,8 +173,8 @@ defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
     if opts.mode == :insert do
       if is_cursor_tile?(tile, opts) and opts.cursor_blink? do
 
-        background_color = GUI.Colors.background()
-        text_color = GUI.Colors.foreground()
+        background_color = Flamelex.GUI.Colors.background()
+        text_color = Flamelex.GUI.Colors.foreground()
 
         blinking_line_cursor_dimensions = {2, block_height}
 
@@ -193,8 +195,8 @@ defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
 
       else
 
-        background_color = GUI.Colors.background()
-        text_color = GUI.Colors.foreground()
+        background_color = Flamelex.GUI.Colors.background()
+        text_color = Flamelex.GUI.Colors.foreground()
 
         new_graph =
           graph
@@ -229,13 +231,13 @@ defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
   # def tile_colors(tile, %{mode: :insert} = opts) do
   #   if is_cursor_tile?(tile, opts) and opts.cursor_blink? do
   #     %{
-  #       background_color: GUI.Colors.foreground(),
-  #       text_color: GUI.Colors.background()
+  #       background_color: Flamelex.GUI.Colors.foreground(),
+  #       text_color: Flamelex.GUI.Colors.background()
   #     }
   #   else
   #     %{
-  #       background_color: GUI.Colors.background(),
-  #       text_color: GUI.Colors.foreground()
+  #       background_color: Flamelex.GUI.Colors.background(),
+  #       text_color: Flamelex.GUI.Colors.foreground()
   #     }
   #   end
   # end
@@ -243,13 +245,13 @@ defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
   def tile_colors(tile, opts) do
     if is_cursor_tile?(tile, opts) and opts.cursor_blink? do
       %{
-        background_color: GUI.Colors.foreground(),
-        text_color: GUI.Colors.background()
+        background_color: Flamelex.GUI.Colors.foreground(),
+        text_color: Flamelex.GUI.Colors.background()
       }
     else
       %{
-        background_color: GUI.Colors.background(),
-        text_color: GUI.Colors.foreground()
+        background_color: Flamelex.GUI.Colors.background(),
+        text_color: Flamelex.GUI.Colors.foreground()
       }
     end
   end
@@ -300,15 +302,15 @@ end
 
   #   background_color =
   #     if row == 12 and col == 0 do
-  #       GUI.Colors.background()
+  #       Flamelex.GUI.Colors.background()
   #     else
-  #       GUI.Colors.foreground()
+  #       Flamelex.GUI.Colors.foreground()
   #     end
   #   text_color =
   #     if row == 12 and col == 0 do
-  #       GUI.Colors.foreground()
+  #       Flamelex.GUI.Colors.foreground()
   #     else
-  #       GUI.Colors.background()
+  #       Flamelex.GUI.Colors.background()
   #     end
 
   #   new_graph =

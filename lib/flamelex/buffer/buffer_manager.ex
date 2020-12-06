@@ -18,21 +18,21 @@ defmodule Flamelex.BufferManager do
   @doc """
   The *correct* way to open a new buffer.
   """
-  def open_buffer(params) do
-    GenServer.call(__MODULE__, {:open_buffer, params})
-  end
+  # def open_buffer(params) do
+  #   GenServer.call(__MODULE__, {:open_buffer, params})
+  # end
 
-  def count_open_buffers do
-    GenServer.call(__MODULE__, :count_buffers)
-  end
+  # def count_open_buffers do
+  #   GenServer.call(__MODULE__, :count_buffers)
+  # end
 
-  def list_open_buffers do
-    GenServer.call(__MODULE__, :list_buffers)
-  end
+  # def list_open_buffers do
+  #   GenServer.call(__MODULE__, :list_buffers)
+  # end
 
-  def close_buffer(buf) do
-    GenServer.call(__MODULE__, {:close_buffer, buf})
-  end
+  # def close_buffer(buf) do
+  #   GenServer.call(__MODULE__, {:close_buffer, buf})
+  # end
 
 
   ## GenServer callbacks
@@ -64,6 +64,9 @@ defmodule Flamelex.BufferManager do
   } = params}, _from, state) do
     case really_open_buffer(params) do
       {:ok, new_buf} ->
+        if params |> Map.has_key?(:open_in_gui?) && params.open_in_gui? do
+          :ok = Flamelex.GUI.Controller.show({:buffer, filepath})
+        end
         {:reply, {:ok, new_buf}, state ++ [new_buf]}
       {:error, reason} ->
         {:reply, {:error, reason}, state}
