@@ -21,6 +21,7 @@ defmodule Flamelex.GUI.Component.SampleComponent do
 
     Draw.blank_graph()
     # |> Draw.background(frame, :green)
+    # |> Draw.test_pattern()
     |> Draw.border(frame)
   end
 
@@ -32,10 +33,23 @@ defmodule Flamelex.GUI.Component.SampleComponent do
 
     {graph, state}
 
-  This is the current... (#TODO finish this)
+  This is how you would send a GUI component an action:
+
+  SampleComponent.action({:a_sample_action, map_of_params})
+
+  Actions can be anything - an atom, a tuple, etc. - but the component
+  *must* implement a handle_action/2 callback for it, or else it will
+  raise an error.
+
+  Actions can return one of these values:
+
+    :ignore_action
+
+
   """
   @impl Flamelex.GUI.ComponentBehaviour
-  def handle_action({graph, _state}, {:sample_action, _some_params}) do
+  def handle_action({_graph, _state}, action) do
+    Logger.info "#{__MODULE__} received an action - #{inspect action}"
     :ignore_action
   end
 

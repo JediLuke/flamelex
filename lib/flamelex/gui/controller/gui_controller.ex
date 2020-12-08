@@ -140,7 +140,8 @@ defmodule Flamelex.GUI.Controller do
     new_graph =
       gui_state.graph #TODO root_graph - look at actual graph & update it, don't just keep drawing on top of it
       # Draw.blank_graph()
-      |> Flamelex.GUI.Component.TextBox.draw({frame, data, opts})
+      # |> Flamelex.GUI.Component.TextBox.draw({frame, data, opts})
+      |> Flamelex.GUI.Component.SampleComponent.mount(%{frame: frame})
 
     Flamelex.GUI.RootScene.redraw(new_graph)
 

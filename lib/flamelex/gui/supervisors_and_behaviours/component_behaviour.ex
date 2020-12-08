@@ -33,7 +33,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       #      so we don't need specific ones, each Component implements them
       #      the same way
       @impl Scenic.Component
-      def verify({%Frame{} = frame, params}) when is_map(params), do: {:ok, {%Frame{} = frame, params}}
+      def verify(%{frame: %Frame{} = _f} = params), do: {:ok, params}
       def verify(_else), do: :invalid_data
 
       @impl Scenic.Component
@@ -49,12 +49,19 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       graph. In our case this is the same for all components though so we
       can abstract it out.
       """
+      def mount(%Scenic.Graph{} = graph, %Frame{} = frame) do
+        mount(graph, %{frame: frame})
+      end
+      def mount(%Scenic.Graph{} = graph, params) when is_map(params) do
+        graph |> add_to_graph(params) #REMINDER: `params` goes to this modules init/2
+      end
       def mount(%Scenic.Graph{} = graph, %Frame{} = frame, params \\ %{}) do
-        graph |> add_to_graph({frame, params}) #REMINDER: This will pass `frame` to this modules init/2
+        Logger.error "DEPRECATE THIS USE OF MOUNT"
+        mount(graph, %{frame: frame} |> Map.merge(params))
       end
 
       @impl Scenic.Scene
-      def init({%Frame{} = frame, params}, _opts) do
+      def init(%{frame: %Frame{} = frame} = params, _opts) do
         Logger.debug "Initializing #{__MODULE__}..."
         register_self()
 
@@ -116,11 +123,11 @@ defmodule Flamelex.GUI.ComponentBehaviour do
 
   @doc """
   Each Component is represented internally at the highest level by the
-  # %Frame{} datastructure. This function takes in that Component definition
-  # and returns a %Scenic.Graph{} which can be drawn by Scenic.
+  %Frame{} datastructure. This function takes in that Component definition
+  and returns a %Scenic.Graph{} which can be drawn by Scenic.
   """
-  #TODO
-  # @callback render(%Flamelex.GUI.Structs.Frame{}) :: %Scenic.Graph{}
+  # TODO
+  @callback render(%Flamelex.GUI.Structs.Frame{}) :: %Scenic.Graph{}
 
   @doc """
   This function may be implemented as many times as necessary, to handle
