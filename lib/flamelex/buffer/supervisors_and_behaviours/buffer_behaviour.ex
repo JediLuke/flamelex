@@ -86,6 +86,7 @@ defmodule Flamelex.BufferBehaviour do
       end
 
       def handle_call(:read_contents, _from, state) do
+        #TODO should this return on ok/error tuple?
         {:reply, state.data, state}
       end
 

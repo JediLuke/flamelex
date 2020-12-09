@@ -46,11 +46,12 @@ defmodule Flamelex.API.Journal do
       File.mkdir_p(current_journal_dir)
     end
 
-    todays_day = day_of_the_week <> day_of_the_month
+    todays_day = day_of_the_month <> "-" <> day_of_the_week
     todays_journal_entry_file = current_journal_dir |> Path.join("/" <> todays_day)
 
 
-    if todays_journal_entry_file |> File.exists?() do
+    if todays_journal_entry_file |> IO.inspect() |> File.exists?() do
+      IO.puts "OPENING THE EXISTING FILE!!"
       Buffer.open!(todays_journal_entry_file)
     else
       # need to create the entry

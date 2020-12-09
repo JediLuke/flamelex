@@ -2,7 +2,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
   @moduledoc """
   The Memex can load different environments.
   """
-  # alias Flamelex.GUI.Structs.Frame
+
 
   #NOTE: Here's a little reminder...
   # the __using__ macro allows us to `use ComponentBehaviour` and automatically
@@ -27,6 +27,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       alias __MODULE__
       alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
       alias Flamelex.GUI.Utilities.Draw
+      alias Flamelex.Utilities.ProcessRegistry
 
 
       #NOTE: In our case, we always want a Component to be passed in a %Frame{}
@@ -50,10 +51,11 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       can abstract it out.
       """
       def mount(%Scenic.Graph{} = graph, %Frame{} = frame) do
+        Logger.error "DEPRECATE THIS USE OF MOUNT"
         mount(graph, %{frame: frame})
       end
       def mount(%Scenic.Graph{} = graph, params) when is_map(params) do
-        graph |> add_to_graph(params) #REMINDER: `params` goes to this modules init/2
+        graph |> add_to_graph(params) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
       end
       def mount(%Scenic.Graph{} = graph, %Frame{} = frame, params \\ %{}) do
         Logger.error "DEPRECATE THIS USE OF MOUNT"
@@ -63,19 +65,21 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       @impl Scenic.Scene
       def init(%{frame: %Frame{} = frame} = params, _opts) do
         Logger.debug "Initializing #{__MODULE__}..."
-        register_self()
+        register_self(frame)
 
         graph =
-          render(frame, params)                   #REMINDER: render/1 has to be implemented by modules using this behaviour
-          |> Frame.decorate_graph(frame, params)  #REMINDER:
+          render(frame, params) #REMINDER: render/1 has to be implemented by the modules "using" this behaviour, and that is the function being called here
+          |> Frame.decorate_graph(frame, params)
 
         {:ok, {graph, frame}, push: graph}
       end
 
-      def register_self do
+      def register_self(frame) do
         #TODO search for if the process is already registered, if it is, engage recovery procedure
-        Process.register(self(), __MODULE__) #TODO this should be gproc
+        # Process.register(self(), __MODULE__) #TODO this should be gproc
         #TODO this should be {:gui_component, frame.id}, or maybe other way around. It could also subscribe to the channel for this id
+        # ProcessRegistry.register({:gui_component, frame.id})
+        ProcessRegistry.register({:gui_component, __MODULE__})
       end
 
       @doc """
@@ -84,19 +88,16 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       This function allows for nice API, e.g. MenuBar.action({:click, button})
       """
       def action(a) do
-        # remember, __MODULE__ will be the module which "uses" this macro
-
         #TODO: We need some way of knowing that MenuBar has indeed been mounted
         #      somewhere, or else the messages just go into the void (use call instead of cast?)
 
+        #REMINDER: `__MODULE__` will be the module which "uses" this macro
         GenServer.cast(__MODULE__, {:action, a})
       end
 
       @impl Scenic.Scene
-      # def handle_cast({:action, action}, {%Scenic.Graph{} = graph, %Frame{} = frame}) do
-      def handle_cast({:action, action}, {graph, frame}) do
-        #TODO maybe we can get away with not passing in the graph to handle_action...
-        case handle_action({graph, frame}, action) do
+      def handle_cast({:action, action}, {%Scenic.Graph{} = graph, %Frame{} = frame}) do
+        case handle_action(frame, action) do
           :ignore_action
             -> {:noreply, {graph, frame}}
           {:redraw_graph, %Scenic.Graph{} = new_graph}
@@ -119,15 +120,14 @@ defmodule Flamelex.GUI.ComponentBehaviour do
   We have actually implemented this in the __using__ macro, but my heart
   tells me to leave this here anyway... maybe it'll save us some pain later.
   """
-  @callback mount(%Scenic.Graph{}, any()) :: %Scenic.Graph{}
+  @callback mount(%Scenic.Graph{}, map()) :: %Scenic.Graph{}
 
   @doc """
   Each Component is represented internally at the highest level by the
   %Frame{} datastructure. This function takes in that Component definition
   and returns a %Scenic.Graph{} which can be drawn by Scenic.
   """
-  # TODO
-  @callback render(%Flamelex.GUI.Structs.Frame{}) :: %Scenic.Graph{}
+  @callback render(%Flamelex.GUI.Structs.Frame{}, map()) :: %Scenic.Graph{}
 
   @doc """
   This function may be implemented as many times as necessary, to handle

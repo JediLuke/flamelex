@@ -11,28 +11,25 @@ defmodule Flamelex.Buffer.Command do
   require Logger
   alias Flamelex.GUI.Component.CommandBuffer, as: GUIComponent
 
-  @buffer_id :command_buffer
 
   def start_link([] = _default_params) do
+    name = ProcessRegistry.via_tuple({:buffer, __MODULE__})
     # initial_buffer_state = Buffer.new(:command)
     initial_state = %{data: ""}
-    # name = ProcessRegistry.register2(:buffer, @buffer_id)
-    GenServer.start_link(__MODULE__, initial_state)
-  end
-
-  def find_pid do
-    ProcessRegistry.find!({:buffer, @buffer_id})
+    GenServer.start_link(__MODULE__, initial_state, name: name)
   end
 
   @doc """
   Empty out the contents of the buffer.
   """
   def clear do
-    find_pid() |> GenServer.cast(:clear)
+    ProcessRegistry.find!({:buffer, __MODULE__})
+    |> GenServer.cast(:clear)
   end
 
   def cast(x) do
-    find_pid() |> GenServer.cast(x)
+    ProcessRegistry.find!({:buffer, __MODULE__})
+    |> GenServer.cast(x)
   end
 
 
@@ -52,11 +49,7 @@ defmodule Flamelex.Buffer.Command do
   def init(buf) do
     IO.puts "#{__MODULE__} initializing...\n" # NOTE: This is the last process we boot in the initial supervision tree, so in thie special case we add a `\n` character to the log output, just for neatness.
 
-    # Process.register(self(), __MODULE__)  # the Commander is a little special, doesn't use gproc
     #TODO link to the command buffer GUI process - can we just use grpoc to talk to it??
-
-    #TODO do this via via_tuple??
-    ProcessRegistry.register2(:buffer, @buffer_id)
 
     {:ok, buf}
   end
