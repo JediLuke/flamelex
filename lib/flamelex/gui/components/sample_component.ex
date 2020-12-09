@@ -4,6 +4,10 @@ defmodule Flamelex.GUI.Component.SampleComponent do
   """
   use Flamelex.GUI.ComponentBehaviour
 
+  @impl Flamelex.GUI.ComponentBehaviour
+  def custom_init_logic(_frame, _params) do
+    :none
+  end
 
   @doc """
   render/1 accepts a %Frame{}, and returns a %Scenic.Graph{} which can be

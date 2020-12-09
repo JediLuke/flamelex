@@ -63,9 +63,15 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       end
 
       @impl Scenic.Scene
-      def init(%{frame: %Frame{} = frame} = params, _opts) do
-        Logger.debug "Initializing #{__MODULE__}..."
-        register_self(frame)
+      def init(%{frame: %Frame{} = frame} = params, opts) do
+        Logger.debug "Initializing #{__MODULE__}... #{inspect opts}"
+
+        register_self(frame) #TODO we shouldn't be using Frame to pass around everything...
+
+        #NOTE: This little trick is so that `custom_init_logic` is optional
+        if function_exported?(__MODULE__, :custom_init_logic, 2) do
+          apply(__MODULE__, :custom_init_logic, [frame, params])
+        end
 
         graph =
           render(frame, params) #REMINDER: render/1 has to be implemented by the modules "using" this behaviour, and that is the function being called here
@@ -121,6 +127,15 @@ defmodule Flamelex.GUI.ComponentBehaviour do
   tells me to leave this here anyway... maybe it'll save us some pain later.
   """
   @callback mount(%Scenic.Graph{}, map()) :: %Scenic.Graph{}
+
+  @doc """
+  We have a nice little method for initializing all components, but
+  sometimes there is some special logic which needs to be done during
+  a components init/2 function.
+
+  This is an optional callback. #TODO
+  """
+  @callback custom_init_logic(%Flamelex.GUI.Structs.Frame{}, map()) :: atom()
 
   @doc """
   Each Component is represented internally at the highest level by the

@@ -6,6 +6,12 @@ defmodule Flamelex.GUI.Component.TextBox do
   alias Flamelex.GUI.Component.Utils.TextBox, as: TextBoxDrawUtils
 
 
+  @impl Flamelex.GUI.ComponentBehaviour
+  def custom_init_logic(_frame, _params) do
+    cursor_position = %{row: 0, col: 0}
+
+    GenServer.cast(self(), :start_blink)
+  end
 
   @impl Flamelex.GUI.ComponentBehaviour
   def render(%Frame{} = frame, _params) do
@@ -16,8 +22,12 @@ defmodule Flamelex.GUI.Component.TextBox do
         Flamelex.API.Buffer.read(frame.id) #TODO this is bad... Frame shouldn't be the key we're passing around here
         |> TextBoxDrawUtils.split_into_a_list_of_lines_of_text_structs()
 
+    background_color =
+      Flamelex.GUI.Colors.background()
+      # :green
+
     Draw.blank_graph()
-    |> Draw.background(frame, :green)
+    |> Draw.background(frame, background_color)
     |> TextBoxDrawUtils.render_lines(%{ lines_of_text: lines_of_text,
                                         top_left_corner: frame.coordinates })
     |> Draw.border(frame)
