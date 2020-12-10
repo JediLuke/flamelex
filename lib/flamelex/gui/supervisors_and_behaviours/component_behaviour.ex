@@ -63,21 +63,22 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       end
 
       @impl Scenic.Scene
-      def init(%{frame: %Frame{} = frame} = params, opts) do
-        Logger.debug "Initializing #{__MODULE__}... #{inspect opts}"
-
+      def init(%{frame: %Frame{} = frame} = init_state, _scenic_opts) do
         register_self(frame) #TODO we shouldn't be using Frame to pass around everything...
 
         #NOTE: This little trick is so that `custom_init_logic` is optional
-        if function_exported?(__MODULE__, :custom_init_logic, 2) do
-          apply(__MODULE__, :custom_init_logic, [frame, params])
-        end
+        init_state =
+          if function_exported?(__MODULE__, :custom_init_logic, 1) do
+            apply(__MODULE__, :custom_init_logic, [init_state])
+          else
+            init_state
+          end
 
         graph =
-          render(frame, params) #REMINDER: render/1 has to be implemented by the modules "using" this behaviour, and that is the function being called here
-          |> Frame.decorate_graph(frame, params)
+          render(frame, init_state) #REMINDER: render/1 has to be implemented by the modules "using" this behaviour, and that is the function being called here
+          |> Frame.draw_frame_footer(init_state)
 
-        {:ok, {graph, frame}, push: graph}
+        {:ok, {graph, init_state}, push: graph}
       end
 
       def register_self(frame) do
@@ -102,7 +103,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       end
 
       @impl Scenic.Scene
-      def handle_cast({:action, action}, {%Scenic.Graph{} = graph, %Frame{} = frame}) do
+      def handle_cast({:action, action}, {%Scenic.Graph{} = graph, %{frame: %Frame{} = frame}}) do
         case handle_action(frame, action) do
           :ignore_action
             -> {:noreply, {graph, frame}}
@@ -135,7 +136,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
 
   This is an optional callback. #TODO
   """
-  @callback custom_init_logic(%Flamelex.GUI.Structs.Frame{}, map()) :: atom()
+  @callback custom_init_logic(map()) :: atom()
 
   @doc """
   Each Component is represented internally at the highest level by the

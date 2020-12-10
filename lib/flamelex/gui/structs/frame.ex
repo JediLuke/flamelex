@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Structs.Frame do #TODO rename this moduile to have utilities in it
+defmodule Flamelex.GUI.Structs.Frame do
   @moduledoc """
   Struct which holds relevant data for rendering a buffer frame status bar.
   """
@@ -100,7 +100,59 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     }
   end
 
-  def decorate_graph(%Scenic.Graph{} = graph, %Frame{} = frame, params) when is_map(params) do
+  def draw_frame_footer(
+        %Scenic.Graph{} = graph,
+        %{ frame: %Frame{} = frame,
+           draw_footer?: true })
+  do
+
+    w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
+    h = Flamelex.GUI.Component.MenuBar.height()
+    x = frame.coordinates.x
+    y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
+    c = Flamelex.GUI.Colors.menu_bar()
+
+    font_size = Flamelex.GUI.Fonts.size()
+    mode_textbox_width = 250
+
+    stroke_width = 2
+    mode_string = "NORMAL_MODE"
+    left_margin = 25
+
+    frame_label = frame.id #TODO this sucks, don't use frame
+
+    graph
+    # first, draw the background
+    |> Scenic.Primitives.rect({w, h},
+                translate:  {x, y},
+                fill:       c)
+    # then, draw the backgrounnd rectangle for the mode-string box
+    |> Scenic.Primitives.rect({mode_textbox_width, h},
+                translate:  {x, y},
+                fill:       Flamelex.GUI.Colors.mode(:normal))
+    # draw the text showing the mode_string
+    |> Scenic.Primitives.text(mode_string,
+                font:       Flamelex.GUI.Fonts.primary(),
+                translate:  {x+left_margin, y+font_size+stroke_width}, # text draws from bottom-left corner??
+                font_size:  font_size,
+                fill:       :black)
+    # draw the text showing the frame_label
+    |> Scenic.Primitives.text(frame_label,
+                font:       Flamelex.GUI.Fonts.primary(),
+                translate:  {x+mode_textbox_width+left_margin, y+font_size+stroke_width}, # text draws from bottom-left corner??
+                font_size:  font_size,
+                fill:       :black)
+    # draw a simple line above the frame footer
+    |> Scenic.Primitives.line({{x, y}, {w, y}},
+                stroke:     {stroke_width, :black})
+  end
+
+  def draw_frame_footer(%Scenic.Graph{} = graph, _params) do
+    #NOTE: do nothing, as we didn't match on the correct frame_opts
+    graph
+  end
+
+  def decorate_graph(%Scenic.Graph{} = graph, %{frame: %Frame{} = frame} = params) do
     Logger.debug "#{__MODULE__} framing up... frame: #{inspect frame}, params: #{inspect params}"
     Logger.warn "Not rly framing anything yet..."
     graph
@@ -121,101 +173,112 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     %{frame|coordinates: new_coordinates}
   end
 
-  def draw(%Scenic.Graph{} = graph, %Frame{} = frame) do
-    graph
-    |> Draw.border_box(frame)
-    |> draw_frame_footer(frame)
+  def resize(%Frame{dimensions: dimens} = frame, reduce_height_by: h) do
+    new_height = frame.dimensions.height - h
+
+    new_dimensions =
+      dimens |> Dimensions.modify(
+                      width: frame.dimensions.width,
+                      height: new_height )
+
+    %{frame|dimensions: new_dimensions}
   end
 
-  def draw(%Scenic.Graph{} = graph, %Frame{} = frame, opts) when is_map(opts) do
-    graph
-    |> draw_frame_footer(frame, opts)
-    |> Draw.border_box(frame)
-  end
+  # def draw(%Scenic.Graph{} = graph, %Frame{} = frame) do
+  #   graph
+  #   |> Draw.border_box(frame)
+  #   |> draw_frame_footer(frame)
+  # end
 
-  def draw(%Scenic.Graph{} = graph, %Frame{} = frame, %Flamelex.Structs.OmegaState{} = omega_state) do
-    graph
-    |> draw_frame_footer(frame, omega_state)
-    |> Draw.border_box(frame)
-  end
+  # def draw(%Scenic.Graph{} = graph, %Frame{} = frame, opts) when is_map(opts) do
+  #   graph
+  #   |> draw_frame_footer(frame, opts)
+  #   |> Draw.border_box(frame)
+  # end
 
-  def draw_frame_footer(graph, frame, %{mode: :normal} = opts) when is_map(opts) do
-    w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
-    h = Flamelex.GUI.Component.MenuBar.height()
-    x = frame.coordinates.x
-    y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
-    c = Flamelex.GUI.Colors.menu_bar()
+  # def draw(%Scenic.Graph{} = graph, %Frame{} = frame, %Flamelex.Structs.OmegaState{} = omega_state) do
+  #   graph
+  #   |> draw_frame_footer(frame, omega_state)
+  #   |> Draw.border_box(frame)
+  # end
 
-    font_size = Flamelex.GUI.Fonts.size()
+  # def draw_frame_footer(graph, frame, %{mode: :normal} = opts) when is_map(opts) do
+  #   w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
+  #   h = Flamelex.GUI.Component.MenuBar.height()
+  #   x = frame.coordinates.x
+  #   y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
+  #   c = Flamelex.GUI.Colors.menu_bar()
 
-    graph
-    |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
-    |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: Flamelex.GUI.Colors.mode(:normal))
-    |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
-    |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
-    |> Scenic.Primitives.text("NORMAL-MODE", font: Flamelex.GUI.Fonts.primary(),
-                translate: {x + 25, y + font_size + 2}, # text draws from bottom-left corner??
-                font_size: font_size, fill: :black)
-    |> Scenic.Primitives.text(frame.id, font: Flamelex.GUI.Fonts.primary(), #TODO should be frame.name ??
-                translate: {x + 200, y + font_size + 2}, # text draws from bottom-left corner??
-                font_size: font_size, fill: :black)
-  end
+  #   font_size = Flamelex.GUI.Fonts.size()
+
+  #   graph
+  #   |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
+  #   |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: Flamelex.GUI.Colors.mode(:normal))
+  #   |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
+  #   |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
+  #   |> Scenic.Primitives.text("NORMAL-MODE", font: Flamelex.GUI.Fonts.primary(),
+  #               translate: {x + 25, y + font_size + 2}, # text draws from bottom-left corner??
+  #               font_size: font_size, fill: :black)
+  #   |> Scenic.Primitives.text(frame.id, font: Flamelex.GUI.Fonts.primary(), #TODO should be frame.name ??
+  #               translate: {x + 200, y + font_size + 2}, # text draws from bottom-left corner??
+  #               font_size: font_size, fill: :black)
+  # end
 
 
-  def draw_frame_footer(graph, frame, %{mode: :insert} = opts) when is_map(opts) do
-    w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
-    h = Flamelex.GUI.Component.MenuBar.height()
-    x = frame.coordinates.x
-    y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
-    c = Flamelex.GUI.Colors.menu_bar()
+  # def draw_frame_footer(graph, frame, %{mode: :insert} = opts) when is_map(opts) do
+  #   w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
+  #   h = Flamelex.GUI.Component.MenuBar.height()
+  #   x = frame.coordinates.x
+  #   y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
+  #   c = Flamelex.GUI.Colors.menu_bar()
 
-    font_size = Flamelex.GUI.Fonts.size()
+  #   font_size = Flamelex.GUI.Fonts.size()
 
-    graph
-    |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
-    |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: Flamelex.GUI.Colors.mode(:insert))
-    |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
-    |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
-    |> Scenic.Primitives.text("INSERT-MODE", font: Flamelex.GUI.Fonts.primary(),
-                translate: {x + 25, y + font_size + 2}, # text draws from bottom-left corner??
-                font_size: font_size, fill: :black)
-    |> Scenic.Primitives.text(frame.id, font: Flamelex.GUI.Fonts.primary(), #TODO should be frame.name ??
-                translate: {x + 200, y + font_size + 2}, # text draws from bottom-left corner??
-                font_size: font_size, fill: :black)
-  end
+  #   graph
+  #   |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
+  #   |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: Flamelex.GUI.Colors.mode(:insert))
+  #   |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
+  #   |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
+  #   |> Scenic.Primitives.text("INSERT-MODE", font: Flamelex.GUI.Fonts.primary(),
+  #               translate: {x + 25, y + font_size + 2}, # text draws from bottom-left corner??
+  #               font_size: font_size, fill: :black)
+  #   |> Scenic.Primitives.text(frame.id, font: Flamelex.GUI.Fonts.primary(), #TODO should be frame.name ??
+  #               translate: {x + 200, y + font_size + 2}, # text draws from bottom-left corner??
+  #               font_size: font_size, fill: :black)
+  # end
 
-  def draw_frame_footer(graph, frame) do
-    w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
-    h = Flamelex.GUI.Component.MenuBar.height()
-    x = frame.coordinates.x
-    y = frame.dimensions.height # go to the bottom & back up how high the bar will be
-    c = Flamelex.GUI.Colors.menu_bar()
+  # def draw_frame_footer(graph, frame) do
+  #   w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
+  #   h = Flamelex.GUI.Component.MenuBar.height()
+  #   x = frame.coordinates.x
+  #   y = frame.dimensions.height # go to the bottom & back up how high the bar will be
+  #   c = Flamelex.GUI.Colors.menu_bar()
 
-    graph
-    |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
-  end
+  #   graph
+  #   |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
+  # end
 
-  def draw_frame_footer(graph, frame, %Flamelex.Structs.OmegaState{mode: :normal}) do
-    w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
-    h = Flamelex.GUI.Component.MenuBar.height()
-    x = frame.coordinates.x
-    y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
-    c = Flamelex.GUI.Colors.menu_bar()
+  # def draw_frame_footer(graph, frame, %Flamelex.Structs.OmegaState{mode: :normal}) do
+  #   w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
+  #   h = Flamelex.GUI.Component.MenuBar.height()
+  #   x = frame.coordinates.x
+  #   y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
+  #   c = Flamelex.GUI.Colors.menu_bar()
 
-    font_size = Flamelex.GUI.Fonts.size()
+  #   font_size = Flamelex.GUI.Fonts.size()
 
-    graph
-    |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
-    |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: Flamelex.GUI.Colors.mode(:normal))
-    |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
-    |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
-    |> Scenic.Primitives.text("NORMAL-MODE", font: Flamelex.GUI.Fonts.primary(),
-                translate: {x + 25, y + font_size + 2}, # text draws from bottom-left corner??
-                font_size: font_size, fill: :black)
-    |> Scenic.Primitives.text(frame.id, font: Flamelex.GUI.Fonts.primary(), #TODO should be frame.name ??
-                translate: {x + 200, y + font_size + 2}, # text draws from bottom-left corner??
-                font_size: font_size, fill: :black)
-  end
+  #   graph
+  #   |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
+  #   |> Scenic.Primitives.rect({168, h}, translate: {x, y}, fill: Flamelex.GUI.Colors.mode(:normal))
+  #   |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
+  #   |> Scenic.Primitives.line({{x, y}, {w, y}}, stroke: {2, :black})
+  #   |> Scenic.Primitives.text("NORMAL-MODE", font: Flamelex.GUI.Fonts.primary(),
+  #               translate: {x + 25, y + font_size + 2}, # text draws from bottom-left corner??
+  #               font_size: font_size, fill: :black)
+  #   |> Scenic.Primitives.text(frame.id, font: Flamelex.GUI.Fonts.primary(), #TODO should be frame.name ??
+  #               translate: {x + 200, y + font_size + 2}, # text draws from bottom-left corner??
+  #               font_size: font_size, fill: :black)
+  # end
 end
 
 

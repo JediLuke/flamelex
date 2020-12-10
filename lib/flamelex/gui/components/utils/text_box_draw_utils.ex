@@ -24,24 +24,17 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
     graph
   end
   def render_lines(
-        %Scenic.Graph{} = graph,
-        %{
-          lines_of_text: [ %LineOfText{} = _l | _rest] = lines,
-          top_left_corner: %Coordinates{} = coords
-        })
+    %Scenic.Graph{} = graph,
+    %{
+      lines_of_text: [ %LineOfText{} = _l | _rest] = lines,
+      top_left_corner: %Coordinates{} = coords
+    })
   do
-
-    initial_accumulator = {
-      graph,  # the initial graph
-      0       # initialize the line_num to zero
-    }
-
-    {new_graph, final_line_num} = # REMINDER: this is the final accumulator, passed through by Enum.reduce/2
-        lines
+    {new_graph, _final_line_num} = # REMINDER: this is the final accumulator, passed through by Enum.reduce/2
+      lines
         |> Enum.reduce(
-              initial_accumulator,
+              {graph, 0}, # initialize the accumulator, line_num starts at zero
               fn line_of_t, {graph, line_num} ->
-
                   new_graph =
                     graph
                     |> render_line({line_num, coords}, line_of_t.text)
@@ -50,10 +43,7 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
                   {new_graph, line_num+1}
               end)
 
-    IO.inspect final_line_num, label: ":::"
-
-    # we return the graph as the last thing
-    new_graph
+    new_graph # we return the graph as the last thing
   end
 
 
@@ -69,6 +59,7 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
            left_margin+coords.x,
            top_margin+coords.y+line_number_y_offset
          },
-         fill:      :white)
+         fill: :white
+    )
   end
 end

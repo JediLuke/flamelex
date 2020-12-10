@@ -3,76 +3,15 @@ defmodule Flamelex.GUI.Component.DeprecatedTextBox do
   use Scenic.Component
   require Logger
   use Flamelex.ProjectAliases
-  alias Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib, as: TextBoxDraw
-
-  @blink_ms trunc(500) # blink speed in hertz
 
 
-  #TODO have horizontal scrolling if we go over the line
 
-  def draw(graph, params) do
-    add_to_graph(graph, params)
-  end
-
-  def verify({%Frame{} = _f, _data, opts} = params) when is_map(opts), do: {:ok, params}
-  def verify(_else), do: :invalid_data
-
-  def info(_data), do: ~s(Invalid data)
-
-
-  @doc false
-  def init({%Frame{} = frame, text, opts}, _opts) do
-
-    Logger.info "#{__MODULE__} initializing..."
-
-    # ProcessRegistry.register({:gui_component, frame.id})
-    ProcessRegistry.register(frame.id)
-
-    cursor_position = %{row: 0, col: 0}
-
-    GenServer.cast(self(), :start_blink)
-
-    graph =
-      Draw.blank_graph()
-      |> Draw.background(frame, Flamelex.GUI.Colors.background())
-      |> TextBoxDraw.render_text_grid(%{
-           frame: frame,
-           text: text,
-           cursor_position: cursor_position,
-           cursor_blink?: false
-         })
-      |> Frame.draw(frame, opts)
-
-    new_state = %{
-      graph: graph,
-      frame: frame,
-      text: text,
-      mode: :normal,
-      cursor_position: cursor_position,
-      cursor_blink?: false,
-      timer: nil
-    }
-
-    {:ok, new_state, push: graph}
-  end
-
-
-  def handle_call(:get_cursor_position, _from, state) do
-    {:reply, state.cursor_position, state}
-  end
-
-  def handle_cast(:start_blink, state) do
-    {:ok, timer} = :timer.send_interval(@blink_ms, :blink)
-    new_state = %{state | timer: timer}
-    {:noreply, new_state}
-  end
-
-  def handle_cast({:refresh, buf}, state) do
-    state = %{state|text: buf.data}
-    new_graph = render_graph(state)
-    new_state = %{state| graph: new_graph}
-    {:noreply, new_state, push: new_graph}
-  end
+  # def handle_cast({:refresh, buf}, state) do
+  #   state = %{state|text: buf.data}
+  #   new_graph = render_graph(state)
+  #   new_state = %{state| graph: new_graph}
+  #   {:noreply, new_state, push: new_graph}
+  # end
 
   def handle_cast({:move_cursor, direction, _dist}, state) do
 
@@ -159,20 +98,6 @@ defmodule Flamelex.GUI.Component.DeprecatedTextBox do
       %{state|graph: new_graph, cursor_blink?: new_blink}
 
     {:noreply, new_state, push: new_graph}
-  end
-
-
-  def render_graph(state) do
-    Draw.blank_graph()
-    |> Draw.background(state.frame, Flamelex.GUI.Colors.background())
-    |> TextBoxDraw.render_text_grid(%{
-          frame: state.frame,
-          text: state.text,
-          cursor_position: state.cursor_position,
-          cursor_blink?: state.cursor_blink?,
-          mode: state.mode
-        })
-    |> Frame.draw(state.frame, %{mode: state.mode})
   end
 
 

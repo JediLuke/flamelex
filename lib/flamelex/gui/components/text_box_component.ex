@@ -4,33 +4,54 @@ defmodule Flamelex.GUI.Component.TextBox do
   """
   use Flamelex.GUI.ComponentBehaviour
   alias Flamelex.GUI.Component.Utils.TextBox, as: TextBoxDrawUtils
+  alias Flamelex.GUI.Component.MenuBar
+
+
+  @blink_ms trunc(500) # blink speed in hertz
 
 
   @impl Flamelex.GUI.ComponentBehaviour
-  def custom_init_logic(_frame, _params) do
-    cursor_position = %{row: 0, col: 0}
-
-    GenServer.cast(self(), :start_blink)
+  #TODO this is a deprecated version of render
+  def render(%Frame{} = frame, params) do
+    render(params |> Map.merge(%{frame: frame}))
   end
 
-  @impl Flamelex.GUI.ComponentBehaviour
-  def render(%Frame{} = frame, _params) do
+  def render(%{frame: %Frame{} = frame} = params) do
 
     #TODO make the frame, only 72 columns wide !!
+    frame =
+      if we_are_drawing_a_footer_bar?(params) do
+        frame |> Frame.resize(reduce_height_by: MenuBar.height()+1) #TODO why do we need +1 here??
+      else
+        frame # no need to make any adjustments
+      end
 
     lines_of_text =
-        Flamelex.API.Buffer.read(frame.id) #TODO this is bad... Frame shouldn't be the key we're passing around here
-        |> TextBoxDrawUtils.split_into_a_list_of_lines_of_text_structs()
+      Flamelex.API.Buffer.read(frame.id) #TODO this is bad... Frame shouldn't be the key we're passing around here
+      |> TextBoxDrawUtils.split_into_a_list_of_lines_of_text_structs()
 
-    background_color =
-      Flamelex.GUI.Colors.background()
-      # :green
+    background_color = Flamelex.GUI.Colors.background()
 
     Draw.blank_graph()
     |> Draw.background(frame, background_color)
     |> TextBoxDrawUtils.render_lines(%{ lines_of_text: lines_of_text,
                                         top_left_corner: frame.coordinates })
     |> Draw.border(frame)
+  end
+
+  defp we_are_drawing_a_footer_bar?(%{draw_footer?: df?}), do: df?
+  defp we_are_drawing_a_footer_bar?(_else), do: false
+
+  @impl Flamelex.GUI.ComponentBehaviour
+  def custom_init_logic(params) do
+    #TODO spin up new cursor component!!
+    GenServer.cast(self(), :start_blink)
+
+    params |> Map.merge(%{
+      timer: nil,
+      draw_footer?: true,
+      cursor_position: %{line: 0, col: 0}
+    })
   end
 
 
@@ -50,6 +71,37 @@ defmodule Flamelex.GUI.Component.TextBox do
     {:noreply, state}
   end
 
+
+  def handle_cast(:start_blink, {graph, state}) do
+    {:ok, timer} = :timer.send_interval(@blink_ms, :blink)
+    new_state = %{state | timer: timer}
+    {:noreply, {graph, new_state}}
+  end
+
+  def handle_info(:blink, state) do
+
+    # new_blink = not state.cursor_blink?
+
+    # new_graph =
+    #   Draw.blank_graph()
+    #   |> Draw.background(state.frame, Flamelex.GUI.Colors.background())
+    #   |> TextBoxDraw.render_text_grid(%{
+    #        frame: state.frame,
+    #        text: state.text,
+    #        cursor_position: state.cursor_position,
+    #        cursor_blink?: new_blink,
+    #        mode: state.mode
+    #      })
+    #   |> Frame.draw(state.frame, %{mode: state.mode})
+
+    # new_state =
+    #   %{state|graph: new_graph, cursor_blink?: new_blink}
+
+    # {:noreply, new_state, push: new_graph}
+
+    IO.puts "BLINKY!"
+    {:noreply, state}
+  end
 
   @doc """
   When placed at the bottom of the module, this function would serve as
