@@ -17,7 +17,7 @@ defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
 
   def draw_command_prompt(graph, %Frame{
     #NOTE: These are the coords/dimens for the whole CommandBuffer Frame
-    coordinates: %Coordinates{x: _top_left_x, y: top_left_y},
+    top_left: %Coordinates{x: _top_left_x, y: top_left_y},
     dimensions: %Dimensions{height: height, width: _width}
   }) do
     #NOTE: The y_offset
@@ -50,7 +50,7 @@ defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
 
   def calc_textbox_frame(_buffer_frame = %Frame{
     #NOTE: These are the coords/dimens for the whole CommandBuffer Frame
-    coordinates: %Coordinates{x: cmd_buf_top_left_x, y: cmd_buf_top_left_y},
+    top_left: %Coordinates{x: cmd_buf_top_left_x, y: cmd_buf_top_left_y},
     dimensions: %Dimensions{height: cmd_buf_height, width: cmd_buf_width}
   }) do
     total_prompt_width = prompt_width(@prompt_size) + (2*@prompt_margin)
@@ -67,8 +67,8 @@ defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
 
     textbox_frame =
       Frame.new(
-        top_left_corner: textbox_coordinates |> Coordinates.new(),
-        dimensions:      textbox_dimensions  |> Dimensions.new())
+        top_left:     textbox_coordinates |> Coordinates.new(),
+        dimensions:   textbox_dimensions  |> Dimensions.new())
 
     # return
     textbox_frame
@@ -82,16 +82,15 @@ defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
   def draw_cursor(
         graph,
         %Frame{
-           coordinates: %Coordinates{x: container_top_left_x, y: container_top_left_y},
-           dimensions:  %Dimensions{height: container_height, width: _container_width}
+           top_left:   %Coordinates{x: container_top_left_x, y: container_top_left_y},
+           dimensions: %Dimensions{height: container_height, width: _container_width}
         },
         id: cursor_component_id)
   do
 
     cursor_frame = Frame.new(
-      id:              cursor_component_id,
-      top_left_corner: {container_top_left_x, container_top_left_y},
-      dimensions:      {@cursor_width, container_height})
+      top_left:   {container_top_left_x, container_top_left_y},
+      dimensions: {@cursor_width, container_height})
 
     graph
     |> GUI.Component.Cursor.add_to_graph(cursor_frame)
@@ -101,7 +100,7 @@ defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
         graph,
         content,
         %Frame{
-           coordinates: %Coordinates{x: container_top_left_x, y: container_top_left_y},
+           top_left:    %Coordinates{x: container_top_left_x, y: container_top_left_y},
            dimensions:  %Dimensions{height: container_height, width: _container_width}
         },
         id: text_field_id)

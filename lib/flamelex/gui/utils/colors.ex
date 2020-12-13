@@ -1,6 +1,6 @@
 defmodule Flamelex.GUI.Colors do
 
-  def pallete do
+  def pallete do #TODO this should be a config
     Flamelex.GUI.ColorsPalletes.Anakin
     # Flamelex.GUI.ColorsPalletes.Obiwan
   end

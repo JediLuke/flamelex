@@ -31,7 +31,8 @@ defmodule Flamelex.GUI.Component.CommandBuffer do
   ## -------------------------------------------------------------------
 
   #TODO this is just straight from ComponentBehaviour
-  def mount(%Scenic.Graph{} = graph, %Frame{} = frame, params \\ %{}) do
+  # def mount(%Scenic.Graph{} = graph, %Frame{} = frame, params \\ %{}) do
+  def mount(%Scenic.Graph{} = graph, %{frame: %Frame{} = frame} = params) do
     graph |> add_to_graph({frame, params}, id: @component_id) #REMINDER: This will pass `frame` to this modules init/2
   end
 

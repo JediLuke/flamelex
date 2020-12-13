@@ -53,7 +53,7 @@ defmodule Flamelex.GUI.Utilities.Draw do
     height = frame.dimensions.height
 
     graph
-    |> Scenic.Primitives.rect({width, height}, fill: color, translate: {frame.coordinates.x, frame.coordinates.y})
+    |> Scenic.Primitives.rect({width, height}, fill: color, translate: {frame.top_left.x, frame.top_left.y})
   end
 
   # def triangle(graph, centroid, size) do
@@ -99,8 +99,8 @@ defmodule Flamelex.GUI.Utilities.Draw do
 
     #TODO-NOTE need + or - 1 here for some reason to do with Scenic quirks...
 
-    x_coord = frame.coordinates.x + size - 1
-    y_coord = frame.coordinates.y
+    x_coord = frame.top_left.x + size - 1
+    y_coord = frame.top_left.y
     width   = frame.dimensions.width - 1
     height  = frame.dimensions.height - MenuBar.height() - size + 1
 

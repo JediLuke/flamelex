@@ -1,6 +1,7 @@
 defmodule Flamelex.Utilities.ProcessRegistry do
   require Logger
   use Flamelex.ProjectAliases
+  alias Flamelex.Structs.Buf
 
   @doc """
   Register a new PiD in gproc.
@@ -21,12 +22,27 @@ defmodule Flamelex.Utilities.ProcessRegistry do
   ```
   """
   def via_tuple(tag) do
+    via_tuple(:gproc, tag)
+  end
+  def via_tuple(:gproc, tag) do
     {:via, :gproc, {:n, :l, tag}}
+  end
+
+  #TODO deprecate above in favor of below
+  def via_tuple_name(:gproc, tag) do
+    via_tuple(:gproc, tag)
   end
 
   @doc """
   Returns an ok/error tuple.
   """
+  def lookup(%Buf{} = buf) do
+    lookup_key = Buf.rego_tag(buf)
+    case :gproc.where({:n, :l, lookup_key}) do
+      p when is_pid(p) -> {:ok, p}
+      _else            -> {:error, "Could not find a process with lookup_key: #{inspect lookup_key}"}
+    end
+  end
   def lookup(lookup_key) do
     case :gproc.where({:n, :l, lookup_key}) do
       p when is_pid(p) -> {:ok, p}
@@ -52,25 +68,6 @@ defmodule Flamelex.Utilities.ProcessRegistry do
   ## TODO deprecate below here
 
 
-
-
-  def new_buffer_name_tuple(Flamelex.Buffer.Text, %{from_file: filename}) do
-    buffer_tag =
-      {:buffer, filename}
-    gproc_name_registration_tuple =
-      {:via, :gproc, {:n, :l, buffer_tag}}
-
-    {:ok, gproc_name_registration_tuple}
-  end
-
-  def new_buffer_name_tuple(Flamelex.Buffer.Text, %{name: name}) do
-    buffer_tag =
-      {:buffer, name}
-    gproc_name_registration_tuple =
-      {:via, :gproc, {:n, :l, buffer_tag}}
-
-    {:ok, gproc_name_registration_tuple}
-  end
 
 
 

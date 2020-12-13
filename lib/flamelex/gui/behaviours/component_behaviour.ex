@@ -28,13 +28,14 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
       alias Flamelex.GUI.Utilities.Draw
       alias Flamelex.Utilities.ProcessRegistry
+      alias Flamelex.Structs.Buf
 
 
       #NOTE: In our case, we always want a Component to be passed in a %Frame{}
       #      so we don't need specific ones, each Component implements them
-      #      the same way
+      #      the same way. Also all components need a `ref`
       @impl Scenic.Component
-      def verify(%{frame: %Frame{} = _f} = params), do: {:ok, params}
+      def verify(%{ref: _r, frame: %Frame{} = _f} = params), do: {:ok, params}
       def verify(_else), do: :invalid_data
 
       @impl Scenic.Component
@@ -50,21 +51,14 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       graph. In our case this is the same for all components though so we
       can abstract it out.
       """
-      def mount(%Scenic.Graph{} = graph, %Frame{} = frame) do
-        Logger.error "DEPRECATE THIS USE OF MOUNT"
-        mount(graph, %{frame: frame})
-      end
       def mount(%Scenic.Graph{} = graph, params) when is_map(params) do
         graph |> add_to_graph(params) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
       end
-      def mount(%Scenic.Graph{} = graph, %Frame{} = frame, params \\ %{}) do
-        Logger.error "DEPRECATE THIS USE OF MOUNT"
-        mount(graph, %{frame: frame} |> Map.merge(params))
-      end
+
 
       @impl Scenic.Scene
       def init(%{frame: %Frame{} = frame} = init_state, _scenic_opts) do
-        register_self(frame) #TODO we shouldn't be using Frame to pass around everything...
+        # register_self(init_state) #TODO we shouldn't be using Frame to pass around everything...
 
         #NOTE: This little trick is so that `custom_init_logic` is optional
         init_state =
@@ -81,12 +75,11 @@ defmodule Flamelex.GUI.ComponentBehaviour do
         {:ok, {graph, init_state}, push: graph}
       end
 
-      def register_self(frame) do
+      def register_self(params) do
+        IO.inspect params
         #TODO search for if the process is already registered, if it is, engage recovery procedure
-        # Process.register(self(), __MODULE__) #TODO this should be gproc
         #TODO this should be {:gui_component, frame.id}, or maybe other way around. It could also subscribe to the channel for this id
-        # ProcessRegistry.register({:gui_component, frame.id})
-        ProcessRegistry.register({:gui_component, __MODULE__})
+        ProcessRegistry.register({:gui_component, params.id})
       end
 
       @doc """
@@ -136,7 +129,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
 
   This is an optional callback. #TODO
   """
-  @callback custom_init_logic(map()) :: atom()
+  @callback custom_init_logic(map()) :: map()
 
   @doc """
   Each Component is represented internally at the highest level by the

@@ -6,11 +6,9 @@ defmodule Flamelex.GUI.Controller do
   """
   use GenServer
   use Flamelex.ProjectAliases
+  alias Flamelex.Structs.Buf
   alias Flamelex.GUI.Structs.GUIState
-  alias Flamelex.GUI.Component.MenuBar
-  require Logger
   import Flamelex.GUI.Utilities.ControlHelper
-
 
 
   def start_link(_params) do
@@ -98,7 +96,7 @@ defmodule Flamelex.GUI.Controller do
 
 
 
-  # def handle_cast(:show_in_gui, %Buffer{} = buffer}, state) do
+  # def handle_cast(:show_in_gui, %Buf{} = buffer}, state) do
 
   #   # the reason we need this controller is, it can keep track of all the buffers that the GUI is managing. Ok fuck it we can maybe get rid of it
 
@@ -132,21 +130,27 @@ defmodule Flamelex.GUI.Controller do
 
 
 
-  def handle_cast({:show, {:buffer, name}}, gui_state) do
-    frame = calculate_framing(name, gui_state.layout)
-    data  = Buffer.read(name)
-    opts  = %{mode: :normal}
+  def handle_cast({:show, %Buf{} = buf}, gui_state) do
+    frame = Frame.new(gui_state, buf)
+    # frame = calculate_framing(gui_state.layout)
+    data  = Buffer.read(buf)
 
-    new_graph =
-      gui_state.graph #TODO root_graph - look at actual graph & update it, don't just keep drawing on top of it
-      # Draw.blank_graph()
-      # |> Flamelex.GUI.Component.TextBox.draw({frame, data, opts})
-      # |> Flamelex.GUI.Component.SampleComponent.mount(%{frame: frame})
-      |> Flamelex.GUI.Component.TextBox.mount(%{frame: frame})
+    gui_component_process_alive? = false
 
-    Flamelex.GUI.RootScene.redraw(new_graph)
+    if gui_component_process_alive? do
+      raise "well that's a surprise"
+    else
+      new_graph =
+        gui_state.graph
+        |> Flamelex.GUI.Component.TextBox.mount(%{
+              ref: buf,
+              frame: frame,
+              mode: :normal,
+              data: data })
 
-    {:noreply, %{gui_state|graph: new_graph}}
+      Flamelex.GUI.RootScene.redraw(new_graph)
+      {:noreply, %{gui_state|graph: new_graph}}
+    end
   end
 
   def handle_cast({:show, {:command_buffer, _data}}, state) do
@@ -187,79 +191,47 @@ defmodule Flamelex.GUI.Controller do
   #   {:noreply, %{state|graph: new_graph}}
   # end
 
-  def handle_cast({:show, {:buffer, name} = buf}, state) do
+  # def handle_cast({:show, {:buffer, name} = buf}, state) do #TODO this is implicitely assuming we want a text buffer
 
-    data  = Buffer.read(buf)
-    frame = calculate_framing(name, state.layout)
+  #   data  = Buffer.read(buf)
+  #   frame = calculate_framing(name, state.layout)
 
-    new_graph =
-      state.graph
-      |> Flamelex.GUI.Component.TextBox.draw({frame, data, %{}})
-      |> Frame.draw(frame)
-      # |> Draw.test_pattern()
+  #   new_graph =
+  #     state.graph
+  #     #TODO this is the part of CommandBu
+  #     # |> Flamelex.GUI.Component.TextBox.draw({frame, data, %{}})
+  #     # |> Frame.draw(frame)
+  #     # # |> Draw.test_pattern()
 
-    Flamelex.GUI.RootScene.redraw(new_graph)
+  #   Flamelex.GUI.RootScene.redraw(new_graph)
 
-    {:noreply, %{state|graph: new_graph}}
-  end
+  #   {:noreply, %{state|graph: new_graph}}
+  # end
 
 
-  # #TODO so, I'm pretty sure this is just adding more & more shit to the graph,
-  # # never taking it away...
   def handle_cast({:refresh, {:buffer, filename} = buf}, state) do
 
-    data  = Buffer.read(buf)
-    frame = calculate_framing(filename, state.layout)
+    # data  = Buffer.read(buf)
+    # frame = calculate_framing(filename, state.layout)
 
+    # new_graph =
+    #   state.graph
+    #   # |> Scenic.Graph.modify(@text_field_id, fn x ->
+    #   #   IO.puts "YES #{inspect x}"
+    #   #   x
+    #   # end)
+    #   # |> Flamelex.GUI.Component.TextBox.draw({frame, data, %{}}) #TODO check the old process is dieing...
+    #   |> Flamelex.GUI.Component.TextBox.mount(%{frame: frame})
+    #   |> Draw.test_pattern()
 
+    # Flamelex.GUI.RootScene.redraw(new_graph)
 
-
-    new_graph =
-      state.graph
-      |> Scenic.Graph.modify(@text_field_id, fn x ->
-        IO.puts "YES #{inspect x}"
-        x
-      end)
-      # |> Flamelex.GUI.Component.TextBox.draw({frame, data, %{}})
-      # |> Draw.test_pattern()
-
-    Flamelex.GUI.RootScene.redraw(new_graph)
-
-    {:noreply, %{state|graph: new_graph}}
+    # {:noreply, %{state|graph: new_graph}}
+    {:noreply, state}
   end
 
 
 
-  def calculate_framing(name, %Layout{
-    arrangement: :maximized,
-    dimensions: %Dimensions{} = layout_dimens,
-    frames: [], #NOTE: No existing frames
-    opts: opts
-  }) do
-    coords = calculate_frame_position(opts)
-    dimens = calculate_frame_size(opts, layout_dimens)
-
-    Frame.new(name, coords, dimens)
-  end
-
-  def calculate_frame_position(opts) do
-    case opts |> Map.fetch(:show_menubar?) do
-      {:ok, true} ->
-        Coordinates.new(x: 0, y: MenuBar.height())
-      _otherwise ->
-        Coordinates.new(x: 0, y: 0)
-    end
-  end
-
-  #TODO lol whats going on here
-  def calculate_frame_size(opts, layout_dimens) do
-    case opts |> Map.fetch(:show_menubar?) do
-      {:ok, true} ->
-        Dimensions.new(width: layout_dimens.width, height: layout_dimens.height)
-      _otherwise ->
-        Dimensions.new(width: layout_dimens.width, height: layout_dimens.height)
-    end
-  end
 
 
     # new_graph =
@@ -299,7 +271,7 @@ defmodule Flamelex.GUI.Controller do
   #   {:noreply, new_state}
   # end
 
-  # def handle_cast({:show_fullscreen, %Buffer{} = buffer}, state) do
+  # def handle_cast({:show_fullscreen, %Buf{} = buffer}, state) do
   def handle_cast({:show_fullscreen, buffer}, state) do
 
     # the reason we need this controller is, it can keep track of all the buffers that the GUI is managing. Ok fuck it we can maybe get rid of it

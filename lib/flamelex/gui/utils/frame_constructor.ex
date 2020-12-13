@@ -35,13 +35,13 @@ defmodule Flamelex.GUI.GraphConstructors.Frame do
          {frame.dimensions.width, height}, [
             fill: fill,
             translate: {
-              frame.coordinates.x,
-              frame.coordinates.y}])
+              frame.top_left.x,
+              frame.top_left.y}])
     |> Scenic.Primitives.text(frame.buffer.name,
             fill: :black,
             translate: {
-              frame.coordinates.x + 50, #TODO need to take text width into account here but good enough for now - would look nice centered
-              frame.coordinates.y + 20}) #TODO god damnit Scenic why do you draw text from bottom-left??
+              frame.top_left.x + 50, #TODO need to take text width into account here but good enough for now - would look nice centered
+              frame.top_left.y + 20}) #TODO god damnit Scenic why do you draw text from bottom-left??
   end
 
   defp draw_footer_bar(graph, frame, height) do
@@ -50,7 +50,7 @@ defmodule Flamelex.GUI.GraphConstructors.Frame do
          {frame.dimensions.width, height}, [
             fill: :grey,
             translate: {
-              frame.coordinates.x,
-              frame.coordinates.y + frame.dimensions.height - height}])
+              frame.top_left.x,
+              frame.top_left.y + frame.dimensions.height - height}])
   end
 end

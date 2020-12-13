@@ -162,8 +162,8 @@ defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
     # maybe we make each box, just slightly bigger than a character...
     box_buffer = 1
 
-    block_position_x = frame.coordinates.x + tile.col*block_width + @left_margin
-    block_position_y = frame.coordinates.y + tile.row*block_height
+    block_position_x = frame.top_left.x + tile.col*block_width + @left_margin
+    block_position_y = frame.top_left.y + tile.row*block_height
 
     text_bottom_buffer = 2*box_buffer
 
@@ -292,8 +292,8 @@ end
   #   block_width  = box_buffer + GUI.FontHelpers.monospace_font_width(:ibm_plex_mono, 24) #TODO need to get the variable amount, not a card-coded value here somehow...
   #   block_height = box_buffer + GUI.FontHelpers.monospace_font_height(:ibm_plex_mono, 24)
 
-  #   block_position_x = frame.coordinates.x + row*block_width + left_margin
-  #   block_position_y = frame.coordinates.y + col*block_height
+  #   block_position_x = frame.top_left.x + row*block_width + left_margin
+  #   block_position_y = frame.top_left.y + col*block_height
 
   #   text_bottom_buffer = 2*box_buffer
 

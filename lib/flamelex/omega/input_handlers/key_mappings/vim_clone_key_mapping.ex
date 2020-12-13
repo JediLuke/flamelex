@@ -48,10 +48,10 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
   def keymap(%OmegaState{}) do
     %{
       # normal mode navigation
-      # @lowercase_h => move_cursor(omega_state, {:left,  1}),
-      # @lowercase_j => move_cursor(omega_state, {:down,  1}),
-      # @lowercase_k => move_cursor(omega_state, {:up,    1}),
-      # @lowercase_l => move_cursor(omega_state, {:right, 1}),
+      @lowercase_h => move_cursor(:left, 1),
+      @lowercase_j => move_cursor(:down, 1),
+      @lowercase_k => move_cursor(:up, 1),
+      @lowercase_l => move_cursor(:right, 1),
 
       # switch modes
       # @lowercase_i => {:apply_mfa, {Flamelex, :switch_mode, [:insert]}},
@@ -65,13 +65,8 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
   end
 
 
-
-
-
-
-  defp move_cursor(%OmegaState{} = omega_state, {direction, x}) do
-    raise "lol"
-    # {:apply_mfa, {Flamelex.Buffer.Text, :move_cursor, [active_text_bufr, {direction,  x}]}}
+  defp move_cursor(direction, amount) do
+    {:apply_mfa, {Flamelex.Buffer.Text, :move_cursor, [:active_buffer, {direction,  amount}]}}
   end
 end
 

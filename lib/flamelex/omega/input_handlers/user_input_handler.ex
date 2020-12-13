@@ -11,13 +11,13 @@ defmodule Flamelex.GUI.UserInputHandler do
   # functions may have side-effects, which cause the GUI to be updated,
   # or a buffer to change, or anything really.
   def handle_input(%OmegaState{} = omega_state, input) do
-    if we_need_to_update_omega_state_atomically_when_processing_this?(input) do
-      spawn_new_syncronous_task_handler()
-      |> Task.await()
-    else
+    # if we_need_to_update_omega_state_atomically_when_processing_this?(input) do
+    #   spawn_new_syncronous_task_handler()
+    #   |> Task.await()
+    # else
       {:ok, _pid} = spawn_new_async_task_handler(omega_state, input)
       omega_state # return state unaltered
-    end
+    # end
   end
 
 

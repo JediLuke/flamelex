@@ -24,29 +24,30 @@ defmodule Flamelex.GUI.Utilities.ControlHelper do
 
     graph
     |> Flamelex.GUI.Component.TransmutationCircle.mount(
-          Frame.new(
-            top_left: {top_left_x_for_centered_frame, top_left_y_for_centered_frame},
-            size:     {scale_factor, scale_factor}))
+          %{ref: :renseijin,
+            frame: Frame.new(
+                     top_left: {top_left_x_for_centered_frame, top_left_y_for_centered_frame},
+                     size:     {scale_factor, scale_factor})})
   end
 
 
   defp mount_menubar(graph, vp) do
     graph
-    |> Flamelex.GUI.Component.MenuBar.mount(
-          Frame.new(
-            #TODO
-            # buffer: %ListBuffer{},
+    |> Flamelex.GUI.Component.MenuBar.mount(%{
+         ref: :menu_bar,
+         frame: Frame.new(
             top_left: {0, 0},
-            size:     {vp.width, Flamelex.GUI.Component.MenuBar.height()}))
+            size:     {vp.width, Flamelex.GUI.Component.MenuBar.height()})})
   end
 
   defp mount_command_buffer(graph, vp) do
     graph
     #DEVELOPING a new component
     # Step 1 - figure out where you want to mount the component. #TODO this should be a layer I guess...
-    |> Flamelex.GUI.Component.CommandBuffer.mount(
-          Frame.new(
+    |> Flamelex.GUI.Component.CommandBuffer.mount(%{
+         ref: :command_buffer,
+         frame: Frame.new(
             top_left: {0, vp.height - Flamelex.GUI.Component.MenuBar.height()},
-            size:     {vp.width, Flamelex.GUI.Component.MenuBar.height()}))
+            size:     {vp.width, Flamelex.GUI.Component.MenuBar.height()})})
   end
 end

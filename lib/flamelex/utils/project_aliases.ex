@@ -7,6 +7,8 @@ defmodule Flamelex.ProjectAliases do
   defmacro __using__(_opts) do
     quote do
 
+      # alias Flamelex.Utilities.TerminalIO
+
       alias Flamelex.API.{Buffer, CommandBuffer, GUI, Memex, Journal}
 
       alias Flamelex.Utilities.ProcessRegistry

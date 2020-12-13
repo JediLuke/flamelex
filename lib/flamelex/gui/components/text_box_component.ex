@@ -9,6 +9,21 @@ defmodule Flamelex.GUI.Component.TextBox do
 
   @blink_ms trunc(500) # blink speed in hertz
 
+  # def tag(%{}) do
+  #   {:gui_component, }
+  # end
+
+  @impl Flamelex.GUI.ComponentBehaviour
+  def custom_init_logic(params) do
+
+    GenServer.cast(self(), :start_blink)
+
+    params |> Map.merge(%{
+      timer: nil,
+      draw_footer?: true,
+      cursor_position: %{line: 0, col: 0}
+    })
+  end
 
   @impl Flamelex.GUI.ComponentBehaviour
   #TODO this is a deprecated version of render
@@ -16,7 +31,7 @@ defmodule Flamelex.GUI.Component.TextBox do
     render(params |> Map.merge(%{frame: frame}))
   end
 
-  def render(%{frame: %Frame{} = frame} = params) do
+  def render(%{ref: %Buf{} = buf, frame: %Frame{} = frame} = params) do
 
     #TODO make the frame, only 72 columns wide !!
     frame =
@@ -27,31 +42,18 @@ defmodule Flamelex.GUI.Component.TextBox do
       end
 
     lines_of_text =
-      Flamelex.API.Buffer.read(frame.id) #TODO this is bad... Frame shouldn't be the key we're passing around here
+      Flamelex.API.Buffer.read(buf)
       |> TextBoxDrawUtils.split_into_a_list_of_lines_of_text_structs()
 
     background_color = Flamelex.GUI.Colors.background()
 
+    #TODO spin up new cursor component!!
+
     Draw.blank_graph()
     |> Draw.background(frame, background_color)
     |> TextBoxDrawUtils.render_lines(%{ lines_of_text: lines_of_text,
-                                        top_left_corner: frame.coordinates })
+                                        top_left_corner: frame.top_left })
     |> Draw.border(frame)
-  end
-
-  defp we_are_drawing_a_footer_bar?(%{draw_footer?: df?}), do: df?
-  defp we_are_drawing_a_footer_bar?(_else), do: false
-
-  @impl Flamelex.GUI.ComponentBehaviour
-  def custom_init_logic(params) do
-    #TODO spin up new cursor component!!
-    GenServer.cast(self(), :start_blink)
-
-    params |> Map.merge(%{
-      timer: nil,
-      draw_footer?: true,
-      cursor_position: %{line: 0, col: 0}
-    })
   end
 
 
@@ -99,7 +101,6 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     # {:noreply, new_state, push: new_graph}
 
-    IO.puts "BLINKY!"
     {:noreply, state}
   end
 
@@ -113,4 +114,8 @@ defmodule Flamelex.GUI.Component.TextBox do
   #   Logger.debug "#{__MODULE__} with id: #{inspect state.id} received unrecognised action: #{inspect action}"
   #   :ignore_action
   # end
+
+
+  defp we_are_drawing_a_footer_bar?(%{draw_footer?: df?}), do: df?
+  defp we_are_drawing_a_footer_bar?(_else), do: false
 end

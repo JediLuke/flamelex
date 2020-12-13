@@ -3,6 +3,7 @@ defmodule Flamelex.GUI.FontHelpers do
   A place to put functions I need to stuff with fonts with. ‾\_(ツ)_/‾
   """
 
+  #TODO the font should be a config
 
   #TODO programatically get this instead of hard-coding it
   #Application.app_dir(:recording_services)

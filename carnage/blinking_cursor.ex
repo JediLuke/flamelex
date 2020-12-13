@@ -57,14 +57,14 @@ defmodule Flamelex.GUI.Component.Cursor do
       frame: frame,
       hidden?: false,
       timer: nil, # holds an erlang :timer for the blink
-      original_coordinates: frame.coordinates # so we can track how we've moved around
+      original_coordinates: frame.top_left # so we can track how we've moved around
     }
 
     graph =
       Draw.blank_graph()
       |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
            id: frame.id,
-           translate: {frame.coordinates.x, frame.coordinates.y},
+           translate: {frame.top_left.x, frame.top_left.y},
            fill: :ghost_white,
            hidden?: false)
 
@@ -83,7 +83,7 @@ defmodule Flamelex.GUI.Component.Cursor do
     %Dimensions{height: _height, width: width} =
       state.frame.dimensions
     %Coordinates{x: current_top_left_x, y: current_top_left_y} =
-      state.frame.coordinates
+      state.frame.top_left
 
     new_state =
       %{state|frame:
@@ -94,7 +94,7 @@ defmodule Flamelex.GUI.Component.Cursor do
     new_graph =
       graph
       |> Graph.modify(state.frame.id, fn %Scenic.Primitive{} = box ->
-           put_transform(box, :translate, {new_state.frame.coordinates.x, new_state.frame.coordinates.y})
+           put_transform(box, :translate, {new_state.frame.top_left.x, new_state.frame.top_left.y})
          end)
 
     {:noreply, {new_state, new_graph}, push: new_graph}
@@ -103,12 +103,12 @@ defmodule Flamelex.GUI.Component.Cursor do
   @impl Scenic.Scene
   def handle_cast({:action, :reset_position}, {state, graph}) do
     new_state =
-      state.frame.coordinates |> put_in(state.original_coordinates)
+      state.frame.top_left |> put_in(state.original_coordinates)
 
     new_graph =
       graph
       |> Graph.modify(state.frame.id, fn %Scenic.Primitive{} = box ->
-           put_transform(box, :translate, {new_state.frame.coordinates.x, new_state.frame.coordinates.y})
+           put_transform(box, :translate, {new_state.frame.top_left.x, new_state.frame.top_left.y})
          end)
 
     {:noreply, {new_state, new_graph}, push: new_graph}

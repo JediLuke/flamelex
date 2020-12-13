@@ -4,99 +4,106 @@ defmodule Flamelex.GUI.Structs.Frame do
   """
   require Logger
   use Flamelex.ProjectAliases
+  alias Flamelex.Structs.Buf
+  alias Flamelex.GUI.Structs.GUIState
 
   #TODO each "new/x" function should be making a new Scenic.Graph, we need
   # to actually build one and cant just use a default struct cause it spits chips
 
   defstruct [
-    id:            nil,               # uniquely identify frames
-    #TODO rename to top_left
-    coordinates:   nil, # %Coordinates{},    # the top-left corner of the frame, referenced from top-left corner of the viewport
-    dimensions:    nil, # :w%Dimensions{},     # the height and width of the frame
-    scenic_opts:   [],                # Scenic options
-    # picture_graph: %Scenic.Graph{}    # The Scenic.Graph that this frame will display
-    buffer:        nil
+    top_left:     nil,  # a %Coordinates{} struct, pointing to the top-left corner of the frame, referenced from top-left corner of the viewport
+    dimensions:   nil,  # a %Dimensions{} struct, specifying the height and width of the frame
+    scenic_opts:  [],   # Scenic options
+    label:        nil   # an optional label, usually used to render a footer bar
   ]
 
-  def test do
-    new("tester", {100, 100}, {100, 100})
+  # def test do
+  #   new("tester", {100, 100}, {100, 100})
+  # end
+
+  # def new(label, %Coordinates{} = c, %Dimensions{}  = d) do
+  #   new(
+  #     id:              label,
+  #     top_left_corner: %Coordinates{} = c,
+  #     dimensions:      %Dimensions{}  = d
+  #   )
+  # end
+  # def new(label, coords, dimensions) do
+  #   new(label, Coordinates.new(coords), Dimensions.new(dimensions))
+  # end
+
+  def calculate_frame_position(opts) do
+    case opts |> Map.fetch(:show_menubar?) do
+      {:ok, true} ->
+        Coordinates.new(x: 0, y: Flamelex.GUI.Component.MenuBar.height())
+      _otherwise ->
+        Coordinates.new(x: 0, y: 0)
+    end
   end
 
-  def new(slug, %Coordinates{} = c, %Dimensions{}  = d) do
-    new(
-      id:              slug,
-      top_left_corner: %Coordinates{} = c,
-      dimensions:      %Dimensions{}  = d
-    )
+  #TODO lol whats going on here
+  def calculate_frame_size(opts, layout_dimens) do
+    case opts |> Map.fetch(:show_menubar?) do
+      {:ok, true} ->
+        Dimensions.new(width: layout_dimens.width, height: layout_dimens.height)
+      _otherwise ->
+        Dimensions.new(width: layout_dimens.width, height: layout_dimens.height)
+    end
   end
-  def new(slug, coords, dimensions) do
-    new(slug, Coordinates.new(coords), Dimensions.new(dimensions))
-  end
+
+
 
   def new(
-    top_left_corner: %Coordinates{} = c,
-    dimensions:      %Dimensions{}  = d
+        %GUIState{
+          layout: %Layout{
+            arrangement: :maximized,
+            dimensions: %Dimensions{} = layout_dimens,
+            frames: [], #NOTE: No existing frames
+            opts: opts
+          }},
+        %Buf{label: buf_label}) do
+
+    coords = calculate_frame_position(opts)
+    dimens = calculate_frame_size(opts, layout_dimens)
+
+    %__MODULE__{
+      top_left:   coords,
+      dimensions: dimens,
+      label: buf_label
+    }
+  end
+
+
+
+  def new(
+    top_left:     %Coordinates{} = c,
+    dimensions:   %Dimensions{}  = d
   ) do
-    %Frame{
-      coordinates: c,
-      dimensions:  d
+    %__MODULE__{
+      top_left:   c,
+      dimensions: d
     }
   end
 
   def new(top_left: top_left, size: size) do
-    %Frame{
-      id:          "#TODO",
-      coordinates: top_left |> Coordinates.new(),
-      dimensions:  size     |> Dimensions.new()
-    }
-
-  end
-
-  #TODO do we really need an id?? (probably)
-  def new(id:              id,
-          top_left_corner: %Coordinates{} = c,
-          dimensions:      %Dimensions{}  = d
-  ) do
-    %Frame{
-      id:          id,
-      coordinates: c,
-      dimensions:  d
-    }
-  end
-
-  #TODO deprecate this too
-  # def new([id: id, top_left_corner: c, dimensions: d, picture_graph: g]) do
-  def new([id: id, top_left_corner: c, dimensions: d, buffer: b]) do
-    %Frame{
-      id: id,
-      coordinates: c |> Coordinates.new(),
-      dimensions:  d |> Dimensions.new(),
-      # picture_graph: g
-      buffer: b
-    }
-  end
-
-  #TODO deprecate these
-  def new([id: id, top_left_corner: c, dimensions: d]) do
-    %Frame{
-      id: id,
-      coordinates: c |> Coordinates.new(),
-      dimensions:  d |> Dimensions.new()
+    %__MODULE__{
+      top_left:   top_left |> Coordinates.new(),
+      dimensions: size     |> Dimensions.new()
     }
   end
 
   def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d) do
-    %Frame{
-      coordinates: c |> Coordinates.new(),
-      dimensions:  d |> Dimensions.new()
+    %__MODULE__{
+      top_left:   c |> Coordinates.new(),
+      dimensions: d |> Dimensions.new()
     }
   end
 
-def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when is_list(o) do #TODO do we need buffer here?
+def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when is_list(o) do
     %Frame{
-      coordinates: c |> Coordinates.new(),
-      dimensions:  d |> Dimensions.new(),
-      scenic_opts: o
+      top_left:     c |> Coordinates.new(),
+      dimensions:   d |> Dimensions.new(),
+      scenic_opts:  o
     }
   end
 
@@ -108,7 +115,7 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
 
     w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
     h = Flamelex.GUI.Component.MenuBar.height()
-    x = frame.coordinates.x
+    x = frame.top_left.x
     y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
     c = Flamelex.GUI.Colors.menu_bar()
 
@@ -119,7 +126,7 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     mode_string = "NORMAL_MODE"
     left_margin = 25
 
-    frame_label = frame.id #TODO this sucks, don't use frame
+    frame_label = if frame.label == nil, do: "", else: frame.label
 
     graph
     # first, draw the background
@@ -158,22 +165,22 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
     graph
   end
 
-  def find_center(%Frame{coordinates: c, dimensions: d}) do
+  def find_center(%__MODULE__{top_left: c, dimensions: d}) do
     Coordinates.new([
       x: c.x + d.width/2,
       y: c.y + d.height/2,
     ])
   end
 
-  def reposition(%Frame{coordinates: coords} = frame, x: new_x, y: new_y) do
+  def reposition(%__MODULE__{top_left: coords} = frame, x: new_x, y: new_y) do
     new_coordinates =
       coords
       |> Coordinates.modify(x: new_x, y: new_y)
 
-    %{frame|coordinates: new_coordinates}
+    %{frame|top_left: new_coordinates}
   end
 
-  def resize(%Frame{dimensions: dimens} = frame, reduce_height_by: h) do
+  def resize(%__MODULE__{dimensions: dimens} = frame, reduce_height_by: h) do
     new_height = frame.dimensions.height - h
 
     new_dimensions =
@@ -205,7 +212,7 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
   # def draw_frame_footer(graph, frame, %{mode: :normal} = opts) when is_map(opts) do
   #   w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
   #   h = Flamelex.GUI.Component.MenuBar.height()
-  #   x = frame.coordinates.x
+  #   x = frame.top_left.x
   #   y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
   #   c = Flamelex.GUI.Colors.menu_bar()
 
@@ -228,7 +235,7 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
   # def draw_frame_footer(graph, frame, %{mode: :insert} = opts) when is_map(opts) do
   #   w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
   #   h = Flamelex.GUI.Component.MenuBar.height()
-  #   x = frame.coordinates.x
+  #   x = frame.top_left.x
   #   y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
   #   c = Flamelex.GUI.Colors.menu_bar()
 
@@ -250,7 +257,7 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
   # def draw_frame_footer(graph, frame) do
   #   w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
   #   h = Flamelex.GUI.Component.MenuBar.height()
-  #   x = frame.coordinates.x
+  #   x = frame.top_left.x
   #   y = frame.dimensions.height # go to the bottom & back up how high the bar will be
   #   c = Flamelex.GUI.Colors.menu_bar()
 
@@ -261,7 +268,7 @@ def new( _buf, top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)
   # def draw_frame_footer(graph, frame, %Flamelex.Structs.OmegaState{mode: :normal}) do
   #   w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
   #   h = Flamelex.GUI.Component.MenuBar.height()
-  #   x = frame.coordinates.x
+  #   x = frame.top_left.x
   #   y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
   #   c = Flamelex.GUI.Colors.menu_bar()
 
@@ -346,8 +353,8 @@ end
 #   #   new_graph =
 #   #     frame.graph
 #   #     |> Draw.box(
-#   #             x: frame.coordinates.x,
-#   #             y: frame.coordinates.y,
+#   #             x: frame.top_left.x,
+#   #             y: frame.top_left.y,
 #   #         width: frame.width,
 #   #        height: frame.height)
 

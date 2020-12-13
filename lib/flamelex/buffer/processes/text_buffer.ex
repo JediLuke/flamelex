@@ -2,6 +2,7 @@ defmodule Flamelex.Buffer.Text do
   @moduledoc """
   A buffer to hold & manipulate text.
   """
+  alias Flamelex.Structs.Buf
 
   # use Flamelex.BufferBehaviour
 
@@ -9,20 +10,23 @@ defmodule Flamelex.Buffer.Text do
   require Logger
   use Flamelex.ProjectAliases
 
-  def start_link(params) do
-    {:ok, buffer_name_tuple} =
-      ProcessRegistry.new_buffer_name_tuple(__MODULE__, params)
 
-    GenServer.start_link(__MODULE__, params, name: buffer_name_tuple)
+  #TODO this looks like a nuce func for a behaviour...
+  def start_link(%{ref: ref} = params) do
+    case Buf.rego_tag(ref) do
+      {:buffer, _ref} = tag ->
+          name = ProcessRegistry.via_tuple_name(:gproc, tag)
+          GenServer.start_link(__MODULE__, params, name: name)
+      :error ->
+          {:error, Buf.invalid_ref_param_error_string(params)}
+    end
   end
 
-  # when we need to *do* stuff with it, then we'll have to get this component
-  # to talk to the buffer I guess
+  #TODO make this cast to itself, & get this process to do the GUI adjustment
   def move_cursor({:buffer, name}, {direction, distance}) do
     ProcessRegistry.find!({:gui_component, name})
     |> GenServer.cast({:move_cursor, direction, distance})
   end
-
   def move_cursor(buf, position) when is_map(position) do
     ProcessRegistry.find!({:gui_component, buf})
     |> GenServer.cast({:move_cursor, position})
@@ -38,6 +42,8 @@ defmodule Flamelex.Buffer.Text do
   def init(%{name: name, data: data}) do
     Logger.debug "#{__MODULE__} initializing..."
 
+    #TODO need to register for PubSUb msgs
+
     new_buf = %{
       name: name,
       data: data,
@@ -51,6 +57,7 @@ defmodule Flamelex.Buffer.Text do
   def handle_continue(:open_file_on_disk, %{from_file: filepath} = params) do
 
     {:ok, file_contents} = File.read(filepath)
+    buf_ref = Buf.new(%{type: :text} |> Map.merge(params))
 
     new_buf = %{
       name: filepath,
@@ -61,7 +68,7 @@ defmodule Flamelex.Buffer.Text do
     # callback to the process which booted this one, to say that we successfully loaded the file from disk
     send(
       params.after_boot_callback,
-      {self(), :successfully_opened, filepath, {:buffer, filepath}}
+      {self(), :successfully_opened, filepath, buf_ref} #REMINDER: we send back `filepath` because we match on it like ^filepath
     )
 
     {:noreply, new_buf}
@@ -108,7 +115,7 @@ defmodule Flamelex.Buffer.Text do
 
   def handle_call({:modify, {:insert, new_text, insertion_site}}, _from, state) do
 
-
+    IO.puts "MODIFYING!!!"
 
     insert_text_function =
         fn string ->
@@ -121,7 +128,7 @@ defmodule Flamelex.Buffer.Text do
         |> Map.update!(:data, insert_text_function)
         |> Map.put(:unsaved_changes?, true)
 
-    Flamelex.GUI.Controller.refresh({:buffer, state.name})
+    # Flamelex.GUI.Controller.refresh({:buffer, state.name})
     # Flamelex.GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
 
     {:reply, :ok, new_state}
