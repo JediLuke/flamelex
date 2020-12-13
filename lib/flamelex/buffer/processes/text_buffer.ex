@@ -39,19 +39,21 @@ defmodule Flamelex.Buffer.Text do
     {:ok, params, {:continue, :open_file_on_disk}}
   end
 
-  def init(%{name: name, data: data}) do
-    Logger.debug "#{__MODULE__} initializing..."
+  # def init(%{name: ref, data: data, weird_thing: www}) do
+  #   Logger.debug "#{__MODULE__} initializing..."
 
-    #TODO need to register for PubSUb msgs
+  #   IO.inspect www, label: "MAYTCJUY???????"
 
-    new_buf = %{
-      name: name,
-      data: data,
-      unsaved_changes?: false
-    }
+  #   #TODO need to register for PubSUb msgs
 
-    {:ok, new_buf}
-  end
+  #   new_buf = %{
+  #     ref: ref,
+  #     data: data,
+  #     unsaved_changes?: false
+  #   }
+
+  #   {:ok, new_buf}
+  # end
 
   @impl GenServer
   def handle_continue(:open_file_on_disk, %{from_file: filepath} = params) do
@@ -60,7 +62,7 @@ defmodule Flamelex.Buffer.Text do
     buf_ref = Buf.new(%{type: :text} |> Map.merge(params))
 
     new_buf = %{
-      name: filepath,
+      ref: buf_ref,
       data: file_contents,
       unsaved_changes?: false
     }
@@ -115,8 +117,6 @@ defmodule Flamelex.Buffer.Text do
 
   def handle_call({:modify, {:insert, new_text, insertion_site}}, _from, state) do
 
-    IO.puts "MODIFYING!!!"
-
     insert_text_function =
         fn string ->
           {before_split, after_split} = string |> String.split_at(insertion_site)
@@ -128,8 +128,7 @@ defmodule Flamelex.Buffer.Text do
         |> Map.update!(:data, insert_text_function)
         |> Map.put(:unsaved_changes?, true)
 
-    # Flamelex.GUI.Controller.refresh({:buffer, state.name})
-    # Flamelex.GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
+    Flamelex.GUI.Controller.show(new_state.ref)
 
     {:reply, :ok, new_state}
   end

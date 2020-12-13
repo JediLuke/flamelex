@@ -38,6 +38,27 @@ defmodule Flamelex.BufferManager do
 
   end
 
+  def handle_call({:find_buffer, search_term}, _from, state) do
+
+    similarity_cutoff = 0.72 # used to compare how similar the strings are
+
+    find_buf =
+      state
+      |> Enum.find(
+           :no_matching_buffer_found, # this is the default value we return if no element is found by the function below
+           fn %Buf{} = b ->
+             # TheFuzz.compare(:jaro_winkler, search_term, b.label) >= similarity_cutoff
+             String.jaro_distance(search_term, b.label) >= similarity_cutoff
+           end)
+
+    case find_buf do
+      :no_matching_buffer_found ->
+        {:reply, {:error, "no matching buffer found"}, state}
+      %Buf{} = buf ->
+        {:reply, {:ok, buf}, state}
+    end
+  end
+
   def handle_call(:count_buffers, _from, state) do
     count = Enum.count(state)
     {:reply, count, state}

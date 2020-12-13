@@ -15,6 +15,10 @@ defmodule Flamelex.API.Buffer do
   def list, do: GenServer.call(BufferManager, :list_buffers)
 
 
+  @doc """
+  Searches the open buffers and returns a single %Buf{}, or raises.
+  """
+  def find(search_term), do: GenServer.call(BufferManager, {:find_buffer, search_term})
 
   @doc """
   Load some data into a new buffer. By default, we open a TextBuffer to
@@ -64,16 +68,19 @@ defmodule Flamelex.API.Buffer do
 
 
 
-  #TODO these should be Buffers
-  def modify(pid, modification) when is_pid(pid) do
-    pid |> GenServer.call({:modify, modification})
-  end
-  def modify({:buffer, _id} = lookup_key, modification) do
-    ProcessRegistry.find!(lookup_key)
-    |> GenServer.call({:modify, modification})
-  end
-  def modify(id, modification) do
-    modify({:buffer, id}, modification)
+
+  @doc """
+  Make modifications or edits, to a buffer. e.g.
+
+  ```
+  insertion_op  = {:insert, "Luke is the best!", 12}
+  {:ok, b}      = Buffer.find("my_buffer")
+
+  Buffer.modify(b, insertion_op)
+  ```
+  """
+  def modify(%Buf{} = buf, modification) do
+    ProcessRegistry.find!(buf) |> GenServer.call({:modify, modification})
   end
 
 
