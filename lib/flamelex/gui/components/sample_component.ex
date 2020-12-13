@@ -53,7 +53,6 @@ defmodule Flamelex.GUI.Component.SampleComponent do
   """
   @impl Flamelex.GUI.ComponentBehaviour
   def handle_action({_graph, _state}, action) do
-    Logger.info "#{__MODULE__} received an action - #{inspect action}"
     :ignore_action
   end
 
@@ -62,7 +61,6 @@ defmodule Flamelex.GUI.Component.SampleComponent do
   """
   @impl Scenic.Scene
   def handle_input(event, _context, state) do
-    Logger.debug "#{__MODULE__} received event: #{inspect event}"
     {:noreply, state}
   end
 

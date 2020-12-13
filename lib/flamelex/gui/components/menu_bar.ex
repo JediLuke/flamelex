@@ -94,7 +94,6 @@ defmodule Flamelex.GUI.Component.MenuBar do
   end
 
   def handle_input(unmatched_input, _context, state) do
-    Logger.warn "#{__MODULE__} recv'd unmatched input: #{inspect unmatched_input}"
     {:noreply, state}
   end
 
@@ -141,7 +140,6 @@ defmodule Flamelex.GUI.Component.MenuBar do
 
   #NOTE: this last handle_action/2 catches actions that didn't match on one of the above
   def handle_action({_graph, frame}, action) do
-    Logger.debug "#{__MODULE__} with frame: #{inspect frame.id} received unrecognised action: #{inspect action}"
     :ignore_action
   end
 end
