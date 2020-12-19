@@ -38,6 +38,8 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do #TODO rename to Renseiji
 
   @primary_color :dark_violet
 
+  def rego_tag(_), do: {:gui_component, :renseijin}
+
   @impl Flamelex.GUI.ComponentBehaviour
   def render(frame, _params) do
 

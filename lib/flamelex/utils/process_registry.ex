@@ -2,6 +2,7 @@ defmodule Flamelex.Utilities.ProcessRegistry do
   require Logger
   use Flamelex.ProjectAliases
   alias Flamelex.Structs.Buf
+  alias Flamelex.GUI.Structs.GUiComponentRef
 
   @doc """
   Register a new PiD in gproc.
@@ -43,6 +44,13 @@ defmodule Flamelex.Utilities.ProcessRegistry do
       _else            -> {:error, "Could not find a process with lookup_key: #{inspect lookup_key}"}
     end
   end
+  def lookup(%GUiComponentRef{} = ref) do
+    lookup_key = GUiComponentRef.rego_tag(ref)
+    case :gproc.where({:n, :l, lookup_key}) do
+      p when is_pid(p) -> {:ok, p}
+      _else            -> {:error, "Could not find a process with lookup_key: #{inspect lookup_key}"}
+    end
+  end
   def lookup(lookup_key) do
     case :gproc.where({:n, :l, lookup_key}) do
       p when is_pid(p) -> {:ok, p}
@@ -57,11 +65,10 @@ defmodule Flamelex.Utilities.ProcessRegistry do
   """
   def find!(lookup_key) do
     case lookup(lookup_key) do
-      {:ok, p}          -> p
-      {:error, _reason} -> raise "Could not find a process with lookup_key: #{inspect lookup_key}"
+      {:ok, p} when is_pid(p) -> p
+      {:error, _reason}       -> raise "Could not find a process with lookup_key: #{inspect lookup_key}"
     end
   end
-
 
 
 
@@ -71,8 +78,8 @@ defmodule Flamelex.Utilities.ProcessRegistry do
 
 
 
-  def find_buffer({:buffer, _name} = buffer), do: find!(buffer)
-  def find_buffer(params),                    do: find!({:buffer, params})
+  # def find_buffer({:buffer, _name} = buffer), do: find!(buffer)
+  # def find_buffer(params),                    do: find!({:buffer, params})
 
   # def register_buffer(params), do: register({:buffer, params})
 

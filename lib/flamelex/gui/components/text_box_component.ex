@@ -5,6 +5,7 @@ defmodule Flamelex.GUI.Component.TextBox do
   use Flamelex.GUI.ComponentBehaviour
   alias Flamelex.GUI.Component.Utils.TextBox, as: TextBoxDrawUtils
   alias Flamelex.GUI.Component.MenuBar
+  alias Flamelex.GUI.Structs.Cursor
 
 
   @blink_ms trunc(500) # blink speed in hertz
@@ -12,6 +13,10 @@ defmodule Flamelex.GUI.Component.TextBox do
   # def tag(%{}) do
   #   {:gui_component, }
   # end
+
+  def rego_tag(%{ref: %Buf{ref: ref}}) do #TODO lol
+    {:gui_component, ref}
+  end
 
   @impl Flamelex.GUI.ComponentBehaviour
   def custom_init_logic(params) do
@@ -21,7 +26,9 @@ defmodule Flamelex.GUI.Component.TextBox do
     params |> Map.merge(%{
       timer: nil,
       draw_footer?: true,
-      cursor_position: %{line: 0, col: 0}
+      cursors: [
+        Cursor.new(%{num: 1})
+      ]
     })
   end
 
@@ -53,13 +60,23 @@ defmodule Flamelex.GUI.Component.TextBox do
     |> Draw.background(frame, background_color)
     |> TextBoxDrawUtils.render_lines(%{ lines_of_text: lines_of_text,
                                         top_left_corner: frame.top_left })
+    |> draw_cursors(params)
     |> Draw.border(frame)
+  end
+
+  def draw_cursors(graph, %{cursors: []}), do: graph
+  def draw_cursors(graph, %{cursors: cursors})
+    when is_list(cursors) and length(cursors) >= 1
+  do
+    Enum.reduce(cursors, graph, fn c, graph ->
+      graph
+      # |> CursorGUIComponent.mount(c) #TODO hERe!!
+    end)
   end
 
 
   @impl Flamelex.GUI.ComponentBehaviour
   def handle_action({_graph, _state}, action) do
-    Logger.info "#{__MODULE__} received an action - #{inspect action}"
     :ignore_action
   end
 
@@ -69,7 +86,6 @@ defmodule Flamelex.GUI.Component.TextBox do
   """
   @impl Scenic.Scene
   def handle_input(event, _context, state) do
-    Logger.debug "#{__MODULE__} received event: #{inspect event}"
     {:noreply, state}
   end
 
@@ -79,6 +95,32 @@ defmodule Flamelex.GUI.Component.TextBox do
     new_state = %{state | timer: timer}
     {:noreply, {graph, new_state}}
   end
+
+  def handle_cast({:refresh, _buf_state, _gui_state}, {_graph, state}) do
+
+    new_graph = render(state)
+
+    {:noreply, {new_graph, state}, push: new_graph}
+
+        # data  = Buffer.read(buf)
+    # frame = calculate_framing(filename, state.layout)
+
+    # new_graph =
+    #   state.graph
+    #   # |> Scenic.Graph.modify(@text_field_id, fn x ->
+    #   #   IO.puts "YES #{inspect x}"
+    #   #   x
+    #   # end)
+    #   # |> Flamelex.GUI.Component.TextBox.draw({frame, data, %{}}) #TODO check the old process is dieing...
+    #   |> Flamelex.GUI.Component.TextBox.mount(%{frame: frame})
+    #   |> Draw.test_pattern()
+
+    # Flamelex.GUI.RootScene.redraw(new_graph)
+
+    # {:noreply, %{state|graph: new_graph}}
+
+  end
+
 
   def handle_info(:blink, state) do
 

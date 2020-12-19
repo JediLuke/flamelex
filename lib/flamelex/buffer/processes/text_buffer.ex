@@ -64,14 +64,12 @@ defmodule Flamelex.Buffer.Text do
     new_buf = %{
       ref: buf_ref,
       data: file_contents,
-      unsaved_changes?: false
-    }
+      unsaved_changes?: false }
 
-    # callback to the process which booted this one, to say that we successfully loaded the file from disk
-    send(
-      params.after_boot_callback,
-      {self(), :successfully_opened, filepath, buf_ref} #REMINDER: we send back `filepath` because we match on it like ^filepath
-    )
+    # now, let's callback to the process which booted this one, to
+    # say that we successfully loaded the file from disk
+    send( params.after_boot_callback,
+          {self(), :successfully_opened, filepath, buf_ref} ) #REMINDER: we send back `filepath` because we match on it like ^filepath
 
     {:noreply, new_buf}
   end
@@ -115,7 +113,7 @@ defmodule Flamelex.Buffer.Text do
     {:reply, :ok, new_state}
   end
 
-  def handle_call({:modify, {:insert, new_text, insertion_site}}, _from, state) do
+  def handle_call({:modify, {:insert, new_text, insertion_site}}, _from, state) when is_bitstring(new_text) and is_integer(insertion_site) do
 
     insert_text_function =
         fn string ->
@@ -128,7 +126,7 @@ defmodule Flamelex.Buffer.Text do
         |> Map.update!(:data, insert_text_function)
         |> Map.put(:unsaved_changes?, true)
 
-    Flamelex.GUI.Controller.show(new_state.ref)
+    Flamelex.GUI.Controller.refresh(new_state)
 
     {:reply, :ok, new_state}
   end
@@ -170,7 +168,6 @@ defmodule Flamelex.Buffer.Text do
       {:stop, :normal, state}
     end
   end
-
 
 
   # def input(pid, {scenic_component_pid, input}), do: GenServer.cast(pid, {:input, {scenic_component_pid, input}})

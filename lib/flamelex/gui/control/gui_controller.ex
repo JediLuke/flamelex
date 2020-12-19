@@ -7,7 +7,7 @@ defmodule Flamelex.GUI.Controller do
   use GenServer
   use Flamelex.ProjectAliases
   alias Flamelex.Structs.Buf
-  alias Flamelex.GUI.Structs.GUIState
+  alias Flamelex.GUI.Structs.{GUIState, GUiComponentRef}
   import Flamelex.GUI.Utilities.ControlHelper
 
 
@@ -209,25 +209,14 @@ defmodule Flamelex.GUI.Controller do
   # end
 
 
-  def handle_cast({:refresh, {:buffer, filename} = buf}, state) do
+  #TODO maybe this doesn't need to be routed through here, but try it for now...
+  def handle_cast({:refresh, %{ref: %Buf{} = ref} = buf_state}, gui_state) do
+    ref
+    |> GUiComponentRef.rego_tag()
+    |> ProcessRegistry.find!()
+    |> GenServer.cast({:refresh, buf_state, gui_state})
 
-    # data  = Buffer.read(buf)
-    # frame = calculate_framing(filename, state.layout)
-
-    # new_graph =
-    #   state.graph
-    #   # |> Scenic.Graph.modify(@text_field_id, fn x ->
-    #   #   IO.puts "YES #{inspect x}"
-    #   #   x
-    #   # end)
-    #   # |> Flamelex.GUI.Component.TextBox.draw({frame, data, %{}}) #TODO check the old process is dieing...
-    #   |> Flamelex.GUI.Component.TextBox.mount(%{frame: frame})
-    #   |> Draw.test_pattern()
-
-    # Flamelex.GUI.RootScene.redraw(new_graph)
-
-    # {:noreply, %{state|graph: new_graph}}
-    {:noreply, state}
+    {:noreply, gui_state}
   end
 
 

@@ -17,15 +17,14 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       # implement all the callbacks defined in *this* module, that is,
       # `Flamelex.GUI.ComponentBehaviour`
       @behaviour Flamelex.GUI.ComponentBehaviour
-
       use Scenic.Component
-      require Logger
 
 
       #NOTE: This is just for convenience, so inside environment modules
       #      we can easily use the unique part of the environment module name
       alias __MODULE__
-      alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
+      alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout,
+              Cursor}
       alias Flamelex.GUI.Utilities.Draw
       alias Flamelex.Utilities.ProcessRegistry
       alias Flamelex.Structs.Buf
@@ -57,29 +56,41 @@ defmodule Flamelex.GUI.ComponentBehaviour do
 
 
       @impl Scenic.Scene
-      def init(%{frame: %Frame{} = frame} = init_state, _scenic_opts) do
-        # register_self(init_state) #TODO we shouldn't be using Frame to pass around everything...
+      def init(%{frame: %Frame{} = frame} = params, _scenic_opts) do
+        register_self(params)
 
         #NOTE: This little trick is so that `custom_init_logic` is optional
-        init_state =
+        params =
           if function_exported?(__MODULE__, :custom_init_logic, 1) do
-            apply(__MODULE__, :custom_init_logic, [init_state])
+            apply(__MODULE__, :custom_init_logic, [params])
           else
-            init_state
+            params
           end
 
         graph =
-          render(frame, init_state) #REMINDER: render/1 has to be implemented by the modules "using" this behaviour, and that is the function being called here
-          |> Frame.draw_frame_footer(init_state)
+          #TODO change this to just render/1 eventually...
+          render(frame, params) #REMINDER: render/1 has to be implemented by the modules "using" this behaviour, and that is the function being called here
+          |> Frame.draw_frame_footer(params)
 
-        {:ok, {graph, init_state}, push: graph}
+        {:ok, {graph, params}, push: graph}
       end
 
       def register_self(params) do
-        IO.inspect params
+
+        #TODO dont hack this, it's not optional!!
+        {:gui_component, _ref} = tag =
+          if function_exported?(__MODULE__, :rego_tag, 1) do
+            apply(__MODULE__, :rego_tag, [params])
+          else
+            {:gui_component, "no-tag"} #TODO auto-generate it at least?
+          end
+
+        IO.inspect tag, label: "TTT"
+
+
         #TODO search for if the process is already registered, if it is, engage recovery procedure
         #TODO this should be {:gui_component, frame.id}, or maybe other way around. It could also subscribe to the channel for this id
-        ProcessRegistry.register({:gui_component, params.id})
+        ProcessRegistry.register(tag)
       end
 
       @doc """
@@ -96,16 +107,16 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       end
 
       @impl Scenic.Scene
-      def handle_cast({:action, action}, {%Scenic.Graph{} = graph, %{frame: %Frame{} = frame}}) do
+      def handle_cast({:action, action}, {%Scenic.Graph{} = graph, %{frame: %Frame{} = frame} = state}) do
         case handle_action(frame, action) do
           :ignore_action
-            -> {:noreply, {graph, frame}}
+            -> {:noreply, {graph, state}}
           {:redraw_graph, %Scenic.Graph{} = new_graph}
-            -> {:noreply, {new_graph, frame}, push: new_graph}
-          {:update_frame, %Frame{} = new_frame}
-            -> {:noreply, {graph, new_frame}}
-          {:update_frame_and_graph, {%Scenic.Graph{} = new_graph, %Frame{} = new_frame}}
-            -> {:noreply, {new_graph, new_frame}, push: new_graph}
+            -> {:noreply, {new_graph, state}, push: new_graph}
+          # {:update_frame, %Frame{} = new_frame}
+          #   -> {:noreply, {graph, new_frame}}
+          # {:update_frame_and_graph, {%Scenic.Graph{} = new_graph, %Frame{} = new_frame}}
+          #   -> {:noreply, {new_graph, new_frame}, push: new_graph}
         end
       end
     end
