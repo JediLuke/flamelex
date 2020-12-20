@@ -27,6 +27,10 @@ defmodule Flamelex.Buffer.Text do
     ProcessRegistry.find!({:gui_component, name})
     |> GenServer.cast({:move_cursor, direction, distance})
   end
+  def move_cursor(:active_buffer, {direction, distance}) do
+    ProcessRegistry.find!(:active_buffer)
+    |> GenServer.cast({:action, {:move_cursor, direction, distance}})
+  end
   def move_cursor(buf, position) when is_map(position) do
     ProcessRegistry.find!({:gui_component, buf})
     |> GenServer.cast({:move_cursor, position})
@@ -36,6 +40,7 @@ defmodule Flamelex.Buffer.Text do
   @impl GenServer
   def init(%{from_file: _filepath} = params) do
     Logger.debug "#{__MODULE__} initializing... params: #{inspect params}"
+    # ProcessRegistry.register(:active_buffer) #TODO
     {:ok, params, {:continue, :open_file_on_disk}}
   end
 

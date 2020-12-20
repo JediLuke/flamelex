@@ -106,16 +106,19 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       end
 
       @impl Scenic.Scene
-      def handle_cast({:action, action}, {%Scenic.Graph{} = graph, %{frame: %Frame{} = frame} = state}) do
-        case handle_action(frame, action) do
+      def handle_cast({:action, action}, {%Scenic.Graph{} = graph, state}) do
+        case handle_action({graph, state}, action) do
+          #TODO this is actually kinda stupid now...
           :ignore_action
             -> {:noreply, {graph, state}}
           {:redraw_graph, %Scenic.Graph{} = new_graph}
             -> {:noreply, {new_graph, state}, push: new_graph}
           # {:update_frame, %Frame{} = new_frame}
           #   -> {:noreply, {graph, new_frame}}
-          # {:update_frame_and_graph, {%Scenic.Graph{} = new_graph, %Frame{} = new_frame}}
-          #   -> {:noreply, {new_graph, new_frame}, push: new_graph}
+          {:update_graph_and_state, {%Scenic.Graph{} = new_graph, new_state}}
+            -> {:noreply, {new_graph, new_state}, push: new_graph}
+          deprecated_return ->
+            deprecated_return
         end
       end
     end

@@ -52,6 +52,8 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
     new_graph # we return the graph as the last thing
   end
 
+  def line_height, do: 24 #TODO get 24 here from somewhere real, something to do with Fonts surely
+
 
   def render_line(graph, %{
     position_tuple: {line_num, frame_coords},
@@ -59,7 +61,7 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
     text: line_of_text
   }) when is_map(margin) do
 
-    line_height          = 24 #TODO get 24 here from somewhere real
+    line_height          = line_height()
     line_number_y_offset = line_num*line_height
 
     graph

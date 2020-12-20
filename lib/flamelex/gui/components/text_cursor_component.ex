@@ -10,6 +10,8 @@ defmodule Flamelex.GUI.Component.TextCursor do
 
   @blink_ms trunc(500) # blink speed in hertz
 
+  @valid_directions [:up, :down, :left, :right]
+
 
   @impl Flamelex.GUI.ComponentBehaviour
   def custom_init_logic(%{num: _n} = params) do # buffers need to keep track of cursors somehow, so we just use simple numbering
@@ -20,8 +22,10 @@ defmodule Flamelex.GUI.Component.TextCursor do
       # frame: params.frame,
       # grid_pos: nil,  # where we are in the file, e.g. line 3, column 5
       hidden?: false,                               # internal variable used to control blinking
+      override?: nil,                               # override lets us disable the blinking temporarily, for when we want to move the cursor
       timer: nil,                                   # holds an erlang :timer for the blink
-      original_coordinates: params.frame.top_left   # so we can track how we've moved around
+      original_coordinates: params.frame.top_left,  # so we can track how we've moved around
+      current_coords: starting_coords(params.frame)
     })
   end
 
@@ -32,27 +36,35 @@ defmodule Flamelex.GUI.Component.TextCursor do
   end
 
 
-  def render(%{ref: %Buf{ref: buf_ref}, frame: %Frame{} = frame}) do
-    block_dimensions = {_w, block_height} = cursor_box_dimensions()
+  def render(%{ref: %Buf{ref: buf_ref}, frame: %Frame{} = frame, current_coords: coords}) do
 
-    #notes
-    # so, you would think that this lovely little equation...
-    #   y_pos_of_cursor = frame.top_left.y+frame.margin.top-block_height
-    # would be correct, considering Scenic renders blocks from the bottom-left for some reason..
-    # however, it just looks weird! So, we move it down, a small offset
 
-    cursor_y_aesthetic_offset = 3
-
-    cursor_x_pos = frame.top_left.x+frame.margin.left
-    cursor_y_pos = frame.top_left.y+frame.margin.top-block_height+cursor_y_aesthetic_offset
+    block_dimensions = {_w, _h} = cursor_box_dimensions()
 
     Draw.blank_graph()
     |> Scenic.Primitives.rect(
           block_dimensions,
             id: buf_ref,
-            translate: {cursor_x_pos, cursor_y_pos},
+            translate: coords,
             fill: :ghost_white,
             hidden?: false)
+  end
+
+  def starting_coords(frame) do
+    # NOTES:
+    # so, you would think that this lovely little equation...
+    #   y_pos_of_cursor = frame.top_left.y+frame.margin.top-block_height
+    # would be correct, considering Scenic renders blocks from the bottom-left for some reason..
+    # however, it just looks weird! So, we move it down, a small offset
+
+    _block_dimensions = {_w, block_height} = cursor_box_dimensions()
+
+    cursor_y_aesthetic_offset = 4
+
+    cursor_x_pos = frame.top_left.x+frame.margin.left
+    cursor_y_pos = frame.top_left.y+frame.margin.top-block_height+cursor_y_aesthetic_offset
+
+    {cursor_x_pos, cursor_y_pos}
   end
 
   defp cursor_box_dimensions do
@@ -69,8 +81,34 @@ defmodule Flamelex.GUI.Component.TextCursor do
   end
 
   @impl Flamelex.GUI.ComponentBehaviour
-  def handle_action({_graph, _state}, action) do
-    :ignore_action
+  def handle_action({graph, %{ref: %Buf{ref: buf_ref}, current_coords: {x_coord, y_coord}} = state}, {:move_cursor, :down = direction, distance}) when direction in @valid_directions and distance >= 1 do
+
+    # base positions before moving the cursor
+    # cursor_x_pos = frame.top_left.x+frame.margin.left
+    # cursor_y_pos = frame.top_left.y+frame.margin.top-block_height+cursor_y_aesthetic_offset
+
+    cursor_height = Flamelex.GUI.Component.Utils.TextBox.line_height()
+
+    # {_w, cursor_height} = cursor_box_dimensions()
+
+    # column_offset = cursor_x_pos+()
+    new_coords =
+      {_new_x_coord, _new_y_coord} =
+        {x_coord, y_coord+(distance*cursor_height)}
+
+    new_state =
+      %{state|current_coords: new_coords, override?: :visible} # the visual effect is better if you dont blink the cursor when moving it
+
+    new_graph =
+      graph
+      |> Scenic.Graph.modify(
+                buf_ref,
+                &Scenic.Primitives.update_opts(&1,
+                                      hidden?: new_state.hidden?,
+                                      translate: new_state.current_coords))
+
+
+    {:update_graph_and_state, {new_graph, new_state}}
   end
 
   def handle_cast(:start_blink, {graph, state}) do
@@ -83,7 +121,15 @@ defmodule Flamelex.GUI.Component.TextCursor do
   @impl Scenic.Scene
   def handle_info(:blink, {graph, %{ref: %Buf{ref: buf_ref}} = state}) do
 
-    new_state = %{state|hidden?: not state.hidden?}
+    new_state =
+      case state.override? do
+        :visible ->
+          %{state|hidden?: false, override?: nil}
+        :invisible ->
+          %{state|hidden?: true, override?: nil}
+        nil ->
+          %{state|hidden?: not state.hidden?}
+      end
 
     new_graph =
       graph

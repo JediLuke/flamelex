@@ -21,6 +21,8 @@ defmodule Flamelex.GUI.Component.TextBox do
   @impl Flamelex.GUI.ComponentBehaviour
   def custom_init_logic(%{frame: %Frame{} = f, ref: %Buf{} = buf} = params) do
 
+    ProcessRegistry.register(:active_buffer) #TODO
+
     params |> Map.merge(%{
       draw_footer?: true,
       cursors: [
@@ -73,7 +75,16 @@ defmodule Flamelex.GUI.Component.TextBox do
 
 
   @impl Flamelex.GUI.ComponentBehaviour
-  def handle_action({_graph, _state}, action) do
+  def handle_action({_graph, state}, {:move_cursor, _direction, _distance} = cursor_movement_action) do
+
+    %{ref: %Buf{ref: buf_ref}} = state
+
+    #assume its cursor 1 for now
+    cursor_tag = {:gui_component, {:text_cursor, buf_ref, 1}} #TODO assume its cursor 1
+
+    ProcessRegistry.find!(cursor_tag)
+    |> GenServer.cast({:action, cursor_movement_action})
+
     :ignore_action
   end
 
