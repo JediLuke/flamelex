@@ -5,7 +5,7 @@ defmodule Flamelex.GUI.Utilities.Draw do
   alias Flamelex.GUI.Component.MenuBar
 
 
-  @ibm_plex_mono Flamelex.GUI.FontHelpers.metrics_hash(:ibm_plex_mono) #NOTE: we use the metrics-hash here, not the font-hash
+  @ibm_plex_mono Flamelex.GUI.Fonts.metrics_hash(:ibm_plex_mono) #NOTE: we use the metrics-hash here, not the font-hash
   @default_text_size Flamelex.GUI.Fonts.size()
 
 
@@ -271,13 +271,13 @@ end
 #   # defp add_blinking_box_cursor(graph, %{top_left_corner: {_x, top_left_y}, dimensions: {_w, height}}) do
 
 #   #   {_x_min, _y_min, _x_max, y_max} =
-#   #     GUI.FontHelpers.get_max_box_for_ibm_plex(@text_size)
+#   #     GUI.Fonts.get_max_box_for_ibm_plex(@text_size)
 
 #   #   y_offset     = top_left_y + (height - @prompt_size)/2 # y is the reference coord, the offset from the top of the screen, where the command buffer gets drawn. (height - prompt_size) is how much bigger the buffer is than the command prompt, so it gives us the extra space - we divide this by 2 to get how much extra space we need to add, to the reference y coordinate, to center the command prompt inside the buffer
 #   #   y_box_buffer = 2 # it looks weird having box exact same size as the text
 #   #   x_coordinate = @prompt_margin + @prompt_to_blinker_distance
 #   #   y_coordinate = y_offset + y_box_buffer
-#   #   width        = GUI.FontHelpers.monospace_font_width(:ibm_plex, @text_size)  #TODO should probably truncate this
+#   #   width        = GUI.Fonts.monospace_font_width(:ibm_plex, @text_size)  #TODO should probably truncate this
 #   #   height       = y_max + y_box_buffer #TODO should probably truncate this
 
 #   #   graph

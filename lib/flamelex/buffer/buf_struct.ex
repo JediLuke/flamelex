@@ -16,7 +16,6 @@ defmodule Flamelex.Structs.Buf do
     label:       nil,  # a short name for the buffer, doesn't have to be unique
     title:      nil,  # an optional title, for displaying in window bars etc
     tags:       [],   # a list of tags... this is for the future
-
   ]
 
 

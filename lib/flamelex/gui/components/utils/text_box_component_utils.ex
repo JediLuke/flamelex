@@ -19,8 +19,8 @@ defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
 
     # maybe we make each box, just slightly bigger than a character...
     box_buffer    = 1
-    block_width   = box_buffer + Flamelex.GUI.FontHelpers.monospace_font_width(:ibm_plex_mono, font_size)
-    block_height  = box_buffer + Flamelex.GUI.FontHelpers.monospace_font_height(:ibm_plex_mono, font_size)
+    block_width   = box_buffer + Flamelex.GUI.Fonts.monospace_font_width(:ibm_plex_mono, font_size)
+    block_height  = box_buffer + Flamelex.GUI.Fonts.monospace_font_height(:ibm_plex_mono, font_size)
 
     num_rows = frame.dimensions.height / block_height |> Float.ceil() |> trunc()
     num_cols = frame.dimensions.width  / block_width  |> Float.ceil() |> trunc()
@@ -289,8 +289,8 @@ end
 
   #   left_margin = 7
 
-  #   block_width  = box_buffer + GUI.FontHelpers.monospace_font_width(:ibm_plex_mono, 24) #TODO need to get the variable amount, not a card-coded value here somehow...
-  #   block_height = box_buffer + GUI.FontHelpers.monospace_font_height(:ibm_plex_mono, 24)
+  #   block_width  = box_buffer + GUI.Fonts.monospace_font_width(:ibm_plex_mono, 24) #TODO need to get the variable amount, not a card-coded value here somehow...
+  #   block_height = box_buffer + GUI.Fonts.monospace_font_height(:ibm_plex_mono, 24)
 
   #   block_position_x = frame.top_left.x + row*block_width + left_margin
   #   block_position_y = frame.top_left.y + col*block_height

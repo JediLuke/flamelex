@@ -1,6 +1,6 @@
 defmodule Flamelex.GUI.ComponentBehaviour do
   @moduledoc """
-  The Memex can load different environments.
+  GUI Components are defined here.
   """
 
 
@@ -23,8 +23,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       #NOTE: This is just for convenience, so inside environment modules
       #      we can easily use the unique part of the environment module name
       alias __MODULE__
-      alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout,
-              Cursor}
+      alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
       alias Flamelex.GUI.Utilities.Draw
       alias Flamelex.Utilities.ProcessRegistry
       alias Flamelex.Structs.Buf

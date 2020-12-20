@@ -11,10 +11,15 @@ defmodule Flamelex.GUI.Structs.Frame do
   # to actually build one and cant just use a default struct cause it spits chips
 
   defstruct [
-    top_left:     nil,  # a %Coordinates{} struct, pointing to the top-left corner of the frame, referenced from top-left corner of the viewport
-    dimensions:   nil,  # a %Dimensions{} struct, specifying the height and width of the frame
-    scenic_opts:  [],   # Scenic options
-    label:        nil   # an optional label, usually used to render a footer bar
+    top_left:     nil,            # a %Coordinates{} struct, pointing to the top-left corner of the frame, referenced from top-left corner of the viewport
+    dimensions:   nil,            # a %Dimensions{} struct, specifying the height and width of the frame
+    margin: %{
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0 },
+    scenic_opts:  [],             # Scenic options
+    label:        nil             # an optional label, usually used to render a footer bar
   ]
 
   # def test do
@@ -105,6 +110,15 @@ def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when 
       dimensions:   d |> Dimensions.new(),
       scenic_opts:  o
     }
+  end
+
+  def set_margin(frame, %{top: t, left: l})
+    when t == 24 and l == 8 do #TODO bad bad
+      %{frame|margin: %{
+          top: t,
+          right: 0,
+          bottom: 0,
+          left: l }}
   end
 
   def draw_frame_footer(

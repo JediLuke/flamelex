@@ -131,8 +131,8 @@
 #     # get height of text font
 #     text_size = 24 # I think? This is just what I set way back in Root scene
 
-#     {_x_min, _y_min, _x_max, y_max} = GUI.FontHelpers.get_max_box_for_ibm_plex(text_size)
-#     new_width        = GUI.FontHelpers.monospace_font_width(:ibm_plex, text_size)  #TODO should probably truncate this
+#     {_x_min, _y_min, _x_max, y_max} = GUI.Fonts.get_max_box_for_ibm_plex(text_size)
+#     new_width        = GUI.Fonts.monospace_font_width(:ibm_plex, text_size)  #TODO should probably truncate this
 #     y_box_buffer = 3
 #     new_height       = y_max - y_box_buffer #TODO should probably truncate this
 
@@ -146,8 +146,8 @@
 #     # get width of text font (use FontMetrics)
 #     # get height of text font
 
-#     {_x_min, _y_min, _x_max, y_max} = GUI.FontHelpers.get_max_box_for_ibm_plex(@title_font_size)
-#     new_width        = GUI.FontHelpers.monospace_font_width(:ibm_plex, @title_font_size)  #TODO should probably truncate this
+#     {_x_min, _y_min, _x_max, y_max} = GUI.Fonts.get_max_box_for_ibm_plex(@title_font_size)
+#     new_width        = GUI.Fonts.monospace_font_width(:ibm_plex, @title_font_size)  #TODO should probably truncate this
 #     y_box_buffer = 3
 #     new_height       = y_max + y_box_buffer #TODO should probably truncate this
 
@@ -165,13 +165,13 @@
 
 #   defp add_cursor(graph, %{top_left_corner: {x, y}}, font_size) do
 #     {_x_min, _y_min, _x_max, y_max} =
-#       GUI.FontHelpers.get_max_box_for_ibm_plex(font_size)
+#       GUI.Fonts.get_max_box_for_ibm_plex(font_size)
 
 #     y_offset     = y+10
 #     y_box_buffer = 2 # it looks weird having box exact same size as the text
 #     x_coordinate = x+15
 #     y_coordinate = y_offset + y_box_buffer
-#     width        = GUI.FontHelpers.monospace_font_width(:ibm_plex, font_size)  #TODO should probably truncate this
+#     width        = GUI.Fonts.monospace_font_width(:ibm_plex, font_size)  #TODO should probably truncate this
 #     height       = y_max + y_box_buffer #TODO should probably truncate this
 
 #     graph

@@ -39,10 +39,10 @@ defmodule Flamelex.GUI.Initialize do
   def load_custom_fonts_into_global_cache do
     font = :ibm_plex_mono
 
-    font_path    = Flamelex.GUI.FontHelpers.project_font_directory()
-    font_hash    = Flamelex.GUI.FontHelpers.font_hash(font)
-    metrics_path = Flamelex.GUI.FontHelpers.metrics_path(font)
-    metrics_hash = Flamelex.GUI.FontHelpers.metrics_hash(font)
+    font_path    = Flamelex.GUI.Fonts.project_font_directory()
+    font_hash    = Flamelex.GUI.Fonts.font_hash(font)
+    metrics_path = Flamelex.GUI.Fonts.metrics_path(font)
+    metrics_hash = Flamelex.GUI.Fonts.metrics_hash(font)
 
     Scenic.Cache.Static.Font.load(font_path, font_hash, scope: :global)
     Scenic.Cache.Static.FontMetrics.load(metrics_path, metrics_hash, scope: :global)

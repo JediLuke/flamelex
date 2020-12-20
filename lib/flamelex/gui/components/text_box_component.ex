@@ -5,10 +5,10 @@ defmodule Flamelex.GUI.Component.TextBox do
   use Flamelex.GUI.ComponentBehaviour
   alias Flamelex.GUI.Component.Utils.TextBox, as: TextBoxDrawUtils
   alias Flamelex.GUI.Component.MenuBar
-  alias Flamelex.GUI.Structs.Cursor
+  alias Flamelex.GUI.Component.TextCursor
 
 
-  @blink_ms trunc(500) # blink speed in hertz
+
 
   # def tag(%{}) do
   #   {:gui_component, }
@@ -19,15 +19,12 @@ defmodule Flamelex.GUI.Component.TextBox do
   end
 
   @impl Flamelex.GUI.ComponentBehaviour
-  def custom_init_logic(params) do
-
-    GenServer.cast(self(), :start_blink)
+  def custom_init_logic(%{frame: %Frame{} = f, ref: %Buf{} = buf} = params) do
 
     params |> Map.merge(%{
-      timer: nil,
       draw_footer?: true,
       cursors: [
-        Cursor.new(%{num: 1})
+        %{ frame: f, ref: buf, num: 1 }
       ]
     })
   end
@@ -48,29 +45,29 @@ defmodule Flamelex.GUI.Component.TextBox do
         frame # no need to make any adjustments
       end
 
+    #TODO get margins from somewhere better
+    frame = frame |> Frame.set_margin(%{top: 24, left: 8})
+
     lines_of_text =
       Flamelex.API.Buffer.read(buf)
       |> TextBoxDrawUtils.split_into_a_list_of_lines_of_text_structs()
 
     background_color = Flamelex.GUI.Colors.background()
 
-    #TODO spin up new cursor component!!
-
     Draw.blank_graph()
     |> Draw.background(frame, background_color)
     |> TextBoxDrawUtils.render_lines(%{ lines_of_text: lines_of_text,
-                                        top_left_corner: frame.top_left })
-    |> draw_cursors(params)
+                                        frame: frame })
+    |> draw_cursors(frame, params)
     |> Draw.border(frame)
   end
 
-  def draw_cursors(graph, %{cursors: []}), do: graph
-  def draw_cursors(graph, %{cursors: cursors})
+  def draw_cursors(graph, _frame, %{cursors: []}), do: graph
+  def draw_cursors(graph, frame, %{cursors: cursors})
     when is_list(cursors) and length(cursors) >= 1
   do
     Enum.reduce(cursors, graph, fn c, graph ->
-      graph
-      # |> CursorGUIComponent.mount(c) #TODO hERe!!
+      graph |> TextCursor.mount(c |> Map.merge(%{frame: frame}))
     end)
   end
 
@@ -90,11 +87,6 @@ defmodule Flamelex.GUI.Component.TextBox do
   end
 
 
-  def handle_cast(:start_blink, {graph, state}) do
-    {:ok, timer} = :timer.send_interval(@blink_ms, :blink)
-    new_state = %{state | timer: timer}
-    {:noreply, {graph, new_state}}
-  end
 
   def handle_cast({:refresh, _buf_state, _gui_state}, {_graph, state}) do
 
@@ -122,30 +114,6 @@ defmodule Flamelex.GUI.Component.TextBox do
   end
 
 
-  def handle_info(:blink, state) do
-
-    # new_blink = not state.cursor_blink?
-
-    # new_graph =
-    #   Draw.blank_graph()
-    #   |> Draw.background(state.frame, Flamelex.GUI.Colors.background())
-    #   |> TextBoxDraw.render_text_grid(%{
-    #        frame: state.frame,
-    #        text: state.text,
-    #        cursor_position: state.cursor_position,
-    #        cursor_blink?: new_blink,
-    #        mode: state.mode
-    #      })
-    #   |> Frame.draw(state.frame, %{mode: state.mode})
-
-    # new_state =
-    #   %{state|graph: new_graph, cursor_blink?: new_blink}
-
-    # {:noreply, new_state, push: new_graph}
-
-    {:noreply, state}
-  end
-
   @doc """
   When placed at the bottom of the module, this function would serve as
   a "catch-all", by pattern-matching on all actions that weren't matched
@@ -161,3 +129,117 @@ defmodule Flamelex.GUI.Component.TextBox do
   defp we_are_drawing_a_footer_bar?(%{draw_footer?: df?}), do: df?
   defp we_are_drawing_a_footer_bar?(_else), do: false
 end
+
+
+
+
+
+
+
+
+
+
+
+# defmodule Flamelex.GUI.Component.DeprecatedTextBox do
+#   @moduledoc false
+#   use Scenic.Component
+#   require Logger
+#   use Flamelex.ProjectAliases
+
+
+
+#   # def handle_cast({:refresh, buf}, state) do
+#   #   state = %{state|text: buf.data}
+#   #   new_graph = render_graph(state)
+#   #   new_state = %{state| graph: new_graph}
+#   #   {:noreply, new_state, push: new_graph}
+#   # end
+
+#   def handle_cast({:move_cursor, direction, _dist}, state) do
+
+#     _old_cursr_position = %{row: rr, col: cc} = state.cursor_position
+#     new_cursor_position =
+#       case direction do
+#         :left  -> %{row: rr,   col: cc-1}
+#         :down  -> %{row: rr-1, col: cc}
+#         :up    -> %{row: rr+1, col: cc}
+#         :right -> %{row: rr,   col: cc+1}
+#       end
+
+#     new_graph =
+#       Draw.blank_graph()
+#       |> Draw.background(state.frame, Flamelex.GUI.Colors.background())
+#       |> TextBoxDraw.render_text_grid(%{
+#            frame: state.frame,
+#            text: state.text,
+#            cursor_position: new_cursor_position,
+#            cursor_blink?: state.cursor_blink?
+#          })
+#       |> Frame.draw(state.frame, %{mode: :normal})
+
+#     new_state = %{state| graph: new_graph,
+#                          cursor_position: new_cursor_position }
+
+#     {:noreply, new_state, push: new_graph}
+#   end
+
+#   def handle_cast({:move_cursor, new_cursor_position}, state) do
+
+#     new_graph =
+#       Draw.blank_graph()
+#       |> Draw.background(state.frame, Flamelex.GUI.Colors.background())
+#       |> TextBoxDraw.render_text_grid(%{
+#            frame: state.frame,
+#            text: state.text,
+#            cursor_position: new_cursor_position,
+#            cursor_blink?: state.cursor_blink?
+#          })
+#       |> Frame.draw(state.frame, %{mode: state.mode})
+
+#     new_state = %{state| graph: new_graph,
+#                          cursor_position: new_cursor_position }
+
+#     {:noreply, new_state, push: new_graph}
+#   end
+
+#   def handle_cast({:switch_mode, m}, state) do
+#     new_graph =
+#       Draw.blank_graph()
+#       |> Draw.background(state.frame, Flamelex.GUI.Colors.background())
+#       |> TextBoxDraw.render_text_grid(%{
+#            frame: state.frame,
+#            text: state.text,
+#            cursor_position: state.cursor_position,
+#            cursor_blink?: state.cursor_blink?,
+#            mode: m
+#          })
+#       |> Frame.draw(state.frame, %{mode: m})
+
+#     new_state = %{state| graph: new_graph, mode: m}
+
+#     {:noreply, new_state, push: new_graph}
+#   end
+
+
+#   # defp add_notes(graph, contents) do
+#   #   {graph, _offset_count} =
+#   #     Enum.reduce(contents, {graph, _offset_count = 0}, fn {_key, note}, {graph, offset_count} ->
+#   #       graph =
+#   #         graph
+#   #         |> Scenic.Primitives.group(fn graph ->
+#   #               graph
+#   #               |> Scenic.Primitives.rect({w / 2, 100}, translate: {10, 10 + offset_count * 110}, fill: :cornflower_blue, stroke: {1, :ghost_white})
+#   #               |> Scenic.Primitives.text(note["title"], font: ibm_plex_mono,
+#   #                   translate: {25, 50 + offset_count * 110}, # text draws from bottom-left corner?? :( also, how high is it???
+#   #                   font_size: 24, fill: :black)
+#   #             end)
+
+
+#   #       {graph, offset_count + 1}
+#   #     end)
+
+#   #   graph
+#   # end
+
+
+# end
