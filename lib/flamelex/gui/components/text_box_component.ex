@@ -88,6 +88,31 @@ defmodule Flamelex.GUI.Component.TextBox do
     :ignore_action
   end
 
+  def handle_action({graph, state}, {:switch_mode, new_mode}) do
+
+    %{ref: %Buf{ref: buf_ref}} = state
+
+    #assume its cursor 1 for now
+    cursor_tag = {:gui_component, {:text_cursor, buf_ref, 1}} #TODO assume its cursor 1
+
+    ProcessRegistry.find!(cursor_tag)
+    |> GenServer.cast({:action, {:switch_mode, new_mode}})
+
+    mode_string =
+      case new_mode do
+        :normal -> "NORMAL-MODE"
+        :insert -> "INSERT-MODE"
+        :command -> "COMMAND-MODE"
+      end
+
+    new_graph =
+      graph
+      |> Scenic.Graph.modify(:mode_string, &Scenic.Primitives.text(&1, mode_string))
+      #TODO also we want to change the color of the box!
+      # |> Frame.redraw()
+
+    {:noreply, {new_graph, state}, push: new_graph}
+  end
 
   @doc """
   This callback is called whenever the component received input.

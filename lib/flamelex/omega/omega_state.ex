@@ -2,11 +2,10 @@ defmodule Flamelex.Structs.OmegaState do
   @moduledoc false
   use Flamelex.ProjectAliases
 
-  # restrict possible modes to those within this list
-  @modes [:normal, :command]
 
   @max_keystroke_history_limit 50
   @max_action_history_limit 50
+
 
   defstruct [
     mode:                 :normal,    # The input mode
@@ -20,7 +19,8 @@ defmodule Flamelex.Structs.OmegaState do
     %__MODULE__{ mode: :normal }
   end
 
-  def set(%__MODULE__{} = omega, mode: m) when m in @modes do
+  @modes [:normal, :insert, :command]
+  def set(%__MODULE__{} = omega, [mode: m]) when m in @modes do
     %{omega|mode: m}
   end
 

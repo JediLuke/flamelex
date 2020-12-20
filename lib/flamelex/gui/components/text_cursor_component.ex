@@ -25,6 +25,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
       override?: nil,                               # override lets us disable the blinking temporarily, for when we want to move the cursor
       timer: nil,                                   # holds an erlang :timer for the blink
       original_coordinates: params.frame.top_left,  # so we can track how we've moved around
+      mode: :normal,                                # start out in normal mode, if insert mode we just have a line
       current_coords: starting_coords(params.frame)
     })
   end
@@ -36,10 +37,10 @@ defmodule Flamelex.GUI.Component.TextCursor do
   end
 
 
-  def render(%{ref: %Buf{ref: buf_ref}, frame: %Frame{} = frame, current_coords: coords}) do
+  def render(%{ref: %Buf{ref: buf_ref}, frame: %Frame{} = frame, current_coords: coords, mode: mode}) do
 
 
-    block_dimensions = {_w, _h} = cursor_box_dimensions()
+    block_dimensions = {_w, _h} = cursor_box_dimensions(mode)
 
     Draw.blank_graph()
     |> Scenic.Primitives.rect(
@@ -57,7 +58,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
     # would be correct, considering Scenic renders blocks from the bottom-left for some reason..
     # however, it just looks weird! So, we move it down, a small offset
 
-    _block_dimensions = {_w, block_height} = cursor_box_dimensions()
+    _block_dimensions = {_w, block_height} = cursor_box_dimensions(:normal) #NOTE start in normal mode
 
     cursor_y_aesthetic_offset = 4
 
@@ -67,10 +68,17 @@ defmodule Flamelex.GUI.Component.TextCursor do
     {cursor_x_pos, cursor_y_pos}
   end
 
-  defp cursor_box_dimensions do
+  defp cursor_box_dimensions(:normal) do
     font = Flamelex.GUI.Fonts.primary(:font)
     size = Flamelex.GUI.Fonts.size()
     w = Flamelex.GUI.Fonts.monospace_font_width(font, size)
+    h = Flamelex.GUI.Fonts.monospace_font_height(font, size)
+    {w, h}
+  end
+  defp cursor_box_dimensions(:insert) do
+    font = Flamelex.GUI.Fonts.primary(:font)
+    size = Flamelex.GUI.Fonts.size()
+    w = 2
     h = Flamelex.GUI.Fonts.monospace_font_height(font, size)
     {w, h}
   end
@@ -93,6 +101,24 @@ defmodule Flamelex.GUI.Component.TextCursor do
       distance: distance,
       buf_ref: buf_ref
     })
+  end
+
+  def handle_action(
+        {graph, %{ref: %Buf{ref: buf_ref}} = state},
+        {:switch_mode, new_mode}) do
+
+    block_dimensions = {_w, _h} = cursor_box_dimensions(new_mode)
+
+    new_state =
+      %{state|mode: new_mode} # the visual effect is better if you dont blink the cursor when moving it
+
+    new_graph =
+      graph
+      |> Scenic.Graph.modify(
+                        buf_ref,
+                        &Scenic.Primitives.rectangle(&1, block_dimensions)) # resize the rectangle
+
+    {:update_graph_and_state, {new_graph, new_state}}
   end
 
   # base positions before moving the cursor

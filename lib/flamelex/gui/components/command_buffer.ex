@@ -61,7 +61,7 @@ defmodule Flamelex.GUI.Component.CommandBuffer do
     # IO.puts "Initializing #{__MODULE__}..."
 
     #TODO search for if the process is already registered, if it is, engage recovery procedure
-    Process.register(self(), __MODULE__) #TODO this should be gproc
+    ProcessRegistry.register({:gui_component, :command_buffer})
 
     graph = initialize(state)
 
@@ -231,9 +231,9 @@ defmodule Flamelex.GUI.Component.CommandBuffer do
       %Frame{} = DrawingHelpers.calc_textbox_frame(frame)
 
     command_mode_background_color = :cornflower_blue
-    component_id = :command_buffer
-    cursor_component_id  = {component_id, :cursor, 1}
-    text_field_id = {component_id, :text_field}
+    component_id                  = :command_buffer
+    # cursor_component_id           = {component_id, :cursor, 1}
+    text_field_id                 = {component_id, :text_field}
 
     Draw.blank_graph()
     |> Scenic.Primitives.group(fn graph ->
@@ -248,5 +248,4 @@ defmodule Flamelex.GUI.Component.CommandBuffer do
       hidden: true
     ])
   end
-
 end

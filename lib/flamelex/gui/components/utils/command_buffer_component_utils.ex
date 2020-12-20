@@ -67,8 +67,8 @@ defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
 
     textbox_frame =
       Frame.new(
-        top_left:     textbox_coordinates |> Coordinates.new(),
-        dimensions:   textbox_dimensions  |> Dimensions.new())
+        top_left:   textbox_coordinates |> Coordinates.new(),
+        dimensions: textbox_dimensions  |> Dimensions.new())
 
     # return
     textbox_frame

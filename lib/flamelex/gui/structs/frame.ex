@@ -149,10 +149,12 @@ def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when 
                 fill:       c)
     # then, draw the backgrounnd rectangle for the mode-string box
     |> Scenic.Primitives.rect({mode_textbox_width, h},
+                id: :mode_string_box,
                 translate:  {x, y},
                 fill:       Flamelex.GUI.Colors.mode(:normal))
     # draw the text showing the mode_string
     |> Scenic.Primitives.text(mode_string,
+                id: :mode_string,
                 font:       Flamelex.GUI.Fonts.primary(),
                 translate:  {x+left_margin, y+font_size+stroke_width}, # text draws from bottom-left corner??
                 font_size:  font_size,

@@ -3,16 +3,27 @@ defmodule Flamelex.Omega.Reducer do
   use Flamelex.ProjectAliases
 
   # do pattern-match check on params
-  def process_action(%OmegaState{} = omega_state, action, opts) when is_tuple(action) and is_list(opts) do
+  def process_action(%OmegaState{} = omega_state, action, opts) when is_list(opts) do
     do_process_action(omega_state, action, opts)
   end
 
 
-  def do_process_action(omega_state, {:show, :command_buffer}, opts) do
+  def do_process_action(omega_state, {:show, :command_buffer}, _opts) do
     #NOTE: both the buffer, and the GUI.Component, should be registered to this topic!!
     Flamelex.GUI.Component.CommandBuffer.show()
     # PubSub.publish(:command_buffer, :show)
     omega_state |> OmegaState.set(mode: :command)
+  end
+
+  def do_process_action(omega_state, {:switch_mode, new_mode}, _opts) do
+
+    #TODO broadcast the new mode to all processes?
+    ProcessRegistry.find!(:active_buffer)
+    |> GenServer.cast({:action, {:switch_mode, new_mode}})
+
+    # Flamelex.GUI.Controller.switch_mode(new_mode)
+
+    omega_state |> OmegaState.set(mode: new_mode)
   end
 
   # #TODO maybe x will be worth considering eventually???

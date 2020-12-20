@@ -106,6 +106,10 @@ defmodule Flamelex.OmegaMaster do
     {:noreply, omega_state}
   end
 
+  def handle_cast({:action, a}, omega_state) do
+    handle_cast({:action, a, []}, omega_state)
+  end
+
   def handle_cast({:action, a, opts}, omega_state)
   do
     new_omega_state =

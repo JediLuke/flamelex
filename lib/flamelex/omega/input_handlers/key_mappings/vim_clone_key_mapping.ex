@@ -54,7 +54,7 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
       @lowercase_l => move_cursor(:right, 1),
 
       # switch modes
-      # @lowercase_i => {:apply_mfa, {Flamelex, :switch_mode, [:insert]}},
+      @lowercase_i => {:apply_mfa, {Flamelex, :switch_mode, [:insert]}},
 
       # leader keys
       leader_key() => %{
