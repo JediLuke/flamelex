@@ -81,20 +81,34 @@ defmodule Flamelex.GUI.Component.TextCursor do
   end
 
   @impl Flamelex.GUI.ComponentBehaviour
-  def handle_action({graph, %{ref: %Buf{ref: buf_ref}, current_coords: {x_coord, y_coord}} = state}, {:move_cursor, :down = direction, distance}) when direction in @valid_directions and distance >= 1 do
+  def handle_action(
+          {graph, %{ref: %Buf{ref: buf_ref}, current_coords: {_x, _y} = current_coords} = state},
+          {:move_cursor, direction, distance})
+            when direction in @valid_directions
+            and distance >= 1 do
 
-    # base positions before moving the cursor
-    # cursor_x_pos = frame.top_left.x+frame.margin.left
-    # cursor_y_pos = frame.top_left.y+frame.margin.top-block_height+cursor_y_aesthetic_offset
+    move(graph, state, %{
+      current_coords: current_coords,
+      direction: direction,
+      distance: distance,
+      buf_ref: buf_ref
+    })
+  end
+
+  # base positions before moving the cursor
+  # cursor_x_pos = frame.top_left.x+frame.margin.left
+  # cursor_y_pos = frame.top_left.y+frame.margin.top-block_height+cursor_y_aesthetic_offset
+  def move(graph, state, %{direction: direction, distance: distance, buf_ref: buf_ref, current_coords: {x_coord, y_coord}}) do
 
     cursor_height = Flamelex.GUI.Component.Utils.TextBox.line_height()
 
-    # {_w, cursor_height} = cursor_box_dimensions()
-
-    # column_offset = cursor_x_pos+()
-    new_coords =
-      {_new_x_coord, _new_y_coord} =
-        {x_coord, y_coord+(distance*cursor_height)}
+    new_coords = {_new_x_coord, _new_y_coord} =
+      case direction do
+        :up    -> {x_coord, y_coord - (distance*cursor_height)}
+        :down  -> {x_coord, y_coord + (distance*cursor_height)}
+        # :left  -> {x_coord, y_coord+(distance*cursor_height)}
+        # :right -> {x_coord, y_coord+(distance*cursor_height)}
+      end
 
     new_state =
       %{state|current_coords: new_coords, override?: :visible} # the visual effect is better if you dont blink the cursor when moving it
