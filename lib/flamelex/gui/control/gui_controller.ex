@@ -58,6 +58,7 @@ defmodule Flamelex.GUI.Controller do
   def init(state) do
     IO.puts "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
+    PubSub.subscribe(topic: :active_buffer)
     {:ok, state, {:continue, :draw_default_gui}}
   end
 
@@ -84,14 +85,14 @@ defmodule Flamelex.GUI.Controller do
     {:noreply, state}
   end
 
-  def handle_cast({:switch_mode, m}, gui_state) do
+  # def handle_cast({:switch_mode, m}, gui_state) do
 
 
 
-    new_graph = gui_state.graph |> Draw.test_pattern()
-    Flamelex.API.GUI.redraw(new_graph)
-    {:noreply, gui_state}
-  end
+  #   new_graph = gui_state.graph |> Draw.test_pattern()
+  #   Flamelex.API.GUI.redraw(new_graph)
+  #   {:noreply, gui_state}
+  # end
 
 
 
@@ -105,7 +106,7 @@ defmodule Flamelex.GUI.Controller do
   #   #   |> Map.update!(:buffer_list, fn b -> b ++ [buffer] end)
   #   #   |> Map.update!(:active_buffer, fn _ab -> buffer end)
 
-  #   # IO.puts "SENDING --- #{new_state.active_buffer.content}"
+  #   # IO.puts SENDING --- #{new_state.active_buffer.content}"
   #   Flamelex.GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
 
   #   {:noreply, state}
@@ -278,6 +279,18 @@ defmodule Flamelex.GUI.Controller do
     {:noreply, state}
   end
 
+
+  @impl true
+  def handle_info({:active_buffer, :switch_mode, _mode}, state) do
+    IO.puts "GUI controller ignoring switch mode cmd, since that will propagate via buffers themselves"
+    {:noreply, state}
+  end
+
+
+  def handle_info(all_info, state) do
+    IO.puts "BAD MASTVH?? #{inspect all_info}"
+    {:noreply, state}
+  end
 
   # @impl true
   # def handle_info(:check_reminders, state) do

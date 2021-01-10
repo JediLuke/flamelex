@@ -78,11 +78,12 @@ defmodule Flamelex.GUI.ComponentBehaviour do
 
         #TODO dont hack this, it's not optional!!
         {:gui_component, _ref} = tag =
-          if function_exported?(__MODULE__, :rego_tag, 1) do
+          #TODO this code is now deprecated, but it's cool and I want to keepit for later
+          # if function_exported?(__MODULE__, :rego_tag, 1) do
             apply(__MODULE__, :rego_tag, [params])
-          else
-            {:gui_component, "no-tag"} #TODO auto-generate it at least?
-          end
+          # else
+          #   {:gui_component, "no-tag"} #TODO auto-generate it at least?
+          # end
 
         IO.inspect tag, label: "TTT"
 

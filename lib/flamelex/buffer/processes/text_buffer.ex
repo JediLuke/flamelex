@@ -40,7 +40,9 @@ defmodule Flamelex.Buffer.Text do
   @impl GenServer
   def init(%{from_file: _filepath} = params) do
     Logger.debug "#{__MODULE__} initializing... params: #{inspect params}"
-    # ProcessRegistry.register(:active_buffer) #TODO
+
+    # PubSub.subscribe(topic)
+
     {:ok, params, {:continue, :open_file_on_disk}}
   end
 
@@ -114,6 +116,31 @@ defmodule Flamelex.Buffer.Text do
 
     # Flamelex.GUI.Controller.refresh({:buffer, state.name})
     # Flamelex.GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
+
+    {:reply, :ok, new_state}
+  end
+
+  def handle_call({:modify, {:insert, {:codepoint, {char, 0}}, cursor = {:cursor, 1}}}, _from, state) when is_bitstring(char) do
+
+    #TODO
+    # cursor_coords =
+    #   ProcessRegistry.find!(Cursor.rego_tag(cursor))
+    #   |> GenServer.call(:get_coords)
+
+    insertion_site = 3 #TODO
+
+    insert_text_function =
+      fn string ->
+        {before_split, after_split} = string |> String.split_at(insertion_site)
+        before_split <> char <> after_split
+      end
+
+    new_state =
+        state
+        |> Map.update!(:data, insert_text_function)
+        |> Map.put(:unsaved_changes?, true)
+
+    Flamelex.GUI.Controller.refresh(new_state)
 
     {:reply, :ok, new_state}
   end

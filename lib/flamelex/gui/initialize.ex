@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Initialize do
+defmodule Flamelex.GUI.ScenicInitializationHelper do
   @moduledoc """
   Contains boot logic and default configurations required by Scenic.
   """
@@ -28,9 +28,6 @@ defmodule Flamelex.GUI.Initialize do
     ]
   }
 
-  def scenic_childspec do
-    {Scenic, viewports: [@main_viewport_config]}
-  end
 
   def viewport_config do
     @main_viewport_config

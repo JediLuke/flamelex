@@ -11,10 +11,11 @@ defmodule Flamelex.Omega.TopLevelSupervisor do
     Logger.info("#{__MODULE__} initializing...")
 
     children = [
-      {Task.Supervisor, name: Flamelex.Omega.UserInput.TaskSupervisor},
+      {Task.Supervisor, name: Flamelex.Omega.Input2ActionLookup.TaskSupervisor},
+      {Task.Supervisor, name: Flamelex.Omega.HandleAction.TaskSupervisor},
       Flamelex.OmegaMaster
     ]
 
-    Supervisor.init(children, strategy: :one_for_all)
+    Supervisor.init(children, strategy: :one_for_all) #TODO make this :rest_for_one?
   end
 end

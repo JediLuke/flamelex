@@ -8,27 +8,69 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
 
 
   @doc """
-  This function is called by OmegaMaster to handle any user input.
-  """
-  def lookup(%OmegaState{mode: m} = omega_state, input) when m in [:normal, :command] do
-    if input == leader_key() do
-      :ignore_input
-    else
-      lookup_keystroke(omega_state, leader_key(), input)
-    end
-  end
-
-
-  @doc """
   This function defines which key acts as the `leader`.
   """
   def leader_key, do: @space_bar
 
+    @doc """
+  This map defines the effect of pressing a key, to a function call.
+  """
+  def keymap(%OmegaState{mode: :normal}) do
+    %{
+      # normal mode navigation
+      @lowercase_h => move_cursor(:left, 1),      ## TODO make this function inside the @behaviour module, so all keymaps can call it
+      @lowercase_j => move_cursor(:down, 1),
+      @lowercase_k => move_cursor(:up, 1),
+      @lowercase_l => move_cursor(:right, 1),
 
-  def lookup_keystroke(%OmegaState{mode: m} = omega_state, leader, input) when m in [:normal, :command] do
+      # switch modes
+      # @lowercase_i => {:apply_mfa, {Flamelex, :switch_mode, [:insert]}},
+      @lowercase_i => {:action, {:active_buffer, :switch_mode, :insert}},
+
+      # leader keys
+      leader_key() => %{
+        @lowercase_j => {:apply_mfa, {Flamelex.API.Journal, :today, []}},
+        @lowercase_k => {:apply_mfa, {Flamelex.API.CommandBuffer, :show, []}}
+      }
+    }
+  end
+
+
+
+  ##TODO below here, should eventually be abstracted away by a Behaviour,
+  ## and this behaviour should do some error checking on that the module
+  ## implementing that behaviour is returning - the key mapping module itself just
+  ## contains the raw lookups
+
+  @doc """
+  This function is called by OmegaMaster to handle any user input.
+  """
+  def lookup(%OmegaState{mode: :normal} = omega_state, input) do
+    if input == leader_key() do
+      :ignore_input
+    else
+      lookup_keystroke(omega_state, input)
+    end
+  end
+
+  def lookup(%OmegaState{mode: :insert} = omega_state, input) do
+    if input in @valid_text_input_characters do
+      #TODO how do we know its cursor 1?
+      {:apply_mfa, {
+                      Flamelex.API.Buffer,
+                      :modify,
+                      [:active_buffer, {:insert, input, {:cursor, 1}}]
+                   }
+      } #TODO generalize this to non-text buffers too
+    else
+      :ignore_input
+    end
+  end
+
+  def lookup_keystroke(%OmegaState{} = omega_state, input) do
     lookup_result =
       if omega_state |> OmegaState.last_keystroke() == leader_key() do
-        keymap(omega_state)[leader][input]
+        keymap(omega_state)[leader_key()][input]
       else
         keymap(omega_state)[input]
       end
@@ -40,29 +82,6 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
     end
   end
 
-
-
-  @doc """
-  This map defines the effect of pressing a key, to a function call.
-  """
-  def keymap(%OmegaState{}) do
-    %{
-      # normal mode navigation
-      @lowercase_h => move_cursor(:left, 1),
-      @lowercase_j => move_cursor(:down, 1),
-      @lowercase_k => move_cursor(:up, 1),
-      @lowercase_l => move_cursor(:right, 1),
-
-      # switch modes
-      @lowercase_i => {:apply_mfa, {Flamelex, :switch_mode, [:insert]}},
-
-      # leader keys
-      leader_key() => %{
-        @lowercase_j => {:apply_mfa, {Flamelex.API.Journal, :today, []}},
-        @lowercase_k => {:apply_mfa, {Flamelex.API.CommandBuffer, :show, []}}
-      }
-    }
-  end
 
 
   defp move_cursor(direction, amount) do

@@ -2,6 +2,31 @@ defmodule Flamelex.Omega.Reducer do
   alias Flamelex.Structs.OmegaState
   use Flamelex.ProjectAliases
 
+
+  def handle_action(%OmegaState{} = omega_state, {:active_buffer = topic, :switch_mode, new_mode}) do
+    IO.puts "switching active buf to insert..."
+
+    #REMINDER: BufferManager & GUiController are subscribed to `:active_buffer` alerts
+    PubSub.broadcast(
+      topic: topic,
+      msg: {topic, :switch_mode, new_mode})
+
+    results =
+      {:ok, omega_state |> OmegaState.set(mode: new_mode)}
+
+    send(Flamelex.OmegaMaster, results)
+
+    :done
+  end
+
+  def handle_action(%OmegaState{} = state, a) do
+    IO.puts "IGNORING ~~~~~ #{inspect a}"
+    {:ok, state}
+  end
+
+
+
+
   # do pattern-match check on params
   def process_action(%OmegaState{} = omega_state, action, opts) when is_list(opts) do
     do_process_action(omega_state, action, opts)
@@ -18,8 +43,10 @@ defmodule Flamelex.Omega.Reducer do
   def do_process_action(omega_state, {:switch_mode, new_mode}, _opts) do
 
     #TODO broadcast the new mode to all processes?
-    ProcessRegistry.find!(:active_buffer)
-    |> GenServer.cast({:action, {:switch_mode, new_mode}})
+    #TODO probably needs to be a GenServer cast
+    :gproc.send({:p, :l, :active_buffer}, {:action, {:switch_mode, new_mode}})
+    # ProcessRegistry.find!(:active_buffer)
+    # |> GenServer.cast()
 
     # Flamelex.GUI.Controller.switch_mode(new_mode)
 

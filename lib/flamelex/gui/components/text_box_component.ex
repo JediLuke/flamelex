@@ -21,8 +21,6 @@ defmodule Flamelex.GUI.Component.TextBox do
   @impl Flamelex.GUI.ComponentBehaviour
   def custom_init_logic(%{frame: %Frame{} = f, ref: %Buf{} = buf} = params) do
 
-    ProcessRegistry.register(:active_buffer) #TODO
-
     params |> Map.merge(%{
       draw_footer?: true,
       cursors: [
@@ -88,7 +86,24 @@ defmodule Flamelex.GUI.Component.TextBox do
     :ignore_action
   end
 
+  def handle_info({:switch_mode, m}, state) do
+    GenServer.cast(self(), {:action, {:switch_mode, m}})
+    # {:noreply, state |> switch_mode(m)}
+    {:noreply, state}
+  end
+
+  # def switch_mode(state, m) do
+
+  # end
+
+  def handle_info(msg, state) do
+    IO.puts "#{__MODULE__} got info msg: #{inspect msg}, state: #{inspect state}"
+    {:noreply, state}
+  end
+
+
   def handle_action({graph, state}, {:switch_mode, new_mode}) do
+
 
     %{ref: %Buf{ref: buf_ref}} = state
 

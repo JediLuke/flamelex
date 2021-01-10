@@ -23,6 +23,15 @@ defmodule Flamelex.GUI.Component.MenuBar do
     frame |> inactive_menubar()
   end
 
+  def rego_tag(%{ref: %Buf{ref: ref}}) do
+    rego_tag(ref)
+  end
+  def rego_tag(%{ref: aa}) when is_atom(aa) do
+    rego_tag(aa)
+  end
+  def rego_tag(x) do #TODO lol
+    {:gui_component, x}
+  end
 
   @doc """
   This function returns a map which describes all the menu items.

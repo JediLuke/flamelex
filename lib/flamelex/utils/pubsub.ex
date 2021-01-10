@@ -1,33 +1,14 @@
-defmodule Flamelex.Utilities.PubSub do
-  use GenServer
+defmodule Flamelex.Utils.PubSub do
 
-
-  def subscribe() do
-
+  def broadcast([topic: topic, msg: msg]) do
+    :gproc.send({:p, :l, topic}, msg)
   end
 
-  def publish(topic, msg) do
-    GenServer.call(__MODULE__, {:publish, topic, msg})
+  def subscribe([topic: topic]) do
+    :gproc.reg({:p, :l, topic})
   end
 
-  def unsubscribe() do
-
-  end
-
-
-
-
-  def start_link(params) do
-    GenServer.start_link(__MODULE__, params)
-  end
-
-  def init(_params) do
-    IO.puts "Initializing #{__MODULE__}..."
-    Process.register(self(), __MODULE__)
-    {:ok, _initial_state = %{}}
-  end
-
-  def handle_call() do
-
+  def unsubscribe([topic: _t]) do
+    raise "now this one is a pickle isn't it"
   end
 end

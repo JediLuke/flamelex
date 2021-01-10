@@ -38,18 +38,20 @@ defmodule Flamelex.Utilities.ProcessRegistry do
   Returns an ok/error tuple.
   """
   def lookup(%Buf{} = buf) do
-    lookup_key = Buf.rego_tag(buf)
-    case :gproc.where({:n, :l, lookup_key}) do
-      p when is_pid(p) -> {:ok, p}
-      _else            -> {:error, "Could not find a process with lookup_key: #{inspect lookup_key}"}
-    end
+    key = Buf.rego_tag(buf)
+    lookup(key)
+    # case :gproc.where({:n, :l, lookup_key}) do
+    #   p when is_pid(p) -> {:ok, p}
+    #   _else            -> {:error, "Could not find a process with lookup_key: #{inspect lookup_key}"}
+    # end
   end
   def lookup(%GUiComponentRef{} = ref) do
-    lookup_key = GUiComponentRef.rego_tag(ref)
-    case :gproc.where({:n, :l, lookup_key}) do
-      p when is_pid(p) -> {:ok, p}
-      _else            -> {:error, "Could not find a process with lookup_key: #{inspect lookup_key}"}
-    end
+    key = GUiComponentRef.rego_tag(ref)
+    lookup(key)
+    # case :gproc.where({:n, :l, lookup_key}) do
+    #   p when is_pid(p) -> {:ok, p}
+    #   _else            -> {:error, "Could not find a process with lookup_key: #{inspect lookup_key}"}
+    # end
   end
   def lookup(lookup_key) do
     case :gproc.where({:n, :l, lookup_key}) do

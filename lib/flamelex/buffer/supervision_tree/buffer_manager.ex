@@ -17,9 +17,10 @@ defmodule Flamelex.BufferManager do
   end
 
   def init(_params) do
-    IO.puts "Initializing #{__MODULE__}..."
+    IO.puts "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
-    {:ok, _initial_state = []}
+    PubSub.subscribe(topic: :active_buffer)
+    {:ok, %{buffer_list: [], active_buffer: nil}}
   end
 
   #TODO maybe it's not safe to have this exposed?? Anyone can call & crash the Manager??
@@ -31,11 +32,10 @@ defmodule Flamelex.BufferManager do
           if BufUtils.open_this_buffer_in_gui?(params) do
             :ok = Flamelex.GUI.Controller.show(buf)
           end
-          {:reply, {:ok, buf}, state ++ [buf]}
+          {:reply, {:ok, buf}, %{state|buffer_list: state.buffer_list ++ [buf], active_buffer: buf}}
       {:error, reason} ->
           {:reply, {:error, reason}, state}
     end
-
   end
 
   def handle_call({:find_buffer, search_term}, _from, state) do
@@ -88,4 +88,26 @@ defmodule Flamelex.BufferManager do
   #     {:reply, {:error, "not an open buffer"}, state}
   #   end
   # end
+
+  @impl true
+  def handle_info({:active_buffer, :switch_mode, _new_mode}, %{active_buffer: nil} = state) do
+    IO.puts "Cannot switch to a new mode sine we don't have an active buffer"
+    {:noreply, state}
+  end
+
+  def handle_info({:active_buffer, :switch_mode, new_mode}, %{active_buffer: %Buf{ref: ref} = active_buf} = state) do
+
+    ProcessRegistry.find!({:gui_component, ref})
+    # Flamelex.GUI.Component.TextBox.rego_tag(active_buf)
+    # |> ProcessRegistry.find!()
+    |> IO.inspect(label: "gui component pid")
+    |> send({:switch_mode, new_mode})
+
+
+    #TODO look up the gui component & send it a msg to switch modes
+
+    #TODO2 just get GUI Controller to do it for us...
+
+    {:noreply, state}
+  end
 end

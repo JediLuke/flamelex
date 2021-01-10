@@ -1,6 +1,5 @@
 defmodule Flamelex.Application do
   @moduledoc false
-
   use Application
 
 
@@ -17,7 +16,7 @@ defmodule Flamelex.Application do
           boot_regular_applications()
         end
 
-    opts = [strategy: :one_for_one, name: Flamelex.Supervisor]
+    opts = [strategy: :one_for_one, name: Flamelex.Trismegistus]
     Supervisor.start_link(children, opts)
   end
 
@@ -36,8 +35,6 @@ defmodule Flamelex.Application do
       Flamelex.Omega.TopLevelSupervisor,
       Flamelex.Buffer.TopLevelSupervisor,
       # Flamelex.Agent.TopLevelSupervisor, #TODO this is just commented out to stop spamming the log with reminders atm
-
-      Flamelex.Utilities.PubSub
     ]
   end
 end

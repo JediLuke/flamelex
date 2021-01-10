@@ -105,18 +105,23 @@ defmodule Flamelex.GUI.ScenicEventsDefinitions do
       @period {:codepoint, {".", 0}}
       @bang {:codepoint, {"!", 1}}
       @question_mark {:codepoint, {"?", 1}}
-      @left_bracket {:codepoint, {"(", 1}}
-      @right_bracket {:codepoint, {")", 1}}
-      @quote_character {:codepoint, {"\"", 1}}
       @colon {:codepoint, {":", 1}}
+      @comma {:codepoint, {",", 0}}
+      @quote_character {:codepoint, {"\"", 1}}
       @percent_sign {:codepoint, {"%", 1}}
+      @left_parenthesis {:codepoint, {"(", 1}} #TODO left_parenthesis
+      @right_parenthesis {:codepoint, {")", 1}}
       @left_brace {:codepoint, {"{", 1}}
       @right_brace {:codepoint, {"}", 1}}
-      @comma {:codepoint, {",", 0}}
 
-      @valid_command_buffer_inputs @all_letters ++ [@space_bar, @period,
-        @bang, @question_mark, @left_bracket, @right_bracket, @quote_character,
-        @colon, @percent_sign, @left_brace, @right_brace, @comma]
+      @all_punctuation [@perion, @bang, @question_mark, @colon, @comma,
+        @quote_character, @percent_sign, @left_parenthesis, @right_parenthesis,
+        @left_brace, @right_brace]
+
+      @valid_text_input_characters @all_letters ++ @all_punctuation ++ [@space_bar]
+
+      #TODO deprecate
+      @valid_command_buffer_inputs @valid_text_input_characters
 
     end
   end
