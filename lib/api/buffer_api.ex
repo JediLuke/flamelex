@@ -52,7 +52,7 @@ defmodule Flamelex.API.Buffer do
 
 
   def load(:text, data, opts) when is_map(opts) do
-    Flamelex.OmegaMaster.action({:open_buffer,
+    Flamelex.FluxusRadix.action({:open_buffer,
       opts |> Map.merge(%{ type: :text, data: data })
     })
   end
@@ -79,8 +79,14 @@ defmodule Flamelex.API.Buffer do
   Buffer.modify(b, insertion_op)
   ```
   """
-  def modify(%Buf{} = buf, modification) do
-    ProcessRegistry.find!(buf) |> GenServer.call({:modify, modification})
+  def modify(:active_buffer, modification) do
+    PubSub.broadcast(topic: :active_buffer,
+                     msg: {:active_buffer, :modification, modification})
+  end
+  def modify(buf, modification) do
+    IO.puts "IHIHIH #{inspect buf}"
+    #TODO make this a try/catch?
+    ProcessRegistry.find!(buf) |> IO.inspect() |> GenServer.call({:modify, modification})
   end
 
 

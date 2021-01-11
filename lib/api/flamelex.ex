@@ -33,7 +33,7 @@ defmodule Flamelex do
   end
 
   def switch_mode(m) when m in @valid_modes do
-    GenServer.cast(Flamelex.OmegaMaster, {:action, {:switch_mode, m}})
+    GenServer.cast(Flamelex.FluxusRadix, {:action, {:switch_mode, m}})
   end
 
 

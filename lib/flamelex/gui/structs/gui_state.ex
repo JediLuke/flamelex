@@ -6,7 +6,7 @@ defmodule Flamelex.GUI.Structs.GUIState do
 
   Resist the temptation to put a mode here! I have tried it, and it is a
   bad idea. If you find yourself leaning that way, look to put the functionality
-  in the OmegaMaster instead. The GUI has no modes - only the application.
+  in the FluxusRadix instead. The GUI has no modes - only the application.
   GUI very simply module, with big warm fuzzy secret job - it just renders
   the GUI.
   """

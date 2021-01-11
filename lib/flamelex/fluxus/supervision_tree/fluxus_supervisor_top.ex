@@ -10,9 +10,9 @@ defmodule Flamelex.Fluxus.TopLevelSupervisor do
     IO.puts "#{__MODULE__} initializing..."
 
     children = [
-      {Task.Supervisor, name: Flamelex.Omega.Input2ActionLookup.TaskSupervisor},
-      {Task.Supervisor, name: Flamelex.Omega.HandleAction.TaskSupervisor},
-      Flamelex.OmegaMaster
+      {Task.Supervisor, name: Flamelex.Fluxus.Input2ActionLookup.TaskSupervisor},
+      {Task.Supervisor, name: Flamelex.Fluxus.HandleAction.TaskSupervisor},
+      Flamelex.FluxusRadix
     ]
 
     Supervisor.init(children, strategy: :one_for_all) #TODO make this :rest_for_one?
