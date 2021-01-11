@@ -219,9 +219,9 @@ def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when 
   #   |> Draw.border_box(frame)
   # end
 
-  # def draw(%Scenic.Graph{} = graph, %Frame{} = frame, %Flamelex.Structs.FluxState{} = flux_state) do
+  # def draw(%Scenic.Graph{} = graph, %Frame{} = frame, %Flamelex.Fluxus.Structs.RadixState{} = radix_state) do
   #   graph
-  #   |> draw_frame_footer(frame, flux_state)
+  #   |> draw_frame_footer(frame, radix_state)
   #   |> Draw.border_box(frame)
   # end
 
@@ -281,7 +281,7 @@ def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when 
   #   |> Scenic.Primitives.rect({w, h}, translate: {x, y}, fill: c)
   # end
 
-  # def draw_frame_footer(graph, frame, %Flamelex.Structs.FluxState{mode: :normal}) do
+  # def draw_frame_footer(graph, frame, %Flamelex.Fluxus.Structs.RadixState{mode: :normal}) do
   #   w = frame.dimensions.width + 1 #NOTE: Weird scenic thing, we need the +1 or we see a thin line to the right of the box
   #   h = Flamelex.GUI.Component.MenuBar.height()
   #   x = frame.top_left.x

@@ -1,6 +1,6 @@
 defmodule Flamelex.GUI.Controller do
   @moduledoc """
-  This process is in some ways the equal-opposite of OmegaMaster. That process
+  This process is in some ways the equal-opposite of BufferManager. That process
   holds all our buffers & manipulates them. This process holds the actual
   %RootScene{} and %Layout{}, as well as keeping track of open buffers etc.
   """
@@ -26,8 +26,8 @@ defmodule Flamelex.GUI.Controller do
     GenServer.cast(__MODULE__, {:show, x})
   end
 
-  def show(x, omega_state) do
-    GenServer.cast(__MODULE__, {:show, x, omega_state})
+  def show(x, radix_state) do
+    GenServer.cast(__MODULE__, {:show, x, radix_state})
   end
 
   def hide(x) do

@@ -52,7 +52,7 @@ defmodule Flamelex.API.Buffer do
 
 
   def load(:text, data, opts) when is_map(opts) do
-    Flamelex.FluxusRadix.action({:open_buffer,
+    Flamelex.FluxusRadix.handle_action({:open_buffer,
       opts |> Map.merge(%{ type: :text, data: data })
     })
   end

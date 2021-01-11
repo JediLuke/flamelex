@@ -8,11 +8,11 @@ defmodule Flamelex.GUI.RootScene do
   # This Scenic.Scene contains the root graph. Re-drawing anything which
   # is rendered at the root level, required updating the state of this
   # process.  It is also responsible # for capturing user-input (this is
-  # just how Scenic behaves), which then gets forwarded to OmegaMaster -
-  # since OmegaMaster holds the global state, and we need that to lookup
+  # just how Scenic behaves), which then gets forwarded to FluxusRadix -
+  # since FluxusRadix holds the global state, and we need that to lookup
   # what to do with this input, as illustrated below:
   #
-  #     %OmegaState{}  +  %Keystroke{}  ->   %Action{}
+  #     %RadixState{}  +  %Keystroke{}  ->   %Action{}
   #
 
   @doc """
@@ -37,7 +37,7 @@ defmodule Flamelex.GUI.RootScene do
 
   @impl Scenic.Scene
   def handle_input(input, _context, state) do
-    Flamelex.OmegaMaster.handle_user_input(input)
+    Flamelex.FluxusRadix.handle_user_input(input)
     {:noreply, state}
   end
 

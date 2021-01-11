@@ -8,14 +8,14 @@ defmodule Flamelex.API.CommandBuffer do
   Make the CommandBuffer visible, and put us in :command mode.
   """
   def show do
-    Flamelex.OmegaMaster.action({:show, :command_buffer})
+    Flamelex.FluxusRadix.handle_action({:show, :command_buffer})
   end
 
   @doc """
   Make the CommandBuffer not-visible, and put us in :normal mode.
   """
   def hide do
-    Flamelex.OmegaMaster.action({:hide, :command_buffer})
+    Flamelex.FluxusRadix.handle_action({:hide, :command_buffer})
   end
 
   @doc """

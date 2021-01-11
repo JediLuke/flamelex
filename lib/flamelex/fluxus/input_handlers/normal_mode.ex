@@ -2,37 +2,37 @@ defmodule Flamelex.GUI.InputHandler.NormalMode do
   @moduledoc false
   use Flamelex.ProjectAliases
   use Flamelex.GUI.ScenicEventsDefinitions
-  alias Flamelex.Structs.OmegaState
+  alias Flamelex.Fluxus.Structs.RadixState
 
 
-  def handle(%OmegaState{} = state, key_mapping, input) do
+  def handle(%RadixState{} = state, key_mapping, input) do
     case key_mapping.lookup(state, input) do
 
       :ignore_input ->
-          state |> OmegaState.add_to_history(input)
+          state |> RadixState.add_to_history(input)
 
       {:apply_mfa, {module, function, args}} ->
           Kernel.apply(module, function, args)
           |> IO.inspect
 
-          state |> OmegaState.add_to_history(input)
+          state |> RadixState.add_to_history(input)
     end
   end
 
 
 
 
-  # def handle_input(%Flamelex.Structs.OmegaState{mode: :normal, active_buffer: active_buf} = state, input) do
+  # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal, active_buffer: active_buf} = state, input) do
   #   Logger.debug "received some input whilst in :normal mode... #{inspect input}"
   #   # buf = Buffer.details(active_buf)
   #   case KeyMapping.lookup_action(state, input) do
   #     :ignore_input ->
   #         state
-  #         |> OmegaState.add_to_history(input)
+  #         |> RadixState.add_to_history(input)
   #     {:apply_mfa, {module, function, args}} ->
   #         Kernel.apply(module, function, args)
   #           |> IO.inspect
-  #         state |> OmegaState.add_to_history(input)
+  #         state |> RadixState.add_to_history(input)
   #   end
   # end
 
@@ -46,13 +46,13 @@ defmodule Flamelex.GUI.InputHandler.NormalMode do
 
 
 
-  # def handle_input(%Flamelex.Structs.OmegaState{mode: :normal} = state, @lowercase_h) do
+  # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal} = state, @lowercase_h) do
   #   Logger.info "Lowercase h was pressed !!"
   #   Flamelex.Buffer.load(type: :text, file: @readme)
   #   state
   # end
 
-  # def handle_input(%Flamelex.Structs.OmegaState{mode: :normal} = state, @lowercase_d) do
+  # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal} = state, @lowercase_d) do
   #   Logger.info "Lowercase d was pressed !!"
   #   Flamelex.Buffer.load(type: :text, file: @dev_tools)
   #   state

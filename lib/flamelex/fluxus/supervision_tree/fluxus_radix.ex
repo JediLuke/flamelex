@@ -12,7 +12,7 @@ defmodule Flamelex.FluxusRadix do
   We need a single junction-point where all the data required to make
   decisions can be combined & acted upon - this is it.
 
-  What belongs in the domain of FluxState? Anything which affects both
+  What belongs in the domain of RadixState? Anything which affects both
   buffers & GUI components. e.g. opening the Command buffer requires:
   * changing the input mode
   * checking the contents of `Flamelex.Buffer.Command`
@@ -31,7 +31,7 @@ defmodule Flamelex.FluxusRadix do
   occurs in a seperate process, running under the
   `Flamelex.Fluxus.HandleAction.TaskSupervisor`.
 
-  User input also gets funneled through this process - the FluxState (which
+  User input also gets funneled through this process - the RadixState (which
   includes the user-input history) and the input itself are handled by
   one of the InputHandler functions, which operate in basically the same
   manner as reducers - spun up into their own process & handled in there.
@@ -40,11 +40,11 @@ defmodule Flamelex.FluxusRadix do
   """
   use GenServer
   use Flamelex.ProjectAliases
-  alias Flamelex.Structs.FluxState
+  alias Flamelex.Fluxus.Structs.RadixState
 
 
   def start_link(_params) do
-    initial_state = FluxState.new()
+    initial_state = RadixState.new()
     GenServer.start_link(__MODULE__, initial_state)
   end
 
@@ -75,7 +75,7 @@ defmodule Flamelex.FluxusRadix do
   This function handles user input. All input from the entire GUI gets
   routed through here (it gets sent here by Flamelex.GUI.RootScene.handle_input/3)
 
-  We use the FluxState (which includes global variables such as which
+  We use the RadixState (which includes global variables such as which
   mode we are in, the input history [to allow chaining of keystrokes\] etc),
   as well as the input itself, to compute the new state.
 
@@ -97,24 +97,24 @@ defmodule Flamelex.FluxusRadix do
 
 
 
-  def init(%Flamelex.Structs.FluxState{} = flux_state) do
+  def init(%Flamelex.Fluxus.Structs.RadixState{} = radix_state) do
     IO.puts "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
-    {:ok, flux_state}
+    {:ok, radix_state}
   end
 
-  def handle_cast({:user_input, event}, flux_state) do
-    Flamelex.FluxusRadix.TransStatum.handle(flux_state, {:user_input, event})
-    {:noreply, flux_state}
+  def handle_cast({:user_input, event}, radix_state) do
+    Flamelex.Fluxus.TransStatum.handle(radix_state, {:user_input, event})
+    {:noreply, radix_state}
   end
 
-  def handle_cast({:action, a, _list?}, flux_state) do
-    case flux_state |> Flamelex.FluxusRadix.TransStatum.handle({:action, a}) do
-      {:ok, %FluxState{} = updated_flux_state} ->
-          {:noreply, updated_flux_state |> FluxState.record(action: a)}
+  def handle_cast({:action, a, _list?}, radix_state) do
+    case radix_state |> Flamelex.Fluxus.TransStatum.handle({:action, a}) do
+      {:ok, %RadixState{} = updated_radix_state} ->
+          {:noreply, updated_radix_state |> RadixState.record(action: a)}
       {:error, reason} ->
           IO.puts "error proc action #{inspect a}, #{inspect reason}"
-          {:noreply, flux_state}
+          {:noreply, radix_state}
     end
   end
 end

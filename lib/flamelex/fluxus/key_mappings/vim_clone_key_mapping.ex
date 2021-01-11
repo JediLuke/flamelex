@@ -1,7 +1,7 @@
 defmodule Flamelex.Utils.KeyMappings.VimClone do
   use Flamelex.ProjectAliases
   use Flamelex.GUI.ScenicEventsDefinitions
-  alias Flamelex.Structs.OmegaState
+  alias Flamelex.Fluxus.Structs.RadixState
 
 
   #TODO should be a behaviour...
@@ -15,7 +15,7 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
   @doc """
   This map defines the effect of pressing a key, to a function call.
   """
-  def keymap(%OmegaState{mode: :normal}) do
+  def keymap(%RadixState{mode: :normal}) do
     %{
       # normal mode navigation
       @lowercase_h => move_cursor(:left, 1),      ## TODO make this function inside the @behaviour module, so all keymaps can call it
@@ -45,17 +45,17 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
   ## contains the raw lookups
 
   @doc """
-  This function is called by OmegaMaster to handle any user input.
+  This function is called by FluxusRadix to handle any user input.
   """
-  def lookup(%OmegaState{mode: :normal} = omega_state, input) do
+  def lookup(%RadixState{mode: :normal} = radix_state, input) do
     if input == leader_key() do
       :ignore_input
     else
-      lookup_keystroke(omega_state, input)
+      lookup_keystroke(radix_state, input)
     end
   end
 
-  def lookup(%OmegaState{mode: :insert} = omega_state, input) when input in @valid_text_input_characters do
+  def lookup(%RadixState{mode: :insert} = radix_state, input) when input in @valid_text_input_characters do
     #TODO how do we know its cursor 1?
     {:apply_mfa, {
                     Flamelex.API.Buffer,
@@ -65,16 +65,16 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
     } #TODO generalize this to non-text buffers too
   end
 
-  def lookup(%OmegaState{mode: :insert}, @escape_key) do
+  def lookup(%RadixState{mode: :insert}, @escape_key) do
     {:action, {:active_buffer, :switch_mode, :normal}}
   end
 
-  def lookup_keystroke(%OmegaState{} = omega_state, input) do
+  def lookup_keystroke(%RadixState{} = radix_state, input) do
     lookup_result =
-      if omega_state |> OmegaState.last_keystroke() == leader_key() do
-        keymap(omega_state)[leader_key()][input]
+      if radix_state |> RadixState.last_keystroke() == leader_key() do
+        keymap(radix_state)[leader_key()][input]
       else
-        keymap(omega_state)[input]
+        keymap(radix_state)[input]
       end
 
     if lookup_result == nil do
@@ -94,21 +94,21 @@ end
 
 
 
-  # # def handle_input(%Flamelex.Structs.OmegaState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
+  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
   # #   Flamelex.API.CommandBuffer.deactivate()
-  # #   Flamelex.OmegaMaster.switch_mode(:normal)
-  # #   state |> OmegaState.set(mode: :normal)
+  # #   Flamelex.FluxusRadix.switch_mode(:normal)
+  # #   state |> RadixState.set(mode: :normal)
   # # end
 
-  # # def handle_input(%Flamelex.Structs.OmegaState{mode: :command} = state, input) when input in @valid_command_buffer_inputs do
+  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :command} = state, input) when input in @valid_command_buffer_inputs do
   # #   Flamelex.API.CommandBuffer.input(input)
   # #   state
   # # end
 
-  # # def handle_input(%Flamelex.Structs.OmegaState{mode: :command} = state, @enter_key) do
+  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :command} = state, @enter_key) do
   # #   Flamelex.API.CommandBuffer.execute()
   # #   Flamelex.API.CommandBuffer.deactivate()
-  # #   state |> OmegaState.set(mode: :normal)
+  # #   state |> RadixState.set(mode: :normal)
   # # end
 
 
@@ -116,26 +116,26 @@ end
   # # ## Normal mode
   # # ## -------------------------------------------------------------------
 
-  # # def handle_input(%Flamelex.Structs.OmegaState{mode: :normal, active_buffer: nil} = state, input) do
+  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal, active_buffer: nil} = state, input) do
   # #   Logger.debug "received some input whilst in :normal mode, but ignoring it because there's no active buffer... #{inspect input}"
-  # #   state |> OmegaState.add_to_history(input)
+  # #   state |> RadixState.add_to_history(input)
   # # end
 
-  # # def handle_input(%Flamelex.Structs.OmegaState{mode: :normal, active_buffer: active_buf} = state, input) do
+  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal, active_buffer: active_buf} = state, input) do
   # #   Logger.debug "received some input whilst in :normal mode... #{inspect input}"
   # #   # buf = Buffer.details(active_buf)
   # #   case KeyMapping.lookup_action(state, input) do
   # #     :ignore_input ->
   # #         state
-  # #         |> OmegaState.add_to_history(input)
+  # #         |> RadixState.add_to_history(input)
   # #     {:apply_mfa, {module, function, args}} ->
   # #         Kernel.apply(module, function, args)
   # #           |> IO.inspect
-  # #         state |> OmegaState.add_to_history(input)
+  # #         state |> RadixState.add_to_history(input)
   # #   end
   # # end
 
-  # # def handle_input(%Flamelex.Structs.OmegaState{mode: :insert} = state, @enter_key = input) do
+  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :insert} = state, @enter_key = input) do
   # #   cursor_pos =
   # #     {:gui_component, state.active_buffer}
   # #     |> ProcessRegistry.find!()
@@ -143,10 +143,10 @@ end
 
   # #   Buffer.modify(state.active_buffer, {:insert, "\n", cursor_pos})
 
-  # #   state |> OmegaState.add_to_history(input)
+  # #   state |> RadixState.add_to_history(input)
   # # end
 
-  # # def handle_input(%Flamelex.Structs.OmegaState{mode: :insert} = state, input) when input in @all_letters do
+  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :insert} = state, input) when input in @all_letters do
   # #   cursor_pos =
   # #     {:gui_component, state.active_buffer}
   # #     |> ProcessRegistry.find!()
@@ -157,24 +157,24 @@ end
 
   # #   Buffer.modify(state.active_buffer, {:insert, letter, cursor_pos})
 
-  # #   state |> OmegaState.add_to_history(input)
+  # #   state |> RadixState.add_to_history(input)
   # # end
 
-  # # def handle_input(%Flamelex.Structs.OmegaState{mode: :insert} = state, input) do
+  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :insert} = state, input) do
   # #   Logger.debug "received some input whilst in :insert mode"
-  # #   state |> OmegaState.add_to_history(input)
+  # #   state |> RadixState.add_to_history(input)
   # # end
 
 
 
 
-  # # def handle_input(%Flamelex.Structs.OmegaState{mode: :normal} = state, @lowercase_h) do
+  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal} = state, @lowercase_h) do
   # #   Logger.info "Lowercase h was pressed !!"
   # #   Flamelex.Buffer.load(type: :text, file: @readme)
   # #   state
   # # end
 
-  # # def handle_input(%Flamelex.Structs.OmegaState{mode: :normal} = state, @lowercase_d) do
+  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal} = state, @lowercase_d) do
   # #   Logger.info "Lowercase d was pressed !!"
   # #   Flamelex.Buffer.load(type: :text, file: @dev_tools)
   # #   state
@@ -188,7 +188,7 @@ end
   # # This function acts as a catch-all for all actions that don't match
   # # anything. Without this, the process which calls this can crash (!!)
   # # if no action matches what is passed in.
-  # # def handle_input(%Flamelex.Structs.OmegaState{} = state, input) do
+  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{} = state, input) do
   # #   Logger.warn "#{__MODULE__} recv'd unrecognised action/state combo. input: #{inspect input}, mode: #{inspect state.mode}"
   # #   state # ignore
   # #   |> IO.inspect(label: "-- DEBUG --")
@@ -218,7 +218,7 @@ end
   # defmodule Flamelex.GUI.Control.Input.KeyMapping do
   #   use Flamelex.ProjectAliases
   #   use Flamelex.GUI.ScenicEventsDefinitions
-  #   alias Flamelex.Structs.OmegaState
+  #   alias Flamelex.Fluxus.Structs.RadixState
 
 
   #   @active_keybinding :vim_inspired_flamelex
@@ -238,7 +238,7 @@ end
   #       @lowercase_l => move_cursor(buf, {:right, 1}),
 
   #       # switch modes
-  #       @lowercase_i => {:apply_mfa, {OmegaMaster, :switch_mode, [:insert]}},
+  #       @lowercase_i => {:apply_mfa, {FluxusRadix, :switch_mode, [:insert]}},
 
   #       # leader keys
   #       leader() => %{
@@ -249,31 +249,31 @@ end
 
 
   #   @doc """
-  #   This function is called by OmegaMaster to handle any user input.
+  #   This function is called by FluxusRadix to handle any user input.
   #   """
-  #   # def lookup(%OmegaState{input: %{history: [last_key | _rest]}} = omega_state, input) do
-  #   def lookup(%OmegaState{} = omega_state, input) do
+  #   # def lookup(%RadixState{input: %{history: [last_key | _rest]}} = radix_state, input) do
+  #   def lookup(%RadixState{} = radix_state, input) do
   #     # if last_key == leader() do
-  #     #   fetch_leader_mapping(omega_state, input)
+  #     #   fetch_leader_mapping(radix_state, input)
   #     # else
-  #       fetch_mapping(omega_state, input)
+  #       fetch_mapping(radix_state, input)
   #     # end
   #   end
 
 
-  #   defp fetch_leader_mapping(omega_state, input) do
-  #     if b = binding(@active_keybinding, omega_state)[leader()][input] != nil do
+  #   defp fetch_leader_mapping(radix_state, input) do
+  #     if b = binding(@active_keybinding, radix_state)[leader()][input] != nil do
   #       IO.inspect b, label: "BBBB"
-  #       binding(@active_keybinding, omega_state)[leader()][input]
+  #       binding(@active_keybinding, radix_state)[leader()][input]
   #     else
   #       :ignore_input
   #     end
   #   end
 
 
-  #   defp fetch_mapping(omega_state, input) do
-  #     if binding(@active_keybinding, omega_state)[input] != nil do
-  #       binding(@active_keybinding, omega_state)[input]
+  #   defp fetch_mapping(radix_state, input) do
+  #     if binding(@active_keybinding, radix_state)[input] != nil do
+  #       binding(@active_keybinding, radix_state)[input]
   #     else
   #       :ignore_input
   #     end
@@ -303,21 +303,21 @@ end
   #   # ## -------------------------------------------------------------------
 
 
-  #   # def handle_input(%Flamelex.Structs.OmegaState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
   #   #   Flamelex.API.CommandBuffer.deactivate()
-  #   #   Flamelex.OmegaMaster.switch_mode(:normal)
-  #   #   state |> OmegaState.set(mode: :normal)
+  #   #   Flamelex.FluxusRadix.switch_mode(:normal)
+  #   #   state |> RadixState.set(mode: :normal)
   #   # end
 
-  #   # def handle_input(%Flamelex.Structs.OmegaState{mode: :command} = state, input) when input in @valid_command_buffer_inputs do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :command} = state, input) when input in @valid_command_buffer_inputs do
   #   #   Flamelex.API.CommandBuffer.input(input)
   #   #   state
   #   # end
 
-  #   # def handle_input(%Flamelex.Structs.OmegaState{mode: :command} = state, @enter_key) do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :command} = state, @enter_key) do
   #   #   Flamelex.API.CommandBuffer.execute()
   #   #   Flamelex.API.CommandBuffer.deactivate()
-  #   #   state |> OmegaState.set(mode: :normal)
+  #   #   state |> RadixState.set(mode: :normal)
   #   # end
 
 
@@ -325,26 +325,26 @@ end
   #   # ## Normal mode
   #   # ## -------------------------------------------------------------------
 
-  #   # def handle_input(%Flamelex.Structs.OmegaState{mode: :normal, active_buffer: nil} = state, input) do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal, active_buffer: nil} = state, input) do
   #   #   Logger.debug "received some input whilst in :normal mode, but ignoring it because there's no active buffer... #{inspect input}"
-  #   #   state |> OmegaState.add_to_history(input)
+  #   #   state |> RadixState.add_to_history(input)
   #   # end
 
-  #   # def handle_input(%Flamelex.Structs.OmegaState{mode: :normal, active_buffer: active_buf} = state, input) do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal, active_buffer: active_buf} = state, input) do
   #   #   Logger.debug "received some input whilst in :normal mode... #{inspect input}"
   #   #   # buf = Buffer.details(active_buf)
   #   #   case KeyMapping.lookup_action(state, input) do
   #   #     :ignore_input ->
   #   #         state
-  #   #         |> OmegaState.add_to_history(input)
+  #   #         |> RadixState.add_to_history(input)
   #   #     {:apply_mfa, {module, function, args}} ->
   #   #         Kernel.apply(module, function, args)
   #   #           |> IO.inspect
-  #   #         state |> OmegaState.add_to_history(input)
+  #   #         state |> RadixState.add_to_history(input)
   #   #   end
   #   # end
 
-  #   # def handle_input(%Flamelex.Structs.OmegaState{mode: :insert} = state, @enter_key = input) do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :insert} = state, @enter_key = input) do
   #   #   cursor_pos =
   #   #     {:gui_component, state.active_buffer}
   #   #     |> ProcessRegistry.find!()
@@ -352,10 +352,10 @@ end
 
   #   #   Buffer.modify(state.active_buffer, {:insert, "\n", cursor_pos})
 
-  #   #   state |> OmegaState.add_to_history(input)
+  #   #   state |> RadixState.add_to_history(input)
   #   # end
 
-  #   # def handle_input(%Flamelex.Structs.OmegaState{mode: :insert} = state, input) when input in @all_letters do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :insert} = state, input) when input in @all_letters do
   #   #   cursor_pos =
   #   #     {:gui_component, state.active_buffer}
   #   #     |> ProcessRegistry.find!()
@@ -366,24 +366,24 @@ end
 
   #   #   Buffer.modify(state.active_buffer, {:insert, letter, cursor_pos})
 
-  #   #   state |> OmegaState.add_to_history(input)
+  #   #   state |> RadixState.add_to_history(input)
   #   # end
 
-  #   # def handle_input(%Flamelex.Structs.OmegaState{mode: :insert} = state, input) do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :insert} = state, input) do
   #   #   Logger.debug "received some input whilst in :insert mode"
-  #   #   state |> OmegaState.add_to_history(input)
+  #   #   state |> RadixState.add_to_history(input)
   #   # end
 
 
 
 
-  #   # def handle_input(%Flamelex.Structs.OmegaState{mode: :normal} = state, @lowercase_h) do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal} = state, @lowercase_h) do
   #   #   Logger.info "Lowercase h was pressed !!"
   #   #   Flamelex.Buffer.load(type: :text, file: @readme)
   #   #   state
   #   # end
 
-  #   # def handle_input(%Flamelex.Structs.OmegaState{mode: :normal} = state, @lowercase_d) do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal} = state, @lowercase_d) do
   #   #   Logger.info "Lowercase d was pressed !!"
   #   #   Flamelex.Buffer.load(type: :text, file: @dev_tools)
   #   #   state
@@ -397,7 +397,7 @@ end
   #   # This function acts as a catch-all for all actions that don't match
   #   # anything. Without this, the process which calls this can crash (!!)
   #   # if no action matches what is passed in.
-  #   # def handle_input(%Flamelex.Structs.OmegaState{} = state, input) do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{} = state, input) do
   #   #   Logger.warn "#{__MODULE__} recv'd unrecognised action/state combo. input: #{inspect input}, mode: #{inspect state.mode}"
   #   #   state # ignore
   #   #   |> IO.inspect(label: "-- DEBUG --")

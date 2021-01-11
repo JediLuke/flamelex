@@ -1,4 +1,4 @@
-defmodule Flamelex.Structs.OmegaState do
+defmodule Flamelex.Fluxus.Structs.RadixState do
   @moduledoc false
   use Flamelex.ProjectAliases
 
@@ -10,7 +10,7 @@ defmodule Flamelex.Structs.OmegaState do
   defstruct [
     mode:                 :normal,    # The input mode
     keystroke_history:    [],         # A list of all previously entered user-input keystrokes
-    action_history:       []          # A history of actions sent to OmegaMaster
+    action_history:       []          # A history of actions sent to FluxusRadix
 
     # active_buffer:  nil         # We need to know the active buffer
   ]
@@ -20,24 +20,24 @@ defmodule Flamelex.Structs.OmegaState do
   end
 
   @modes [:normal, :insert, :command]
-  def set(%__MODULE__{} = omega, [mode: m]) when m in @modes do
-    %{omega|mode: m}
+  def set(%__MODULE__{} = radix_state, [mode: m]) when m in @modes do
+    %{radix_state|mode: m}
   end
 
-  def record(%__MODULE__{keystroke_history: keystroke_history} = omega, keystroke: k) do
+  def record(%__MODULE__{keystroke_history: keystroke_history} = radix_state, keystroke: k) do
     new_keystroke_history =
         keystroke_history
         |> add_to_list(k, max_length: @max_keystroke_history_limit)
 
-    %{omega|keystroke_history: new_keystroke_history}
+    %{radix_state|keystroke_history: new_keystroke_history}
   end
 
-  def record(%__MODULE__{action_history: action_history} = omega, action: a) do
+  def record(%__MODULE__{action_history: action_history} = radix_state, action: a) do
     new_action_history =
         action_history
         |> add_to_list(a, max_length: @max_action_history_limit)
 
-    %{omega|action_history: new_action_history}
+    %{radix_state|action_history: new_action_history}
   end
 
   # def last_keystroke_was?(%__MODULE__{keystroke_history: [last|_rest]}, x)

@@ -1,38 +1,38 @@
 defmodule Flamelex.Fluxus.TransStatum do #TODO change to EventHandler
   use Flamelex.ProjectAliases
-  alias Flamelex.Structs.OmegaState
+  alias Flamelex.Fluxus.Structs.RadixState
   alias Flamelex.Fluxus.TransStatum.ActionHandler
 
 
 
-  def handle(flux_state, {:user_input, event}) do
-    spawn_async_handler_process(flux_state, {:user_input, event})
+  def handle(radix_state, {:user_input, event}) do
+    spawn_async_handler_process(radix_state, {:user_input, event})
     :ok #NOTE: no awaiting a callback from handling user input
   end
 
-  def handle(flux_state, {:action, a}) do
-    spawn_async_handler_process(flux_state, {:action, a})
+  def handle(radix_state, {:action, a}) do
+    spawn_async_handler_process(radix_state, {:action, a})
     await_callback()
   end
 
 
   #NOTE: this function is defined here, but it is run in it's own process
-  def handle_action_async(%OmegaState{} = flux_state, action) do
-    case ActionHandler.reduce(flux_state, action) do
-      :no_updates_to_flux_state ->
-          Flamelex.OmegaMaster
-          |> Kernel.send({:ok, :no_updates_to_flux_state})
-      %OmegaState{} = new_flux_state ->
-          Flamelex.OmegaMaster
-          |> Kernel.send({:action_callback, {:ok, new_flux_state}})
+  def handle_action_async(%RadixState{} = radix_state, action) do
+    case ActionHandler.reduce(radix_state, action) do
+      :no_updates_to_radix_state ->
+          Flamelex.FluxusRadix
+          |> Kernel.send({:ok, :no_updates_to_radix_state})
+      %RadixState{} = new_radix_state ->
+          Flamelex.FluxusRadix
+          |> Kernel.send({:action_callback, {:ok, new_radix_state}})
     end
   end
 
   #NOTE: this function is defined here, but it is run in it's own process
-  def lookup_input_async(%OmegaState{} = flux_state, event) do
+  def lookup_input_async(%RadixState{} = radix_state, event) do
     IO.puts "#{__MODULE__} processing input... #{inspect event}"
 
-    #TODO key_mapping should be? a property of OmegaState?
+    #TODO key_mapping should be? a property of RadixState?
     #NOTE: `key_mapping` is  module, which (eventually) will be a `KeyMapping`
     #      behaviour - this infrastructure is in place, but until I get more
     #      than 1 key-mapping even made, I'm just gonna hard-code the
@@ -42,13 +42,13 @@ defmodule Flamelex.Fluxus.TransStatum do #TODO change to EventHandler
 
     ##TODO get the active buffer & pass it in??
 
-    case key_mapping.lookup(flux_state, event) do
+    case key_mapping.lookup(radix_state, event) do
       :ignore_input ->
           IO.puts "ignoring input..."
           :ok
       {:action, a} ->
           IO.puts "action!! #{inspect a}"
-          Flamelex.OmegaMaster.action(a) # dispatch the action by casting a msg back to OmegaMaster
+          Flamelex.FluxusRadix.handle_action(a) # dispatch the action by casting a msg back to FluxusRadix
       invalid_response ->
           IO.puts "\n\nthe input: #{inspect event} did not return a valid response: #{inspect invalid_response}"
           :error
@@ -75,20 +75,20 @@ defmodule Flamelex.Fluxus.TransStatum do #TODO change to EventHandler
   # private functions
 
 
-  defp spawn_async_handler_process(flux_state, {:action, action}) do
+  defp spawn_async_handler_process(radix_state, {:action, action}) do
     Task.Supervisor.start_child(
-      Flamelex.Omega.HandleAction.TaskSupervisor,
+      Flamelex.Fluxus.HandleAction.TaskSupervisor,
           __MODULE__,             # module
           :handle_action_async,   # function
-          [flux_state, action])   # args
+          [radix_state, action])   # args
   end
 
-  defp spawn_async_handler_process(flux_state, {:user_input, event}) do
+  defp spawn_async_handler_process(radix_state, {:user_input, event}) do
     Task.Supervisor.start_child(
-      Flamelex.Omega.Input2ActionLookup.TaskSupervisor,
+      Flamelex.Fluxus.Input2ActionLookup.TaskSupervisor,
           __MODULE__,             # module
           :lookup_input_async,    # function
-          [flux_state, event])    # args
+          [radix_state, event])    # args
   end
 
   @action_callback_timeout 12

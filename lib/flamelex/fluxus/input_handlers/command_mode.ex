@@ -2,33 +2,33 @@ defmodule Flamelex.GUI.InputHandler.CommandMode do
   @moduledoc false
   use Flamelex.ProjectAliases
   use Flamelex.GUI.ScenicEventsDefinitions
-  alias Flamelex.Structs.OmegaState
+  alias Flamelex.Fluxus.Structs.RadixState
 
-  def handle(%OmegaState{} = state, input) when input in @valid_command_buffer_inputs do
+  def handle(%RadixState{} = state, input) when input in @valid_command_buffer_inputs do
     Flamelex.API.CommandBuffer.input(input)
     state
   end
 
-  def handle(%OmegaState{} = state, @enter_key) do
+  def handle(%RadixState{} = state, @enter_key) do
     Flamelex.API.CommandBuffer.execute()
     Flamelex.API.CommandBuffer.deactivate()
-    state |> OmegaState.set(mode: :normal)
+    state |> RadixState.set(mode: :normal)
   end
 
 
 
   # This function acts as a catch-all for all actions that don't match
   # anything. Without this, the process which calls this can crash (!!)
-  def handle(%OmegaState{} = state, _input) do
+  def handle(%RadixState{} = state, _input) do
     state
     # |> IO.inspect(label: "-- DEBUG --")
   end
 
 
-  # def handle_input(%OmegaState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
+  # def handle_input(%RadixState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
   #   Flamelex.API.CommandBuffer.deactivate()
-  #   Flamelex.OmegaMaster.switch_mode(:normal)
-  #   state |> OmegaState.set(mode: :normal)
+  #   Flamelex.FluxusRadix.switch_mode(:normal)
+  #   state |> RadixState.set(mode: :normal)
   # end
 
 
