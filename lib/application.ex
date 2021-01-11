@@ -32,7 +32,7 @@ defmodule Flamelex.Application do
 
   defp boot_regular_applications do
     [
-      Flamelex.Omega.TopLevelSupervisor,
+      Flamelex.Fluxus.TopLevelSupervisor,
       Flamelex.Buffer.TopLevelSupervisor,
       # Flamelex.Agent.TopLevelSupervisor, #TODO this is just commented out to stop spamming the log with reminders atm
     ]

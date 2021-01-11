@@ -28,7 +28,7 @@ defmodule Flamelex.GUI.RootScene do
   def init(_params, _opts) do
 
     Process.register(self(), __MODULE__)
-    Flamelex.GUI.ScenicInitializationHelper.load_custom_fonts_into_global_cache()
+    Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
 
     #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
     #      the scene, so we just need to initialize it with *something*
@@ -36,13 +36,9 @@ defmodule Flamelex.GUI.RootScene do
   end
 
   @impl Scenic.Scene
-  def handle_input({:codepoint, _c} = codepoint, _context, state) do
-    Flamelex.OmegaMaster.handle_user_input(codepoint)
+  def handle_input(input, _context, state) do
+    Flamelex.OmegaMaster.handle_user_input(input)
     {:noreply, state}
-  end
-
-  def handle_input(_input, _context, state) do
-    {:noreply, state} # ignore the input, as it hasn't matched any pattern above
   end
 
   @impl Scenic.Scene

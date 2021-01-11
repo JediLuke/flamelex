@@ -23,6 +23,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
     frame |> inactive_menubar()
   end
 
+  #TODO all of this is hacks... we need to move rego_tag into the behaviour, and this needs to be a behaviour
   def rego_tag(%{ref: %Buf{ref: ref}}) do
     rego_tag(ref)
   end

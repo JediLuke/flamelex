@@ -20,6 +20,6 @@ defmodule Flamelex.GUI.TopLevelSupervisor do
 
 
   defp default_viewport_config do
-    Flamelex.GUI.ScenicInitializationHelper.viewport_config()
+    Flamelex.GUI.ScenicInitialize.viewport_config()
   end
 end

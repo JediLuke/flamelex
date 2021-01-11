@@ -12,7 +12,7 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
   """
   def leader_key, do: @space_bar
 
-    @doc """
+  @doc """
   This map defines the effect of pressing a key, to a function call.
   """
   def keymap(%OmegaState{mode: :normal}) do
@@ -26,6 +26,8 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
       # switch modes
       # @lowercase_i => {:apply_mfa, {Flamelex, :switch_mode, [:insert]}},
       @lowercase_i => {:action, {:active_buffer, :switch_mode, :insert}},
+
+      @uppercase_G => {:action, {:active_buffer, :move_cursor, {:last_line, :same_column}}}, #TODO when actibve buf is text?? How do we handle this???
 
       # leader keys
       leader_key() => %{
@@ -53,18 +55,18 @@ defmodule Flamelex.Utils.KeyMappings.VimClone do
     end
   end
 
-  def lookup(%OmegaState{mode: :insert} = omega_state, input) do
-    if input in @valid_text_input_characters do
-      #TODO how do we know its cursor 1?
-      {:apply_mfa, {
-                      Flamelex.API.Buffer,
-                      :modify,
-                      [:active_buffer, {:insert, input, {:cursor, 1}}]
-                   }
-      } #TODO generalize this to non-text buffers too
-    else
-      :ignore_input
-    end
+  def lookup(%OmegaState{mode: :insert} = omega_state, input) when input in @valid_text_input_characters do
+    #TODO how do we know its cursor 1?
+    {:apply_mfa, {
+                    Flamelex.API.Buffer,
+                    :modify,
+                    [:active_buffer, {:insert, input, {:cursor, 1}}]
+                  }
+    } #TODO generalize this to non-text buffers too
+  end
+
+  def lookup(%OmegaState{mode: :insert}, @escape_key) do
+    {:action, {:active_buffer, :switch_mode, :normal}}
   end
 
   def lookup_keystroke(%OmegaState{} = omega_state, input) do

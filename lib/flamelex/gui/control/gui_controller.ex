@@ -280,11 +280,11 @@ defmodule Flamelex.GUI.Controller do
   end
 
 
-  @impl true
-  def handle_info({:active_buffer, :switch_mode, _mode}, state) do
-    IO.puts "GUI controller ignoring switch mode cmd, since that will propagate via buffers themselves"
-    {:noreply, state}
-  end
+  # @impl true
+  # def handle_info({:active_buffer, :SWITCH_mode, _mode}, state) do
+  #   IO.puts "GUI controller ignoring switch mode cmd, since that will propagate via buffers themselves"
+  #   {:noreply, state}
+  # end
 
 
   def handle_info(all_info, state) do

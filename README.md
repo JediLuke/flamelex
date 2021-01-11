@@ -148,6 +148,22 @@ Some of my main goals are:
 * REPL driven for absolute programmability
 * modal-editing, but with inputs completely de-coupled from functionality
 
+## The flamelex architecture
+
+### Handling user input
+
+User input gets picked up by the underlying Scenic drivers, and Scenic
+then sends that input as a message to the root scene, which in flamelex
+(by convention) is `Flamelex.GUI.RootScene` - see the handle_input/3 fn.
+
+
+Flamelex.GUI.RootScene (root_scene.ex)
+-> Flamelex.FluxusRadix (fluxus_radix.ex)
+
+  and then, depending on the type of input:
+
+  -> Flamelex.Fluxus.TransStatum.UserInputReducer (user_input_reducer.ex)
+
 ### The `franklin_dev` branch
 
 #TODO Explain about Franklin
