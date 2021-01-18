@@ -35,9 +35,24 @@ defmodule Flamelex.GUI.RootScene do
     {:ok, push: Draw.blank_graph()}
   end
 
+  # Scenic sends us lots of keypresses etc... easiest to just filter them
+  # out right where they're detected, otherwise they clog up things like
+  # keystroke history etc...
+  @ignorable_input_events [
+    :viewport_enter,
+    :viewport_exit,
+    :key # we use `:codepoint` to recognise when characters have been inputted...
+  ]
+
   @impl Scenic.Scene
+  def handle_input({event, _details}, _context, state)
+    when event in @ignorable_input_events do
+      # ignore...
+      {:noreply, state}
+  end
+
   def handle_input(input, _context, state) do
-    Flamelex.FluxusRadix.handle_user_input(input)
+    Flamelex.Fluxus.handle_user_input(input)
     {:noreply, state}
   end
 

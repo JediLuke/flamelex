@@ -114,7 +114,7 @@ defmodule Flamelex.GUI.ScenicEventsDefinitions do
       @left_brace {:codepoint, {"{", 1}}
       @right_brace {:codepoint, {"}", 1}}
 
-      @all_punctuation [@perion, @bang, @question_mark, @colon, @comma,
+      @all_punctuation [@period, @bang, @question_mark, @colon, @comma,
         @quote_character, @percent_sign, @left_parenthesis, @right_parenthesis,
         @left_brace, @right_brace]
 
