@@ -19,7 +19,7 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
     %__MODULE__{ mode: :normal }
   end
 
-  @modes [:normal, :insert, :command]
+  @modes [:normal, :insert, {:command_buffer_active, :insert}]
   def set(%__MODULE__{} = radix_state, [mode: m]) when m in @modes do
     %{radix_state|mode: m}
   end

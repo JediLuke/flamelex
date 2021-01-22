@@ -1,4 +1,10 @@
 defmodule Flamelex.Fluxus.Actions.Basic do
+  @moduledoc """
+  This module provides some basic functions which return tuples, representing
+  actions inside flamelex.
+
+  By default, it assumed you want to apply the action to the active buffer.
+  """
 
   def switch_mode(m)  when is_atom(m) do
     {:action, {:active_buffer, :switch_mode, m}}

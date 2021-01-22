@@ -11,14 +11,14 @@ defmodule Flamelex.Fluxus.UserInputHandler do
     Task.Supervisor.start_child(
       Flamelex.Fluxus.Input2ActionLookup.TaskSupervisor,
           __MODULE__,                       # module
-          :fire_actions_for_input_async,    # function
+          :lookup_action_for_input_async,   # function
           [radix_state, ii]                 # args
     )
   end
 
 
   #NOTE: this function is defined here, but it is run in it's own process...
-  def fire_actions_for_input_async(%RadixState{} = radix_state, user_input) do
+  def lookup_action_for_input_async(%RadixState{} = radix_state, user_input) do
 
     # IO.puts "#{__MODULE__} processing input... #{inspect event}"
 

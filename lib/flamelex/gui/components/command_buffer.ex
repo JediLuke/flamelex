@@ -37,9 +37,10 @@ defmodule Flamelex.GUI.Component.CommandBuffer do
   end
 
   def show do
-    IO.puts "COMPONENT SHOW???"
     #TODO this should be checking if the process exists (& will be, when we wrap it all up into component behaviour)
-    GenServer.cast(__MODULE__, :show)
+    {:gui_component, :command_buffer}
+    |> ProcessRegistry.find!()
+    |> GenServer.cast(:show)
   end
 
   def hide do

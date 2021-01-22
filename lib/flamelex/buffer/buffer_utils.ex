@@ -68,7 +68,7 @@ defmodule Flamelex.Buffer.BufUtils do
       @file_open_timeout ->
         IO.puts "Didn't get a msg back from the recently opened buffer" #TODO make it red
         Process.exit(pid, :kill)
-        {:error, "Timed out waiting for the Buffer to open a file."}
+        {:error, "timed out waiting for the Buffer to open a file."}
     end
   end
 

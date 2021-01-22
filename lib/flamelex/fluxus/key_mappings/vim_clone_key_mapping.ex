@@ -53,7 +53,7 @@ https://hea-www.harvard.edu/~fine/Tech/vi.html
       # @uppercase_D => delete(to: :end_of_line)
       @uppercase_E => move_cursor(to: :end_of_current_word),
       # @uppercase_F => find_character(:current_line, :after_cursor, {:direction, :reverse})
-      # @uppercase_G => goto_line() # how to explain this... either use a pre-cursor, or go to end (just go to end by defualt???)
+      @uppercase_G => move_cursor(to: :last_line), #TODO implement proper vim handling, how to get it to accept pre-G alpha numeric... how to explain this... either use a pre-cursor, or go to end (just go to end by defualt???)
       # @uppercase_G => {:action, {:active_buffer, :move_cursor, {:last_line, :same_column}}}, #TODO when actibve buf is text?? How do we handle this???
       # @uppercase_H => goto_line(1) # home cursor
       # @uppercase_I => move_cursor(to: :first_non_whitespace_character, :current_line, :backwards), switch_mode(:insert)
