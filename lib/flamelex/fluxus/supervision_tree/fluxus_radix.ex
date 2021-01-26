@@ -51,7 +51,7 @@ defmodule Flamelex.FluxusRadix do
   end
 
 
-  def init(%Flamelex.Fluxus.Structs.RadixState{} = radix_state) do
+  def init(%RadixState{} = radix_state) do
     IO.puts "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
     {:ok, radix_state}
@@ -65,12 +65,22 @@ defmodule Flamelex.FluxusRadix do
 
 
   def handle_cast({:action, a}, radix_state) do
-    case radix_state |> Flamelex.Fluxus.RootReducer.handle({:action, a}) do
-      {:ok, %RadixState{} = updated_radix_state} ->
-          {:noreply, updated_radix_state |> RadixState.record(action: a)}
-      {:error, reason} ->
-          IO.puts "error handling action: #{inspect a}, #{inspect reason}"
-          {:noreply, radix_state}
-    end
+    Flamelex.Fluxus.RootReducer.handle(radix_state, {:action, a})
+    {:noreply, radix_state |> RadixState.record(action: a)}
+
+    # #TODO maybe we dont even wait for a callback???
+    # case radix_state |> Flamelex.Fluxus.RootReducer.handle({:action, a}) do
+    #   {:ok, %RadixState{} = updated_radix_state} ->
+    #       {:noreply, updated_radix_state |> RadixState.record(action: a)}
+    #   {:error, reason} ->
+    #       IO.puts "error handling action: #{inspect a}, #{inspect reason}"
+    #       {:noreply, radix_state}
+    # end
+  end
+
+
+  #TODO we just need to make sure we have a way, of checking the order? of callbacks? of timing em out?? something
+  def handle_cast({:reducer_callback, %RadixState{} = new_radix_state}, _old_radix_state) do
+    {:noreply, new_radix_state}
   end
 end

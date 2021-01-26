@@ -150,19 +150,40 @@ Some of my main goals are:
 
 ## The flamelex architecture
 
+flamelex used the `flux` architecture - we hold a store of state, and
+use reducer functions, combined with actions/input (and they are capable
+of generating side-effects, such as firing of other actions), to generate
+the updated state - which is then rendered.
+
+### Flamelex.Fluxus
+
+
+
 ### Handling user input
 
 User input gets picked up by the underlying Scenic drivers, and Scenic
-then sends that input as a message to the root scene, which in flamelex
-(by convention) is `Flamelex.GUI.RootScene` - see the handle_input/3 fn.
+then sends that input as a message to the process which is rendering
+the root scene - see `Flamelex.GUI.RootScene`.
 
+Inside `Flamelex.GUI.RootScene` there is a function, `handle_input/3` -
+this is where user-input is presented to us by Scenic. That's just how
+Scenic works, keypresses show up here first. But we don't want to hold
+our application state inside Scenic really, since we want to keep drawing
+the GUI decoupled from the actual business-logic of editing text. So we
+just immediately forward this user input to the Fluxus part of the app,
+by calling `Flamelex.Fluxus.handle_user_input(input)`
 
-Flamelex.GUI.RootScene (root_scene.ex)
--> Flamelex.FluxusRadix (fluxus_radix.ex)
-
-  and then, depending on the type of input:
-
-  -> Flamelex.Fluxus.TransStatum.UserInputReducer (user_input_reducer.ex)
+when a user presses a key...
+-> `Flamelex.GUI.RootScene.handle_input/3` (root_scene.ex)
+  -> `Flamelex.Fluxus.handle_user_input/1` (fluxus.ex)
+    -> `Flamelex.FluxusRadix` receives `{:user_input, ii}` via `Genserver.cast` (fluxus_radix.ex)
+      -> calls `Flamelex.Fluxus.UserInputHandler.handle/2` (user_input_handler.ex)
+        -> spins up a new `Task` process, executing
+          `lookup_action_for_input_async/2` under `Input2ActionLookup.TaskSupervisor`
+          -> that function will look in the key-mapping module, e.g.
+             `Flamelex.API.KeyMappings.VimClone` if this lookup fails/crashes,
+             no problem really. If a lookup is successful, then maybe
+             actions get fired, functions get called... whatever.
 
 ### The `franklin_dev` branch
 

@@ -21,38 +21,38 @@ defmodule Flamelex.Buffer.BufUtils do
   #   end
   # end
 
-    # we accept just raw_data and a ref as a valid text buffer - we don't discriminate!!
-    # def open_buffer(%{type: :text, ref: _r, raw_data: _d} = params) do
-    #   DynamicSupervisor.start_child(
-    #                       Flamelex.Buffer.Supervisor,
-    #                       {Flamelex.Buffer.Text, params})
-    # end
+  # we accept just raw_data and a ref as a valid text buffer - we don't discriminate!!
+  # def open_buffer(%{type: :text, ref: _r, raw_data: _d} = params) do
+  #   DynamicSupervisor.start_child(
+  #                       Flamelex.Buffer.Supervisor,
+  #                       {Flamelex.Buffer.Text, params})
+  # end
 
-    @file_open_timeout 3_000
-    def open_buffer(%{type: :text, from_file: filepath} = params) do
-      # opening from a text file has a bit of a handshake/callback thing going on...
+  @file_open_timeout 3_000
+  def open_buffer(%{type: Flamelex.Buffer.Text, from_file: filepath} = params) do
+    # opening from a text file has a bit of a handshake/callback thing going on...
 
-      params =
-        params |> Map.merge(%{
-                        ref: {:file, filepath},       # this is how we construct a Buffer ref for a file on disk
-                        after_boot_callback: self()   # add the callback, since we're going to read from disk...
-                      })
+    params =
+      params |> Map.merge(%{
+                      ref: {:file, filepath},       # this is how we construct a Buffer ref for a file on disk
+                      after_boot_callback: self()   # add the callback, since we're going to read from disk...
+                    })
 
-      start_process_attempt =
-        DynamicSupervisor.start_child(
-                            Flamelex.Buffer.Supervisor,
-                            {Flamelex.Buffer.Text, params})
+    start_process_attempt =
+      DynamicSupervisor.start_child(
+                          Flamelex.Buffer.Supervisor,
+                          {Flamelex.Buffer.Text, params})
 
-      case start_process_attempt do
-        {:ok, pid} ->
-            wait_for_callback(pid, filepath)
-        {:error, reason} ->
-            {:error, reason}
-        # {:error, {:function_clause, _details_list} = reason} ->
-        #     IO.puts "FUNCTION CLAUSE ERROR"
-        #     {:error, reason}
-      end
+    case start_process_attempt do
+      {:ok, pid} ->
+          wait_for_callback(pid, filepath)
+      {:error, reason} ->
+          {:error, reason}
+      # {:error, {:function_clause, _details_list} = reason} ->
+      #     IO.puts "FUNCTION CLAUSE ERROR"
+      #     {:error, reason}
     end
+  end
 
 
 

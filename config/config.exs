@@ -6,7 +6,7 @@ config :elixir,
 
 
 config :flamelex,
-  :key_mapping, Flamelex.Utils.KeyMappings.VimClone
+  :key_mapping, Flamelex.API.KeyMappings.VimClone
 
 
 # Import environment specific config. This must remain at the bottom

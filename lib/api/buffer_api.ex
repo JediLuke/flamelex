@@ -8,7 +8,6 @@ defmodule Flamelex.API.Buffer do
   alias Flamelex.Structs.Buf #NOTE: this is a little confusing, but unavoidable - that we have a %Buf{} struct, and `Buffer` module...
 
 
-
   @doc """
   List all the open buffers.
   """
@@ -18,7 +17,9 @@ defmodule Flamelex.API.Buffer do
   @doc """
   Searches the open buffers and returns a single %Buf{}, or raises.
   """
+  #TODO put a bang if it raises - it should just return nil if it cant find it
   def find(search_term), do: GenServer.call(BufferManager, {:find_buffer, search_term})
+
 
   @doc """
   Load some data into a new buffer. By default, we open a TextBuffer to
@@ -29,33 +30,28 @@ defmodule Flamelex.API.Buffer do
   iex> Buffer.load("README.md")
   {:ok, %Buf{} = _bufr_ref}
   """
+
+
   def open!, do: open! "/Users/luke/workbench/elixir/flamelex/README.md"
 
-  def open!(filepath, params \\ %{}) do
-    IO.puts "Loading new text buffer for file: #{inspect filepath}..."
-
-    case GenServer.call(BufferManager, {:open_buffer, %{
-           type: :text,
-           label: "journal - today",
-           from_file: filepath,
-           open_in_gui?: true,
-    } |> Map.merge(params)}) do
-         {:ok, %Buf{} = buf} ->
-            buf
-         {:error, {:already_started, _pid}} ->
-            raise "Here we should just link to the alrdy open pid"
-         {:error, reason} ->
-            raise "dunno lol - #{inspect reason}"
-    end
+  def open!(filepath, opts \\ %{}) do
+    # opts2 = %{
+    #   type: :text,
+    #   label: "journal - today",
+    #   from_file: filepath,
+    #   open_in_gui?: true,
+    # }
+    Flamelex.Buffer.open!(filepath, opts)
   end
 
 
 
-  def load(:text, data, opts) when is_map(opts) do
-    Flamelex.FluxusRadix.handle_action({:open_buffer,
-      opts |> Map.merge(%{ type: :text, data: data })
-    })
-  end
+
+  # def load(:text, data, opts) when is_map(opts) do
+  #   Flamelex.FluxusRadix.handle_action({:open_buffer,
+  #     opts |> Map.merge(%{ type: :text, data: data })
+  #   })
+  # end
 
 
 
@@ -79,15 +75,15 @@ defmodule Flamelex.API.Buffer do
   Buffer.modify(b, insertion_op)
   ```
   """
-  def modify(:active_buffer, modification) do
-    PubSub.broadcast(topic: :active_buffer,
-                     msg: {:active_buffer, :modification, modification})
-  end
-  def modify(buf, modification) do
-    IO.puts "IHIHIH #{inspect buf}"
-    #TODO make this a try/catch?
-    ProcessRegistry.find!(buf) |> IO.inspect() |> GenServer.call({:modify, modification})
-  end
+  # def modify(:active_buffer, modification) do
+  #   PubSub.broadcast(topic: :active_buffer,
+  #                    msg: {:active_buffer, :modification, modification})
+  # end
+  # def modify(buf, modification) do
+  #   IO.puts "IHIHIH #{inspect buf}"
+  #   #TODO make this a try/catch?
+  #   ProcessRegistry.find!(buf) |> IO.inspect() |> GenServer.call({:modify, modification})
+  # end
 
 
 

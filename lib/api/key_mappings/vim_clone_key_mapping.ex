@@ -1,11 +1,12 @@
-defmodule Flamelex.Utils.KeyMappings.VimClone do #TODO remove utils from module name
-@moduledoc """
-Implements the Vim keybindings for editing text inside flamelex.
+defmodule Flamelex.API.KeyMappings.VimClone do
+  @moduledoc """
+  Implements the Vim keybindings for editing text inside flamelex.
 
-https://hea-www.harvard.edu/~fine/Tech/vi.html
-"""
+  https://hea-www.harvard.edu/~fine/Tech/vi.html
+  """
   use Flamelex.Fluxux.KeyMappingBehaviour
-
+  alias Flamelex.Fluxus.Actions.CoreActions
+  alias Flamelex.Structs.Buf
 
   @doc ~s(Define the leader key here.)
   def leader, do: @space_bar
@@ -14,22 +15,22 @@ https://hea-www.harvard.edu/~fine/Tech/vi.html
   ##TODO - go ahead & map all the actions I want, in here - then, action reducer needs to be able to handle them !!
 
   @doc ~s(This function maps defines the act of pressing a key, to an action.)
-  def keymap(%RadixState{mode: :normal}) do
+  def keymap(%RadixState{mode: :normal, active_buffer: %Buf{type: Flamelex.Buffer.Text} = active_buf}) do
     %{
       # enter_insert_mode_after_current_character
-      # @lowercase_a => [:active_buffer |> move_cursor(:forward, 1, :character),
+      # @lowercase_a => [:active_buffer |> CoreActions.move_cursor(:forward, 1, :character),
       #                  :active_buffer |> switch_mode(:insert)],
-      @lowercase_b => move_cursor(:back, 1, :word),
+      @lowercase_b => TextBufferActions.move_cursor(:back, 1, :word),
       # @lowercase_c => vim_language_command(:change),
       # @lowercase_d => vim_language_command(:delete),
-      # @lowercase_e => vim_language(:end) #:active_buffer |> move_cursor(:end, :word), #TODO this is tough... we want to be able to go dte, etc...
+      # @lowercase_e => vim_language(:end) #:active_buffer |> CoreActions.move_cursor(:end, :word), #TODO this is tough... we want to be able to go dte, etc...
       # @lowercase_f => find_character(:current_line, :after_cursor, {:direction, :forward}) #TODO vim language command??
       # @lowercase_g => #unbound
-      @lowercase_h => move_cursor(:left, 1, :column),
-      @lowercase_i => switch_mode(:insert),
-      @lowercase_j => move_cursor(:down, 1, :line),
-      @lowercase_k => move_cursor(:up, 1, :line),
-      @lowercase_l => move_cursor(:right, 1, :column),
+      @lowercase_h => active_buf |> CoreActions.move_cursor(:left, 1, :column),
+      @lowercase_i => CoreActions.switch_mode(:insert),
+      @lowercase_j => CoreActions.move_cursor(:down, 1, :line),
+      @lowercase_k => CoreActions.move_cursor(:up, 1, :line),
+      @lowercase_l => CoreActions.move_cursor(:right, 1, :column),
       # @lowercase_m => place_mark(:current_position)
       # @lowercase_n => repeat_last_search
       # @lowercase_o => open_line_below_and_go_into_insert_mode
@@ -38,54 +39,54 @@ https://hea-www.harvard.edu/~fine/Tech/vi.html
       # @lowercase_q => #unbound
       # @lowercase_r => replace_single_character_at_cursor()
       # @lowercase_s => substitute_single_character_with_new_text()
-      # @lowercase_t => move_cursor_till_just_before_find_character()
+      # @lowercase_t => CoreActions.move_cursor_till_just_before_find_character()
       #TODO also important!!!j
       # @lowercase_u => undo()
       # @lowercase_v => #unbound
-      @lowercase_w => move_cursor(:forward, 1, :word),
+      @lowercase_w => CoreActions.move_cursor(:forward, 1, :word),
       # @lowercase_x => delete_character(at: :cursor)
       # @lowercase_y => yank()
       # @lowercase_z => position_current_line()
 
       # @uppercase_A => enter_insertion_mode_after_line()
-      @uppercase_B => move_cursor(:back, 1, :word),
+      @uppercase_B => CoreActions.move_cursor(:back, 1, :word),
       # @uppercase_C => change(to: :end_of_line)
       # @uppercase_D => delete(to: :end_of_line)
-      @uppercase_E => move_cursor(to: :end_of_current_word),
+      @uppercase_E => CoreActions.move_cursor(to: :end_of_current_word),
       # @uppercase_F => find_character(:current_line, :after_cursor, {:direction, :reverse})
-      @uppercase_G => move_cursor(to: :last_line), #TODO implement proper vim handling, how to get it to accept pre-G alpha numeric... how to explain this... either use a pre-cursor, or go to end (just go to end by defualt???)
-      # @uppercase_G => {:action, {:active_buffer, :move_cursor, {:last_line, :same_column}}}, #TODO when actibve buf is text?? How do we handle this???
+      @uppercase_G => CoreActions.move_cursor(to: :last_line), #TODO implement proper vim handling, how to get it to accept pre-G alpha numeric... how to explain this... either use a pre-cursor, or go to end (just go to end by defualt???)
+      # @uppercase_G => {:action, {:active_buffer, :CoreActions.move_cursor, {:last_line, :same_column}}}, #TODO when actibve buf is text?? How do we handle this???
       # @uppercase_H => goto_line(1) # home cursor
-      # @uppercase_I => move_cursor(to: :first_non_whitespace_character, :current_line, :backwards), switch_mode(:insert)
+      # @uppercase_I => CoreActions.move_cursor(to: :first_non_whitespace_character, :current_line, :backwards), switch_mode(:insert)
       #TODO also important!!
       # @uppercase_J => join_line_below()
       # @uppercase_K => #unbound
-      # @uppercase_L => move_cursor(:last_line_visible_on_screen)
-      # @uppercase_M => move_cursor(:middle_line_visible_on_screen)
+      # @uppercase_L => CoreActions.move_cursor(:last_line_visible_on_screen)
+      # @uppercase_M => CoreActions.move_cursor(:middle_line_visible_on_screen)
       # @uppercase_N => repeat_last_dearch(firection: :backward)
       # @uppercase_O => open_line(:above), :enterINsert_mode
       # @uppercase_P => paste(:default_padst_bin, :before, :cursor)
       # @uppercase_Q => switch_mode(:ex)
       # @uppercase_R => switch_mode(:replace)
       # @uppercase_S => delete_line, enter_insert_mode
-      # @uppercase_T => move_cursor_till_just_before_find_character(direction: :backward)
+      # @uppercase_T => CoreActions.move_cursor_till_just_before_find_character(direction: :backward)
       # @uppercase_U => restore_line_to_state_before_cursor_moved_in_to_it()
       # @uppercase_V => #unbound
-      @uppercase_W => move_cursor(:forward, 1, :word)
+      @uppercase_W => CoreActions.move_cursor(:forward, 1, :word)
       # @uppercase_X => delete_character(1, :column, :before, :cursor)
       # @uppercase_Y => yank(:current_line)
       # @uppercase_Z => first_hald_quick_save_and_exit??
 
-      # @number_0 => move_cursor(column_number: 0)
-      # @number_1 => move_cursor(column_number: 0)
-      # @number_2 => move_cursor(column_number: 0)
-      # @number_3 => move_cursor(column_number: 0)
-      # @number_4 => move_cursor(column_number: 0)
-      # @number_5 => move_cursor(column_number: 0)
-      # @number_6 => move_cursor(column_number: 0)
-      # @number_7 => move_cursor(column_number: 0)
-      # @number_8 => move_cursor(column_number: 0)
-      # @number_9 => move_cursor(column_number: 0)
+      # @number_0 => CoreActions.move_cursor(column_number: 0)
+      # @number_1 => CoreActions.move_cursor(column_number: 0)
+      # @number_2 => CoreActions.move_cursor(column_number: 0)
+      # @number_3 => CoreActions.move_cursor(column_number: 0)
+      # @number_4 => CoreActions.move_cursor(column_number: 0)
+      # @number_5 => CoreActions.move_cursor(column_number: 0)
+      # @number_6 => CoreActions.move_cursor(column_number: 0)
+      # @number_7 => CoreActions.move_cursor(column_number: 0)
+      # @number_8 => CoreActions.move_cursor(column_number: 0)
+      # @number_9 => CoreActions.move_cursor(column_number: 0)
 
 
       # !	shell command filter	cursor motion command, shell command
@@ -167,7 +168,7 @@ https://hea-www.harvard.edu/~fine/Tech/vi.html
   # end
   def keymap(%RadixState{mode: :insert}) do
     %{
-      @escape_key => switch_mode(:normal)
+      @escape_key => CoreActions.switch_mode(:normal)
     }
   end
 
@@ -176,7 +177,8 @@ https://hea-www.harvard.edu/~fine/Tech/vi.html
   def leader_keybindings(%RadixState{mode: :normal}) do
     %{
       @lowercase_j => {:apply_mfa, {Flamelex.API.Journal, :today, []}},
-      @lowercase_k => {:apply_mfa, {Flamelex.API.CommandBuffer, :show, []}}, #TODO, it's broken :(
+      @lowercase_k => {:apply_mfa, {Flamelex.API.CommandBuffer, :show, []}},
+      @lowercase_t => {:apply_mfa, {Flamelex.API.Memex.TiddlyWiki, :open, []}}, #TODO
 
       @lowercase_x => {:execute_function, fn -> raise "intentionally raising! little x" end},
       @uppercase_X => {:execute_function, fn -> raise "intentionally raising! big X" end}

@@ -11,7 +11,7 @@ defmodule Flamelex.Fluxux.KeyMappingBehaviour do
       use Flamelex.ProjectAliases
       use Flamelex.GUI.ScenicEventsDefinitions
       alias Flamelex.Fluxus.Structs.RadixState
-      import Flamelex.Fluxus.Actions.Basic
+
 
       #REMINDER: including this @behaviour in the __using__ macro here means
       #          that any module which calls `use This.Behaviour.Module`

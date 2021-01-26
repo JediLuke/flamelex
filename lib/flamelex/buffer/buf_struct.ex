@@ -6,7 +6,7 @@ defmodule Flamelex.Structs.Buf do
   use Flamelex.{ProjectAliases, CustomGuards}
 
 
-  @valid_buffer_types [:text]
+  @valid_buffer_types [Flamelex.Buffer.Text]
 
 
   defstruct [
@@ -17,6 +17,7 @@ defmodule Flamelex.Structs.Buf do
     title:      nil,  # an optional title, for displaying in window bars etc
     tags:       [],   # a list of tags... this is for the future
   ]
+
 
 
   def new(%{type: t, ref: r} = params) when t in @valid_buffer_types do

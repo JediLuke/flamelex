@@ -9,16 +9,19 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
 
   defstruct [
     mode:                 :normal,    # The input mode
+    active_buffer:        nil,        # We need to know the active buffer - must be a %Flamelex.Structs.Buf{}
     keystroke_history:    [],         # A list of all previously entered user-input keystrokes
-    action_history:       []          # A history of actions sent to FluxusRadix
-
-    # active_buffer:  nil         # We need to know the active buffer
+    action_history:       [],         # A history of actions sent to FluxusRadix
+    # runtime_config:       %{
+    #   keymap:             Flamelex.API.KeyMappings.VimClone
+    # }
   ]
 
   def new do
     %__MODULE__{ mode: :normal }
   end
 
+  #TODO ok, figure out how modes is gonna work, with active buffer etc...
   @modes [:normal, :insert, {:command_buffer_active, :insert}]
   def set(%__MODULE__{} = radix_state, [mode: m]) when m in @modes do
     %{radix_state|mode: m}

@@ -3,19 +3,22 @@ defmodule Flamelex.API.CommandBuffer do
   This API module is the interface for all functionality relating to the
   CommandBuffer.
   """
+  alias Flamelex.Fluxus.Actions.CommandBufferActions
 
   @doc """
   Make the CommandBuffer visible, and put us in :command mode.
   """
   def show do
-    Flamelex.Fluxus.fire_action({:show, :command_buffer})
+    CommandBufferActions.show()
+    |> Flamelex.Fluxus.fire_action()
   end
 
   @doc """
   Make the CommandBuffer not-visible, and put us in :normal mode.
   """
   def hide do
-    Flamelex.Fluxus.fire_action({:hide, :command_buffer})
+    CommandBufferActions.hide()
+    |> Flamelex.Fluxus.fire_action()
   end
 
   @doc """
@@ -25,8 +28,11 @@ defmodule Flamelex.API.CommandBuffer do
   when you mash escape to go back to :edit mode
   """
   def deactivate do
-    clear()
-    hide()
+    [
+      CommandBufferActions.clear(),
+      CommandBufferActions.hide()
+    ]
+    |> Flamelex.Fluxus.fire_multiple_actions()
   end
 
 
@@ -34,23 +40,27 @@ defmodule Flamelex.API.CommandBuffer do
   Resets the text field to an empty string.
   """
   def clear do
-    Flamelex.Buffer.Command.clear()
+    CommandBufferActions.clear()
+    |> Flamelex.Fluxus.fire_action()
+    # Flamelex.Buffer.Command.clear()
   end
 
   @doc """
   Send input to the API.CommandBuffer
   """
   def input(x) do
-    Flamelex.Buffer.Command.cast({:input, x})
+    CommandBufferActions.input(x)
+    |> Flamelex.Fluxus.fire_action()
+    #   def backspace,             do: GenServer.cast(CmdBuffer, :backspace)
+    # Flamelex.Buffer.Command.cast({:input, x})
   end
 
   @doc """
   Execute the command in the API.CommandBuffer
   """
   def execute do
-    Flamelex.Buffer.Command.cast(:execute)
+    CommandBufferActions.execute_contents()
+    |> Flamelex.Fluxus.fire_action()
+    # Flamelex.Buffer.Command.cast(:execute)
   end
-
-  #   def backspace,             do: GenServer.cast(CmdBuffer, :backspace)
-
 end

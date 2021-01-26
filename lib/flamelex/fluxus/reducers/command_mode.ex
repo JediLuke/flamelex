@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.InputHandler.CommandMode do
+defmodule Flamelex.Fluxus.Actions.CommandBuffer do
   @moduledoc false
   use Flamelex.ProjectAliases
   use Flamelex.GUI.ScenicEventsDefinitions

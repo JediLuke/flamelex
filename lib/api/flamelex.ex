@@ -32,12 +32,12 @@ defmodule Flamelex do
     Application.start(:flamelex)
   end
 
-  def switch_mode(m) when m in @valid_modes do
-    GenServer.cast(Flamelex.FluxusRadix, {:action, {:switch_mode, m}})
-  end
+  # def switch_mode(m) when m in @valid_modes do
+  #   GenServer.cast(Flamelex.FluxusRadix, {:action, {:switch_mode, m}})
+  # end
 
 
-  def set_log_level(l) do
+  def set_log_level(:debug) do
     raise "How do I set the log level??"
   end
 

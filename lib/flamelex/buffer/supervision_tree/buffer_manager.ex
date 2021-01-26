@@ -25,13 +25,14 @@ defmodule Flamelex.BufferManager do
 
   #TODO maybe it's not safe to have this exposed?? Anyone can call & crash the Manager??
   def handle_call({:open_buffer, params}, _from, state) do
+    #TODO updte active buffer? by option??
     # 1) way of registering processes / # 2) a system for doing that
     # 3) a PubSub which works, which goes heirarchically, and the top level can be some reference like "lukes_journal", so it's easy to broadcast to all processes which need updates about my journal
     case BufUtils.open_buffer(params) do
       {:ok, %Buf{} = buf} ->
-          if BufUtils.open_this_buffer_in_gui?(params) do
-            :ok = Flamelex.GUI.Controller.show(buf)
-          end
+          # if BufUtils.open_this_buffer_in_gui?(params) do
+          #   :ok = Flamelex.GUI.Controller.show(buf)
+          # end
           {:reply, {:ok, buf}, %{state|buffer_list: state.buffer_list ++ [buf], active_buffer: buf}}
       {:error, reason} ->
           {:reply, {:error, reason}, state}

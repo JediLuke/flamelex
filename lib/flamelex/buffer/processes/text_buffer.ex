@@ -63,10 +63,10 @@ defmodule Flamelex.Buffer.Text do
   # end
 
   @impl GenServer
-  def handle_continue(:open_file_on_disk, %{from_file: filepath} = params) do
+  def handle_continue(:open_file_on_disk, %{type: __MODULE__, from_file: filepath} = params) do
 
     {:ok, file_contents} = File.read(filepath)
-    buf_ref = Buf.new(%{type: :text} |> Map.merge(params))
+    buf_ref = Buf.new(params)
 
     new_buf = %{
       ref: buf_ref,

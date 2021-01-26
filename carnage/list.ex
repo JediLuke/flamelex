@@ -1,3 +1,28 @@
+
+
+
+  # def new_list_buffer do
+  #   raise "lol?"
+  #   #   alias GUI.Scene.Root, as: Franklin
+  #   #   def new_buffer(:test) do
+  #   #     new_buffer(%{
+  #   #       type: :list,
+  #   #       data: [
+  #   #         {"iderieri", %{
+  #   #           title: "Luke",
+  #   #           text: "First note"
+  #   #         }},
+  #   #         {"ikey-heihderieri", %{
+  #   #           title: "Leah",
+  #   #           text: "Second note"
+  #   #         }}
+  #   #       ]
+  #   #     })
+  #   #   end
+
+
+
+
 # defmodule GUI.Component.List do
 #   @moduledoc false
 #   use Scenic.Component
