@@ -8,10 +8,6 @@ defmodule Flamelex.Fluxus.Reducers.Journal do
   #   :ok
   # end
 
-  def async_reduce(_radix_state, {:action, a}) do
-    IO.puts "#{__MODULE__} ignoring action: #{inspect a}"
-    :ok
-  end
 
   def async_reduce(_radix_state, :open_todays_journal_entry) do
     if Journal.todays_page |> File.exists?() do
@@ -37,5 +33,10 @@ defmodule Flamelex.Fluxus.Reducers.Journal do
         }
       })
     end
+  end
+
+  def async_reduce(_radix_state, a) do
+    IO.puts "#{__MODULE__} ignoring action: #{inspect a}"
+    :ok
   end
 end

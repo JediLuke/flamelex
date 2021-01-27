@@ -2,6 +2,8 @@ defmodule Flamelex.Buffer.BufUtils do
   alias Flamelex.Structs.Buf
 
 
+  @text_buf Flamelex.Buffer.Text
+
 
   # #TODO here next !!!
   # def open_buffer(params) do
@@ -21,15 +23,10 @@ defmodule Flamelex.Buffer.BufUtils do
   #   end
   # end
 
-  # we accept just raw_data and a ref as a valid text buffer - we don't discriminate!!
-  # def open_buffer(%{type: :text, ref: _r, raw_data: _d} = params) do
-  #   DynamicSupervisor.start_child(
-  #                       Flamelex.Buffer.Supervisor,
-  #                       {Flamelex.Buffer.Text, params})
-  # end
+
 
   @file_open_timeout 3_000
-  def open_buffer(%{type: Flamelex.Buffer.Text, from_file: filepath} = params) do
+  def open_buffer(%{type: @text_buf, from_file: filepath} = params) do
     # opening from a text file has a bit of a handshake/callback thing going on...
 
     params =
@@ -41,7 +38,7 @@ defmodule Flamelex.Buffer.BufUtils do
     start_process_attempt =
       DynamicSupervisor.start_child(
                           Flamelex.Buffer.Supervisor,
-                          {Flamelex.Buffer.Text, params})
+                          {@text_buf, params})
 
     case start_process_attempt do
       {:ok, pid} ->
@@ -55,7 +52,19 @@ defmodule Flamelex.Buffer.BufUtils do
   end
 
 
+  # we accept just raw_data and a ref as a valid text buffer - we don't discriminate!!
+  def open_buffer(%{type: :text, ref: _r, raw_data: _d} = params) do
+    DynamicSupervisor.start_child(
+                        Flamelex.Buffer.Supervisor,
+                        {@text_buf, params})
+  end
 
+
+
+  def open_this_buffer_in_gui?(%{open_in_gui?: open?}), do: open?
+  def open_this_buffer_in_gui?(_else), do: open_buffers_in_gui_by_default?()
+
+  def open_buffers_in_gui_by_default?, do: true #TODO this should be a config somewhere
 
   defp wait_for_callback(pid, filepath) do
     #NOTE: We want the Text buffer to try to open the file (in that
@@ -71,10 +80,4 @@ defmodule Flamelex.Buffer.BufUtils do
         {:error, "timed out waiting for the Buffer to open a file."}
     end
   end
-
-
-  def open_this_buffer_in_gui?(%{open_in_gui?: open?}), do: open?
-  def open_this_buffer_in_gui?(_else), do: false
-
-
 end

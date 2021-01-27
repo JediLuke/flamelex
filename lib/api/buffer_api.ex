@@ -31,18 +31,16 @@ defmodule Flamelex.API.Buffer do
   {:ok, %Buf{} = _bufr_ref}
   """
 
+  def open!, do: open!("/Users/luke/workbench/elixir/flamelex/README.md")
 
-  def open!, do: open! "/Users/luke/workbench/elixir/flamelex/README.md"
-
-  def open!(filepath, opts \\ %{}) do
-    # opts2 = %{
-    #   type: :text,
-    #   label: "journal - today",
-    #   from_file: filepath,
-    #   open_in_gui?: true,
-    # }
-    Flamelex.Buffer.open!(filepath, opts)
+  def open!(filepath) do
+    Flamelex.Fluxus.fire_action({
+      :open_buffer,
+        {:local_text_file, path: filepath}, %{
+          label: filepath,
+      }})
   end
+
 
 
 

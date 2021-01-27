@@ -13,7 +13,7 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do
       open_in_gui?: true, #TODO remove
     })
 
-    buf = Flamelex.Buffer.open!(filepath, opts)
+    buf = Flamelex.Buffer.open!(opts)
 
     if BufUtils.open_this_buffer_in_gui?(opts) do
       :ok = Flamelex.GUI.Controller.show(buf)
@@ -23,21 +23,15 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do
   end
 
 
-  def async_reduce(_radix_state, {:action, a}) do
+  def execute_action_async(%RadixState{} = radix_state, {:active_buffer, action, details}) do
+    Flamelex.BufferManager.fire_action(radix_state, action, details)
+    :ok
+  end
+
+
+
+  def async_reduce(_radix_state, a) do
     IO.puts "#{__MODULE__} ignoring action: #{inspect a}"
     :ok
   end
 end
-
-
-
-
-
-  # def execute_action_async(%RadixState{} = radix_state, {:active_buffer, :move_cursor, %{to: :last_line}}) do
-  #   #TODO find active buffer
-  #   #TODO then move the cursor to the last line
-
-
-
-  #   Flamelex.FluxusRadix |> send({:ok, radix_state})
-  # end

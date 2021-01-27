@@ -76,6 +76,9 @@ defmodule Flamelex.FluxusRadix do
     #       IO.puts "error handling action: #{inspect a}, #{inspect reason}"
     #       {:noreply, radix_state}
     # end
+
+    #TODO register callbacks & timeouts within ourself, if we need to get
+    #     callbacks from actions
   end
 
 

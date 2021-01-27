@@ -23,16 +23,39 @@ defmodule Flamelex.BufferManager do
     {:ok, %{buffer_list: [], active_buffer: nil}}
   end
 
-  #TODO maybe it's not safe to have this exposed?? Anyone can call & crash the Manager??
+  #TODO you know, we might be able to just call open_buffer directly,
+  #     & have it update only if it was successful...
   def handle_call({:open_buffer, params}, _from, state) do
-    #TODO updte active buffer? by option??
-    # 1) way of registering processes / # 2) a system for doing that
-    # 3) a PubSub which works, which goes heirarchically, and the top level can be some reference like "lukes_journal", so it's easy to broadcast to all processes which need updates about my journal
+
+    # in this idea, it's even crazier - we spin up a whole
+    # new task which is solely responsible for opening a buffer -
+    # first we need the pure function to do it (can run in iex), then
+    # we make it a one-off task call
+
+    # if we need the buffer_mgr_state, then it will have to be
+    # routed through here, but, we might not even need it - especially
+    # if we design the buffers themselves to call back to BufferManager
+    # and say "hey, I worked!"
+
+    # Task.Supervisor.start_child(
+    #   Flamelex.Buffer.Jackaroo,
+    #     Flamelex.Buffer.BufUtils,       # module
+    #     :open_buffer,                   # function
+    #     [buffer_mgr_state, params]      # args
+    # )
+
+    # {:noreply, buffer_mgr_state}
+    # # receive do
+    #   {:}
+    # end
+
+
+    # #TODO updte active buffer? by option??
+    # # 1) way of registering processes / # 2) a system for doing that
+    # # 3) a PubSub which works, which goes heirarchically, and the top level can be some reference like "lukes_journal", so it's easy to broadcast to all processes which need updates about my journal
+
     case BufUtils.open_buffer(params) do
       {:ok, %Buf{} = buf} ->
-          # if BufUtils.open_this_buffer_in_gui?(params) do
-          #   :ok = Flamelex.GUI.Controller.show(buf)
-          # end
           {:reply, {:ok, buf}, %{state|buffer_list: state.buffer_list ++ [buf], active_buffer: buf}}
       {:error, reason} ->
           {:reply, {:error, reason}, state}

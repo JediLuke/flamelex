@@ -74,6 +74,29 @@ Frame.move(1, left: {10, :px}) # move first frame left 10 pixels
 
 How inputs get mapped to these functions is covered in #TODO explain how inputs get mapped to commands
 
+#### using the API modules
+
+The way it works is this - users should only need to use the API to achieve
+what they want to do. If this isn't the case, then adding this functionality
+is not difficult, but it needs to be added in a way that's consistent with
+how flamelex works.
+
+The API can call directly into the underlying sub-tree for information
+requests, e.g. Buffer.list calls BufferManager, but to trigger actions,
+it should only call `Flamelex.Fluxus.fire_action/2`
+
+Then, these actions will go through Fluxus and eventually propagate through
+to the reducer. Then, in the reducers, *that's* where you can call things
+like Buffer.move_cursor, etc.
+
+The unguarded nature of Elixir modules is both a strength and a weakness,
+and overall I prefer to be given the freedom to build amazing things with
+some gotchas, rather than be forced to jump through unnecessary hoops that
+just get in the way once I know what I'm doing - but this is a gotcha for
+adding code to Flamelex, you *must* go through the designated flows. If you
+start calling things like Buffer.move_cursor(2), it will probably work,
+but your whole state tree might get out of whack...
+
 ### The Flamelex CommandBuffer #TODO
 
 ### The Flamelex MenuBar #TODO

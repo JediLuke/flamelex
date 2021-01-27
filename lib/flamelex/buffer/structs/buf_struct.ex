@@ -25,7 +25,7 @@ defmodule Flamelex.Structs.Buf do
         %__MODULE__{
           type: t,
           ref: r,
-          label: params.label
+          label: params |> Map.get(:label)
         }
     else
       raise invalid_ref_param_error_string()

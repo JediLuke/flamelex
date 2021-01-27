@@ -8,7 +8,7 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
         author: "William H. Gass"
       }),
       LiteraryQuote.construct(%{
-        text: "One man's “magic” is another man's engineering.",
+        text: "One man's “kabalah” is another man's engineering.",
         author: "Robert A. Heinlein"
       }),
       LiteraryQuote.construct(%{
@@ -74,7 +74,15 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
       LiteraryQuote.construct(%{
         text: ~s(As `eval`d, So `apply`d),
         author: "Harold Abelson"
-      })
+      }),
+      LiteraryQuote.construct(%{
+        text: ~s(We each have a pre-deteriminned amount of time, to accomplish certain spiritual goals... so it behooves us all to be attentive to our spiritual growth, for no time is wasted there),
+        author: "Dr. David R. Hawkins"
+      }),
+      LiteraryQuote.construct(%{
+        text: ~s(This infinite presence which is all things ans everywhere, both the space in the room and the objects in the room, the figure & the ground simultaneously - is also exquisitely gentle. It's touch just melts you with it's exquisite gentleness, and whatever there was of individual self is melted by it - dissolved! Dissolved into it... like a salt when dropped into water, it just dissolves and becomes all at one with what is.),
+        author: "Dr. David R. Hawkins"
+      }),
     ]
   end
 
