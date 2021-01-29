@@ -1,7 +1,6 @@
 defmodule Flamelex.Utilities.ProcessRegistry do
   require Logger
   use Flamelex.ProjectAliases
-  alias Flamelex.Structs.Buf
   alias Flamelex.GUI.Structs.GUiComponentRef
 
   @doc """
@@ -30,6 +29,10 @@ defmodule Flamelex.Utilities.ProcessRegistry do
   end
 
   #TODO deprecate above in favor of below
+  @doc """
+  In order to register a process using :gproc when we spawn it, we need
+  to use a :via tuple. see: https://hexdocs.pm/elixir/Registry.html#module-using-in-via
+  """
   def via_tuple_name(:gproc, tag) do
     via_tuple(:gproc, tag)
   end
@@ -37,23 +40,15 @@ defmodule Flamelex.Utilities.ProcessRegistry do
   @doc """
   Returns an ok/error tuple.
   """
-  def lookup(%Buf{} = buf) do
-    key = Buf.rego_tag(buf)
-    lookup(key)
-    # case :gproc.where({:n, :l, lookup_key}) do
-    #   p when is_pid(p) -> {:ok, p}
-    #   _else            -> {:error, "Could not find a process with lookup_key: #{inspect lookup_key}"}
-    # end
+  def lookup(%BufRef{ref: ref}) do
+    lookup({:buffer, ref})
   end
   def lookup(%GUiComponentRef{} = ref) do
     key = GUiComponentRef.rego_tag(ref)
     lookup(key)
-    # case :gproc.where({:n, :l, lookup_key}) do
-    #   p when is_pid(p) -> {:ok, p}
-    #   _else            -> {:error, "Could not find a process with lookup_key: #{inspect lookup_key}"}
-    # end
   end
   def lookup(lookup_key) do
+    IO.puts "LOOKUP-KEY: #{inspect lookup_key}"
     case :gproc.where({:n, :l, lookup_key}) do
       p when is_pid(p) -> {:ok, p}
       _else            -> {:error, "Could not find a process with lookup_key: #{inspect lookup_key}"}

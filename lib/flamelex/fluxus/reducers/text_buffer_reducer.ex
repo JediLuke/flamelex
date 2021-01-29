@@ -1,6 +1,6 @@
 defmodule Flamelex.Fluxus.Reducers.TextBuffer do
   use Flamelex.Fluxux.ReducerBehaviour
-  alias Flamelex.Structs.Buf
+  alias Flamelex.Structs.BufRef
 
   def async_reduce(_radix_state, {:acive_buffer, :move_cursor, %{to: destination}}) do
     # get_active_buffer()
@@ -10,7 +10,7 @@ defmodule Flamelex.Fluxus.Reducers.TextBuffer do
 
   end
 
-  # def async_reduce(_radix_state, {%Buf{} = buf, :move_cursor, %{to: destination}}) do
+  # def async_reduce(_radix_state, {%BufRef{} = buf, :move_cursor, %{to: destination}}) do
 
   # end
   def async_reduce(_radix_state, a) do

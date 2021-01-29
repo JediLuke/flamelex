@@ -1,5 +1,5 @@
-defmodule Flamelex.Buffer.BufUtils do
-  alias Flamelex.Structs.Buf
+defmodule Flamelex.Buffer.BufUtils do #TODO rename to Buffer.Utils.OpenBuffer
+  alias Flamelex.Structs.BufRef
 
 
   @text_buf Flamelex.Buffer.Text
@@ -12,7 +12,7 @@ defmodule Flamelex.Buffer.BufUtils do
   #   # 2) a system for doing that
   #   # 3) a PubSub which works, which goes heirarchically, and the top level can be some reference like "lukes_journal", so it's easy to broadcast to all processes which need updates about my journal
   #   case start_buffer_process(params) do
-  #     {:ok, %Buf{} = buf} ->
+  #     {:ok, %BufRef{} = buf} ->
   #         # num_buffers = Enum.count(state)
   #         if open_this_buffer_in_gui?(params) do
   #           :ok = Flamelex.GUI.Controller.show(buf.ref)
@@ -71,7 +71,7 @@ defmodule Flamelex.Buffer.BufUtils do
     #      process!), but not inside the init/1 callback - because then
     #      if it fails to read the file, the init will fail... instead:
     receive do
-      {^pid, :successfully_opened, ^filepath, %Buf{} = buf} ->
+      {^pid, :successfully_opened, ^filepath, %BufRef{} = buf} ->
         {:ok, buf}
     after
       @file_open_timeout ->

@@ -84,6 +84,7 @@ defmodule Flamelex.FluxusRadix do
 
   #TODO we just need to make sure we have a way, of checking the order? of callbacks? of timing em out?? something
   def handle_cast({:reducer_callback, %RadixState{} = new_radix_state}, _old_radix_state) do
+    IO.puts "\n\n\n\nupdating radix state !! \n\n\n\n"
     {:noreply, new_radix_state}
   end
 end

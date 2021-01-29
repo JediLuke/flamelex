@@ -1,4 +1,4 @@
-defmodule Flamelex.Structs.Buf do
+defmodule Flamelex.Structs.BufRef do
   @moduledoc """
   Points to a Buffer in Flamelex - but it isn't the buffer itself! Just a
   reference to one.
@@ -13,14 +13,14 @@ defmodule Flamelex.Structs.Buf do
     ref:        nil,  # a unique reference, used to register the buffer process, eg. {:file, "some/filepath"} or "lukesBuffer"
     number:     nil,  # if we want to give buffers numbers, ie. to order them
     type:       nil,  # tells us if its a text buffer or whatever
-    label:       nil,  # a short name for the buffer, doesn't have to be unique
+    label:      nil,  # a short name for the buffer, doesn't have to be unique
     title:      nil,  # an optional title, for displaying in window bars etc
-    tags:       [],   # a list of tags... this is for the future
+    # tags:       [],   # a list of tags... this is for the future
   ]
 
 
 
-  def new(%{type: t, ref: r} = params) when t in @valid_buffer_types do
+  def new!(%{type: t, ref: r} = params) when t in @valid_buffer_types do
     if is_valid_ref?(r) do
         %__MODULE__{
           type: t,

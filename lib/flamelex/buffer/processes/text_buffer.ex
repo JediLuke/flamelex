@@ -2,183 +2,138 @@ defmodule Flamelex.Buffer.Text do
   @moduledoc """
   A buffer to hold & manipulate text.
   """
-  alias Flamelex.Structs.Buf
+  use Flamelex.BufferBehaviour
 
-  # use Flamelex.BufferBehaviour
-
-  use GenServer, restart: :temporary
-  require Logger
-  use Flamelex.ProjectAliases
-
-
-  #TODO this looks like a nuce func for a behaviour...
-  def start_link(%{ref: ref} = params) do
-    case Buf.rego_tag(ref) do
-      {:buffer, _ref} = tag ->
-          name = ProcessRegistry.via_tuple_name(:gproc, tag)
-          GenServer.start_link(__MODULE__, params, name: name)
-      :error ->
-          {:error, Buf.invalid_ref_param_error_string(params)}
-    end
+  @impl Flamelex.BufferBehaviour
+  def rego_tag(%{type: __MODULE__, ref: {:file, filepath}, from_file: same_filepath}) when filepath == same_filepath and is_bitstring(filepath) do
+    # a unique reference, used to register the buffer process,
+    # eg. {:file, "some/filepath"} or "lukesBuffer"
+    {:buffer, {:file, filepath}}
   end
 
-  #TODO make this cast to itself, & get this process to do the GUI adjustment
-  def move_cursor({:buffer, name}, {direction, distance}) do
-    ProcessRegistry.find!({:gui_component, name})
-    |> GenServer.cast({:move_cursor, direction, distance})
-  end
-  def move_cursor(:active_buffer, {direction, distance}) do
-    ProcessRegistry.find!(:active_buffer)
-    |> GenServer.cast({:action, {:move_cursor, direction, distance}})
-  end
-  def move_cursor(buf, position) when is_map(position) do
-    ProcessRegistry.find!({:gui_component, buf})
-    |> GenServer.cast({:move_cursor, position})
-  end
-
-
-  @impl GenServer
-  def init(%{from_file: _filepath} = params) do
-    Logger.debug "#{__MODULE__} initializing... params: #{inspect params}"
-
-    # PubSub.subscribe(topic)
-
-    {:ok, params, {:continue, :open_file_on_disk}}
-  end
-
-  # def init(%{name: ref, data: data, weird_thing: www}) do
-  #   Logger.debug "#{__MODULE__} initializing..."
-
-  #   IO.inspect www, label: "MAYTCJUY???????"
-
-  #   #TODO need to register for PubSUb msgs
-
-  #   new_buf = %{
-  #     ref: ref,
-  #     data: data,
-  #     unsaved_changes?: false
-  #   }
-
-  #   {:ok, new_buf}
-  # end
-
-  @impl GenServer
-  def handle_continue(:open_file_on_disk, %{type: __MODULE__, from_file: filepath} = params) do
+  # handle opening
+  @impl Flamelex.BufferBehaviour
+  def boot_sequence(%{
+        type: __MODULE__,
+   from_file: filepath,
+   after_boot_callback: callback_pid
+  } = params) when is_pid(callback_pid) do
 
     {:ok, file_contents} = File.read(filepath)
-    buf_ref = Buf.new(params)
 
-    new_buf = %{
-      ref: buf_ref,
-      data: file_contents,
-      unsaved_changes?: false }
+    buf_ref   = BufRef.new!(params)
+    buf_state = BufferState.new!(params
+                                 |> Map.merge(%{data: file_contents}))
+
+    #NOTE: just checking here that both the BufRef and BufferState have the same `ref`...
+    if buf_ref.ref != buf_state.ref do
+      context = %{buf_ref: buf_ref, buf_state: buf_state, params: params}
+      raise "a `ref` mismatch occured when booting a TextBuffer.\n\n#{inspect context}\n\n"
+    end
 
     # now, let's callback to the process which booted this one, to
     # say that we successfully loaded the file from disk
-    send( params.after_boot_callback,
-          {self(), :successfully_opened, filepath, buf_ref} ) #REMINDER: we send back `filepath` because we match on it like ^filepath
+    callback_pid #TODO this could just be BufferManager, save some complexity
+    |> send({self(), :successfully_opened, filepath, buf_ref})
+       #REMINDER: we send back `filepath` because we match on it like ^filepath
 
-    {:noreply, new_buf}
+    {:noreply, buf_state}
   end
 
-  @impl GenServer
-  def handle_call(:read, _from, state) do
-    {:reply, state.data, state}
-  end
+  #TODO with modify_buffer utils
+  # def handle_call({:modify, {:insert, new_text, %{col: cursor_x, row: cursor_y}}}, _from, state) do
 
-  def handle_call({:modify, {:insert, new_text, %{col: cursor_x, row: cursor_y}}}, _from, state) do
+  #   insert_text_function =
+  #       fn string ->
+  #         list_of_text_lines = String.split(string, "\n")
 
-    insert_text_function =
-        fn string ->
-          list_of_text_lines = String.split(string, "\n")
+  #         {this_line, _other_lines} = list_of_text_lines |> List.pop_at(cursor_y)
 
-          {this_line, _other_lines} = list_of_text_lines |> List.pop_at(cursor_y)
+  #         {before_split, after_split} = this_line |> String.split_at(cursor_x)
 
-          {before_split, after_split} = this_line |> String.split_at(cursor_x)
+  #         updated_line = before_split <> new_text <> after_split
 
-          updated_line = before_split <> new_text <> after_split
+  #         updated_list_of_text_lines = list_of_text_lines |> List.replace_at(cursor_y, updated_line)
 
-          updated_list_of_text_lines = list_of_text_lines |> List.replace_at(cursor_y, updated_line)
+  #         updated_list_of_text_lines |> Enum.join()
+  #       end
 
-          updated_list_of_text_lines |> Enum.join()
-        end
+  #   new_state =
+  #       state
+  #       |> Map.update!(:data, insert_text_function)
+  #       |> Map.put(:unsaved_changes?, true)
 
-    new_state =
-        state
-        |> Map.update!(:data, insert_text_function)
-        |> Map.put(:unsaved_changes?, true)
+  #   {:gui_component, new_state.name}
+  #   |> ProcessRegistry.find!()
+  #   |> GenServer.cast({:refresh, new_state})
 
-    {:gui_component, new_state.name}
-    |> ProcessRegistry.find!()
-    |> GenServer.cast({:refresh, new_state})
+  #   move_cursor(new_state.name, %{row: cursor_x+1, col: 0})
 
-    move_cursor(new_state.name, %{row: cursor_x+1, col: 0})
+  #   # Flamelex.GUI.Controller.refresh({:buffer, state.name})
+  #   # Flamelex.GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
 
-    # Flamelex.GUI.Controller.refresh({:buffer, state.name})
-    # Flamelex.GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
+  #   {:reply, :ok, new_state}
+  # end
 
-    {:reply, :ok, new_state}
-  end
+  # def handle_call({:modify, {:insert, {:codepoint, {char, 0}}, cursor = {:cursor, 1}}}, _from, state) when is_bitstring(char) do
 
-  def handle_call({:modify, {:insert, {:codepoint, {char, 0}}, cursor = {:cursor, 1}}}, _from, state) when is_bitstring(char) do
+  #   #TODO
+  #   # cursor_coords =
+  #   #   ProcessRegistry.find!(Cursor.rego_tag(cursor))
+  #   #   |> GenServer.call(:get_coords)
 
-    #TODO
-    # cursor_coords =
-    #   ProcessRegistry.find!(Cursor.rego_tag(cursor))
-    #   |> GenServer.call(:get_coords)
+  #   insertion_site = 3 #TODO
 
-    insertion_site = 3 #TODO
+  #   insert_text_function =
+  #     fn string ->
+  #       {before_split, after_split} = string |> String.split_at(insertion_site)
+  #       before_split <> char <> after_split
+  #     end
 
-    insert_text_function =
-      fn string ->
-        {before_split, after_split} = string |> String.split_at(insertion_site)
-        before_split <> char <> after_split
-      end
+  #   new_state =
+  #       state
+  #       |> Map.update!(:data, insert_text_function)
+  #       |> Map.put(:unsaved_changes?, true)
 
-    new_state =
-        state
-        |> Map.update!(:data, insert_text_function)
-        |> Map.put(:unsaved_changes?, true)
+  #   Flamelex.GUI.Controller.refresh(new_state)
 
-    Flamelex.GUI.Controller.refresh(new_state)
+  #   {:reply, :ok, new_state}
+  # end
 
-    {:reply, :ok, new_state}
-  end
+  # def handle_call({:modify, {:insert, new_text, insertion_site}}, _from, state) when is_bitstring(new_text) and is_integer(insertion_site) do
 
-  def handle_call({:modify, {:insert, new_text, insertion_site}}, _from, state) when is_bitstring(new_text) and is_integer(insertion_site) do
+  #   insert_text_function =
+  #       fn string ->
+  #         {before_split, after_split} = string |> String.split_at(insertion_site)
+  #         before_split <> new_text <> after_split
+  #       end
 
-    insert_text_function =
-        fn string ->
-          {before_split, after_split} = string |> String.split_at(insertion_site)
-          before_split <> new_text <> after_split
-        end
+  #   new_state =
+  #       state
+  #       |> Map.update!(:data, insert_text_function)
+  #       |> Map.put(:unsaved_changes?, true)
 
-    new_state =
-        state
-        |> Map.update!(:data, insert_text_function)
-        |> Map.put(:unsaved_changes?, true)
+  #   Flamelex.GUI.Controller.refresh(new_state)
 
-    Flamelex.GUI.Controller.refresh(new_state)
+  #   {:reply, :ok, new_state}
+  # end
 
-    {:reply, :ok, new_state}
-  end
+  # #TODO so now we have the question, is the first position 0 or 1???
+  # def handle_call({:modify, {:delete, [from: a, to: b]}}, _from, state) when b >= a and a >= 0 do
 
-  #TODO so now we have the question, is the first position 0 or 1???
-  def handle_call({:modify, {:delete, [from: a, to: b]}}, _from, state) when b >= a and a >= 0 do
+  #   {before_split, _after_split} = state.data |> String.split_at(a)
+  #   {_before_split, after_split} = state.data |> String.split_at(b)
 
-    {before_split, _after_split} = state.data |> String.split_at(a)
-    {_before_split, after_split} = state.data |> String.split_at(b)
+  #   text_after_deletion = before_split <> after_split
 
-    text_after_deletion = before_split <> after_split
+  #   new_state =
+  #       state
+  #       |> Map.put(:data, text_after_deletion)
 
-    new_state =
-        state
-        |> Map.put(:data, text_after_deletion)
+  #   Flamelex.GUI.Controller.refresh({:buffer, state.name})
 
-    Flamelex.GUI.Controller.refresh({:buffer, state.name})
-
-    {:reply, :ok, new_state}
-  end
+  #   {:reply, :ok, new_state}
+  # end
 
   def handle_call(:save, _from, state) do
 
@@ -200,6 +155,17 @@ defmodule Flamelex.Buffer.Text do
       {:stop, :normal, state}
     end
   end
+
+  # def handle_cast({:move_cursor, %{cursor_num: 1, instructions: {:down, 1, :line}}} = details, state) do
+
+  #   #TODO once buffer name registration is solid, this becomes easy...
+  #   IO.puts "OK, NOW WE GOTTA MOVE THE FKIN THING\n\n"
+
+  #   ProcessRegistry.find!({:gui_component, state.name}) # then it will, in turn, forward the request to the cursor...
+  #   |> GenServer.cast({:move_cursor, details})
+  # end
+
+
 
 
   # def input(pid, {scenic_component_pid, input}), do: GenServer.cast(pid, {:input, {scenic_component_pid, input}})
@@ -252,5 +218,19 @@ defmodule Flamelex.Buffer.Text do
   #   new_state = %{state|focus: :title}
   #   {:noreply, new_state}
   # end
+
+  #TODO make this cast to itself, & get this process to do the GUI adjustment
+  def move_cursor({:buffer, name}, {direction, distance}) do
+    ProcessRegistry.find!({:gui_component, name})
+    |> GenServer.cast({:move_cursor, direction, distance})
+  end
+  def move_cursor(:active_buffer, {direction, distance}) do
+    ProcessRegistry.find!(:active_buffer)
+    |> GenServer.cast({:action, {:move_cursor, direction, distance}})
+  end
+  def move_cursor(buf, position) when is_map(position) do
+    ProcessRegistry.find!({:gui_component, buf})
+    |> GenServer.cast({:move_cursor, position})
+  end
 
 end

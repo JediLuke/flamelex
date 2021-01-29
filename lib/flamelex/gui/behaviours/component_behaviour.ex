@@ -26,7 +26,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
       alias Flamelex.GUI.Utilities.Draw
       alias Flamelex.Utilities.ProcessRegistry
-      alias Flamelex.Structs.Buf
+      alias Flamelex.Structs.BufRef
 
 
       #NOTE: In our case, we always want a Component to be passed in a %Frame{}

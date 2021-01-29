@@ -1,4 +1,4 @@
-defmodule Flamelex.API.GUI do
+defmodule Flamelex.GUI do
   @moduledoc """
   This module provides an interface for controlling the Flamelex GUI. It
   is mostly a container for several sub-modules, which in-turn are interfaces

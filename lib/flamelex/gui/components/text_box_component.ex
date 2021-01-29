@@ -14,17 +14,17 @@ defmodule Flamelex.GUI.Component.TextBox do
   #   {:gui_component, }
   # end
 
-  def rego_tag(%{ref: %Buf{ref: ref}}) do #TODO lol
+  def rego_tag(%{ref: %BufRef{ref: ref}}) do #TODO lol
     {:gui_component, ref}
   end
 
   @impl Flamelex.GUI.ComponentBehaviour
-  def custom_init_logic(%{frame: %Frame{} = f, ref: %Buf{} = buf} = params) do
+  def custom_init_logic(%{frame: %Frame{} = f, ref: %BufRef{} = buf} = params) do
 
     params |> Map.merge(%{
       draw_footer?: true,
       cursors: [
-        %{ frame: f, ref: buf, num: 1 }
+        %{ frame: f, ref: buf, num: 1 } #TODO use cursor struct, add frame to cursor struct
       ]
     })
   end
@@ -35,7 +35,7 @@ defmodule Flamelex.GUI.Component.TextBox do
     render(params |> Map.merge(%{frame: frame}))
   end
 
-  def render(%{ref: %Buf{} = buf, frame: %Frame{} = frame} = params) do
+  def render(%{ref: %BufRef{} = buf, frame: %Frame{} = frame} = params) do
 
     #TODO make the frame, only 72 columns wide !!
     frame =
@@ -75,7 +75,7 @@ defmodule Flamelex.GUI.Component.TextBox do
   @impl Flamelex.GUI.ComponentBehaviour
   def handle_action({_graph, state}, {:move_cursor, _direction, _distance} = cursor_movement_action) do
 
-    %{ref: %Buf{ref: buf_ref}} = state
+    %{ref: %BufRef{ref: buf_ref}} = state
 
     #assume its cursor 1 for now
     cursor_tag = {:gui_component, {:text_cursor, buf_ref, 1}} #TODO assume its cursor 1
@@ -105,7 +105,7 @@ defmodule Flamelex.GUI.Component.TextBox do
   def handle_action({graph, state}, {:switch_mode, new_mode}) do
 
 
-    %{ref: %Buf{ref: buf_ref}} = state
+    %{ref: %BufRef{ref: buf_ref}} = state
 
     #assume its cursor 1 for now
     cursor_tag = {:gui_component, {:text_cursor, buf_ref, 1}} #TODO assume its cursor 1
@@ -175,6 +175,11 @@ defmodule Flamelex.GUI.Component.TextBox do
   #   Logger.debug "#{__MODULE__} with id: #{inspect state.id} received unrecognised action: #{inspect action}"
   #   :ignore_action
   # end
+  def handle_cast({:move_cursor, %{cursor_num: 1, instructions: {:down, 1, :line}} = _details}, %{cursors: [c]} = state) do
+    #TODO here
+    IO.inspect c
+    {:noreply, state}
+  end
 
 
   defp we_are_drawing_a_footer_bar?(%{draw_footer?: df?}), do: df?

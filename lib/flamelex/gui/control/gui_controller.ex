@@ -6,7 +6,6 @@ defmodule Flamelex.GUI.Controller do
   """
   use GenServer
   use Flamelex.ProjectAliases
-  alias Flamelex.Structs.Buf
   alias Flamelex.GUI.Structs.{GUIState, GUiComponentRef}
   import Flamelex.GUI.Utilities.ControlHelper
 
@@ -58,7 +57,7 @@ defmodule Flamelex.GUI.Controller do
   def init(state) do
     IO.puts "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
-    PubSub.subscribe(topic: :active_buffer)
+    # PubSub.subscribe(topic: :active_buffer) #TODO?
     {:ok, state, {:continue, :draw_default_gui}}
   end
 
@@ -70,7 +69,7 @@ defmodule Flamelex.GUI.Controller do
     :timer.sleep(50)
 
     new_graph = default_gui(state)
-    Flamelex.API.GUI.redraw(new_graph)
+    Flamelex.GUI.redraw(new_graph)
 
     {:noreply, %{state|graph: new_graph}}
   end
@@ -81,7 +80,7 @@ defmodule Flamelex.GUI.Controller do
 
   def handle_cast({:action, :reset}, state) do
     new_graph = default_gui(state)
-    Flamelex.API.GUI.redraw(new_graph)
+    Flamelex.GUI.redraw(new_graph)
     {:noreply, state}
   end
 
@@ -90,14 +89,14 @@ defmodule Flamelex.GUI.Controller do
 
 
   #   new_graph = gui_state.graph |> Draw.test_pattern()
-  #   Flamelex.API.GUI.redraw(new_graph)
+  #   Flamelex.GUI.redraw(new_graph)
   #   {:noreply, gui_state}
   # end
 
 
 
 
-  # def handle_cast(:show_in_gui, %Buf{} = buffer}, state) do
+  # def handle_cast(:show_in_gui, %BufRef{} = buffer}, state) do
 
   #   # the reason we need this controller is, it can keep track of all the buffers that the GUI is managing. Ok fuck it we can maybe get rid of it
 
@@ -131,13 +130,12 @@ defmodule Flamelex.GUI.Controller do
 
 
 
-  def handle_cast({:show, %Buf{} = buf}, gui_state) do
+  def handle_cast({:show, %BufRef{} = buf}, gui_state) do
+
     frame = Frame.new(gui_state, buf)
-    # frame = calculate_framing(gui_state.layout)
     data  = Buffer.read(buf)
 
     gui_component_process_alive? = false
-
     if gui_component_process_alive? do
       raise "well that's a surprise"
     else
@@ -211,7 +209,7 @@ defmodule Flamelex.GUI.Controller do
 
 
   #TODO maybe this doesn't need to be routed through here, but try it for now...
-  def handle_cast({:refresh, %{ref: %Buf{} = ref} = buf_state}, gui_state) do
+  def handle_cast({:refresh, %{ref: %BufRef{} = ref} = buf_state}, gui_state) do
     ref
     |> GUiComponentRef.rego_tag()
     |> ProcessRegistry.find!()
@@ -261,7 +259,7 @@ defmodule Flamelex.GUI.Controller do
   #   {:noreply, new_state}
   # end
 
-  # def handle_cast({:show_fullscreen, %Buf{} = buffer}, state) do
+  # def handle_cast({:show_fullscreen, %BufRef{} = buffer}, state) do
   def handle_cast({:show_fullscreen, buffer}, state) do
 
     # the reason we need this controller is, it can keep track of all the buffers that the GUI is managing. Ok fuck it we can maybe get rid of it

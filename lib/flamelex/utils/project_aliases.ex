@@ -11,6 +11,8 @@ defmodule Flamelex.ProjectAliases do
 
       alias Flamelex.API.{Buffer, CommandBuffer, GUI, Memex, Journal}
 
+      alias Flamelex.Structs.BufRef
+
       alias Flamelex.Utilities.ProcessRegistry
       alias Flamelex.Utils.PubSub
 

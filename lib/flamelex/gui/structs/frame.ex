@@ -4,7 +4,7 @@ defmodule Flamelex.GUI.Structs.Frame do
   """
   require Logger
   use Flamelex.ProjectAliases
-  alias Flamelex.Structs.Buf
+  alias Flamelex.Structs.BufRef
   alias Flamelex.GUI.Structs.GUIState
 
   #TODO each "new/x" function should be making a new Scenic.Graph, we need
@@ -66,7 +66,7 @@ defmodule Flamelex.GUI.Structs.Frame do
             frames: [], #NOTE: No existing frames
             opts: opts
           }},
-        %Buf{label: buf_label}) do
+        %BufRef{label: buf_label}) do
 
     coords = calculate_frame_position(opts)
     dimens = calculate_frame_size(opts, layout_dimens)

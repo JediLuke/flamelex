@@ -24,7 +24,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
   end
 
   #TODO all of this is hacks... we need to move rego_tag into the behaviour, and this needs to be a behaviour
-  def rego_tag(%{ref: %Buf{ref: ref}}) do
+  def rego_tag(%{ref: %BufRef{ref: ref}}) do
     rego_tag(ref)
   end
   def rego_tag(%{ref: aa}) when is_atom(aa) do

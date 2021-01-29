@@ -227,10 +227,11 @@ defmodule Flamelex.Fluxus.UserInputHandler do
           :no_mapping_found
       :ignore_input ->
           :ok
-      {:action, a} ->
+      {:fire_action, a} ->
           Flamelex.Fluxus.fire_action(a)
       {:multiple_actions, action_list} when is_list(action_list) and length(action_list) > 0 ->
-          action_list |> Enum.map(&Flamelex.Fluxus.fire_action/1)
+          raise "can't handle multiple actions yet"
+          # action_list |> Enum.map(&Flamelex.Fluxus.fire_action/1)
       {:apply_mfa, {module, function, args}} ->
           # apply_mfa(module, function, args)
           Kernel.apply(module, function, args)

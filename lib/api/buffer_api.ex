@@ -5,7 +5,8 @@ defmodule Flamelex.API.Buffer do
   require Logger
   use Flamelex.ProjectAliases
   alias Flamelex.BufferManager
-  alias Flamelex.Structs.Buf #NOTE: this is a little confusing, but unavoidable - that we have a %Buf{} struct, and `Buffer` module...
+  #TODO write this up
+  # alias Flamelex.Structs.BufRef #NOTE: this is a little confusing, but unavoidable - that we have a %BufRef{} struct, and `Buffer` module...
 
 
   @doc """
@@ -15,7 +16,7 @@ defmodule Flamelex.API.Buffer do
 
 
   @doc """
-  Searches the open buffers and returns a single %Buf{}, or raises.
+  Searches the open buffers and returns a single %BufRef{}, or raises.
   """
   #TODO put a bang if it raises - it should just return nil if it cant find it
   def find(search_term), do: GenServer.call(BufferManager, {:find_buffer, search_term})
@@ -28,7 +29,7 @@ defmodule Flamelex.API.Buffer do
   ## Examples
 
   iex> Buffer.load("README.md")
-  {:ok, %Buf{} = _bufr_ref}
+  {:ok, %BufRef{} = _bufr_ref}
   """
 
   def open!, do: open!("/Users/luke/workbench/elixir/flamelex/README.md")
@@ -56,7 +57,7 @@ defmodule Flamelex.API.Buffer do
   @doc """
   Return the contents of a buffer.
   """
-  def read(%Buf{} = buf) do
+  def read(%BufRef{} = buf) do
     ProcessRegistry.find!(buf) |> GenServer.call(:read)
   end
 
@@ -99,6 +100,12 @@ defmodule Flamelex.API.Buffer do
 
 
   def close(buf) do
-    BufferManager.close_buffer(buf)
+    Flamelex.Fluxus.fire_action({:close_buffer, buf})
+  end
+
+  def close_all! do
+    raise "this should work, but is it too dangerous??"
+    list()
+    |> Enum.each(&Flamelex.Fluxus.fire_action({:close_buffer, &1}))
   end
 end

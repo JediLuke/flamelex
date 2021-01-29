@@ -4,7 +4,6 @@ defmodule Flamelex.GUI.Structs.GUiComponentRef do
   itself! Just a reference to one.
   """
   use Flamelex.{ProjectAliases, CustomGuards}
-  alias Flamelex.Structs.Buf
 
 
   defstruct [
@@ -28,13 +27,13 @@ defmodule Flamelex.GUI.Structs.GUiComponentRef do
   & it will either return the rego_tag matching the params, or `:error`
   """
   #TODO deprecate first...
-  def rego_tag(%Buf{ref: ref}) do
+  def rego_tag(%BufRef{ref: ref}) do
     {:gui_component, ref}
   end
   def rego_tag(:gui_component, ref: r) do
     {:gui_component, r}
   end
-  def rego_tag({:gui_component, %Buf{ref: ref}}) do
+  def rego_tag({:gui_component, %BufRef{ref: ref}}) do
     {:gui_component, ref}
   end
   def rego_tag(_else), do: :error

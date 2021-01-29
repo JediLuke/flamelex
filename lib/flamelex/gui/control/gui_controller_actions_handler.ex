@@ -217,7 +217,7 @@ end
 
 
 
-#   # def process({_scene, graph}, {:show_in_gui, %Buf{} = buf}) do
+#   # def process({_scene, graph}, {:show_in_gui, %BufRef{} = buf}) do
 #   #   new_graph =
 #   #     graph
 #   #     |> GUI.Utilities.Draw.text(buf.content) #TODO update the correct buffer GUI process, & do it from within that buffer itself (high-five!)

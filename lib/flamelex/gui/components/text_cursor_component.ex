@@ -37,7 +37,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
   end
 
 
-  def render(%{ref: %Buf{ref: buf_ref}, frame: %Frame{} = frame, current_coords: coords, mode: mode}) do
+  def render(%{ref: %BufRef{ref: buf_ref}, frame: %Frame{} = frame, current_coords: coords, mode: mode}) do
 
 
     block_dimensions = {_w, _h} = cursor_box_dimensions(mode)
@@ -84,13 +84,13 @@ defmodule Flamelex.GUI.Component.TextCursor do
   end
 
 
-  def rego_tag(%{ref: %Buf{ref: buf_ref}, num: num}) when is_integer(num) and num >= 1 do
+  def rego_tag(%{ref: %BufRef{ref: buf_ref}, num: num}) when is_integer(num) and num >= 1 do
     {:gui_component, {:text_cursor, buf_ref, num}}
   end
 
   @impl Flamelex.GUI.ComponentBehaviour
   def handle_action(
-          {graph, %{ref: %Buf{ref: buf_ref}, current_coords: {_x, _y} = current_coords} = state},
+          {graph, %{ref: %BufRef{ref: buf_ref}, current_coords: {_x, _y} = current_coords} = state},
           {:move_cursor, direction, distance})
             when direction in @valid_directions
             and distance >= 1 do
@@ -104,7 +104,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
   end
 
   def handle_action(
-        {graph, %{ref: %Buf{ref: buf_ref}} = state},
+        {graph, %{ref: %BufRef{ref: buf_ref}} = state},
         {:switch_mode, new_mode}) do
 
     block_dimensions = {_w, _h} = cursor_box_dimensions(new_mode)
@@ -127,13 +127,15 @@ defmodule Flamelex.GUI.Component.TextCursor do
   def move(graph, state, %{direction: direction, distance: distance, buf_ref: buf_ref, current_coords: {x_coord, y_coord}}) do
 
     cursor_height = Flamelex.GUI.Component.Utils.TextBox.line_height()
+    _block_dimensions = {cursor_width, _h} = cursor_box_dimensions(state.mode)
 
     new_coords = {_new_x_coord, _new_y_coord} =
       case direction do
-        :up    -> {x_coord, y_coord - (distance*cursor_height)}
-        :down  -> {x_coord, y_coord + (distance*cursor_height)}
-        # :left  -> {x_coord, y_coord+(distance*cursor_height)}
-        # :right -> {x_coord, y_coord+(distance*cursor_height)}
+        :up    -> {x_coord, y_coord-(distance*cursor_height)}
+        :down  -> {x_coord, y_coord+(distance*cursor_height)}
+        #TODO
+        :left  -> {x_coord-cursor_width, y_coord}
+        :right -> {x_coord+cursor_width, y_coord}
       end
 
     new_state =
@@ -159,7 +161,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
 
 
   @impl Scenic.Scene
-  def handle_info(:blink, {graph, %{ref: %Buf{ref: buf_ref}} = state}) do
+  def handle_info(:blink, {graph, %{ref: %BufRef{ref: buf_ref}} = state}) do
 
     new_state =
       case state.override? do
@@ -177,6 +179,45 @@ defmodule Flamelex.GUI.Component.TextCursor do
                 buf_ref,
                 &Scenic.Primitives.update_opts(&1,
                                       hidden: new_state.hidden?))
+
+    {:noreply, {new_graph, new_state}, push: new_graph}
+  end
+
+
+  def handle_cast({:move, %{instructions: {direction, num, :line}}}, {graph, state}) do
+
+    # forward to this buffers top gui_component, then it will, in turn,#
+    # forward the request to the cursor...
+    # ProcessRegistry.find!({:gui_component, state.ref})
+    # |> GenServer.cast({:move_cursor, details})
+
+    IO.puts "IF WE GET HERE... WE CAN SEND TH CURSOR UPDATES!!\n\n"
+    {:update_graph_and_state, {new_graph, new_state}} =
+      move(graph, state, %{
+        current_coords: state.current_coords,
+        direction: direction,
+        distance: num,
+        buf_ref: state.ref.ref #TODO lol
+      })
+
+    {:noreply, {new_graph, new_state}, push: new_graph}
+  end
+
+  def handle_cast({:move, %{instructions: {direction, num, :column}}}, {graph, state}) do
+
+    # forward to this buffers top gui_component, then it will, in turn,#
+    # forward the request to the cursor...
+    # ProcessRegistry.find!({:gui_component, state.ref})
+    # |> GenServer.cast({:move_cursor, details})
+
+    IO.puts "IF WE GET HERE... WE CAN SEND TH CURSOR UPDATES!!\n\n"
+    {:update_graph_and_state, {new_graph, new_state}} =
+      move(graph, state, %{
+        current_coords: state.current_coords,
+        direction: direction,
+        distance: num,
+        buf_ref: state.ref.ref #TODO lol
+      })
 
     {:noreply, {new_graph, new_state}, push: new_graph}
   end

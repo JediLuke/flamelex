@@ -44,7 +44,7 @@
 #   ## -------------------------------------------------------------------
 
 
-#   # def init(%Buf{} = buf) do
+#   # def init(%BufRef{} = buf) do
 #   def init(buf) do
 #     IO.puts "#{__MODULE__} initializing...\n" # NOTE: This is the last process we boot in the initial supervision tree, so in thie special case we add a `\n` character to the log output, just for neatness.
 

@@ -1,4 +1,3 @@
-
 defmodule Flamelex.BufferManager do
   @moduledoc """
   Coordinates & administrates all the open buffers.
@@ -6,7 +5,6 @@ defmodule Flamelex.BufferManager do
   use GenServer
   use Flamelex.ProjectAliases
   require Logger
-  alias Flamelex.Structs.Buf
   alias Flamelex.Buffer.BufUtils
 
   #TODO if a buffer crashes, need to catch it & alert Flamelex.GUI.Controller
@@ -19,7 +17,7 @@ defmodule Flamelex.BufferManager do
   def init(_params) do
     IO.puts "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
-    PubSub.subscribe(topic: :active_buffer)
+    # PubSub.subscribe(topic: :active_buffer) #TODO??
     {:ok, %{buffer_list: [], active_buffer: nil}}
   end
 
@@ -55,7 +53,7 @@ defmodule Flamelex.BufferManager do
     # # 3) a PubSub which works, which goes heirarchically, and the top level can be some reference like "lukes_journal", so it's easy to broadcast to all processes which need updates about my journal
 
     case BufUtils.open_buffer(params) do
-      {:ok, %Buf{} = buf} ->
+      {:ok, %BufRef{} = buf} ->
           {:reply, {:ok, buf}, %{state|buffer_list: state.buffer_list ++ [buf], active_buffer: buf}}
       {:error, reason} ->
           {:reply, {:error, reason}, state}
@@ -70,7 +68,7 @@ defmodule Flamelex.BufferManager do
       state
       |> Enum.find(
            :no_matching_buffer_found, # this is the default value we return if no element is found by the function below
-           fn %Buf{} = b ->
+           fn %BufRef{} = b ->
              # TheFuzz.compare(:jaro_winkler, search_term, b.label) >= similarity_cutoff
              String.jaro_distance(search_term, b.label) >= similarity_cutoff
            end)
@@ -78,7 +76,7 @@ defmodule Flamelex.BufferManager do
     case find_buf do
       :no_matching_buffer_found ->
         {:reply, {:error, "no matching buffer found"}, state}
-      %Buf{} = buf ->
+      %BufRef{} = buf ->
         {:reply, {:ok, buf}, state}
     end
   end
@@ -119,7 +117,7 @@ defmodule Flamelex.BufferManager do
     {:noreply, state}
   end
 
-  def handle_info({:active_buffer, :switch_mode, new_mode}, %{active_buffer: %Buf{ref: ref} = active_buf} = state) do
+  def handle_info({:active_buffer, :switch_mode, new_mode}, %{active_buffer: %BufRef{ref: ref} = active_buf} = state) do
 
     ProcessRegistry.find!({:gui_component, ref})
     # Flamelex.GUI.Component.TextBox.rego_tag(active_buf)

@@ -13,7 +13,7 @@ defmodule Flamelex.Buffer do
     IO.puts "Loading new text buffer for file: #{inspect filepath}..."
 
     case GenServer.call(BufferManager, {:open_buffer, opts}) do
-         {:ok, %Flamelex.Structs.Buf{} = buf} ->
+         {:ok, %Flamelex.Structs.BufRef{} = buf} ->
             buf
          {:error, {:already_started, _pid}} ->
             raise "Here we should just link to the alrdy open pid"
@@ -22,8 +22,12 @@ defmodule Flamelex.Buffer do
     end
   end
 
+  #TODO
+#   def show
+#   def hide
+
   #TODO use TextCursor structs
-#   def move_cursor(%Buf{} = buf, %Cursor{num: 1}, %{to: destination}) do
+#   def move_cursor(%BufRef{} = buf, %Cursor{num: 1}, %{to: destination}) do
 #    #TODO call the pid, & give them the instructions
 
 #   end

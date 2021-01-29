@@ -1,9 +1,10 @@
 defmodule Flamelex.Fluxus.Reducers.Buffer do
   use Flamelex.Fluxux.ReducerBehaviour
   alias Flamelex.Buffer.BufUtils
+  alias Flamelex.Structs.BufRef
 
 
-  def async_reduce(_radix_state,
+  def async_reduce(radix_state,
     {:open_buffer, {:local_text_file, path: filepath}, opts}
   ) when is_map(opts) do
 
@@ -16,18 +17,32 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do
     buf = Flamelex.Buffer.open!(opts)
 
     if BufUtils.open_this_buffer_in_gui?(opts) do
+      #TODO maybe replace this with GUI.Controller.fire_action({:show, buf}) - it' more consistent with the rest of flamelex, and then we dont need to keep adding new interface functions inside gui controller
       :ok = Flamelex.GUI.Controller.show(buf)
     end
 
-    #TODO call back to FluxusRadix with results of opening
+    new_radix_state =
+      radix_state
+      |> RadixState.set_active_buffer(buf)
+
+    IO.puts "CASTING!!\n\n\n"
+    GenServer.cast(Flamelex.FluxusRadix, {:reducer_callback, new_radix_state})
+    IO.puts "DONEONEONE"
   end
 
 
-  def execute_action_async(%RadixState{} = radix_state, {:active_buffer, action, details}) do
-    Flamelex.BufferManager.fire_action(radix_state, action, details)
-    :ok
-  end
+  def async_reduce(_radix_state,
+        {:move_cursor, %{buffer: %BufRef{type: Flamelex.Buffer.Text, ref: ref}, details: details}}
+  ) do
 
+    # Flamelex.GUI.Controller.fire_action({})
+
+    #TODO eventually we need to go through some kind of manager, to check we dont overrun the line etc... but for now...
+    # we just go to the cursor component directly!!
+    {:gui_component, {:text_cursor, ref, 1}}
+    |> ProcessRegistry.find!()
+    |> GenServer.cast({:move, details})
+  end
 
 
   def async_reduce(_radix_state, a) do

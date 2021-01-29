@@ -9,7 +9,7 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
 
   defstruct [
     mode:                 :normal,    # The input mode
-    active_buffer:        nil,        # We need to know the active buffer - must be a %Flamelex.Structs.Buf{}
+    active_buffer:        nil,        # We need to know the active buffer - must be a %Flamelex.Structs.BufRef{}
     keystroke_history:    [],         # A list of all previously entered user-input keystrokes
     action_history:       [],         # A history of actions sent to FluxusRadix
     # runtime_config:       %{
@@ -33,6 +33,10 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
         |> add_to_list(k, max_length: @max_keystroke_history_limit)
 
     %{radix_state|keystroke_history: new_keystroke_history}
+  end
+
+  def set_active_buffer(%__MODULE__{} = radix_state, %BufRef{} = b) do
+    %{radix_state|active_buffer: b}
   end
 
   def record(%__MODULE__{action_history: action_history} = radix_state, action: a) do
