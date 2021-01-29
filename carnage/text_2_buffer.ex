@@ -51,7 +51,7 @@
 
 #     {:ok, file_contents} = File.read(filepath)
 
-#     buf_ref = Buf.new(params)
+#     buf_ref = BufRef.new(params)
 
 #     new_buf = %{
 #       name: filepath,
