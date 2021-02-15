@@ -12,7 +12,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
 
 
   @doc ~s(This function maps defines the act of pressing a key, to an action.)
-  def keymap(%RadixState{mode: :normal, active_buffer: %BufRef{type: Flamelex.Buffer.Text} = active_buf}) do
+  def keymap(%RadixState{mode: :normal, active_buffer: active_buf}) do #TODO so, we used to have BufRef here, which let us pattern match on the type of buffer the active buffer was... and I liked that :(
     %{
       # enter_insert_mode_after_current_character
       # @lowercase_a => [:active_buffer |> CoreActions.move_cursor(:forward, 1, :character),
@@ -21,7 +21,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
       # @lowercase_c => vim_language_command(:change),
       # @lowercase_d => vim_language_command(:delete),
       # @lowercase_e => vim_language(:end) #:active_buffer |> CoreActions.move_cursor(:end, :word), #TODO this is tough... we want to be able to go dte, etc...
-      # @lowercase_f => find_character(:current_line, :after_cursor, {:direction, :forward}) #TODO vim language command??
+      # @lowercase_f => find_character(:current_line, :after_cursor, {:direction, :forward})
       # @lowercase_g => #unbound
       @lowercase_h => {:fire_action, {:move_cursor, %{buffer: active_buf, details: %{cursor_num: 1, instructions: {:left, 1, :column}}}}},
       # @lowercase_i => CoreActions.switch_mode(:insert),
@@ -53,7 +53,9 @@ defmodule Flamelex.API.KeyMappings.VimClone do
       # @uppercase_E => CoreActions.move_cursor(to: :end_of_current_word),
       # @uppercase_F => find_character(:current_line, :after_cursor, {:direction, :reverse})
       # @uppercase_G => :active_buffer |> move_cursor(to: :last_line), #TODO implement proper vim handling, how to get it to accept pre-G alpha numeric... how to explain this... either use a pre-cursor, or go to end (just go to end by defualt???)
-      # @uppercase_G => {:action, {:active_buffer, :CoreActions.move_cursor, {:last_line, :same_column}}}, #TODO when actibve buf is text?? How do we handle this???
+      @uppercase_G => {:vim_lang, :motion, :goto_last_line_in_buffer},
+      #TODO actually, got a new plan for this - send it to the VimLang process
+      # @uppercase_G => {:fire_action, {:move_cursor, %{buffer: active_buf, details: %{cursor_num: 1, instructions: %{last: :line, same: :column}}}}},
       # @uppercase_H => goto_line(1) # home cursor
       # @uppercase_I => CoreActions.move_cursor(to: :first_non_whitespace_character, :current_line, :backwards), switch_mode(:insert)
       #TODO also important!!
@@ -164,7 +166,8 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   #                 }
   #   } #TODO generalize this to non-text buffers too
   # end
-  def keymap(%RadixState{mode: :normal, active_buffer: %BufRef{type: Flamelex.Buffer.Text} = active_buf}) do
+  # def keymap(%RadixState{mode: :normal, active_buffer: %BufRef{type: Flamelex.Buffer.Text} = active_buf}) do
+  def keymap(%RadixState{mode: :normal, active_buffer: active_buf}) do
     %{
       @escape_key => CoreActions.switch_mode(:normal)
     }

@@ -72,7 +72,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
   # end
 
   def handle_action(
-        {graph, %{ref: %BufRef{ref: _buf_ref}} = state},
+        {graph, %{ref: %{ref: _buf_ref}} = state},
         {:switch_mode, new_mode}) do
     {new_graph, new_state} = CursorUtils.switch_mode({graph, state}, new_mode)
     {:update_graph_and_state, {new_graph, new_state}}

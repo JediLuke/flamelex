@@ -153,7 +153,7 @@ defmodule Flamelex.GUI.Component.TextBox do
   def handle_action({graph, state}, {:switch_mode, new_mode}) do
 
 
-    %{ref: %BufRef{ref: buf_ref}} = state
+    %{ref: %{ref: buf_ref}} = state
 
     #assume its cursor 1 for now
     cursor_tag = {:gui_component, {:text_cursor, buf_ref, 1}} #TODO assume its cursor 1

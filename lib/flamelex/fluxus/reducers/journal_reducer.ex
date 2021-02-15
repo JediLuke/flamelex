@@ -10,32 +10,30 @@ defmodule Flamelex.Fluxus.Reducers.Journal do
 
 
   def async_reduce(_radix_state, :open_todays_journal_entry) do
-    if Journal.todays_page |> File.exists?() do
-      Flamelex.Fluxus.fire_action({
-              :open_buffer,
-                {:local_text_file, path: Journal.todays_page()}, %{
-                  label: "journal-today",
-                  append_new_timestamp?: false #TODO scan the file, look for most recent timestamp - if it's more than 15? minutes, append a new one
-              }})
+    if filepath = Journal.todays_page() |> File.exists?() do
+      fire_open_buffer_action(filepath)
     else
-      journal_entry = Journal.new_journal_entry_template()
-
+      # create the file since it doesn't exist...
       {:ok, file} = File.open(Journal.todays_page, [:write])
-      IO.binwrite(file, journal_entry)
-      :ok = File.close(file)
+      IO.binwrite(file, Journal.new_journal_entry_template())
+      File.close(file)
 
-      Flamelex.Fluxus.fire_action({
-        :open_buffer!,
-        {:local_file, path: Journal.todays_page},
-        %{
-          label: "journal - today",
-          make_active_buffer?: true
-        }
-      })
+      fire_open_buffer_action(file)
     end
   end
 
   def async_reduce(_radix_state, _a) do
     :ignoring_action
+  end
+
+  defp fire_open_buffer_action(filepath) do
+    Flamelex.Fluxus.fire_action({:open_buffer, %{
+      type: Flamelex.Buffer.Text,
+      source: {:file, filepath},
+      label: "journal-today",
+      open_in_gui?: true, #TODO set active buffer
+      append_new_timestamp?: false #TODO scan the file, look for most recent timestamp - if it's more than 15? minutes, append a new one
+      # make_active_buffer?: true
+    }})
   end
 end

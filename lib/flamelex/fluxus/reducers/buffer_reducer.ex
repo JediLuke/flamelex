@@ -3,27 +3,20 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do
 
 
   def async_reduce(radix_state, {:open_buffer, opts}) do
-    buf = Flamelex.Buffer.open!(opts)
-    GenServer.cast(Flamelex.FluxusRadix,
-                   {:radix_state_update,
-                     radix_state |> RadixState.set_active_buffer(buf)})
 
+    buf =
+      Flamelex.Buffer.open!(opts)
+    radix_update =
+      {:radix_state_update, radix_state |> RadixState.set_active_buffer(buf)}
+
+    GenServer.cast(Flamelex.FluxusRadix, radix_update)
   end
 
 
-  def async_reduce(_radix_state,
-        {:move_cursor, %{
-            buffer:   %{type: Flamelex.Buffer.Text} = text_buf_ref,
-            details:  details}}
-  ) do
-
-    # {:gui_component, {:text_cursor, buffer_ref, 1}} #TODO properly define this wannabee tree structure
-
-    # {:gui_component, buf_ref.ref} # find the Flamelex.GUI.Component.TextBox process for this Buffer.Text
-
-    text_buf_ref
+  def async_reduce(_radix_state, {:move_cursor, %{buffer: buffer_tag, details: details}}) do
+    buffer_tag
     |> ProcessRegistry.find!()
-    |> GenServer.cast({:move_cursor, details}) #TODO cursor number??
+    |> GenServer.cast({:move_cursor, details})
   end
 
 

@@ -232,6 +232,8 @@ defmodule Flamelex.Fluxus.UserInputHandler do
       {:multiple_actions, action_list} when is_list(action_list) and length(action_list) > 0 ->
           raise "can't handle multiple actions yet"
           # action_list |> Enum.map(&Flamelex.Fluxus.fire_action/1)
+      {:vim_lang, x, v} ->
+          GenServer.cast(Flamelex.GUI.VimServer, {{x, v}, radix_state})
       {:apply_mfa, {module, function, args}} ->
           # apply_mfa(module, function, args)
           Kernel.apply(module, function, args)

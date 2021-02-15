@@ -10,7 +10,8 @@ defmodule Flamelex.Buffer do
 
   def open!(params) do
 
-    params = add_this_process_to_callback_list(params)
+    params = params
+             |> add_this_process_to_callback_list()
 
     DynamicSupervisor.start_child(Flamelex.Buffer.Supervisor,
                                   {params.type, params})
