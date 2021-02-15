@@ -3,7 +3,6 @@ defmodule Flamelex.BufferBehaviour do
   Defines the interface for a Flamelex.Buffer
   """
 
-
   defmacro __using__(_params) do
     quote do
 
@@ -14,7 +13,6 @@ defmodule Flamelex.BufferBehaviour do
       @behaviour Flamelex.BufferBehaviour
       use GenServer
       use Flamelex.ProjectAliases
-      alias Flamelex.Buffer.Structs.BufferState
 
 
       @doc """
@@ -66,25 +64,8 @@ defmodule Flamelex.BufferBehaviour do
       def handle_call(:read, _from, state) do
         {:reply, state.data, state}
       end
-
-
-      #TODO
-      # @doc """
-      # All Buffers support show/hide
-      # """
-      # @impl GenServer
-      # def handle_cast(:show, buf) do
-      #   Flamelex.GUI.Controller.action({:show, buf})
-      #   {:noreply, buf}
-      # end
-
-      # def handle_cast(:hide, buf) do
-      #   Flamelex.GUI.Controller.action({:hide, buf})
-      #   {:noreply, buf}
-      # end
     end
   end
-
 
 
   @doc """

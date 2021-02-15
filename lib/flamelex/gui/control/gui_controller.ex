@@ -122,10 +122,10 @@ defmodule Flamelex.GUI.Controller do
 
 
 
-  def handle_cast({:show, buf}, gui_state) do
+  def handle_cast({:show, buf_state}, gui_state) do #TODO this assumes it isn't hibernated or whatever
 
-    frame = Frame.new(gui_state, buf)
-    data  = Buffer.read(buf)
+    frame = Frame.new(gui_state, buf_state)
+    # data  = Buffer.read(buf)
 
     gui_component_process_alive? = false
     if gui_component_process_alive? do
@@ -133,11 +133,13 @@ defmodule Flamelex.GUI.Controller do
     else
       new_graph =
         gui_state.graph
-        |> Flamelex.GUI.Component.TextBox.mount(%{
-              ref: buf,
-              frame: frame,
-              mode: :normal,
-              data: data })
+        |> Flamelex.GUI.Component.TextBox.mount(
+             buf_state
+             |> Map.merge(%{
+                  ref: buf_state.rego_tag,
+                  frame: frame,
+                  mode: :normal
+             }))
 
       Flamelex.GUI.RootScene.redraw(new_graph)
       {:noreply, %{gui_state|graph: new_graph}}

@@ -13,7 +13,7 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do
   end
 
 
-  def async_reduce(_radix_state, {:move_cursor, %{buffer: buffer_tag, details: details}}) do
+  def async_reduce(_radix_state, {:move_cursor, %{buffer: buffer_tag, details: details}}) do #TODO I dunno if I like this or not
     buffer_tag
     |> ProcessRegistry.find!()
     |> GenServer.cast({:move_cursor, details})

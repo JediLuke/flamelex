@@ -20,9 +20,9 @@ defmodule Flamelex.GUI.Component.TextCursor do
     GenServer.cast(self(), :start_blink)
 
     starting_coords = CursorUtils.calc_starting_coordinates(params.frame)
-    #TODO so this is basically, the TextCursor struct
+
     params |> Map.merge(%{
-      # frame: params.frame,
+      #TODO do everything in terms of grids...
       # grid_pos: nil,  # where we are in the file, e.g. line 3, column 5
       #TODO make this original_coords
       original_coordinates: starting_coords,        # so we can track how we've moved around
@@ -52,8 +52,8 @@ defmodule Flamelex.GUI.Component.TextCursor do
   end
 
 
-  def rego_tag(%{ref: buf_ref, num: num}) when is_integer(num) and num >= 1 do
-    {:gui_component, {:text_cursor, buf_ref, num}}
+  def rego_tag(%{ref: ref, num: num}) when is_integer(num) and num >= 1 do
+    {:cursor, num, ref}
   end
 
   # @impl Flamelex.GUI.ComponentBehaviour
@@ -87,6 +87,11 @@ defmodule Flamelex.GUI.Component.TextCursor do
 
   def handle_cast({:move, details}, {graph, state}) do
     {new_graph, new_state} = CursorUtils.move_cursor({graph, state}, details)
+    {:noreply, {new_graph, new_state}, push: new_graph}
+  end
+
+  def handle_cast({:reposition, new_coords}, {graph, state}) do
+    {new_graph, new_state} = CursorUtils.reposition({graph, state}, new_coords)
     {:noreply, {new_graph, new_state}, push: new_graph}
   end
 

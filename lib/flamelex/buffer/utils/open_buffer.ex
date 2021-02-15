@@ -1,5 +1,4 @@
 defmodule Flamelex.Buffer.Utils.OpenBuffer do
-  alias Flamelex.Structs.BufRef
 
 
 

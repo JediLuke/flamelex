@@ -167,7 +167,8 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   #   } #TODO generalize this to non-text buffers too
   # end
   # def keymap(%RadixState{mode: :normal, active_buffer: %BufRef{type: Flamelex.Buffer.Text} = active_buf}) do
-  def keymap(%RadixState{mode: :normal, active_buffer: active_buf}) do
+
+  def keymap(%RadixState{mode: :normal, active_buffer: _active_buf}) do
     %{
       @escape_key => CoreActions.switch_mode(:normal)
     }
@@ -177,7 +178,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   @doc ~s(This function allows users to define custom leader key-bindings.)
   def leader_keybindings(%RadixState{mode: :normal}) do
     %{
-      @lowercase_j => {:apply_mfa, {Flamelex.API.Journal, :today, []}},
+      @lowercase_j => {:apply_mfa, {Flamelex.API.Journal, :now, []}},
       @lowercase_k => {:apply_mfa, {Flamelex.API.CommandBuffer, :show, []}},
       @lowercase_t => {:apply_mfa, {Flamelex.API.Memex.TiddlyWiki, :open, []}}, #TODO
 

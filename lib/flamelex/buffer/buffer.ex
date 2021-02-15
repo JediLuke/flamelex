@@ -8,13 +8,13 @@ defmodule Flamelex.Buffer do
   """
 
 
-  def open!(params) do
+  def open!(%{type: buffer_module} = params) when is_atom(buffer_module) do
 
     params = params
              |> add_this_process_to_callback_list()
 
     DynamicSupervisor.start_child(Flamelex.Buffer.Supervisor,
-                                  {params.type, params})
+                                  {buffer_module, params})
 
     receive do
       {:open_buffer_successful, tag} ->
@@ -28,6 +28,22 @@ defmodule Flamelex.Buffer do
   #TODO
 #   def show
 #   def hide
+
+
+      #TODO
+      # @doc """
+      # All Buffers support show/hide
+      # """
+      # @impl GenServer
+      # def handle_cast(:show, buf) do
+      #   Flamelex.GUI.Controller.action({:show, buf})
+      #   {:noreply, buf}
+      # end
+
+      # def handle_cast(:hide, buf) do
+      #   Flamelex.GUI.Controller.action({:hide, buf})
+      #   {:noreply, buf}
+      # end
 
   #TODO use TextCursor structs
 #   def move_cursor(%BufRef{} = buf, %Cursor{num: 1}, %{to: destination}) do

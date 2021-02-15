@@ -14,22 +14,24 @@ defmodule Flamelex.GUI.Component.TextBox do
   #   {:gui_component, }
   # end
 
-  def rego_tag(%{ref: buffer_tag}) do
-    {:gui_component, buffer_tag}
+  def rego_tag(%{ref: buffer}) do
+    {:gui_component, buffer}
   end
 
   @impl Flamelex.GUI.ComponentBehaviour
-  def custom_init_logic(%{frame: %Frame{} = f, ref: buf} = params) do
+  def custom_init_logic(%{frame: %Frame{} = f} = params) do
 
+    #TODO can probs get this direct from buf state?
     lines_of_text =
-      Flamelex.API.Buffer.read(buf)
+      # Flamelex.API.Buffer.read(buf)
+      params.data
       |> TextBoxDrawUtils.split_into_a_list_of_lines_of_text_structs()
 
     #TODO this is the whole textbox
     params |> Map.merge(%{
       draw_footer?: true,
       cursors: [
-        %{ frame: f, ref: buf, num: 1 } #TODO use cursor struct, add frame to cursor struct
+        %{ frame: f, ref: rego_tag(params), num: 1 } #TODO use cursor struct, add frame to cursor struct
       ],
       num_lines: lines_of_text |> length()
     })
@@ -72,8 +74,8 @@ defmodule Flamelex.GUI.Component.TextBox do
   def draw_cursors(graph, frame, %{cursors: cursors})
     when is_list(cursors) and length(cursors) >= 1
   do
-    Enum.reduce(cursors, graph, fn c, graph ->
-      graph |> TextCursor.mount(c |> Map.merge(%{frame: frame}))
+    Enum.reduce(cursors, _init_acc={graph, _first_cursor_num=1}, fn c, {graph, n} ->
+      graph |> TextCursor.mount(c |> Map.merge(%{frame: frame, num: n}))
     end)
   end
 

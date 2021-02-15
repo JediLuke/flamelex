@@ -58,6 +58,22 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
     {new_graph, new_state}
   end
 
+  def reposition({graph, state}, %{line: l, col: c}) do
+
+    {start_x, start_y} = state.original_coordinates
+
+    new_x = start_x + (cursor_box_width()*(c-1)) #REMINDER: we need the -1 here because we starts lines & columns at 1 not zero
+    new_y = start_y + (cursor_box_height()*(l-1))
+
+    new_state =
+      %{state|current_coords: {new_x, new_y}, override?: :visible} # the visual effect is better if you dont blink the cursor when moving it
+
+    new_graph =
+      graph |> modify_cursor_position(new_state)
+
+    {new_graph, new_state}
+  end
+
   def move_cursor({graph, state}, %{instructions: instructions}) do
 
     new_coords =

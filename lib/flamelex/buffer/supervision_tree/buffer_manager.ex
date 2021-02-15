@@ -59,15 +59,15 @@ defmodule Flamelex.BufferManager do
   end
 
   @impl GenServer
-  def handle_cast({:buffer_opened, %{rego_tag: t} = buf_state}, state) do
+  def handle_cast({:buffer_opened, buf_state}, state) do
 
     #TODO we can do better than this (though, this is still better I think, at least it's BuffERManager doing it)
     if Flamelex.Buffer.Utils.OpenBuffer.open_this_buffer_in_gui?(buf_state) do
       #TODO maybe replace this with GUI.Controller.fire_action({:show, buf}) - it' more consistent with the rest of flamelex, and then we dont need to keep adding new interface functions inside gui controller
-      GenServer.cast(Flamelex.GUI.Controller, {:show, t})
+      GenServer.cast(Flamelex.GUI.Controller, {:show, buf_state})
     end
 
-    {:noreply, %{state|buffer_list: state.buffer_list ++ [t], active_buffer: t}}
+    {:noreply, %{state|buffer_list: state.buffer_list ++ [buf_state.rego_tag], active_buffer: buf_state.rego_tag}}
   end
 
   # #TODO need to give each buffer a new number...

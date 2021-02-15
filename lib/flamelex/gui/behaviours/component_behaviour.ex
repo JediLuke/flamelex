@@ -49,7 +49,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       graph. In our case this is the same for all components though so we
       can abstract it out.
       """
-      def mount(%Scenic.Graph{} = graph, params) when is_map(params) do
+      def mount(%Scenic.Graph{} = graph, params) do
         graph |> add_to_graph(params) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
       end
 
@@ -74,19 +74,14 @@ defmodule Flamelex.GUI.ComponentBehaviour do
         {:ok, {graph, params}, push: graph}
       end
 
+
       def register_self(params) do
-
-        #TODO dont hack this, it's not optional!!
-        {:gui_component, _ref} = tag =
-          #TODO this code is now deprecated, but it's cool and I want to keepit for later
-          # if function_exported?(__MODULE__, :rego_tag, 1) do
+        tag =
+          if function_exported?(__MODULE__, :rego_tag, 1) do
             apply(__MODULE__, :rego_tag, [params])
-          # else
-          #   {:gui_component, "no-tag"} #TODO auto-generate it at least?
-          # end
-
-        IO.inspect tag, label: "TTT"
-
+          else
+            {:gui_component, params.rego_tag}
+          end
 
         #TODO search for if the process is already registered, if it is, engage recovery procedure
         #TODO this should be {:gui_component, frame.id}, or maybe other way around. It could also subscribe to the channel for this id
