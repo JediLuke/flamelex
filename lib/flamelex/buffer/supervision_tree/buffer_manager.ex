@@ -4,8 +4,7 @@ defmodule Flamelex.BufferManager do
   """
   use GenServer
   use Flamelex.ProjectAliases
-  require Logger
-  alias Flamelex.Buffer.BufUtils
+  alias Flamelex.Buffer.Utils.OpenBuffer, as: BufferOpenUtils
 
   #TODO if a buffer crashes, need to catch it & alert Flamelex.GUI.Controller
   #TODO idea: the GUI should turn grey, with an x through it - but it has memory (text etc) in it - maybe it can be used to recover the Buffer state...
@@ -14,51 +13,20 @@ defmodule Flamelex.BufferManager do
     GenServer.start_link(__MODULE__, params)
   end
 
+  @impl GenServer
   def init(_params) do
     IO.puts "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
-    # PubSub.subscribe(topic: :active_buffer) #TODO??
-    {:ok, %{buffer_list: [], active_buffer: nil}}
+
+    init_state = %{
+      buffer_list: [],        # holds a reference to each open buffer
+      active_buffer: nil,     # holds a reference to the `active` buffer
+    }
+
+    {:ok, init_state}
   end
 
-  #TODO you know, we might be able to just call open_buffer directly,
-  #     & have it update only if it was successful...
-  def handle_call({:open_buffer, params}, _from, state) do
 
-    # in this idea, it's even crazier - we spin up a whole
-    # new task which is solely responsible for opening a buffer -
-    # first we need the pure function to do it (can run in iex), then
-    # we make it a one-off task call
-
-    # if we need the buffer_mgr_state, then it will have to be
-    # routed through here, but, we might not even need it - especially
-    # if we design the buffers themselves to call back to BufferManager
-    # and say "hey, I worked!"
-
-    # Task.Supervisor.start_child(
-    #   Flamelex.Buffer.Jackaroo,
-    #     Flamelex.Buffer.BufUtils,       # module
-    #     :open_buffer,                   # function
-    #     [buffer_mgr_state, params]      # args
-    # )
-
-    # {:noreply, buffer_mgr_state}
-    # # receive do
-    #   {:}
-    # end
-
-
-    # #TODO updte active buffer? by option??
-    # # 1) way of registering processes / # 2) a system for doing that
-    # # 3) a PubSub which works, which goes heirarchically, and the top level can be some reference like "lukes_journal", so it's easy to broadcast to all processes which need updates about my journal
-
-    case BufUtils.open_buffer(params) do
-      {:ok, %BufRef{} = buf} ->
-          {:reply, {:ok, buf}, %{state|buffer_list: state.buffer_list ++ [buf], active_buffer: buf}}
-      {:error, reason} ->
-          {:reply, {:error, reason}, state}
-    end
-  end
 
   def handle_call({:find_buffer, search_term}, _from, state) do
 
@@ -68,7 +36,7 @@ defmodule Flamelex.BufferManager do
       state
       |> Enum.find(
            :no_matching_buffer_found, # this is the default value we return if no element is found by the function below
-           fn %BufRef{} = b ->
+           fn b ->
              # TheFuzz.compare(:jaro_winkler, search_term, b.label) >= similarity_cutoff
              String.jaro_distance(search_term, b.label) >= similarity_cutoff
            end)
@@ -76,7 +44,7 @@ defmodule Flamelex.BufferManager do
     case find_buf do
       :no_matching_buffer_found ->
         {:reply, {:error, "no matching buffer found"}, state}
-      %BufRef{} = buf ->
+      buf ->
         {:reply, {:ok, buf}, state}
     end
   end
@@ -88,6 +56,18 @@ defmodule Flamelex.BufferManager do
 
   def handle_call(:list_buffers, _from, state) do
     {:reply, state, state}
+  end
+
+  @impl GenServer
+  def handle_cast({:buffer_opened, %{rego_tag: t} = buf_state}, state) do
+
+    #TODO we can do better than this (though, this is still better I think, at least it's BuffERManager doing it)
+    if Flamelex.Buffer.Utils.OpenBuffer.open_this_buffer_in_gui?(buf_state) do
+      #TODO maybe replace this with GUI.Controller.fire_action({:show, buf}) - it' more consistent with the rest of flamelex, and then we dont need to keep adding new interface functions inside gui controller
+      GenServer.cast(Flamelex.GUI.Controller, {:show, t})
+    end
+
+    {:noreply, %{state|buffer_list: state.buffer_list ++ [t], active_buffer: t}}
   end
 
   # #TODO need to give each buffer a new number...
@@ -117,7 +97,7 @@ defmodule Flamelex.BufferManager do
     {:noreply, state}
   end
 
-  def handle_info({:active_buffer, :switch_mode, new_mode}, %{active_buffer: %BufRef{ref: ref} = active_buf} = state) do
+  def handle_info({:active_buffer, :switch_mode, new_mode}, %{active_buffer: %{ref: ref} = active_buf} = state) do
 
     ProcessRegistry.find!({:gui_component, ref})
     # Flamelex.GUI.Component.TextBox.rego_tag(active_buf)
@@ -132,4 +112,8 @@ defmodule Flamelex.BufferManager do
 
     {:noreply, state}
   end
+
+  ##TODO very good maintenance check
+  # this process should periodically check the children under Buffer Supervisor,
+  # and see which ones are supposed to be open, and try to end the ones that shouldn't be open
 end

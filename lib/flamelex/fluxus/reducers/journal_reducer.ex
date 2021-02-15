@@ -13,7 +13,7 @@ defmodule Flamelex.Fluxus.Reducers.Journal do
     if Journal.todays_page |> File.exists?() do
       Flamelex.Fluxus.fire_action({
               :open_buffer,
-                {:local_text_file, path: Journal.todays_page}, %{
+                {:local_text_file, path: Journal.todays_page()}, %{
                   label: "journal-today",
                   append_new_timestamp?: false #TODO scan the file, look for most recent timestamp - if it's more than 15? minutes, append a new one
               }})
@@ -35,8 +35,7 @@ defmodule Flamelex.Fluxus.Reducers.Journal do
     end
   end
 
-  def async_reduce(_radix_state, a) do
-    IO.puts "#{__MODULE__} ignoring action: #{inspect a}"
-    :ok
+  def async_reduce(_radix_state, _a) do
+    :ignoring_action
   end
 end

@@ -14,18 +14,24 @@ defmodule Flamelex.GUI.Component.TextBox do
   #   {:gui_component, }
   # end
 
-  def rego_tag(%{ref: %BufRef{ref: ref}}) do #TODO lol
-    {:gui_component, ref}
+  def rego_tag(%{ref: buffer_tag}) do
+    {:gui_component, buffer_tag}
   end
 
   @impl Flamelex.GUI.ComponentBehaviour
-  def custom_init_logic(%{frame: %Frame{} = f, ref: %BufRef{} = buf} = params) do
+  def custom_init_logic(%{frame: %Frame{} = f, ref: buf} = params) do
 
+    lines_of_text =
+      Flamelex.API.Buffer.read(buf)
+      |> TextBoxDrawUtils.split_into_a_list_of_lines_of_text_structs()
+
+    #TODO this is the whole textbox
     params |> Map.merge(%{
       draw_footer?: true,
       cursors: [
         %{ frame: f, ref: buf, num: 1 } #TODO use cursor struct, add frame to cursor struct
-      ]
+      ],
+      num_lines: lines_of_text |> length()
     })
   end
 
@@ -35,7 +41,7 @@ defmodule Flamelex.GUI.Component.TextBox do
     render(params |> Map.merge(%{frame: frame}))
   end
 
-  def render(%{ref: %BufRef{} = buf, frame: %Frame{} = frame} = params) do
+  def render(%{ref: buf, frame: %Frame{} = frame} = params) do
 
     #TODO make the frame, only 72 columns wide !!
     frame =
@@ -72,19 +78,61 @@ defmodule Flamelex.GUI.Component.TextBox do
   end
 
 
-  @impl Flamelex.GUI.ComponentBehaviour
-  def handle_action({_graph, state}, {:move_cursor, _direction, _distance} = cursor_movement_action) do
+  # @impl Flamelex.GUI.ComponentBehaviour
+  # def handle_action({_graph, state}, {:move_cursor, _direction, _distance} = cursor_movement_action) do
 
-    %{ref: %BufRef{ref: buf_ref}} = state
+  #   %{ref: %BufRef{ref: buf_ref}} = state
 
-    #assume its cursor 1 for now
-    cursor_tag = {:gui_component, {:text_cursor, buf_ref, 1}} #TODO assume its cursor 1
+  #   #assume its cursor 1 for now
+  #   cursor_tag = {:gui_component, {:text_cursor, buf_ref, 1}} #TODO assume its cursor 1
 
-    ProcessRegistry.find!(cursor_tag)
-    |> GenServer.cast({:action, cursor_movement_action})
+  #   ProcessRegistry.find!(cursor_tag)
+  #   |> GenServer.cast({:action, cursor_movement_action})
 
-    :ignore_action
+  #   :ignore_action
+  # end
+
+  def handle_cast({:move_cursor, %{last: :line, same: :column}} , {graph, state}) do
+
+
+
   end
+
+  def handle_cast({:move_cursor, details}, {graph, state}) do
+
+    # instructions = translate_details(state, details)
+
+    {:gui_component, {:text_cursor, state.ref.ref, 1}} #TODO standardize this bastard wannabee tree format, also lmao
+    |> ProcessRegistry.find!()
+    |> GenServer.cast({:move, details})
+
+    {:noreply, {graph, state}}
+  end
+
+  # defp translate_details(state, %{instructions: %{last: :line, same: :column}} = details) do
+  #   IO.puts "I know you pressed G..."
+
+  #   lines_of_text =
+  #     Flamelex.API.Buffer.read(state.ref)
+  #     |> TextBoxDrawUtils.split_into_a_list_of_lines_of_text_structs()
+
+
+  #   num_lines = lines_of_text |> Kernel.length()
+
+  #   details
+  #   |> Map.put(:instructions, {:down, num_lines, :line})
+  # end
+
+  # defp translate_details(_state, details) do
+  #   details
+  # end
+
+
+
+  # def handle_action({_g, _s}, {:move_cursor, details}) do
+  #   IO.inspect details, label: "HERE IS WHERE THE ACTION IS"
+  #   :ignore_action
+  # end
 
   def handle_info({:switch_mode, m}, state) do
     GenServer.cast(self(), {:action, {:switch_mode, m}})
@@ -175,11 +223,6 @@ defmodule Flamelex.GUI.Component.TextBox do
   #   Logger.debug "#{__MODULE__} with id: #{inspect state.id} received unrecognised action: #{inspect action}"
   #   :ignore_action
   # end
-  def handle_cast({:move_cursor, %{cursor_num: 1, instructions: {:down, 1, :line}} = _details}, %{cursors: [c]} = state) do
-    #TODO here
-    IO.inspect c
-    {:noreply, state}
-  end
 
 
   defp we_are_drawing_a_footer_bar?(%{draw_footer?: df?}), do: df?

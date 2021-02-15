@@ -3,7 +3,6 @@ defmodule Flamelex.BufferBehaviour do
   Defines the interface for a Flamelex.Buffer
   """
 
-          # open_time: DateTime.utc_now()
 
   defmacro __using__(_params) do
     quote do
@@ -22,41 +21,50 @@ defmodule Flamelex.BufferBehaviour do
       This wrapper around GenServer.start_link/3 ensures a consistent boot
       for all Buffers.
       """
-      def start_link(params) do
-        case rego_tag(params) do
-          :error ->
-            {:error, "received invalid params"} #TODO make this better
-          tag ->
-              IO.puts "\n\ngot the tag!\n\n #{inspect tag}\n\n"
-              name = Flamelex.Utilities.ProcessRegistry.via_tuple_name(:gproc, tag)
-              GenServer.start_link(__MODULE__, params, name: name)
-        end
+      def start_link(%{source: source} = params) do
+        IO.puts "#{__MODULE__} starting... params: #{inspect params}"
+        tag  = {:buffer, source}
+        name = Flamelex.Utilities.ProcessRegistry.via_tuple_name(:gproc, tag)
+        GenServer.start_link(__MODULE__, Map.merge(params, %{rego_tag: tag}), name: name)
       end
 
-
       @doc """
-      All Buffers essentially start the same way.
+      We don't do anything here except start the boot sequence.
       """
       @impl GenServer
       def init(params) do
-        # ok so here, what we want is - figure out where the params get passd from,
-        # where do we want to do  boundary checking?? Maybe we pass raw
-        # params all the way, to an after initialize handle_continue,
-        # where it can safely look at them & maybe just shut down if it has to,
-        # maybe make network requests etc...
-
-        # PubSub.subscribe(topic)
-
         {:ok, params, {:continue, :boot_sequence}}
       end
 
+      @impl GenServer
       def handle_continue(:boot_sequence, init_params) do
-        boot_sequence(init_params) # implemented as a callback - turns params into a %BufferState{}
+        # implemented as a callback - uses the `init_params` to finish
+        # booting up the buffer, and sets the initial state of the buffer
+        {:ok, buf_state} = boot_sequence(init_params)
+        {:noreply, buf_state, {:continue, :register_with_buffer_manager}}
+      end
+
+      @impl GenServer
+      def handle_continue(:register_with_buffer_manager, buf_state) do
+        GenServer.cast(Flamelex.BufferManager, {:buffer_opened, buf_state})
+        {:noreply, buf_state, {:continue, :send_callbacks}}
+      end
+
+      @impl GenServer
+      def handle_continue(:send_callbacks, %{callback_list: clist, rego_tag: tag} = buf_state) when is_list(clist) do
+        Enum.each(clist, &send(&1, {:open_buffer_successful, tag}))
+        {:noreply, buf_state |> Map.delete(:callback_list)}
+      end
+
+      @impl GenServer
+      def handle_continue(:send_callbacks, buf_state) do # since we didn't match above, we must not be any callbacks...
+        {:noreply, buf_state}
       end
 
       # all buffers will answer a `:read` call
-      def handle_call(:read, _from, %BufferState{data: data}=state) do
-        {:reply, data, state}
+      @impl GenServer
+      def handle_call(:read, _from, state) do
+        {:reply, state.data, state}
       end
 
 
@@ -78,21 +86,16 @@ defmodule Flamelex.BufferBehaviour do
   end
 
 
-  # @doc """
-  # Opening a buffer spawns a process which is reponsible for managing the
-  # data inside itself.
-  # """
-  # @callback open(any()) :: any()
 
   @doc """
-  Accepts different sets of parameters, returns the name-registration
-  used by :gproc, for both registration & lookup
-  """
-  @callback rego_tag(map()) :: tuple()
+  This function gets run when a new Buffer starts, it contains startup
+  logic for the buffer.
 
-  @doc """
-  This gets called immediately after init/2, via a handle_continue
+  Each Buffer which implements the BufferBehaviour already has the
+  GenServer functions `start_link/1` and `init/1` implemented. After `init/1`
+  has run, it uses the `handle_continue` mechanism to call this function
+  `boot_sequence/1`, which must be implemented in the actual Buffer module.
   """
-  @callback boot_sequence(map()) :: map() #TODO this should be a buffer state struct
+  @callback boot_sequence(map()) :: any()
 
 end

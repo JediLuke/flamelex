@@ -21,14 +21,6 @@ defmodule Flamelex.GUI.Controller do
     GenServer.cast(__MODULE__, {:action, a})
   end
 
-  def show(x) do
-    GenServer.cast(__MODULE__, {:show, x})
-  end
-
-  def show(x, radix_state) do
-    GenServer.cast(__MODULE__, {:show, x, radix_state})
-  end
-
   def hide(x) do
     GenServer.cast(__MODULE__, {:hide, x})
   end
@@ -130,7 +122,7 @@ defmodule Flamelex.GUI.Controller do
 
 
 
-  def handle_cast({:show, %BufRef{} = buf}, gui_state) do
+  def handle_cast({:show, buf}, gui_state) do
 
     frame = Frame.new(gui_state, buf)
     data  = Buffer.read(buf)
@@ -209,7 +201,7 @@ defmodule Flamelex.GUI.Controller do
 
 
   #TODO maybe this doesn't need to be routed through here, but try it for now...
-  def handle_cast({:refresh, %{ref: %BufRef{} = ref} = buf_state}, gui_state) do
+  def handle_cast({:refresh, %{ref: ref} = buf_state}, gui_state) do
     ref
     |> GUiComponentRef.rego_tag()
     |> ProcessRegistry.find!()

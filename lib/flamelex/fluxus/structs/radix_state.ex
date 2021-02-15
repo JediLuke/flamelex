@@ -35,7 +35,7 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
     %{radix_state|keystroke_history: new_keystroke_history}
   end
 
-  def set_active_buffer(%__MODULE__{} = radix_state, %BufRef{} = b) do
+  def set_active_buffer(%__MODULE__{} = radix_state, b) do
     %{radix_state|active_buffer: b}
   end
 

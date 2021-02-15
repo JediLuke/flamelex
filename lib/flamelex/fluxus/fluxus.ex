@@ -21,9 +21,9 @@ defmodule Flamelex.Fluxus do
     GenServer.cast(Flamelex.FluxusRadix, {:action, a})
   end
 
-  def fire_action(%{radix_state: r, fluxus_state_process: fsp_module}, a) do
-    GenServer.cast(fsp_module, {:action, %{radix_state: r, action: a}})
-  end
+  # def fire_action(%{radix_state: r, fluxus_state_process: fsp_module}, a) do
+  #   GenServer.cast(fsp_module, {:action, %{radix_state: r, action: a}})
+  # end
 
   #NOTE: If the process dispatching this action requires a callback, that's possible
   # def fire_action(a, await_callback?: true) do

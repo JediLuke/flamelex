@@ -1,8 +1,7 @@
-defmodule Flamelex.Buffer.BufUtils do #TODO rename to Buffer.Utils.OpenBuffer
+defmodule Flamelex.Buffer.Utils.OpenBuffer do
   alias Flamelex.Structs.BufRef
 
 
-  @text_buf Flamelex.Buffer.Text
 
 
   # #TODO here next !!!
@@ -25,39 +24,20 @@ defmodule Flamelex.Buffer.BufUtils do #TODO rename to Buffer.Utils.OpenBuffer
 
 
 
-  @file_open_timeout 3_000
-  def open_buffer(%{type: @text_buf, from_file: filepath} = params) do
-    # opening from a text file has a bit of a handshake/callback thing going on...
 
-    params =
-      params |> Map.merge(%{
-                      ref: {:file, filepath},       # this is how we construct a Buffer ref for a file on disk
-                      after_boot_callback: self()   # add the callback, since we're going to read from disk...
-                    })
-
-    start_process_attempt =
-      DynamicSupervisor.start_child(
-                          Flamelex.Buffer.Supervisor,
-                          {@text_buf, params})
-
-    case start_process_attempt do
-      {:ok, pid} ->
-          wait_for_callback(pid, filepath)
-      {:error, reason} ->
-          {:error, reason}
-      # {:error, {:function_clause, _details_list} = reason} ->
-      #     IO.puts "FUNCTION CLAUSE ERROR"
-      #     {:error, reason}
-    end
-  end
+  # @file_open_timeout 3_000
+  # def open_buffer(%{type: buffer_module} = params) do
+  #   DynamicSupervisor.start_child(Flamelex.Buffer.Supervisor,
+  #                                 {buffer_module, params})
+  # end
 
 
   # we accept just raw_data and a ref as a valid text buffer - we don't discriminate!!
-  def open_buffer(%{type: :text, ref: _r, raw_data: _d} = params) do
-    DynamicSupervisor.start_child(
-                        Flamelex.Buffer.Supervisor,
-                        {@text_buf, params})
-  end
+  # def open_buffer(%{type: :text, ref: _r, raw_data: _d} = params) do
+  #   DynamicSupervisor.start_child(
+  #                       Flamelex.Buffer.Supervisor,
+  #                       {Flamelex.Buffer.Text, params})
+  # end
 
 
 
@@ -66,18 +46,18 @@ defmodule Flamelex.Buffer.BufUtils do #TODO rename to Buffer.Utils.OpenBuffer
 
   def open_buffers_in_gui_by_default?, do: true #TODO this should be a config somewhere
 
-  defp wait_for_callback(pid, filepath) do
-    #NOTE: We want the Text buffer to try to open the file (in that
-    #      process!), but not inside the init/1 callback - because then
-    #      if it fails to read the file, the init will fail... instead:
-    receive do
-      {^pid, :successfully_opened, ^filepath, %BufRef{} = buf} ->
-        {:ok, buf}
-    after
-      @file_open_timeout ->
-        IO.puts "Didn't get a msg back from the recently opened buffer" #TODO make it red
-        Process.exit(pid, :kill)
-        {:error, "timed out waiting for the Buffer to open a file."}
-    end
-  end
+  # defp wait_for_callback(pid, filepath) do
+  #   #NOTE: We want the Text buffer to try to open the file (in that
+  #   #      process!), but not inside the init/1 callback - because then
+  #   #      if it fails to read the file, the init will fail... instead:
+  #   receive do
+  #     {^pid, :successfully_opened, ^filepath, %BufRef{} = buf} ->
+  #       {:ok, buf}
+  #   after
+  #     @file_open_timeout ->
+  #       IO.puts "Didn't get a msg back from the recently opened buffer" #TODO make it red
+  #       Process.exit(pid, :kill)
+  #       {:error, "timed out waiting for the Buffer to open a file."}
+  #   end
+  # end
 end

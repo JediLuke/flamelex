@@ -27,14 +27,14 @@ defmodule Flamelex.GUI.Structs.GUiComponentRef do
   & it will either return the rego_tag matching the params, or `:error`
   """
   #TODO deprecate first...
-  def rego_tag(%BufRef{ref: ref}) do
-    {:gui_component, ref}
-  end
-  def rego_tag(:gui_component, ref: r) do
-    {:gui_component, r}
-  end
-  def rego_tag({:gui_component, %BufRef{ref: ref}}) do
-    {:gui_component, ref}
-  end
+  # def rego_tag(%BufRef{ref: ref}) do
+  #   {:gui_component, ref}
+  # end
+  # def rego_tag(:gui_component, ref: r) do
+  #   {:gui_component, r}
+  # end
+  # def rego_tag({:gui_component, %BufRef{ref: ref}}) do
+  #   {:gui_component, ref}
+  # end
   def rego_tag(_else), do: :error
 end

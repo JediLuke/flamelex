@@ -52,6 +52,7 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
     new_graph # we return the graph as the last thing
   end
 
+  # h = Flamelex.GUI.Fonts.monospace_font_height(font, size)
   def line_height, do: 24 #TODO get 24 here from somewhere real, something to do with Fonts surely
 
 

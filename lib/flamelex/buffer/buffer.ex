@@ -6,19 +6,21 @@ defmodule Flamelex.Buffer do
   actions - and inside the reducers, that's where these functions will
   get called.
   """
-  alias Flamelex.BufferManager
 
 
-  def open!(%{type: Flamelex.Buffer.Text, from_file: filepath} = opts) when is_bitstring(filepath) do
-    IO.puts "Loading new text buffer for file: #{inspect filepath}..."
+  def open!(params) do
 
-    case GenServer.call(BufferManager, {:open_buffer, opts}) do
-         {:ok, %Flamelex.Structs.BufRef{} = buf} ->
-            buf
-         {:error, {:already_started, _pid}} ->
-            raise "Here we should just link to the alrdy open pid"
-         {:error, reason} ->
-            raise "dunno lol - #{inspect reason}"
+    params = add_this_process_to_callback_list(params)
+
+    DynamicSupervisor.start_child(Flamelex.Buffer.Supervisor,
+                                  {params.type, params})
+
+    receive do
+      {:open_buffer_successful, tag} ->
+        tag
+    after
+      :timer.seconds(1) ->
+        raise "timeout to open the buffer was exceeded"
     end
   end
 
@@ -34,4 +36,10 @@ defmodule Flamelex.Buffer do
 
 
 
+  defp add_this_process_to_callback_list(%{callback_list: l} = opts) when is_list(l) and length(l) >= 1 do
+    Map.merge(opts, %{callback_list: l ++ [self()]}) # if we need to add to an existing list...
+  end
+  defp add_this_process_to_callback_list(opts) do
+    Map.merge(opts, %{callback_list: [self()]}) # if we need to create the callback_list...
+  end
 end

@@ -28,18 +28,30 @@ defmodule Flamelex.API.Buffer do
 
   ## Examples
 
-  iex> Buffer.load("README.md")
-  {:ok, %BufRef{} = _bufr_ref}
+  iex> Buffer.open("README.md")
+  {:ok, _bufr_ref = {:buffer, {:file, "README.md"}}}
   """
 
+  #TODO make this open a new blank buffer
   def open!, do: open!("/Users/luke/workbench/elixir/flamelex/README.md")
 
   def open!(filepath) do
-    Flamelex.Fluxus.fire_action({
-      :open_buffer,
-        {:local_text_file, path: filepath}, %{
-          label: filepath,
-      }})
+
+    Flamelex.Fluxus.fire_action({:open_buffer, %{
+      type: Flamelex.Buffer.Text,
+      source: {:file, filepath},
+      label: filepath,
+      open_in_gui?: true, #TODO set active buffer
+      callback_list: [self()]
+    }})
+
+    receive do
+      {:open_buffer_successful, tag} ->
+        tag
+    after
+      :timer.seconds(1) ->
+        raise "timeout to open the buffer was exceeded"
+    end
   end
 
 
@@ -57,7 +69,7 @@ defmodule Flamelex.API.Buffer do
   @doc """
   Return the contents of a buffer.
   """
-  def read(%BufRef{} = buf) do
+  def read(buf) do
     ProcessRegistry.find!(buf) |> GenServer.call(:read)
   end
 

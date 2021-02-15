@@ -4,40 +4,29 @@ defmodule Flamelex.Buffer.Text do
   """
   use Flamelex.BufferBehaviour
 
-  @impl Flamelex.BufferBehaviour
-  def rego_tag(%{type: __MODULE__, ref: {:file, filepath}, from_file: same_filepath}) when filepath == same_filepath and is_bitstring(filepath) do
-    # a unique reference, used to register the buffer process,
-    # eg. {:file, "some/filepath"} or "lukesBuffer"
-    {:buffer, {:file, filepath}}
-  end
 
-  # handle opening
+
   @impl Flamelex.BufferBehaviour
-  def boot_sequence(%{
-        type: __MODULE__,
-   from_file: filepath,
-   after_boot_callback: callback_pid
-  } = params) when is_pid(callback_pid) do
+  def boot_sequence(%{source: {:file, filepath}} = params) do
 
     {:ok, file_contents} = File.read(filepath)
 
-    buf_ref   = BufRef.new!(params)
-    buf_state = BufferState.new!(params
-                                 |> Map.merge(%{data: file_contents}))
+    # #TODO make a new TextBufferState here, which of course required a mandatory `rego_tag`
 
-    #NOTE: just checking here that both the BufRef and BufferState have the same `ref`...
-    if buf_ref.ref != buf_state.ref do
-      context = %{buf_ref: buf_ref, buf_state: buf_state, params: params}
-      raise "a `ref` mismatch occured when booting a TextBuffer.\n\n#{inspect context}\n\n"
-    end
 
-    # now, let's callback to the process which booted this one, to
-    # say that we successfully loaded the file from disk
-    callback_pid #TODO this could just be BufferManager, save some complexity
-    |> send({self(), :successfully_opened, filepath, buf_ref})
-       #REMINDER: we send back `filepath` because we match on it like ^filepath
+    # buf_state = BufferState.new!(Map.merge(params, %{data: file_contents}))
 
-    {:noreply, buf_state}
+    # #NOTE: just checking here that both the BufRef and BufferState have the same `ref`...
+    # #TODO can probably fuck this off at some point (when I feel confident it actually works lol)
+    # if buf_ref.ref != buf_state.ref do
+    #   context = %{buf_ref: buf_ref, buf_state: buf_state, params: params}
+    #   raise "a `ref` mismatch occured when booting a TextBuffer.\n\n#{inspect context}\n\n"
+    # end
+
+
+
+
+    {:ok, params |> Map.merge(%{data: file_contents})}
   end
 
   #TODO with modify_buffer utils
@@ -135,6 +124,7 @@ defmodule Flamelex.Buffer.Text do
   #   {:reply, :ok, new_state}
   # end
 
+  @impl GenServer
   def handle_call(:save, _from, state) do
 
     {:ok, file} = File.open(state.name, [:write])
@@ -157,13 +147,18 @@ defmodule Flamelex.Buffer.Text do
   end
 
   # def handle_cast({:move_cursor, %{cursor_num: 1, instructions: {:down, 1, :line}}} = details, state) do
+  def handle_cast({:move_cursor, details}, state) do
 
-  #   #TODO once buffer name registration is solid, this becomes easy...
-  #   IO.puts "OK, NOW WE GOTTA MOVE THE FKIN THING\n\n"
+    #TODO once buffer name registration is solid, this becomes easy...
+    IO.puts "OK, NOW WE GOTTA MOVE THE FKIN THING\n\n"
 
-  #   ProcessRegistry.find!({:gui_component, state.name}) # then it will, in turn, forward the request to the cursor...
-  #   |> GenServer.cast({:move_cursor, details})
-  # end
+    # ProcessRegistry.find!({:gui_component, state.name}) # then it will, in turn, forward the request to the cursor...
+    # |> GenServer.cast({:move_cursor, details})
+
+    IO.inspect details, label: "DEETZZZ"
+
+    {:noreply, state}
+  end
 
 
 

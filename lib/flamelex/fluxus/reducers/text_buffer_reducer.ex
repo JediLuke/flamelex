@@ -13,8 +13,7 @@ defmodule Flamelex.Fluxus.Reducers.TextBuffer do
   # def async_reduce(_radix_state, {%BufRef{} = buf, :move_cursor, %{to: destination}}) do
 
   # end
-  def async_reduce(_radix_state, a) do
-    IO.puts "#{__MODULE__} ignoring action: #{inspect a}"
-    :ok
+  def async_reduce(_radix_state, _a) do
+    :ignoring_action
   end
 end

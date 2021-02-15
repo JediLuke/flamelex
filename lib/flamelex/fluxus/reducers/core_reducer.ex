@@ -17,8 +17,7 @@ defmodule Flamelex.Fluxus.Reducers.Core do
 
 
 
-  def async_reduce(_radix_state, a) do
-    IO.puts "#{__MODULE__} ignoring action: #{inspect a}"
-    :ok
+  def async_reduce(_radix_state, _a) do
+    :ignoring_action
   end
 end

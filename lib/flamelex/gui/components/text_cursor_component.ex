@@ -6,6 +6,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
   """
   use Flamelex.ProjectAliases
   use Flamelex.GUI.ComponentBehaviour
+  alias Flamelex.GUI.Component.Utils.TextCursor, as: CursorUtils
 
 
   @blink_ms trunc(500) # blink speed in hertz
@@ -18,15 +19,18 @@ defmodule Flamelex.GUI.Component.TextCursor do
 
     GenServer.cast(self(), :start_blink)
 
+    starting_coords = CursorUtils.calc_starting_coordinates(params.frame)
+    #TODO so this is basically, the TextCursor struct
     params |> Map.merge(%{
       # frame: params.frame,
       # grid_pos: nil,  # where we are in the file, e.g. line 3, column 5
+      #TODO make this original_coords
+      original_coordinates: starting_coords,        # so we can track how we've moved around
+      current_coords: starting_coords,
       hidden?: false,                               # internal variable used to control blinking
       override?: nil,                               # override lets us disable the blinking temporarily, for when we want to move the cursor
       timer: nil,                                   # holds an erlang :timer for the blink
-      original_coordinates: params.frame.top_left,  # so we can track how we've moved around
       mode: :normal,                                # start out in normal mode, if insert mode we just have a line
-      current_coords: starting_coords(params.frame)
     })
   end
 
@@ -37,121 +41,43 @@ defmodule Flamelex.GUI.Component.TextCursor do
   end
 
 
-  def render(%{ref: %BufRef{ref: buf_ref}, frame: %Frame{} = frame, current_coords: coords, mode: mode}) do
-
-
-    block_dimensions = {_w, _h} = cursor_box_dimensions(mode)
-
+  def render(%{ref: buf_ref, current_coords: coords, mode: mode}) do
     Draw.blank_graph()
     |> Scenic.Primitives.rect(
-          block_dimensions,
+          CursorUtils.cursor_box_dimensions(mode),
             id: buf_ref,
             translate: coords,
             fill: :ghost_white,
             hidden?: false)
   end
 
-  def starting_coords(frame) do
-    # NOTES:
-    # so, you would think that this lovely little equation...
-    #   y_pos_of_cursor = frame.top_left.y+frame.margin.top-block_height
-    # would be correct, considering Scenic renders blocks from the bottom-left for some reason..
-    # however, it just looks weird! So, we move it down, a small offset
 
-    _block_dimensions = {_w, block_height} = cursor_box_dimensions(:normal) #NOTE start in normal mode
-
-    cursor_y_aesthetic_offset = 4
-
-    cursor_x_pos = frame.top_left.x+frame.margin.left
-    cursor_y_pos = frame.top_left.y+frame.margin.top-block_height+cursor_y_aesthetic_offset
-
-    {cursor_x_pos, cursor_y_pos}
-  end
-
-  defp cursor_box_dimensions(:normal) do
-    font = Flamelex.GUI.Fonts.primary(:font)
-    size = Flamelex.GUI.Fonts.size()
-    w = Flamelex.GUI.Fonts.monospace_font_width(font, size)
-    h = Flamelex.GUI.Fonts.monospace_font_height(font, size)
-    {w, h}
-  end
-  defp cursor_box_dimensions(:insert) do
-    font = Flamelex.GUI.Fonts.primary(:font)
-    size = Flamelex.GUI.Fonts.size()
-    w = 2
-    h = Flamelex.GUI.Fonts.monospace_font_height(font, size)
-    {w, h}
-  end
-
-
-  def rego_tag(%{ref: %BufRef{ref: buf_ref}, num: num}) when is_integer(num) and num >= 1 do
+  def rego_tag(%{ref: buf_ref, num: num}) when is_integer(num) and num >= 1 do
     {:gui_component, {:text_cursor, buf_ref, num}}
   end
 
-  @impl Flamelex.GUI.ComponentBehaviour
-  def handle_action(
-          {graph, %{ref: %BufRef{ref: buf_ref}, current_coords: {_x, _y} = current_coords} = state},
-          {:move_cursor, direction, distance})
-            when direction in @valid_directions
-            and distance >= 1 do
+  # @impl Flamelex.GUI.ComponentBehaviour
+  # def handle_action(
+  #         {graph, %{ref: buf_ref, current_coords: {_x, _y} = current_coords} = state},
+  #         {:move_cursor, direction, distance})
+  #           when direction in @valid_directions
+  #           and distance >= 1 do
 
-    move(graph, state, %{
-      current_coords: current_coords,
-      direction: direction,
-      distance: distance,
-      buf_ref: buf_ref
-    })
-  end
+  #   CursorUtils.move(graph, state, %{
+  #     current_coords: current_coords,
+  #     direction: direction,
+  #     distance: distance,
+  #     buf_ref: buf_ref
+  #   })
+  # end
 
   def handle_action(
-        {graph, %{ref: %BufRef{ref: buf_ref}} = state},
+        {graph, %{ref: %BufRef{ref: _buf_ref}} = state},
         {:switch_mode, new_mode}) do
-
-    block_dimensions = {_w, _h} = cursor_box_dimensions(new_mode)
-
-    new_state =
-      %{state|mode: new_mode} # the visual effect is better if you dont blink the cursor when moving it
-
-    new_graph =
-      graph
-      |> Scenic.Graph.modify(
-                        buf_ref,
-                        &Scenic.Primitives.rectangle(&1, block_dimensions)) # resize the rectangle
-
+    {new_graph, new_state} = CursorUtils.switch_mode({graph, state}, new_mode)
     {:update_graph_and_state, {new_graph, new_state}}
   end
 
-  # base positions before moving the cursor
-  # cursor_x_pos = frame.top_left.x+frame.margin.left
-  # cursor_y_pos = frame.top_left.y+frame.margin.top-block_height+cursor_y_aesthetic_offset
-  def move(graph, state, %{direction: direction, distance: distance, buf_ref: buf_ref, current_coords: {x_coord, y_coord}}) do
-
-    cursor_height = Flamelex.GUI.Component.Utils.TextBox.line_height()
-    _block_dimensions = {cursor_width, _h} = cursor_box_dimensions(state.mode)
-
-    new_coords = {_new_x_coord, _new_y_coord} =
-      case direction do
-        :up    -> {x_coord, y_coord-(distance*cursor_height)}
-        :down  -> {x_coord, y_coord+(distance*cursor_height)}
-        #TODO
-        :left  -> {x_coord-cursor_width, y_coord}
-        :right -> {x_coord+cursor_width, y_coord}
-      end
-
-    new_state =
-      %{state|current_coords: new_coords, override?: :visible} # the visual effect is better if you dont blink the cursor when moving it
-
-    new_graph =
-      graph
-      |> Scenic.Graph.modify(
-                buf_ref,
-                &Scenic.Primitives.update_opts(&1,
-                                      hidden?: new_state.hidden?,
-                                      translate: new_state.current_coords))
-
-
-    {:update_graph_and_state, {new_graph, new_state}}
-  end
 
   def handle_cast(:start_blink, {graph, state}) do
     {:ok, timer} = :timer.send_interval(@blink_ms, :blink)
@@ -159,66 +85,14 @@ defmodule Flamelex.GUI.Component.TextCursor do
     {:noreply, {graph, new_state}}
   end
 
+  def handle_cast({:move, details}, {graph, state}) do
+    {new_graph, new_state} = CursorUtils.move_cursor({graph, state}, details)
+    {:noreply, {new_graph, new_state}, push: new_graph}
+  end
 
   @impl Scenic.Scene
-  def handle_info(:blink, {graph, %{ref: %BufRef{ref: buf_ref}} = state}) do
-
-    new_state =
-      case state.override? do
-        :visible ->
-          %{state|hidden?: false, override?: nil}
-        :invisible ->
-          %{state|hidden?: true, override?: nil}
-        nil ->
-          %{state|hidden?: not state.hidden?}
-      end
-
-    new_graph =
-      graph
-      |> Scenic.Graph.modify(
-                buf_ref,
-                &Scenic.Primitives.update_opts(&1,
-                                      hidden: new_state.hidden?))
-
-    {:noreply, {new_graph, new_state}, push: new_graph}
-  end
-
-
-  def handle_cast({:move, %{instructions: {direction, num, :line}}}, {graph, state}) do
-
-    # forward to this buffers top gui_component, then it will, in turn,#
-    # forward the request to the cursor...
-    # ProcessRegistry.find!({:gui_component, state.ref})
-    # |> GenServer.cast({:move_cursor, details})
-
-    IO.puts "IF WE GET HERE... WE CAN SEND TH CURSOR UPDATES!!\n\n"
-    {:update_graph_and_state, {new_graph, new_state}} =
-      move(graph, state, %{
-        current_coords: state.current_coords,
-        direction: direction,
-        distance: num,
-        buf_ref: state.ref.ref #TODO lol
-      })
-
-    {:noreply, {new_graph, new_state}, push: new_graph}
-  end
-
-  def handle_cast({:move, %{instructions: {direction, num, :column}}}, {graph, state}) do
-
-    # forward to this buffers top gui_component, then it will, in turn,#
-    # forward the request to the cursor...
-    # ProcessRegistry.find!({:gui_component, state.ref})
-    # |> GenServer.cast({:move_cursor, details})
-
-    IO.puts "IF WE GET HERE... WE CAN SEND TH CURSOR UPDATES!!\n\n"
-    {:update_graph_and_state, {new_graph, new_state}} =
-      move(graph, state, %{
-        current_coords: state.current_coords,
-        direction: direction,
-        distance: num,
-        buf_ref: state.ref.ref #TODO lol
-      })
-
+  def handle_info(:blink, {graph, %{ref: _buf_ref} = state}) do
+    {new_graph, new_state} = CursorUtils.handle_blink({graph, state})
     {:noreply, {new_graph, new_state}, push: new_graph}
   end
 end

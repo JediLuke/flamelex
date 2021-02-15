@@ -66,7 +66,7 @@ defmodule Flamelex.GUI.Structs.Frame do
             frames: [], #NOTE: No existing frames
             opts: opts
           }},
-        %BufRef{label: buf_label}) do
+        buf_tag) do
 
     coords = calculate_frame_position(opts)
     dimens = calculate_frame_size(opts, layout_dimens)
@@ -74,7 +74,7 @@ defmodule Flamelex.GUI.Structs.Frame do
     %__MODULE__{
       top_left:   coords,
       dimensions: dimens,
-      label: buf_label
+      label: "TODO change the label lol"
     }
   end
 

@@ -1,4 +1,4 @@
-defmodule Flamelex.Utilities.ProcessRegistry do
+defmodule Flamelex.Utilities.ProcessRegistry do #TODO Registrar
   require Logger
   use Flamelex.ProjectAliases
   alias Flamelex.GUI.Structs.GUiComponentRef
@@ -37,18 +37,25 @@ defmodule Flamelex.Utilities.ProcessRegistry do
     via_tuple(:gproc, tag)
   end
 
+  # #TODO this is where we wannabee, tackling the treeeee problem
+  # def register_gui_component(%BufRef{ref: ref}) do
+  #   register({:gui_component, ref})
+  # end
+
   @doc """
   Returns an ok/error tuple.
   """
-  def lookup(%BufRef{ref: ref}) do
-    lookup({:buffer, ref})
-  end
-  def lookup(%GUiComponentRef{} = ref) do
-    key = GUiComponentRef.rego_tag(ref)
-    lookup(key)
-  end
+  # def lookup(%BufRef{ref: ref}) do
+  #   lookup({:buffer, ref})
+  # end
+  # def lookup({:gui_component, %BufRef{ref: ref}}) do
+  #   lookup({:gui_component, ref})
+  # end
+  # def lookup(%GUiComponentRef{} = ref) do
+  #   key = GUiComponentRef.rego_tag(ref)
+  #   lookup(key)
+  # end
   def lookup(lookup_key) do
-    IO.puts "LOOKUP-KEY: #{inspect lookup_key}"
     case :gproc.where({:n, :l, lookup_key}) do
       p when is_pid(p) -> {:ok, p}
       _else            -> {:error, "Could not find a process with lookup_key: #{inspect lookup_key}"}
