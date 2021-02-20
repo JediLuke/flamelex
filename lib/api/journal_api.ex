@@ -17,7 +17,7 @@ defmodule Flamelex.API.Journal do
 
     Flamelex.Fluxus.fire_action({:open_buffer, %{
       type: Flamelex.Buffer.Text,
-      source: {:file, filepath},
+      source: {:file, todays_page_filepath},
       label: "journal-today",
       open_in_gui?: true, #TODO set active buffer
       append_new_timestamp?: false #TODO scan the file, look for most recent timestamp - if it's more than 15? minutes, append a new one
