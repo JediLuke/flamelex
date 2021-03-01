@@ -36,9 +36,11 @@ defmodule Flamelex.Fluxux.ReducerBehaviour do
   end
 
 
+  #TODO handle?
+
   @doc """
   If you want custom leader keybindings, put them in this map.
   """
-  @callback async_reduce(map(), tuple()) :: :ok | :error
+  @callback async_reduce(map()) :: :ok | :error
 
 end

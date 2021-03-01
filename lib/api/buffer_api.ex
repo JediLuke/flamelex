@@ -35,21 +35,38 @@ defmodule Flamelex.API.Buffer do
   def open!, do: open!("/Users/luke/workbench/elixir/flamelex/README.md")
 
   def open!(filepath) do
-    Flamelex.Fluxus.fire_action({:open_buffer, %{
-      type: Flamelex.Buffer.Text,
-      source: {:file, filepath},
-      label: filepath,
-      open_in_gui?: true, #TODO set active buffer
-      callback_list: [self()]
-    }})
 
+    GenServer.cast(Flamelex.FluxusRadix, {:action, {
+        :open_buffer, %{
+            type: Flamelex.Buffer.Text,
+            source: {:file, filepath},
+            label: filepath,
+            open_in_gui?: true, #TODO set active buffer
+            callback_list: [self()]
+    }}})
+
+    # await callback...
     receive do
-      {:open_buffer_successful, tag} ->
+      {:ok_open_buffer, tag} ->
         tag
     after
       :timer.seconds(1) ->
-        raise "timeout to open the buffer was exceeded"
+        raise "Buffer failed to open. reason: TimedOut."
     end
+
+    #TODO I don't actually know what I like better, the above, or the below...
+
+    # Flamalex.Fluxus.fire(:action, {
+    #     :open_buffer, %{
+    #         type: Flamelex.Buffer.Text,
+    #         source: {:file, filepath},
+    #         label: filepath,
+    #         open_in_gui?: true, #TODO set active buffer
+    #         callback_list: [self()]
+    #         }},
+    #     expect_callback?: {true, :ok_open_buffer}
+    # })
+
   end
 
 

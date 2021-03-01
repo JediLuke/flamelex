@@ -45,12 +45,12 @@ defmodule Flamelex.BufferBehaviour do
       @impl GenServer
       def handle_continue(:register_with_buffer_manager, buf_state) do
         GenServer.cast(Flamelex.BufferManager, {:buffer_opened, buf_state})
-        {:noreply, buf_state, {:continue, :send_callbacks}}
+        {:noreply, buf_state, {:continue, :send_ok_open_buffer_callbacks}}
       end
 
       @impl GenServer
-      def handle_continue(:send_callbacks, %{callback_list: clist, rego_tag: tag} = buf_state) when is_list(clist) do
-        Enum.each(clist, &send(&1, {:open_buffer_successful, tag}))
+      def handle_continue(:send_ok_open_buffer_callbacks, %{callback_list: clist, rego_tag: tag} = buf_state) when is_list(clist) do
+        Enum.each(clist, &send(&1, {:ok_open_buffer, tag}))
         {:noreply, buf_state |> Map.delete(:callback_list)}
       end
 

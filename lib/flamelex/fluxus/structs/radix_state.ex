@@ -12,17 +12,20 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
     active_buffer:        nil,        # We need to know the active buffer - must be a %Flamelex.Structs.BufRef{}
     keystroke_history:    [],         # A list of all previously entered user-input keystrokes
     action_history:       [],         # A history of actions sent to FluxusRadix
-    # runtime_config:       %{
-    #   keymap:             Flamelex.API.KeyMappings.VimClone
-    # }
+    runtime_config:       %{
+      keymap:             Flamelex.API.KeyMappings.VimClone
+    }
   ]
 
-  def new do
+  @modes [:normal, :insert, {:command_buffer_active, :insert}]
+
+  def new, do: default() #TODO deprecate
+
+  def default do
     %__MODULE__{ mode: :normal }
   end
 
   #TODO ok, figure out how modes is gonna work, with active buffer etc...
-  @modes [:normal, :insert, {:command_buffer_active, :insert}]
   def set(%__MODULE__{} = radix_state, [mode: m]) when m in @modes do
     %{radix_state|mode: m}
   end
@@ -33,6 +36,14 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
         |> add_to_list(k, max_length: @max_keystroke_history_limit)
 
     %{radix_state|keystroke_history: new_keystroke_history}
+  end
+
+  def record(%__MODULE__{action_history: action_history} = radix_state, action: a) do
+    updated_history =
+      action_history
+      |> add_to_list(a, max_length: @max_action_history_limit)
+
+    %{radix_state|action_history: updated_history}
   end
 
   def set_active_buffer(%__MODULE__{} = radix_state, b) do

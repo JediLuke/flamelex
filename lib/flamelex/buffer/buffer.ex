@@ -13,15 +13,18 @@ defmodule Flamelex.Buffer do
     params = params
              |> add_this_process_to_callback_list()
 
+    #TODO we could encapsulate this receive do messyness by implementing a DYnamixSupervisor for Buffers
     DynamicSupervisor.start_child(Flamelex.Buffer.Supervisor,
                                   {buffer_module, params})
 
     receive do
-      {:open_buffer_successful, tag} ->
+      {:ok_open_buffer, tag} ->
         tag
+      anything_else ->
+        raise "received unexpected callback: #{inspect anything_else}"
     after
       :timer.seconds(1) ->
-        raise "timeout to open the buffer was exceeded"
+        raise "Buffer failed to open. reason: TimedOut."
     end
   end
 

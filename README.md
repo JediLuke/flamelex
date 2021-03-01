@@ -202,7 +202,7 @@ when a user presses a key...
     -> `Flamelex.FluxusRadix` receives `{:user_input, ii}` via `Genserver.cast` (fluxus_radix.ex)
       -> calls `Flamelex.Fluxus.UserInputHandler.handle/2` (user_input_handler.ex)
         -> spins up a new `Task` process, executing
-          `lookup_action_for_input_async/2` under `Input2ActionLookup.TaskSupervisor`
+          `lookup_action_for_input_async/2` under `InputHandler.TaskSupervisor`
           -> that function will look in the key-mapping module, e.g.
              `Flamelex.API.KeyMappings.VimClone` if this lookup fails/crashes,
              no problem really. If a lookup is successful, then maybe

@@ -1,13 +1,16 @@
 defmodule Flamelex.FluxusRadix do
   @moduledoc """
   In latin, `fluxus` means "flow" and `radix` means "root". FluxusRadix
-  is the root node in the state-tree of fluxus processes.The FluxusRadix
-  holds the highest-level flamelex state, including:
+  is the root node in the state-tree of fluxus internally.
 
-    - the user-input mode
-    - the input history (both keystrokes, & commands)
+  The FluxusRadix holds the highest-level flamelex state, for example:
+
+    - the active buffer
+    - the system mode
+    - the input history (both keystrokes, & actions)
     - it acts as a conduit for all user-input (which got sent
       here by `Flamelex.GUI.RootScene`)
+
 
   We need a single junction-point where all the data required to make
   decisions can be combined & acted upon - this is it.
@@ -46,7 +49,7 @@ defmodule Flamelex.FluxusRadix do
 
 
   def start_link(_params) do
-    initial_state = RadixState.new()
+    initial_state = RadixState.new() #TODO change this to default
     GenServer.start_link(__MODULE__, initial_state)
   end
 
@@ -63,9 +66,11 @@ defmodule Flamelex.FluxusRadix do
     {:noreply, radix_state |> RadixState.record(keystroke: ii)}
   end
 
-
-  def handle_cast({:action, a}, radix_state) do
+  def handle_cast({:action, a}, radix_state) do #TODO this should be :new_action, it's clearer, other places I pattern match directly on :action ' sthat have atually been fired
     Flamelex.Fluxus.RootReducer.handle(radix_state, {:action, a})
+
+    # |> #TODO broadcast to all :gui_components the updated state ??
+
     {:noreply, radix_state |> RadixState.record(action: a)}
 
     # #TODO maybe we dont even wait for a callback???
@@ -83,6 +88,13 @@ defmodule Flamelex.FluxusRadix do
 
 
   #TODO we just need to make sure we have a way, of checking the order? of callbacks? of timing em out?? something
+
+  #TODO
+  # def handle_cast({:update, uu}, radix_state) do
+  #   Flamelex.Fluxus.Updater.handle(radix_state, {:update, uu})
+  #   {:noreply, radix_state |> RadixState.record(update: uu)}
+  # end
+
   def handle_cast({:radix_state_update, %RadixState{} = new_radix_state}, _old_radix_state) do
     IO.puts "\n\n\n\nupdating radix state !! \n\n\n\n"
     {:noreply, new_radix_state}

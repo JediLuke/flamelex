@@ -23,7 +23,13 @@ defmodule Flamelex.BufferManager do
       active_buffer: nil,     # holds a reference to the `active` buffer
     }
 
-    {:ok, init_state}
+    {:ok, init_state, {:continue, :pubsub_registration}}
+  end
+
+  @impl GenServer
+  def handle_continue(:pubsub_registration, bufr_mgr_state) do
+    Flamelex.Utils.PubSub.subscribe(topic: :action_event_bus) # be notified of `actions` fired internally
+    {:noreply, bufr_mgr_state}
   end
 
 
@@ -99,6 +105,7 @@ defmodule Flamelex.BufferManager do
 
   def handle_info({:active_buffer, :switch_mode, new_mode}, %{active_buffer: %{ref: ref} = active_buf} = state) do
 
+    #TODO just broadcast to the :gui_update_bus
     ProcessRegistry.find!({:gui_component, ref})
     # Flamelex.GUI.Component.TextBox.rego_tag(active_buf)
     # |> ProcessRegistry.find!()
@@ -111,6 +118,17 @@ defmodule Flamelex.BufferManager do
     #TODO2 just get GUI Controller to do it for us...
 
     {:noreply, state}
+  end
+
+  def handle_info(%{action: action, radix_state: radix_state}, bufr_mgr_state) do
+
+    Flamelex.Fluxus.Reducers.Buffer.handle(%{
+      radix_state: radix_state,
+      bufr_mgr_state: bufr_mgr_state,
+      action: action
+    })
+
+    {:noreply, bufr_mgr_state}
   end
 
   ##TODO very good maintenance check

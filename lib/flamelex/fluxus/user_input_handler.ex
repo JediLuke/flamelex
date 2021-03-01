@@ -203,7 +203,7 @@ defmodule Flamelex.Fluxus.UserInputHandler do
     #NOTE: no need to await any callback from handling user input
 
     Task.Supervisor.start_child(
-      Flamelex.Fluxus.Input2ActionLookup.TaskSupervisor,
+      Flamelex.Fluxus.InputHandler.TaskSupervisor,
           __MODULE__,                       # module
           :lookup_action_for_input_async,   # function
           [radix_state, ii]                 # args

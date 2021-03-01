@@ -24,7 +24,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
       # @lowercase_f => find_character(:current_line, :after_cursor, {:direction, :forward})
       # @lowercase_g => #unbound
       @lowercase_h => {:fire_action, {:move_cursor, %{buffer: active_buf, details: %{cursor_num: 1, instructions: {:left, 1, :column}}}}},
-      # @lowercase_i => CoreActions.switch_mode(:insert),
+      # @lowercase_i => CoreActions.switch_mode(:insert), #TODO change current buffer mode
       @lowercase_j => {:fire_action, {:move_cursor, %{buffer: active_buf, details: %{cursor_num: 1, instructions: {:down, 1, :line}}}}},
       @lowercase_k => {:fire_action, {:move_cursor, %{buffer: active_buf, details: %{cursor_num: 1, instructions: {:up, 1, :line}}}}},
       @lowercase_l => {:fire_action, {:move_cursor, %{buffer: active_buf, details: %{cursor_num: 1, instructions: {:right, 1, :column}}}}},

@@ -10,8 +10,9 @@ defmodule Flamelex.Fluxus.TopLevelSupervisor do
     IO.puts "#{__MODULE__} initializing..."
 
     children = [
-      {Task.Supervisor, name: Flamelex.Fluxus.Input2ActionLookup.TaskSupervisor},
-      {Task.Supervisor, name: Flamelex.Fluxus.HandleAction.TaskSupervisor},
+      # Flamelex.Fluxus.Stash, #TODO this is a rly cool concept
+      {Task.Supervisor, name: Flamelex.Fluxus.InputHandler.TaskSupervisor},
+      {Task.Supervisor, name: Flamelex.Fluxus.RootReducer.TaskSupervisor},
       Flamelex.FluxusRadix
     ]
 

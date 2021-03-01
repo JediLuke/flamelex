@@ -16,8 +16,15 @@ defmodule Flamelex.Fluxus do
   @doc """
   This function enables us to fire actions off which enact changes, at
   the FluxusRadix level, but which aren't stricly responses to user input.
+
+  #TODO sometimes the caller wants  to get a callback, and maybe even get some results
   """
   def fire_action(a) do
+    GenServer.cast(Flamelex.FluxusRadix, {:action, a})
+  end
+
+  #TODO opts is either, expects_callback? or nothing
+  def fire(:action, a, opts) do
     GenServer.cast(Flamelex.FluxusRadix, {:action, a})
   end
 
