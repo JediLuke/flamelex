@@ -120,6 +120,8 @@ defmodule Flamelex.BufferManager do
     {:noreply, state}
   end
 
+  # when new actions are published to the :action_event_bus, this is where
+  # BufferManager receives them
   def handle_info(%{action: action, radix_state: radix_state}, bufr_mgr_state) do
 
     Flamelex.Fluxus.Reducers.Buffer.handle(%{
