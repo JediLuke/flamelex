@@ -28,6 +28,19 @@ defmodule Flamelex.GUI.ScenicEventsDefinitions do
       @left_shift_and_space_bar {:key, {" ", :press, 1}}
       @left_shift_and_tab {:key, {"tab", :press, 1}}
 
+      #NOTE: even though these are numbers, the last one in the tuple
+      #      we send, is still always zero
+      @number_0 {:codepoint, {"0", 0}}
+      @number_1 {:codepoint, {"1", 0}}
+      @number_2 {:codepoint, {"2", 0}}
+      @number_3 {:codepoint, {"3", 0}}
+      @number_4 {:codepoint, {"4", 0}}
+      @number_5 {:codepoint, {"5", 0}}
+      @number_6 {:codepoint, {"6", 0}}
+      @number_7 {:codepoint, {"7", 0}}
+      @number_8 {:codepoint, {"8", 0}}
+      @number_9 {:codepoint, {"9", 0}}
+
       @lowercase_a {:codepoint, {"a", 0}}
       @lowercase_b {:codepoint, {"b", 0}}
       @lowercase_c {:codepoint, {"c", 0}}

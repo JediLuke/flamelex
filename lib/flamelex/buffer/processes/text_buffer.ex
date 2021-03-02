@@ -23,6 +23,10 @@ defmodule Flamelex.Buffer.Text do
     {:ok, init_state}
   end
 
+  def handle_call({:get_cursor_coords, 1}, _from, %{cursors: [c]} = state) do #TODO this only works for one cursor
+    {:reply, c, state}
+  end
+
   #TODO with modify_buffer utils
   # def handle_call({:modify, {:insert, new_text, %{col: cursor_x, row: cursor_y}}}, _from, state) do
 
@@ -159,10 +163,16 @@ defmodule Flamelex.Buffer.Text do
     end
   end
 
+  #TODO what we're doing is, moving cursors over to gtid based
+
   defp move_cursor(%{line: l, col: c} = _cursor, {:down, x, :line}, _state) do
     %{line: l+x, col: c} #TODO this doesn't check if we have hit the limit for number of lines
   end
 
+
+  defp move_cursor(%{line: l, col: c} = _cursor, {:up, x, :line}, _state) do
+    %{line: l-x, col: c} #TODO this doesn't check if we have hit the limit for number of lines
+  end
 
 
   # def input(pid, {scenic_component_pid, input}), do: GenServer.cast(pid, {:input, {scenic_component_pid, input}})

@@ -53,7 +53,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
       # @uppercase_E => CoreActions.move_cursor(to: :end_of_current_word),
       # @uppercase_F => find_character(:current_line, :after_cursor, {:direction, :reverse})
       # @uppercase_G => :active_buffer |> move_cursor(to: :last_line), #TODO implement proper vim handling, how to get it to accept pre-G alpha numeric... how to explain this... either use a pre-cursor, or go to end (just go to end by defualt???)
-      @uppercase_G => {:vim_lang, :motion, :goto_last_line_in_buffer},
+      @uppercase_G => {:vim_lang, :motion, {:jump, :goto_line}},
       #TODO actually, got a new plan for this - send it to the VimLang process
       # @uppercase_G => {:fire_action, {:move_cursor, %{buffer: active_buf, details: %{cursor_num: 1, instructions: %{last: :line, same: :column}}}}},
       # @uppercase_H => goto_line(1) # home cursor
@@ -77,17 +77,16 @@ defmodule Flamelex.API.KeyMappings.VimClone do
       # @uppercase_Y => yank(:current_line)
       # @uppercase_Z => first_hald_quick_save_and_exit??
 
-      # @number_0 => CoreActions.move_cursor(column_number: 0)
-      # @number_1 => CoreActions.move_cursor(column_number: 0)
-      # @number_2 => CoreActions.move_cursor(column_number: 0)
-      # @number_3 => CoreActions.move_cursor(column_number: 0)
-      # @number_4 => CoreActions.move_cursor(column_number: 0)
-      # @number_5 => CoreActions.move_cursor(column_number: 0)
-      # @number_6 => CoreActions.move_cursor(column_number: 0)
-      # @number_7 => CoreActions.move_cursor(column_number: 0)
-      # @number_8 => CoreActions.move_cursor(column_number: 0)
-      # @number_9 => CoreActions.move_cursor(column_number: 0)
-
+      @number_0 => {:vim_lang, {:integer, 0}},
+      @number_1 => {:vim_lang, {:integer, 1}},
+      @number_2 => {:vim_lang, {:integer, 2}},
+      @number_3 => {:vim_lang, {:integer, 3}},
+      @number_4 => {:vim_lang, {:integer, 4}},
+      @number_5 => {:vim_lang, {:integer, 5}},
+      @number_6 => {:vim_lang, {:integer, 6}},
+      @number_7 => {:vim_lang, {:integer, 7}},
+      @number_8 => {:vim_lang, {:integer, 8}},
+      @number_9 => {:vim_lang, {:integer, 9}},
 
       # !	shell command filter	cursor motion command, shell command
       # @	vi eval	buffer name (a-z)

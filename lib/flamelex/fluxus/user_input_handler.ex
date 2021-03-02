@@ -1,6 +1,7 @@
 defmodule Flamelex.Fluxus.UserInputHandler do
   use Flamelex.ProjectAliases
   alias Flamelex.Fluxus.Structs.RadixState
+  require Logger
 
 
 
@@ -224,6 +225,8 @@ defmodule Flamelex.Fluxus.UserInputHandler do
     #     or rather, maybe we pass the module into the lookup function?q
     case key_mapping.lookup(radix_state, user_input) do
       nil ->
+          details = %{key_mapping: key_mapping, user_input: user_input}
+          Logger.warn "no KeyMapping found for recv'd user_input. #{inspect details}"
           :no_mapping_found
       :ignore_input ->
           :ok
@@ -232,8 +235,11 @@ defmodule Flamelex.Fluxus.UserInputHandler do
       {:multiple_actions, action_list} when is_list(action_list) and length(action_list) > 0 ->
           raise "can't handle multiple actions yet"
           # action_list |> Enum.map(&Flamelex.Fluxus.fire_action/1)
+      #TODO deprecate it, just have 1 pattern match here
       {:vim_lang, x, v} ->
           GenServer.cast(Flamelex.GUI.VimServer, {{x, v}, radix_state})
+      {:vim_lang, v} ->
+          GenServer.cast(Flamelex.GUI.VimServer, {v, radix_state})
       {:apply_mfa, {module, function, args}} ->
           # apply_mfa(module, function, args)
           Kernel.apply(module, function, args)

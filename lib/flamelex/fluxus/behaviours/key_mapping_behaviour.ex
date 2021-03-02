@@ -3,6 +3,7 @@ defmodule Flamelex.Fluxux.KeyMappingBehaviour do
   Defines the interface for a key-mapping.
   """
   alias Flamelex.Fluxus.Structs.RadixState
+  require Logger
 
 
   defmacro __using__(_params) do
@@ -11,6 +12,7 @@ defmodule Flamelex.Fluxux.KeyMappingBehaviour do
       use Flamelex.ProjectAliases
       use Flamelex.GUI.ScenicEventsDefinitions
       alias Flamelex.Fluxus.Structs.RadixState
+      require Logger
 
 
       #REMINDER: including this @behaviour in the __using__ macro here means
@@ -49,7 +51,15 @@ defmodule Flamelex.Fluxux.KeyMappingBehaviour do
         rescue
           _e in FunctionClauseError ->
                   context = %{radix_state: radix_state, input: input}
-                  IO.puts "ERROR: #{__MODULE__} could not handle context: #{inspect context}" #TODO print it in red or something nice & ERROR like
+
+                  error_msg = ~s(#{__MODULE__} failed to process some input due to a FunctionClauseError.
+
+                  Most likely this KeyMapping module did not have a function
+                  implemented which pattern-matched on this input.
+
+                  context: #{inspect context})
+
+                  Logger.error error_msg
                   :ignore_input
         end
       end
