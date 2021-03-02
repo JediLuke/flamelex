@@ -7,7 +7,8 @@ During the alpha phase of development (~Dec 2019 - ??), the branch name
 changed several times, but it was actually just a continuous series of
 commits from a single developer (JediLuke). This branch has been kept for
 archaelogical reasons - once `v0.2.7-alfonz` has been officially released,
-development will move over to the `develop` branch.
+the default branch will revert to `trunk`, and development will move over
+to the `jediluke/develop` branch.
 
 # Flamelex
 
@@ -24,7 +25,7 @@ by Vim.
 
 As mentioned, we need Scenic. Scenic requires gfx drivers. The most up
 to date information on how to install Scenic for your platform can be found
-at #TODO
+in the [Scenic documentation](https://hexdocs.pm/scenic/install_dependencies.html)
 
 ### Running Flamelex from IEx
 
