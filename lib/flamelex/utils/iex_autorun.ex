@@ -8,8 +8,10 @@ defmodule Flamelex.IExAutoRun do
 
   Note that it is a *quote*, not a function. This code
   """
-  use Flamelex.ProjectAliases
 
+
+  # this macto gets executed whenever the application is started in IEx
+  # via the `.iex.exs` file
   defmacro __using__(_) do
     quote do
 
@@ -33,7 +35,7 @@ defmodule Flamelex.IExAutoRun do
   end
 
   def punctuated_quote do
-    q = Memex.random_quote()
+    q = Flamelex.API.Memex.random_quote()
 
     ~s(“#{q.text}”
      - #{q.author}

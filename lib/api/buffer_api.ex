@@ -32,7 +32,7 @@ defmodule Flamelex.API.Buffer do
   """
 
   #TODO make this open a new blank buffer
-  def open!, do: open!("/Users/luke/workbench/elixir/flamelex/README.md")
+  def open!, do: open!("/Users/luke/workbench/elixir/flamelex/README.md") #TODO update this filename
 
   def open!(filepath) do
 
