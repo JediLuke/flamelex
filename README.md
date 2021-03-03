@@ -46,7 +46,7 @@ TO get a feel for FLamelex, run some of the following commands:
 Transmute.main_circle()
 <!-- Transmute.clear() -->
 
-Buffer.load("README")
+Buffer.open!("README")
 
 All editing & processing can be achieved via IEx, including drawing graphics
 and all edits of any text, so you can kind of think of it as a shell with
@@ -65,6 +65,10 @@ of the transmutation circle, or even to speed it up!
 
 
 #TODO experiment with making a flamelex alias
+
+## Adjusting the window size
+
+#TODO
 
 ## How to use Flamelex
 
