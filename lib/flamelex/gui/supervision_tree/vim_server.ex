@@ -68,7 +68,7 @@ defmodule Flamelex.GUI.VimServer do
         buffer: radix_state.active_buffer,
         details: %{
           cursor_num: 1,
-          goto: %{row: last_line, col: current_cursor_coords.col}}
+          goto: %{line: last_line, col: current_cursor_coords.col}}
     }})
 
     IO.inspect current_cursor_coords, label: "GOT THE CURENT CURSOR"

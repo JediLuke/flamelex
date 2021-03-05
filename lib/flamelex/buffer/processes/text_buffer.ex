@@ -27,6 +27,10 @@ defmodule Flamelex.Buffer.Text do
     {:reply, c, state}
   end
 
+  def handle_call(:get_num_lines, _from, state) do
+  {:reply, Enum.count(state.lines), state}
+end
+
   #TODO with modify_buffer utils
   # def handle_call({:modify, {:insert, new_text, %{col: cursor_x, row: cursor_y}}}, _from, state) do
 
@@ -143,7 +147,7 @@ defmodule Flamelex.Buffer.Text do
     end
   end
 
-  def handle_cast({:move_cursor, %{cursor_num: n, instructions: instructions} = details}, state) do
+  def handle_cast({:move_cursor, %{cursor_num: n, instructions: instructions} = details}, state) when n >= 1 do
     case state.cursors |> Enum.at(n-1) do # fetch_cursor
       nil ->
           IO.puts "can't move this cursor cause it dont exist lol" #TODO make it red, maybe crash??
@@ -163,7 +167,21 @@ defmodule Flamelex.Buffer.Text do
     end
   end
 
-  #TODO what we're doing is, moving cursors over to gtid based
+  def handle_cast({:move_cursor, %{cursor_num: n=1, goto: %{col: col, line: line}}}, state) do #TODO hard-coded as first ursor for now
+
+    new_cursor = %{col: col, line: line}
+
+    # update state with the new cursor position
+    new_state =
+      %{state|cursors: state.cursors |> List.replace_at(n-1, new_cursor)}
+
+    # send an update request to the :gui_component (redraw)
+    ProcessRegistry.find!({:cursor, n, {:gui_component, state.rego_tag}})
+    |> GenServer.cast({:reposition, new_cursor})
+
+    {:noreply, new_state}
+  end
+
 
   defp move_cursor(%{line: l, col: c} = _cursor, {:down, x, :line}, _state) do
     %{line: l+x, col: c} #TODO this doesn't check if we have hit the limit for number of lines
