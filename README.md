@@ -10,6 +10,11 @@ archaelogical reasons - once `v0.2.7-alfonz` has been officially released,
 the default branch will revert to `trunk`, and development will move over
 to the `jediluke/develop` branch.
 
+## TODOs
+
+* update instructions about loading in a Memex
+* show popup to new users
+
 # Flamelex
 
 A combination text-editor & memex written in Elixir.
@@ -18,6 +23,8 @@ Flamelex is a self-contained Elixir app, build upon the Elixir GUI library
 `Scenic`. The main inspiration is emacs, especially the idea of having a
 REPL that can be personalized. The text-editing experience is also inspired
 by Vim.
+
+
 
 ## Installing Flamelex
 
@@ -37,16 +44,15 @@ iex -S mix run
 ```
 
 This gives you an IEx session, and should have displayed the default
-Flamelex window showing a `transmutation circle` and a version number
+Flamelex window showing a "transmutation circle" and a version number
 
 #TODO insert screenshot
 
-TO get a feel for FLamelex, run some of the following commands:
-
-Transmute.main_circle()
-<!-- Transmute.clear() -->
+To get a feel for FLamelex, run some of the following commands:
 
 Buffer.open!("README")
+
+#TODO Transmute.main_circle()
 
 All editing & processing can be achieved via IEx, including drawing graphics
 and all edits of any text, so you can kind of think of it as a shell with
@@ -54,15 +60,11 @@ better graphics/feedback - but, we do go a little bit further -> we also
 allow inputs into the GUI (mouse clicks / keypresses / etc) to be collected
 and then transformed into function calls.
 
-For example, we have a mapping where pressing `e` calls:
-
-Buffer.add_char(buf_id, "e") #TODO
+#TODO example
 
 All inputs in Flamelex are simply mappings. We can also use memory, to get
 effects such as a leader key. You can press space + c to shift the color
 of the transmutation circle, or even to speed it up!
-
-
 
 #TODO experiment with making a flamelex alias
 
@@ -85,7 +87,8 @@ Flamelex is re-producable via command line.
 Some examples:
 
 ```
-Frame.move(1, left: {10, :px}) # move first frame left 10 pixels
+Buffer.open!
+#TODO Frame.move(1, left: {10, :px}) # move first frame left 10 pixels
 ```
 
 How inputs get mapped to these functions is covered in #TODO explain how inputs get mapped to commands
@@ -113,7 +116,7 @@ adding code to Flamelex, you *must* go through the designated flows. If you
 start calling things like Buffer.move_cursor(2), it will probably work,
 but your whole state tree might get out of whack...
 
-### The Flamelex CommandBuffer #TODO
+### The Flamelex KommandBuffer #TODO
 
 ### The Flamelex MenuBar #TODO
 
@@ -153,11 +156,42 @@ easily this way, simply by doing the action.
 
 ## Memex
 
-The Memex is heavily inspired by Tiddlywiki
+What is a Memex? see: https://en.wikipedia.org/wiki/Memex
 
-### Listing the feed
+Think of the Memex as your personal wikipedia. It's a place to store all
+your knowledge and data, in a way that's retreivable and programmable
+(in Elixir no less!). In the Memex, you can store:
 
-### Creating a new note
+* Your favourite Elixir snippets
+* Your wife's birthday
+* Your latest beyond-brisket recipe
+* Financial records
+* kanban boards
+* ...
+* anything...
+
+#TODO Example
+
+iex> Memex.My.current_timezone()
+"Texas" #TODO
+iex> Memex.random_quote().text
+"Well done is better than well said."
+
+The Memex is heavily inspired by Tiddlywiki.
+
+### Creating your own Memex environment
+
+#TODO
+Flamelex must be configured with a Memex?
+Flamelex will look for a Memex?
+
+### Showing the memex-feed
+
+#TODO it looks like Tiddlywiki
+
+### Creating a new tidbit
+
+#TODO
 
 ## Agents
 
@@ -169,7 +203,7 @@ How to set a reminder using the Remidner agent...
 
 ## Goals of the project
 
-Franklin was born out of my frustration trying to create the "perfect"
+Flamelex was born out of my frustration trying to create the "perfect"
 emacs/vim setup. I am a heavy modifier of these programs, but eventually
 hard to use APIs and bugs in the software (I consider emacs' inability
 to support multi-threading a bug in 2020) prompted me to "flip the desk"
@@ -226,7 +260,28 @@ when a user presses a key...
 
 ### The `franklin_dev` branch
 
-#TODO Explain about Franklin
+*warning - you are on the branch `franklin_dev`*
+
+This software's first working name was `Franklin`, after the American
+philosopher, inventor, and I suspect alchemist, Benjamin Franklin.
+I was learning a lot about American history at the time, and when looking
+for a good quote to initialize the branch, came across the apocryphal
+quip that graces the git-log of the first commit:
+
+“For every minute spent organizing, an hour is earned.” - Benjamin Franklin
+JediLuke on 12/28/2019, 11:49:22 PM
+
+At some point I began throwing the name out there to some other programmers,
+and got feedback that `frankin` was too generic, there were other packages
+in other languages that already used it, etc... I had already gotten very
+into the alchemist theme by this point, so decided to change the name to
+`flamelex` after the famous alchemist, Nicholas Flamel.
+
+The first flamelex release, `v0.2.7-alfonz` was beginning to become finalized
+around the start of 2021. Up until this point, all work was just one series of
+commits by me, JediLuke. I decided to keep this series of commits as the
+branch `franklin_dev`, as a tip-o'-the-hat to Franklin, the original seed
+that grew into Flamelex. Any code archaelogists out there?? here's a dig!
 
 ## Backlog / TODOs
 

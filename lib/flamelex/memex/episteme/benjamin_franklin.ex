@@ -10,7 +10,15 @@ defmodule Flamelex.Memex.Episteme.BenjaminFranklin do
       LiteraryQuote.construct(%{
         text: "Love your Enemies, for they tell you your Faults.",
         author: name()
-      })
+      }),
+      LiteraryQuote.construct(%{
+        text: "Well done is better than well said.",
+        author: name(),
+        sources: [
+          "Poor Richard’s Almanack, 1737",
+          "https://www.fi.edu/benjamin-franklin/famous-quotes"
+        ]
+      }),
     ]
 
 
