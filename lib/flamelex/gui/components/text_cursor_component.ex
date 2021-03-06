@@ -13,6 +13,11 @@ defmodule Flamelex.GUI.Component.TextCursor do
 
   @valid_directions [:up, :down, :left, :right]
 
+  # def redraw() do
+  #   ProcessRegistry.find!({:cursor, n, {:gui_component, state.rego_tag}})
+  #   |> GenServer.cast({:reposition, new_cursor}) #TODO change this to update
+  # end
+
 
   @impl Flamelex.GUI.ComponentBehaviour
   def custom_init_logic(%{num: _n} = params) do # buffers need to keep track of cursors somehow, so we just use simple numbering

@@ -34,6 +34,14 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do #TODO rename module
     |> GenServer.cast({:move_cursor, details})
   end
 
+  # modifying buffers...
+  def async_reduce(%{action: {:modify_buffer, specifics}}) do
+    %{buffer: buffer, details: details} = specifics
+
+    ProcessRegistry.find!(buffer)
+    |> GenServer.cast({:modify_buffer, details})
+  end
+
 
   # below here are the pattern match functions to handle actions we
   # receive but we want to ignore

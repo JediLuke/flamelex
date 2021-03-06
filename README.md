@@ -70,7 +70,19 @@ of the transmutation circle, or even to speed it up!
 
 ## Adjusting the window size
 
-#TODO
+Right now, because of the way Scenic works, we have to re-draw the gui
+if we want to resize the window. The way we do this, is to change the
+value of the GUI dimensions in the `Flamelex.GUI.ScenicInitialize` (or,
+the `scenic_initialize.ex` file, same thing)
+
+Fine the `default_viewport_config`, declared at the top, and update the
+`size` key to a tuple. This is the number of pixels (citation needed) in
+the new window. Restart Flamelex and voila, it should be the new size.
+
+Note that right now, all objects in the GUI are hard-coded in size, so
+adjusting the size of the window may make things render stragely. In the
+future, we want to look to incorporating the [Layout-o-Matic!](https://github.com/BWheatie/scenic_layout_o_matic)
+library to get flexible sizes/layouts.
 
 ## How to use Flamelex
 
@@ -117,6 +129,19 @@ start calling things like Buffer.move_cursor(2), it will probably work,
 but your whole state tree might get out of whack...
 
 ### The Flamelex KommandBuffer #TODO
+
+historical note: The day I thought I had become an emacs convert for life,
+was the day I discovered `M-x` or `execute-extended-command`. This command
+in emacs brings up a lisp repl, right over your text files! I was a heavy
+user of this feature, and I wrote many personal shortcut functions, which
+were naturally all accessible via the `M-x` shell. I liked this command
+so much, that I re-mapped it to <leader>k, which is IMHO the most
+ergonomic and efficient leader keymapping - it earned that spot, because
+I used it so often.
+
+When I implemented this feature in flamelex, I immediately mapped it to
+<leader>k again, which is how it ended up with the nomenclature of
+`KommandBuffer`
 
 ### The Flamelex MenuBar #TODO
 
@@ -230,7 +255,11 @@ the updated state - which is then rendered.
 
 ### Flamelex.Fluxus
 
-
+The starting point for firing any `action` to the inner-workings of 
+flamelex is to look at the `Flamelex.Fluxus` module. This module provides
+the interface to firing these actions - when an action is fired, a message
+is propagated through an entire tree of processes, which effectively
+hold the state of the entire application between them.
 
 ### Handling user input
 

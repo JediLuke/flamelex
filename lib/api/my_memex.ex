@@ -26,4 +26,19 @@ defmodule Flamelex.Memex.My do
   def todo_list do
     memex_env().todo_list()
   end
+
+  # def save_memex_file do
+  #   DataFile.read()
+  #     |> Map.merge(%{
+  #          state.uuid => %{
+  #            title: state.title,
+  #            text: state.text,
+  #            datetime_utc: DateTime.utc_now(),
+  #            #TODO hash entire contents
+  #            #TODO handle timezones
+  #            tags: ["note"]
+  #          },
+  #        })
+  #     |> DataFile.write()
+  # end
 end

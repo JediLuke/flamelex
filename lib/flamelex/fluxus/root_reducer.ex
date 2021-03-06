@@ -38,6 +38,10 @@ defmodule Flamelex.Fluxus.RootReducer do
   what we want to do instead is, the reducer broadcasts the message to
   the "actions" channel - all the managers are able to react to this event.
   """
+  def async_reduce(radix_state, {:action, {:switch_mode, m}}) do
+    raise "here we should switch mode"
+  end
+
   def async_reduce(radix_state, {:action, action}) do
     IO.puts "Broadcasting action... #{inspect action}"
     Flamelex.Utils.PubSub.broadcast([

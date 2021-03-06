@@ -54,10 +54,10 @@ defmodule Flamelex.BufferBehaviour do
         {:noreply, buf_state |> Map.delete(:callback_list)}
       end
 
-      @impl GenServer
-      def handle_continue(:send_callbacks, buf_state) do # since we didn't match above, we must not be any callbacks...
-        {:noreply, buf_state}
-      end
+      # @impl GenServer
+      # def handle_continue(:send_callbacks, buf_state) do # since we didn't match above, we must not be any callbacks...
+      #   {:noreply, buf_state}
+      # end
 
       # all buffers will answer a `:read` call
       @impl GenServer

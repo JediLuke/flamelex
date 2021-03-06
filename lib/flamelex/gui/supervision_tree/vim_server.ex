@@ -62,9 +62,6 @@ defmodule Flamelex.GUI.VimServer do
       active_buffer_process
       |> GenServer.call({:get_cursor_coords, 1}) #TODO how do we reference cursors here?
 
-    # Buffer.modify(active_buffer, line: x, "\n")
-    # move cursor down 1 line
-    # enter insert mode
 
     Flamelex.Fluxus.fire_actions([
       # append a new line to the current line
@@ -75,7 +72,16 @@ defmodule Flamelex.GUI.VimServer do
             append: "\n" # a newline character
           }
       }},
-      {:switch_mode, :insert} #TODO don't use global modes, this should only affect the buffer
+      # move the cursor down to the new line we just created
+      {:move_cursor, %{
+          buffer: radix_state.active_buffer,
+          details: %{
+            cursor_num: 1,
+            instructions: {:down, 1, :line}
+          }
+      }},
+      # then, switch into insert mode
+      {:switch_mode, :insert} #TODO don't use global modes, this should only affect the local buffer
     ])
 
 
@@ -109,8 +115,8 @@ defmodule Flamelex.GUI.VimServer do
         buffer: radix_state.active_buffer,
         details: %{
           cursor_num: 1,
-          goto: %{line: last_line, col: current_cursor_coords.col}}
-    }})
+          instructions: {:goto, %{line: last_line, col: current_cursor_coords.col}}
+    }}})
 
     IO.inspect current_cursor_coords, label: "GOT THE CURENT CURSOR"
 
