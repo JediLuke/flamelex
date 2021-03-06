@@ -178,8 +178,9 @@ defmodule Flamelex.API.KeyMappings.VimClone do
     %{
       @lowercase_j => {:apply_mfa, {Flamelex.API.Journal, :now, []}},
       @lowercase_k => {:apply_mfa, {Flamelex.API.CommandBuffer, :show, []}},
-      @lowercase_t => {:apply_mfa, {Flamelex.API.Memex.TiddlyWiki, :open, []}}, #TODO
+      # @lowercase_t => {:apply_mfa, {Flamelex.API.Memex.TiddlyWiki, :open, []}}, #TODO Memex.open_catalog()
 
+      #TODO these mappings are here for testing purposes, so make sure that leader commands are working as expected
       @lowercase_x => {:execute_function, fn -> raise "intentionally raising! little x" end},
       @uppercase_X => {:execute_function, fn -> raise "intentionally raising! big X" end}
     }

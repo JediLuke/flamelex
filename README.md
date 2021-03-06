@@ -99,11 +99,17 @@ Flamelex is re-producable via command line.
 Some examples:
 
 ```
-Buffer.open!
-#TODO Frame.move(1, left: {10, :px}) # move first frame left 10 pixels
-```
+Buffer.list() # will return nothing because, no buffers open
+[]
+b = Buffer.open!
+b
+{:file, blah} # so, this is a reference
+Buffer.list()
+# this will now show a list with the new buffer in it
 
-How inputs get mapped to these functions is covered in #TODO explain how inputs get mapped to commands
+#TODO Frame.move(1, left: {10, :px}) # move first frame left 10 pixels
+
+```
 
 #### using the API modules
 
@@ -146,6 +152,37 @@ When I implemented this feature in flamelex, I immediately mapped it to
 ### The Flamelex MenuBar #TODO
 
 ## Basic text editing
+
+Before we start down this journey, let's take a moment to stop and reflect
+one last time on how under the hood, all things that happen in flamelex
+are just function calls - we are just interacting with the REPL (and
+sometimes storing some stuff on some disk/network), and the only way we
+do that is via the IEx console.
+
+So then, why do we have a GUI? Well obviously a GUI organizes the information
+in a way which is useful for human brains - and those same brains, when
+they want to take an action (like, for example, putting a new letter on
+the end of a word), would rather achieve that action by pressing a single
+button which they have already mentally mapped to that action occuring,
+rather than going back to the command line and typing in a more thorough
+specification (e.g. `Buffer.modify(b, {:insert, "x"})`) #TODO
+
+In other text-editors, it seems that the specific sequence of button-presses
+required to achieve an action, seems to end up defining the entire editor.
+I have implemented a few defaults, based on my preferences & history of
+using text-editors, but I want to stress that in flamelex, what functions
+any particular keystroke or menu-button may take, is completely opaque -
+you can peek right on into the code, because *they're all just mappings
+to functions*. Hopefully, this will clear up a lot of previous confusion,
+and allow a greater ease of customizability for the end user.
+
+The directions given in this README only apply when the default GUI-keymappings
+are being used - if that is changed, these will obviously no longer work.
+
+How inputs get mapped to these functions is covered in this document -
+you don't have to understand how that works to use flamelex, but if you
+would like to know more, please refer to the section
+sub-titled: `Handling user input`
 
 ### Opening files
 
