@@ -39,12 +39,53 @@ defmodule Flamelex.GUI.VimServer do
   # http://vimdoc.sourceforge.net/htmldoc/motion.html#jump-motions
 
 
+
+
+
+  # http://vimdoc.sourceforge.net/htmldoc/insert.html#inserting
+  #TODO need to take count into affect - http://vimdoc.sourceforge.net/htmldoc/insert.html#o - repeat [count] times
+  #TAKES COUNT - opens up 5 cursors on 5 lines !!
+  def handle_cast({{:inserting, {:open_a_new_line, :below_the_current_line}}, radix_state}, vim_state) do
+    # http://vimdoc.sourceforge.net/htmldoc/insert.html#o
+    # The following commands can be used to insert new text into the buffer.
+    # They can all be undone and repeated with the "." command.
+    IO.puts "for now, just open below current line... every time"
+
+    # 2 - insert newline character at end
+    # 1 - open insert mode
+
+    active_buffer_process =
+      radix_state.active_buffer
+      |> ProcessRegistry.find!()
+
+    current_cursor_coords = # %Coords{} = #TODO this should be a coords struct
+      active_buffer_process
+      |> GenServer.call({:get_cursor_coords, 1}) #TODO how do we reference cursors here?
+
+    # Buffer.modify(active_buffer, line: x, "\n")
+    # move cursor down 1 line
+    # enter insert mode
+
+    Flamelex.Fluxus.fire_actions([
+      # append a new line to the current line
+      {:modify_buffer, %{
+          buffer: radix_state.active_buffer,
+          details: %{
+            line: current_cursor_coords.line,
+            append: "\n" # a newline character
+          }
+      }},
+      {:switch_mode, :insert} #TODO don't use global modes, this should only affect the buffer
+    ])
+
+
+    {:noreply, vim_state}
+  end
+
   # http://vimdoc.sourceforge.net/htmldoc/motion.html#G
   def handle_cast({{:motion, {:jump, :goto_line}}, radix_state}, %{count: nil} = vim_state) do #NOTE: a count of 1 is the default, no count has been given
     # If you make the cursor "jump" with one of these commands, the
-    # position of the cursor before the jump is remembered.
-
-    IO.puts "WE HAVE NO COUNT"
+    # position of the cursor before the jump is remembered. #TODO
 
     active_buffer_process =
         radix_state.active_buffer
@@ -80,6 +121,8 @@ defmodule Flamelex.GUI.VimServer do
 
     # {:noreply, vim_state}
   end
+
+
 
 
   # http://vimdoc.sourceforge.net/htmldoc/intro.html#[count]

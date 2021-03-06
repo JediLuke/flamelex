@@ -28,6 +28,10 @@ defmodule Flamelex.Fluxus do
     GenServer.cast(Flamelex.FluxusRadix, {:action, a})
   end
 
+  def fire_actions(actions) when is_list(actions) do
+    Enum.each(actions, &fire_action(&1))
+  end
+
   # def fire_action(%{radix_state: r, fluxus_state_process: fsp_module}, a) do
   #   GenServer.cast(fsp_module, {:action, %{radix_state: r, action: a}})
   # end

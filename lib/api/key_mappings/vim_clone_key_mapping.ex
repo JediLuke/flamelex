@@ -5,7 +5,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   https://hea-www.harvard.edu/~fine/Tech/vi.html
   """
   use Flamelex.Fluxux.KeyMappingBehaviour
-  alias Flamelex.Structs.BufRef
+  # alias Flamelex.Structs.BufRef
 
   @doc ~s(Define the leader key here.)
   def leader, do: @space_bar
@@ -31,8 +31,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
       # @lowercase_l => CoreActions.move_cursor(:right, 1, :column),
       # @lowercase_m => place_mark(:current_position)
       # @lowercase_n => repeat_last_search
-      # @lowercase_o => open_line_below_and_go_into_insert_mode
-      #TODO next!!???
+      @lowercase_o => {:vim_lang, :inserting, {:open_a_new_line, :below_the_current_line}},
       # @lowercase_p => paste(:default_paste_bin, :after, :cursor) # vim calls this `put`
       # @lowercase_q => #unbound
       # @lowercase_r => replace_single_character_at_cursor()
