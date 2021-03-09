@@ -34,14 +34,17 @@ defmodule Flamelex.Buffer.Utils.TextBufferUtils do
   # (since this function just updates the state, what should really happen,
   # is that we just send the updated state to a general purpose render function)
   def move_cursor(state, %{cursor_num: n, instructions: instructions}) when is_integer(n) do
+    IO.puts "MOVING THE CURSOR!!! #{inspect state, pretty: true}"
     case state.cursors |> Enum.at(n-1) do # cursors start at 1, lists do not
       nil ->
         raise "You are attempting to move a cursor (#{inspect n}), but that cursor is not registered in the buffer."
       cursor ->
         new_cursor = case {cursor, instructions} do
-          {%{line: l, col: c}, {:down, x, :line}}   -> %{line: l+x, col: c} #TODO this doesn't check if we have hit the limit for number of lines
-          {%{line: l, col: c}, {:up,   x, :line}}   -> %{line: l-x, col: c} #TODO this doesn't check if we have hit the limit for number of lines
-          {_old_cursor,        {:goto, new_coords}} -> new_coords
+          {%{line: l, col: c}, {:down,  x, :line}}   -> %{line: l+x, col: c} #TODO this doesn't check if we have hit the limit for number of lines
+          {%{line: l, col: c}, {:up,    x, :line}}   -> %{line: l-x, col: c} #TODO this doesn't check if we have hit the limit for number of lines
+          {%{line: l, col: c}, {:right, x, :column}} -> %{line: l, col: c+x} #TODO this doesn't check if we have hit the limit for number of lines
+          {%{line: l, col: c}, {:left,  x, :column}} -> %{line: l, col: c-x} #TODO this doesn't check if we have hit the limit for number of lines
+          {_old_cursor,        {:goto,  new_coords}} -> new_coords
         end
 
         # send an update request to the :gui_component (redraw)

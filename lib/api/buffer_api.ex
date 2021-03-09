@@ -111,6 +111,31 @@ defmodule Flamelex.API.Buffer do
   #   save({:buffer, buf})
   # end
 
+  #TODO
+#   def show
+#   def hide
+
+      #TODO
+      # @doc """
+      # All Buffers support show/hide
+      # """
+      # @impl GenServer
+      # def handle_cast(:show, buf) do
+      #   Flamelex.GUI.Controller.action({:show, buf})
+      #   {:noreply, buf}
+      # end
+
+      # def handle_cast(:hide, buf) do
+      #   Flamelex.GUI.Controller.action({:hide, buf})
+      #   {:noreply, buf}
+      # end
+
+  #TODO use TextCursor structs
+#   def move_cursor(%BufRef{} = buf, %Cursor{num: 1}, %{to: destination}) do
+#    #TODO call the pid, & give them the instructions
+
+#   end
+
 
 
   def close(buf) do

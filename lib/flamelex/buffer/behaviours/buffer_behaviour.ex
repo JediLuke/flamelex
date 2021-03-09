@@ -19,6 +19,7 @@ defmodule Flamelex.BufferBehaviour do
       This wrapper around GenServer.start_link/3 ensures a consistent boot
       for all Buffers.
       """
+      #TODO this is currently only going to work for text files...
       def start_link(%{source: source} = params) do
         IO.puts "#{__MODULE__} starting... params: #{inspect params}"
         tag  = {:buffer, source}

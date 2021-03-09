@@ -1,16 +1,78 @@
 defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
+  use Flamelex.ProjectAliases
   alias Flamelex.Buffer.Utils.TextBufferUtils
 
-  # special case for the newline character
-  def modify(state, %{append: text = "\n", line: l}) when is_integer(l) do
+  #TODO use ReducerBehaviour - they all need to do this, start a task under
+  # the corresponding supervisor thing (micromanager pattern)
 
-    new_lines = List.insert_at(state.lines, l, %{line: l, text: text}) #TODO create new Line struct here
-    new_data  = TextBufferUtils.join_lines_into_raw_text(new_lines)
+  #TODO move this under Registry.lookup(BufferRegistry, id)
 
-    #TODO trigger re-draw
 
-    {:ok, %{state|data: new_data, lines: new_lines}}
+  def start_modification_task(state, params) do # params e.g.
+    # spin up a new process to do the handling...
+    Task.Supervisor.start_child(
+        find_supervisor_pid(state),  # start the task under the Task.Supervisor specific to this Buffer
+            __MODULE__,
+            :modify,
+            [state, params]
+      )
   end
+
+  def find_supervisor_pid(%{rego_tag: rego_tag = {:buffer, _details}}) do
+    ProcessRegistry.find!({:buffer, :task_supervisor, rego_tag})
+  end
+
+
+  # def start_modification_task(state, specifics) do
+  #   #TODO start the task under the Task.Supervisor
+
+  #   Task.Supervisor.start_child(
+  #     this_buffers_corresponding_task_supervisor(),
+  #   {:buffer, :task, params.source})
+
+
+  #   {:ok, new_state} = modify(state, specifics)
+
+
+
+  #   # {:buffer, :task_supervisor, params.source}
+  #   # ProcessRegistry.find!(state.rego_tag)
+  #   ProcessRegistry.find!(state.source)
+  #   |> GenServer.cast({:update, new_state})
+  # end
+
+
+  # special case for the newline character
+  # def modify(state, %{append: text = "\n", line: l}) when is_integer(l) do
+
+  #   new_lines = List.insert_at(state.lines, l, %{line: l, text: text}) #TODO create new Line struct here
+  #   new_data  = TextBufferUtils.join_lines_into_raw_text(new_lines)
+
+  #   #TODO trigger re-draw
+
+  #   {:ok, %{state|data: new_data, lines: new_lines}}
+  # end
+
+  def modify(state, params) do
+    IO.puts "modifying..."
+    :timer.sleep(3_000)
+    IO.puts "modifying..."
+    :timer.sleep(3_000)
+    IO.puts "modifying..."
+    :timer.sleep(3_000)
+    IO.puts "modifying..."
+    :timer.sleep(3_000)
+    IO.puts "modifying..."
+    :timer.sleep(3_000)
+    IO.puts "modifying..."
+    :timer.sleep(3_000)
+    IO.puts "modifying..."
+    :timer.sleep(3_000)
+    IO.puts "modifying..."
+    :timer.sleep(3_000)
+  end
+
+
 end
 
 

@@ -17,9 +17,10 @@ defmodule Flamelex.Buffer.TopLevelSupervisor do
     children = [
       # {Registry, keys: :unique, name: Flamelex.Buffer.ProcessRegistry},
       {Task.Supervisor, name: Flamelex.Buffer.Reducer.TaskSupervisor},
+      Flamelex.Buffer.SeniorSupervisor,
       Flamelex.BufferManager,
-      Flamelex.Buffer.Supervisor,
-      {Flamelex.Buffer.KommandBuffer, %{rego_tag: {:buffer, KommandBuffer}}}
+      {Flamelex.Buffer.KommandBuffer, %{rego_tag: {:buffer, KommandBuffer}}},
+      # {Registry, keys: :unique, name: BufferRegistry},
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

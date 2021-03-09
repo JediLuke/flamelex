@@ -181,7 +181,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
         # update the buffer text
         {:modify_buffer, %{
             buffer: active_buf,
-            modification: {:insert, letter, %{coords: {:cursor, 1}}} #TODO why is it always cursor 1?
+            details: {:insert, letter, %{coords: {:cursor, 1}}} #TODO why is it always cursor 1?
         }},
         # move the cursor along 1 character
         {:move_cursor, %{

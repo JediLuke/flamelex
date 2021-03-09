@@ -10,6 +10,8 @@ defmodule Flamelex.Buffer.Text do
 
   @impl Flamelex.BufferBehaviour
   def boot_sequence(%{source: {:file, filepath}} = params) do
+    Logger.info "#{__MODULE__} booting up..."
+
     {:ok, file_contents} = File.read(filepath)
 
     init_state =
@@ -49,14 +51,20 @@ defmodule Flamelex.Buffer.Text do
     end
   end
 
+  # {:"$gen_cast", {:move_cursor, %{cursor_num: 1, instructions: {:right, 1, :column}}}}
   def handle_cast({:move_cursor, instructions}, state) do
     #TODO so, these should all also have the same, Task.Supervisor pattern...
-    {:ok, new_state} = TextBufferUtils.move_cursor(state, instructions)
+    {:ok, new_state} = TextBufferUtils.move_cursor(state, instructions) #TODO then helper crashes... so this should all be under a new task sup
     {:noreply, new_state}
   end
 
   def handle_cast({:modify_buffer, specifics}, state) do
-    {:ok, new_state} = ModifyHelper.modify(state, specifics)
+    ModifyHelper.start_modification_task(state, specifics)
+    {:noreply, state} #TODO wait for a callback from this process
+  end
+
+  # this should only be sent msgs by Tasks running for this Buffer
+  def handle_cast({:update, new_state}, _old_state) do
     {:noreply, new_state}
   end
 end
