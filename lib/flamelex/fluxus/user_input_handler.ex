@@ -6,56 +6,6 @@ defmodule Flamelex.Fluxus.UserInputHandler do
 
 
 
-  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
-  # #   Flamelex.API.CommandBuffer.deactivate()
-  # #   Flamelex.FluxusRadix.switch_mode(:normal)
-  # #   state |> RadixState.set(mode: :normal)
-  # # end
-
-  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :command} = state, input) when input in @valid_command_buffer_inputs do
-  # #   Flamelex.API.CommandBuffer.input(input)
-  # #   state
-  # # end
-
-  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :command} = state, @enter_key) do
-  # #   Flamelex.API.CommandBuffer.execute()
-  # #   Flamelex.API.CommandBuffer.deactivate()
-  # #   state |> RadixState.set(mode: :normal)
-  # # end
- # # ## -------------------------------------------------------------------
-  # # ## Normal mode
-  # # ## -------------------------------------------------------------------
-
-  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal, active_buffer: nil} = state, input) do
-  # #   Logger.debug "received some input whilst in :normal mode, but ignoring it because there's no active buffer... #{inspect input}"
-  # #   state |> RadixState.add_to_history(input)
-  # # end
-
-  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal, active_buffer: active_buf} = state, input) do
-  # #   Logger.debug "received some input whilst in :normal mode... #{inspect input}"
-  # #   # buf = Buffer.details(active_buf)
-  # #   case KeyMapping.lookup_action(state, input) do
-  # #     :ignore_input ->
-  # #         state
-  # #         |> RadixState.add_to_history(input)
-  # #     {:apply_mfa, {module, function, args}} ->
-  # #         Kernel.apply(module, function, args)
-  # #           |> IO.inspect
-  # #         state |> RadixState.add_to_history(input)
-  # #   end
-  # # end
-
-  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :insert} = state, @enter_key = input) do
-  # #   cursor_pos =
-  # #     {:gui_component, state.active_buffer}
-  # #     |> ProcessRegistry.find!()
-  # #     |> GenServer.call(:get_cursor_position)
-
-  # #   Buffer.modify(state.active_buffer, {:insert, "\n", cursor_pos})
-
-  # #   state |> RadixState.add_to_history(input)
-  # # end
-
   # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :insert} = state, input) when input in @all_letters do
   # #   cursor_pos =
   # #     {:gui_component, state.active_buffer}
@@ -222,20 +172,19 @@ defmodule Flamelex.Fluxus.UserInputHandler do
     key_mapping = Flamelex.API.KeyMappings.VimClone #TODO just hard-code it for now, much easier...
 
     #TODO this should probably be a lookup inside the module?
-    #     or rather, maybe we pass the module into the lookup function?q
+    #     or rather, maybe we pass the module into the lookup function?
     case key_mapping.lookup(radix_state, user_input) do
       nil ->
-          details = %{key_mapping: key_mapping, user_input: user_input}
-          Logger.warn "no KeyMapping found for recv'd user_input. #{inspect details}"
+          details = %{radix_state: radix_state, key_mapping: key_mapping, user_input: user_input}
+          Logger.warn "no KeyMapping found for recv'd user_input. #{inspect details, pretty: true}"
           :no_mapping_found
       :ignore_input ->
           :ok
       {:fire_action, a} ->
           Flamelex.Fluxus.fire_action(a)
-      {:multiple_actions, action_list} when is_list(action_list) and length(action_list) > 0 ->
-          raise "can't handle multiple actions yet"
-          # action_list |> Enum.map(&Flamelex.Fluxus.fire_action/1)
-      #TODO deprecate it, just have 1 pattern match here
+      {:fire_multiple_actions, action_list} when is_list(action_list) and length(action_list) > 0 ->
+          action_list |> Enum.map(&Flamelex.Fluxus.fire_action/1)
+      #TODO deprecate it, just have 1 pattern match for vim_lang here
       {:vim_lang, x, v} ->
           GenServer.cast(Flamelex.GUI.VimServer, {{x, v}, radix_state})
       {:vim_lang, v} ->

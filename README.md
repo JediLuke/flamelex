@@ -324,6 +324,16 @@ when a user presses a key...
              no problem really. If a lookup is successful, then maybe
              actions get fired, functions get called... whatever.
 
+### A guideline for adding new functionality
+
+
+#DEVELOPING a new component
+Step 1 - figure out where you want to mount the component. #TODO this should be a layer I guess...
+  - it needs to get mounted in the GIU somewhere
+  - 
+
+
+
 ### The `franklin_dev` branch
 
 *warning - you are on the branch `franklin_dev`*

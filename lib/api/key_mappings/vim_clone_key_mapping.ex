@@ -5,11 +5,16 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   https://hea-www.harvard.edu/~fine/Tech/vi.html
   """
   use Flamelex.Fluxux.KeyMappingBehaviour
-  # alias Flamelex.Structs.BufRef
+
 
   @doc ~s(Define the leader key here.)
   def leader, do: @space_bar
 
+
+  # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal, active_buffer: nil} = state, input) do
+  #   Logger.debug "received some input whilst in :normal mode, but ignoring it because there's no active buffer... #{inspect input}"
+  #   state |> RadixState.add_to_history(input)
+  # end
 
   @doc ~s(This function maps defines the act of pressing a key, to an action.)
   def keymap(%RadixState{mode: :normal, active_buffer: active_buf}) do #TODO so, we used to have BufRef here, which let us pattern match on the type of buffer the active buffer was... and I liked that :(
@@ -24,7 +29,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
       # @lowercase_f => find_character(:current_line, :after_cursor, {:direction, :forward})
       # @lowercase_g => #unbound
       @lowercase_h => {:fire_action, {:move_cursor, %{buffer: active_buf, details: %{cursor_num: 1, instructions: {:left, 1, :column}}}}},
-      # @lowercase_i => CoreActions.switch_mode(:insert), #TODO change current buffer mode
+      @lowercase_i => {:fire_action, {:switch_mode, :insert}}, #TODO change current buffer mode
       @lowercase_j => {:fire_action, {:move_cursor, %{buffer: active_buf, details: %{cursor_num: 1, instructions: {:down, 1, :line}}}}},
       @lowercase_k => {:fire_action, {:move_cursor, %{buffer: active_buf, details: %{cursor_num: 1, instructions: {:up, 1, :line}}}}},
       @lowercase_l => {:fire_action, {:move_cursor, %{buffer: active_buf, details: %{cursor_num: 1, instructions: {:right, 1, :column}}}}},
@@ -164,20 +169,59 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   #                 }
   #   } #TODO generalize this to non-text buffers too
   # end
-  # def keymap(%RadixState{mode: :normal, active_buffer: %BufRef{type: Flamelex.Buffer.Text} = active_buf}) do
 
-  def keymap(%RadixState{mode: :normal, active_buffer: _active_buf}) do
+
+  # inputting text when in insert mode
+  def keymap(%RadixState{mode: :insert, active_buffer: active_buf}, {:codepoint, {letter, _num}} = input)
+  when input in @valid_text_input_characters
+  and not is_nil(active_buf) do
+    #TODO maybe we get cursor 1 coords first, and then can move cursor directly
+    #     to the new spot, and use that as the input
+    {:fire_multiple_actions, [
+        # update the buffer text
+        {:modify_buffer, %{
+            buffer: active_buf,
+            modification: {:insert, letter, %{coords: {:cursor, 1}}} #TODO why is it always cursor 1?
+        }},
+        # move the cursor along 1 character
+        {:move_cursor, %{
+            buffer: active_buf,
+            details: %{cursor_num: 1, instructions: {:right, 1, :column}}
+        }}
+    ]}
+  end
+
+  def keymap(%RadixState{mode: :insert}) do
     %{
-      @escape_key => CoreActions.switch_mode(:normal)
+      @lowercase_x => {:execute_function, fn -> raise "intentionally raising! little x" end},
+      @escape_key => {:fire_action, {:switch_mode, :normal}}, #TODO change current buffer mode
     }
   end
+
+
+  # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
+  #   Flamelex.API.CommandBuffer.deactivate()
+  #   Flamelex.FluxusRadix.switch_mode(:normal)
+  #   state |> RadixState.set(mode: :normal)
+  # end
+
+  # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :command} = state, input) when input in @valid_command_buffer_inputs do
+  #   Flamelex.API.CommandBuffer.input(input)
+  #   state
+  # end
+
+  # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :command} = state, @enter_key) do
+  #   Flamelex.API.CommandBuffer.execute()
+  #   Flamelex.API.CommandBuffer.deactivate()
+  #   state |> RadixState.set(mode: :normal)
+  # end
 
 
   @doc ~s(This function allows users to define custom leader key-bindings.)
   def leader_keybindings(%RadixState{mode: :normal}) do
     %{
       @lowercase_j => {:apply_mfa, {Flamelex.API.Journal, :now, []}},
-      @lowercase_k => {:apply_mfa, {Flamelex.API.CommandBuffer, :show, []}},
+      @lowercase_k => {:apply_mfa, {Flamelex.API.KommandBuffer, :show, []}},
       # @lowercase_t => {:apply_mfa, {Flamelex.API.Memex.TiddlyWiki, :open, []}}, #TODO Memex.open_catalog()
 
       #TODO these mappings are here for testing purposes, so make sure that leader commands are working as expected

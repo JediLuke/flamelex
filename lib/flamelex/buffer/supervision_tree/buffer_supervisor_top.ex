@@ -19,7 +19,7 @@ defmodule Flamelex.Buffer.TopLevelSupervisor do
       {Task.Supervisor, name: Flamelex.Buffer.Reducer.TaskSupervisor},
       Flamelex.BufferManager,
       Flamelex.Buffer.Supervisor,
-      Flamelex.Buffer.Command
+      {Flamelex.Buffer.KommandBuffer, %{rego_tag: {:buffer, KommandBuffer}}}
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

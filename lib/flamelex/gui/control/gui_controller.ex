@@ -49,7 +49,7 @@ defmodule Flamelex.GUI.Controller do
   def init(state) do
     IO.puts "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
-    # PubSub.subscribe(topic: :active_buffer) #TODO?
+    Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
     {:ok, state, {:continue, :draw_default_gui}}
   end
 
@@ -279,10 +279,10 @@ defmodule Flamelex.GUI.Controller do
   # end
 
 
-  def handle_info(all_info, state) do
-    IO.puts "BAD MASTVH?? #{inspect all_info}"
-    {:noreply, state}
-  end
+  # def handle_info(all_info, state) do
+  #   IO.puts "BAD MASTVH?? #{inspect all_info}"
+  #   {:noreply, state}
+  # end
 
   # @impl true
   # def handle_info(:check_reminders, state) do

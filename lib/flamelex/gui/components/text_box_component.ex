@@ -21,6 +21,8 @@ defmodule Flamelex.GUI.Component.TextBox do
   @impl Flamelex.GUI.ComponentBehaviour
   def custom_init_logic(%{frame: %Frame{} = f} = params) do
 
+    Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
+
     #TODO can probs get this direct from buf state?
     lines_of_text =
       # Flamelex.API.Buffer.read(buf)
@@ -155,10 +157,13 @@ defmodule Flamelex.GUI.Component.TextBox do
   def handle_action({graph, state}, {:switch_mode, new_mode}) do
 
 
-    %{ref: %{ref: buf_ref}} = state
+    %{ref: buf_ref} = state
 
     #assume its cursor 1 for now
-    cursor_tag = {:gui_component, {:text_cursor, buf_ref, 1}} #TODO assume its cursor 1
+    # cursor_tag = {:gui_component, {:text_cursor, buf_ref, 1}} #TODO assume its cursor 1
+
+    cursor_tag =
+      Flamelex.GUI.Component.TextCursor.rego_tag(%{ref: {:gui_component, buf_ref}, num: 1}) #TODO only works for cursor 1 right now
 
     ProcessRegistry.find!(cursor_tag)
     |> GenServer.cast({:action, {:switch_mode, new_mode}})

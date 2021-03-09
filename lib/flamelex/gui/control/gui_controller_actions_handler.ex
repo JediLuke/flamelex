@@ -42,13 +42,12 @@ defmodule Flamelex.GUI.Utilities.ControlHelper do
 
   defp mount_command_buffer(graph, vp) do
     graph
-    #DEVELOPING a new component
-    # Step 1 - figure out where you want to mount the component. #TODO this should be a layer I guess...
     |> Flamelex.GUI.Component.CommandBuffer.mount(%{
-         ref: :command_buffer,
+         ref: :kommand_buffer,
          frame: Frame.new(
             top_left: {0, vp.height - Flamelex.GUI.Component.MenuBar.height()},
-            size:     {vp.width, Flamelex.GUI.Component.MenuBar.height()})})
+            size:     {vp.width, Flamelex.GUI.Component.MenuBar.height()})
+       })
   end
 end
 

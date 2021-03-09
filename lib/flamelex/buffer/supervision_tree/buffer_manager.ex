@@ -65,6 +65,11 @@ defmodule Flamelex.BufferManager do
   end
 
   @impl GenServer
+  def handle_cast({:buffer_opened, %{rego_tag: {:buffer, KommandBuffer}}}, state) do
+    # just ignore it...
+    {:noreply, state}
+  end
+
   def handle_cast({:buffer_opened, buf_state}, state) do
 
     #TODO we can do better than this (though, this is still better I think, at least it's BuffERManager doing it)
@@ -97,28 +102,28 @@ defmodule Flamelex.BufferManager do
   #   end
   # end
 
-  @impl true
-  def handle_info({:active_buffer, :switch_mode, _new_mode}, %{active_buffer: nil} = state) do
-    IO.puts "Cannot switch to a new mode sine we don't have an active buffer"
-    {:noreply, state}
-  end
+  # @impl true
+  # def handle_info({:active_buffer, :switch_mode, _new_mode}, %{active_buffer: nil} = state) do
+  #   IO.puts "Cannot switch to a new mode sine we don't have an active buffer"
+  #   {:noreply, state}
+  # end
 
-  def handle_info({:active_buffer, :switch_mode, new_mode}, %{active_buffer: %{ref: ref} = active_buf} = state) do
+  # def handle_info({:active_buffer, :switch_mode, new_mode}, %{active_buffer: %{ref: ref} = active_buf} = state) do
 
-    #TODO just broadcast to the :gui_update_bus
-    ProcessRegistry.find!({:gui_component, ref})
-    # Flamelex.GUI.Component.TextBox.rego_tag(active_buf)
-    # |> ProcessRegistry.find!()
-    |> IO.inspect(label: "gui component pid")
-    |> send({:switch_mode, new_mode})
+  #   #TODO just broadcast to the :gui_update_bus
+  #   ProcessRegistry.find!({:gui_component, ref})
+  #   # Flamelex.GUI.Component.TextBox.rego_tag(active_buf)
+  #   # |> ProcessRegistry.find!()
+  #   |> IO.inspect(label: "gui component pid")
+  #   |> send({:switch_mode, new_mode})
 
 
-    #TODO look up the gui component & send it a msg to switch modes
+  #   #TODO look up the gui component & send it a msg to switch modes
 
-    #TODO2 just get GUI Controller to do it for us...
+  #   #TODO2 just get GUI Controller to do it for us...
 
-    {:noreply, state}
-  end
+  #   {:noreply, state}
+  # end
 
   # when new actions are published to the :action_event_bus, this is where
   # BufferManager receives them

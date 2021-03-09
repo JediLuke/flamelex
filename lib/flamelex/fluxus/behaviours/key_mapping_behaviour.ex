@@ -39,6 +39,12 @@ defmodule Flamelex.Fluxux.KeyMappingBehaviour do
           :ignore_input
       end
 
+      #TODO this isn't very clean, but gets the job done... ideally we want
+      #     a consistent way to lookup the keymap though...
+      def lookup(%RadixState{mode: :insert} = radix_state, input) do
+        keymap(radix_state, input)
+      end
+
       def lookup(radix_state, input) do
         #TODO look up active buffer here & use it to decipher keystrokes??
         try do
@@ -46,6 +52,18 @@ defmodule Flamelex.Fluxux.KeyMappingBehaviour do
             leader_keybindings(radix_state)[input]
           else
             ##TODO get the active buffer & pass it in??
+            #NOTE: This cute little hack allows keymap to either  return
+            #      the actions directly, or return a map that we contains
+            #      the lookup we're interested in
+            IO.puts "ABOUT TO LOOK IT UP"
+            # case keymap(radix_state) do
+            #   m when is_map(m) ->
+            #       IO.puts "WELL I GUESS ITS A MAP??? #{inspect m, pretty: true}"
+            #       m[input]
+            #   otherwise ->
+            #       IO.puts "YES ITS OTHERWISE #{inspect otherwise}"
+            #       otherwise
+            # end
             keymap(radix_state)[input]
           end
         rescue

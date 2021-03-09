@@ -1,23 +1,23 @@
-defmodule Flamelex.API.CommandBuffer do
+defmodule Flamelex.API.KommandBuffer do
   @moduledoc """
   This API module is the interface for all functionality relating to the
-  CommandBuffer.
+  KommandBuffer.
   """
 
 
   @doc """
-  Make the CommandBuffer visible, and put us in :command mode.
+  Make the KommandBuffer visible, and put us in :command mode.
   """
   def show do
-    Flamelex.Fluxus.fire_action({:action, {:command_buffer, :show}})
+    Flamelex.Fluxus.fire_action({KommandBuffer, :show})
   end
 
 
   @doc """
-  Make the CommandBuffer not-visible, and put us in :normal mode.
+  Make the KommandBuffer not-visible, and put us in :normal mode.
   """
   def hide do
-    Flamelex.Fluxus.fire_action({:action, {:command_buffer, :hide}})
+    Flamelex.Fluxus.fire_action({KommandBuffer, :hide})
   end
 
 
@@ -25,14 +25,14 @@ defmodule Flamelex.API.CommandBuffer do
   Resets the text field to an empty string.
   """
   def clear do
-    Flamelex.Fluxus.fire_action({:action, {:command_buffer, :clear}})
+    Flamelex.Fluxus.fire_action({KommandBuffer, :clear})
   end
 
 
   @doc """
   The difference between this function and hide is that hide simply makes
   the API.CommandBuffer invisible in the GUI, but usually when we want it to go
-  away we also want to forget all the state in the CommandBuffer - like
+  away we also want to forget all the state in the KommandBuffer - like
   when you mash escape to go back to :edit mode
   """
   def deactivate do
@@ -47,7 +47,7 @@ defmodule Flamelex.API.CommandBuffer do
   Send input to the API.CommandBuffer
   """
   def input(x) do
-    Flamelex.Fluxus.fire_action({:action, {:command_buffer, :input, x}})
+    Flamelex.Fluxus.fire_action({KommandBuffer, {:input, x}})
   end
 
 
@@ -55,6 +55,6 @@ defmodule Flamelex.API.CommandBuffer do
   Execute the command in the API.CommandBuffer
   """
   def execute do
-    Flamelex.Fluxus.fire_action({:action, {:command_buffer, :execute}})
+    Flamelex.Fluxus.fire_action({KommandBuffer, :execute})
   end
 end

@@ -8,6 +8,7 @@ defmodule Flamelex.Fluxus.RootReducer do
   they crash, either nothing will happen, or some timeouts will trigger
   if they were set further up the chain.
   """
+  use Flamelex.ProjectAliases
 
 
   def handle(radix_state, action) do
@@ -38,8 +39,17 @@ defmodule Flamelex.Fluxus.RootReducer do
   what we want to do instead is, the reducer broadcasts the message to
   the "actions" channel - all the managers are able to react to this event.
   """
-  def async_reduce(radix_state, {:action, {:switch_mode, m}}) do
-    raise "here we should switch mode"
+  def async_reduce(%{mode: _current_mode} = radix_state, {:action, {:switch_mode, m}}) do
+    new_radix_state = %{radix_state|mode: m} # update the state with the new mode
+    IO.puts "CHANGE MODE!!"
+    GenServer.cast(Flamelex.FluxusRadix, {:radix_state_update, new_radix_state}) # update FluxusRadix
+    PubSub.broadcast(topic: :gui_update_bus, msg: {:switch_mode, m})
+    :ok
+  end
+
+  def async_reduce(radix_state, {:action, {KommandBuffer, x}}) do
+    IO.puts "we're trying to do something with KommandBuffer..."
+    GenServer.cast(Flamelex.Buffer.KommandBuffer, x)
   end
 
   def async_reduce(radix_state, {:action, action}) do

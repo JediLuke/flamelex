@@ -58,7 +58,8 @@ defmodule Flamelex.GUI.Component.TextCursor do
 
 
   def rego_tag(%{ref: ref, num: num}) when is_integer(num) and num >= 1 do
-    {:cursor, num, ref}
+    # {:gui_component, {:buffer, {:file, _filename}}} = ref
+    {:text_cursor, num, ref}
   end
 
   # @impl Flamelex.GUI.ComponentBehaviour
@@ -77,7 +78,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
   # end
 
   def handle_action(
-        {graph, %{ref: %{ref: _buf_ref}} = state},
+        {graph, %{ref: _buf_ref} = state},
         {:switch_mode, new_mode}) do
     {new_graph, new_state} = CursorUtils.switch_mode({graph, state}, new_mode)
     {:update_graph_and_state, {new_graph, new_state}}

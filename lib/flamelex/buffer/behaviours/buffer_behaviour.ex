@@ -26,6 +26,16 @@ defmodule Flamelex.BufferBehaviour do
         GenServer.start_link(__MODULE__, Map.merge(params, %{rego_tag: tag}), name: name)
       end
 
+      def start_link(%{rego_tag: {:buffer, _b} = tag} = params) do #TODO should we enforce this tuple shape here?? dunno
+        IO.puts "#{__MODULE__} starting... params: #{inspect params}"
+        name = Flamelex.Utilities.ProcessRegistry.via_tuple_name(:gproc, tag)
+        GenServer.start_link(__MODULE__, %{rego_tag: tag, params: params}, name: name)
+      end
+
+      def start_link([]) do
+        raise "cant start a buffer with no params (yet!)"
+      end
+
       @doc """
       We don't do anything here except start the boot sequence.
       """
@@ -45,19 +55,20 @@ defmodule Flamelex.BufferBehaviour do
       @impl GenServer
       def handle_continue(:register_with_buffer_manager, buf_state) do
         GenServer.cast(Flamelex.BufferManager, {:buffer_opened, buf_state})
-        {:noreply, buf_state, {:continue, :send_ok_open_buffer_callbacks}}
+        {:noreply, buf_state, {:continue, :send_callbacks}}
       end
 
       @impl GenServer
-      def handle_continue(:send_ok_open_buffer_callbacks, %{callback_list: clist, rego_tag: tag} = buf_state) when is_list(clist) do
+      def handle_continue(:send_callbacks, %{callback_list: clist, rego_tag: tag} = buf_state) when is_list(clist) do
         Enum.each(clist, &send(&1, {:ok_open_buffer, tag}))
         {:noreply, buf_state |> Map.delete(:callback_list)}
       end
 
-      # @impl GenServer
-      # def handle_continue(:send_callbacks, buf_state) do # since we didn't match above, we must not be any callbacks...
-      #   {:noreply, buf_state}
-      # end
+      @impl GenServer
+      # since we didn't match the above case, we must not have any callbacks...
+      def handle_continue(:send_callbacks, buf_state) do
+        {:noreply, buf_state}
+      end
 
       # all buffers will answer a `:read` call
       @impl GenServer

@@ -45,7 +45,8 @@ defmodule Flamelex.Buffer.Utils.TextBufferUtils do
         end
 
         # send an update request to the :gui_component (redraw)
-        ProcessRegistry.find!({:cursor, n, {:gui_component, state.rego_tag}})
+        Flamelex.GUI.Component.TextCursor.rego_tag(%{ref: {:gui_component, state.rego_tag}, num: 1}) #TODO only works for cursor 1 right now
+        |> ProcessRegistry.find!()
         |> GenServer.cast({:reposition, new_cursor}) #TODO change this to update
 
         # update state with the new cursor position

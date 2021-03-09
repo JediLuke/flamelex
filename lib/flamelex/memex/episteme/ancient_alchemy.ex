@@ -53,7 +53,7 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
       }),
       LiteraryQuote.construct(%{
         text: ~s(Alchemy, It is the scientific technique of understanding the structure of matter, decomposing it, and then reconstructing it. If performed skillfully, it is even possible to create gold out of lead. However, as it is a science, there are some natural principles in place. Only one thing can be created from something else of a certain mass. This is the Principle of Equivalent Exchange.),
-        author: "Fullmetal Alchemist: Brotherhood, Intro"
+        author: "Fullmetal Alchemist: Brotherhood"
       }),
       LiteraryQuote.construct(%{
         text: ~s(Perception is the illusion that gives all matter mass),

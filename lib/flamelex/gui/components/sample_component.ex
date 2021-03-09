@@ -1,11 +1,33 @@
 defmodule Flamelex.GUI.Component.SampleComponent do
   @moduledoc """
   This module is just an example. Copy & modify it.
+
+  # Adding a new component to the GUI
+
+  To understand how to add a new component, we need to look in to how they
+  are rendered. We use Scenic to draw all our graphics. At the very base
+  layer, our Graphics are nothing more than a single %Scenic.Graph{} struct
+  help in the the `Flamelex.GUI.RootScene` process.
+
+  At the very bottom of the abstraction, we have a %Scenic.Graph{}. To
+  update this Graph, we need to modify it and push it - this involves
+  sending an update to the `RootScene` process.
+
+  The way Scenic works, is that although in some way a component is just
+  another entry into the Scenic Graph, a Scenic component is special in
+  that it has it's own process backing it, and what's in the Scenic.Graph
+  held in the RootScene is just a reference to that other process, which
+  will in turn contain a Scenic.Graph, representing the component.
+
+  To alert components of changes, components need to register themselves
+  to the `:gui_update_bus` and any GUI update events will be sent to all
+  registered GUI components - it is the responsibility of each component
+  to either ignore or react ;) to updates as they come in.
   """
   use Flamelex.GUI.ComponentBehaviour
 
   @impl Flamelex.GUI.ComponentBehaviour
-  def custom_init_logic(_frame, _params) do
+  def custom_init_logic(_frame, _params) do # TODO this is kind of like `mount`
     :none
   end
 
@@ -25,7 +47,7 @@ defmodule Flamelex.GUI.Component.SampleComponent do
 
     Draw.blank_graph()
     # |> Draw.background(frame, :green)
-    # |> Draw.test_pattern()
+    |> Draw.test_pattern()
     |> Draw.border(frame)
   end
 
