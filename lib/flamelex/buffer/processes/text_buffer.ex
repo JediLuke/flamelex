@@ -60,12 +60,12 @@ defmodule Flamelex.Buffer.Text do
 
   def handle_cast({:modify_buffer, specifics}, state) do
     ModifyHelper.start_modification_task(state, specifics)
-    {:noreply, state} #TODO wait for a callback from this process
+    {:noreply, state}
   end
 
   # this should only be sent msgs by Tasks running for this Buffer
-  def handle_cast({:update, new_state}, _old_state) do
-    IO.puts "UPDATING... #{inspect new_state}"
+  def handle_cast({:update, new_state}, old_state) do
+    PubSub.broadcast(topic: :gui_update_bus, msg: {:buffer, old_state.rego_tag, {:new_state, new_state}})
     {:noreply, new_state}
   end
 end

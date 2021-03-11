@@ -13,31 +13,17 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
       )
   end
 
+
   @doc """
   This is here so we have a library of pure functions we can call, whilst
   still having the callback logic contained within the Task.
   """
   def call_modify_and_callback(state, params) do
     {:ok, new_state} = modify(state, params)
-
-    #TODO update GUI
-    #     # Flamelex.GUI.Controller.refresh({:buffer, state.name})
-#     # Flamelex.GUI.Controller.show({:buffer, filepath}) #TODO this is just a request, top show a buffer. Once I really nail the way we're linking up buffers/components, come back & fix this
-
-
-  #   {:gui_component, new_state.name}
-  #   |> ProcessRegistry.find!()
-  #   |> GenServer.cast({:refresh, new_state})
-
-
-  #   Flamelex.GUI.Controller.refresh(new_state)
-
-
-    ProcessRegistry.find!(state.rego_tag)
-    |> GenServer.cast({:update, new_state})
-
-    :ok
+    buffer_pid = ProcessRegistry.find!(state.rego_tag)
+    GenServer.cast(buffer_pid, {:update, new_state})
   end
+
 
   # special case for the newline character
   def modify(state, %{append: text = "\n", line: l}) when is_integer(l) do
@@ -46,7 +32,6 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
     new_lines = List.insert_at(state.lines, l, %{line: l, text: text}) #TODO create new Line struct here
     new_data  = TextBufferUtils.join_lines_into_raw_text(new_lines)
 
-    #TODO trigger re-draw
 
     {:ok, %{state|data: new_data, lines: new_lines}}
   end
@@ -115,17 +100,31 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
               |> Map.put(:unsaved_changes?, true)}
   end
 
+  # `insertion_site` is a count of how many characters from the start of
+  # the text.
+  def modify(state, {:insert, text, insertion_site})
+    when is_bitstring(text)
+    and is_integer(insertion_site)
+      do
+        {before_split, after_split} = state.data |> String.split_at(insertion_site)
+        new_data = before_split <> text <> after_split
 
-
-
-
-  def modify(state, params) do
-    IO.puts "TODO this catchall needs to be deleted.... but it's a good way of seeing tasks be spun up in the process tree..."
-    IO.puts "#{inspect state, pretty: true}"
-    IO.puts "#{inspect params, pretty: true}"
-    :timer.seconds(30)
-    IO.puts "DONE!"
+        {:ok, state
+              |> Map.put(:data, new_data)
+              |> Map.put(:lines, TextBufferUtils.parse_raw_text_into_lines(new_data))
+              |> Map.put(:unsaved_changes?, true)}
   end
+
+
+
+
+  # def modify(state, params) do
+  #   IO.puts "TODO this catchall needs to be deleted.... but it's a good way of seeing tasks be spun up in the process tree..."
+  #   IO.puts "#{inspect state, pretty: true}"
+  #   IO.puts "#{inspect params, pretty: true}"
+  #   :timer.seconds(30)
+  #   IO.puts "DONE!"
+  # end
 
 
 
@@ -143,6 +142,9 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
 
   #         updated_list_of_text_lines |> Enum.join()
   #       end
+
+
+
   def insert_text_into_line(%{text: line_of_text} = line, new_text, pos)
     when is_bitstring(line_of_text)
      and is_bitstring(new_text)

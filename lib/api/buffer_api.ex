@@ -14,6 +14,7 @@ defmodule Flamelex.API.Buffer do
     buffer_list
   end
 
+
   @doc """
   Return the active Buffer.
   """
@@ -23,15 +24,13 @@ defmodule Flamelex.API.Buffer do
   end
 
 
-
-
-  @doc """
-  Searches the open buffers and returns a single %BufRef{}, or raises.
-  """
-  #TODO put a bang if it raises - it should just return nil if it cant find it
-  def find(search_term) do
-    GenServer.call(BufferManager, {:find_buffer, search_term})
-  end
+  # @doc """
+  # Searches the open buffers and returns a single %BufRef{}, or raises.
+  # """
+  # #TODO put a bang if it raises - it should just return nil if it cant find it
+  # def find(search_term) do
+  #   GenServer.call(BufferManager, {:find_buffer, search_term})
+  # end
 
 
   @doc """
@@ -45,7 +44,7 @@ defmodule Flamelex.API.Buffer do
   """
 
   #TODO make this open a new blank buffer
-  def open!, do: open!("/Users/luke/workbench/elixir/flamelex/README.md") #TODO update this filename
+  def open!, do: open!(File.cwd! <> "/README.md") #NOTE: this only works from the root directory of the Flamelex project...
 
   def open!(filepath) do
 
@@ -96,59 +95,43 @@ defmodule Flamelex.API.Buffer do
 
   ```
   insertion_op  = {:insert, "Luke is the best!", 12}
-  {:ok, b}      = Buffer.find("my_buffer")
+  {:ok, b}      = Buffer.find("my_buffer") #TODO still correct?
 
   Buffer.modify(b, insertion_op)
   ```
   """
-  # def modify(:active_buffer, modification) do
-  #   PubSub.broadcast(topic: :active_buffer,
-  #                    msg: {:active_buffer, :modification, modification})
-  # end
-  # def modify(buf, modification) do
-  #   IO.puts "IHIHIH #{inspect buf}"
-  #   #TODO make this a try/catch?
-  #   ProcessRegistry.find!(buf) |> IO.inspect() |> GenServer.call({:modify, modification})
-  # end
+  def modify(buf, modification) do
+    GenServer.cast(Flamelex.FluxusRadix, {:action, {
+        :modify_buffer, %{
+            buffer: buf,
+            details: modification
+        }
+    }})
+  end
 
 
+  @doc """
+  Tell a buffer to save it's contents.
+  """
+  def save({:buffer, _details} = buf) do
+    ProcessRegistry.find!(buf) |> GenServer.call(:save)
+  end
 
-  # def save(pid) when is_pid(pid) do
-  #   pid |> GenServer.call(:save)
-  # end
-  # def save({:buffer, _id} = lookup_key) do
-  #   ProcessRegistry.find!(lookup_key)
-  #   |> GenServer.call(:save)
-  # end
-  # def save(buf) do
-  #   save({:buffer, buf})
-  # end
 
   #TODO
-#   def show
-#   def hide
+  # @doc """
+  # All Buffers support show/hide
+  # """
+  # @impl GenServer
+  # def handle_cast(:show, buf) do
+  #   Flamelex.GUI.Controller.action({:show, buf})
+  #   {:noreply, buf}
+  # end
 
-      #TODO
-      # @doc """
-      # All Buffers support show/hide
-      # """
-      # @impl GenServer
-      # def handle_cast(:show, buf) do
-      #   Flamelex.GUI.Controller.action({:show, buf})
-      #   {:noreply, buf}
-      # end
-
-      # def handle_cast(:hide, buf) do
-      #   Flamelex.GUI.Controller.action({:hide, buf})
-      #   {:noreply, buf}
-      # end
-
-  #TODO use TextCursor structs
-#   def move_cursor(%BufRef{} = buf, %Cursor{num: 1}, %{to: destination}) do
-#    #TODO call the pid, & give them the instructions
-
-#   end
-
+  # def handle_cast(:hide, buf) do
+  #   Flamelex.GUI.Controller.action({:hide, buf})
+  #   {:noreply, buf}
+  # end
 
 
   def close(buf) do

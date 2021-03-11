@@ -18,15 +18,17 @@ defmodule Flamelex.Fluxus do
   the FluxusRadix level, but which aren't stricly responses to user input.
 
   #TODO sometimes the caller wants  to get a callback, and maybe even get some results
+  seems like for now, we're going with the idea of, "write your pid down
+  on this list, and eventually someone will call you back..."
   """
   def fire_action(a) do
     GenServer.cast(Flamelex.FluxusRadix, {:action, a})
   end
 
   #TODO opts is either, expects_callback? or nothing
-  def fire(:action, a, opts) do
-    GenServer.cast(Flamelex.FluxusRadix, {:action, a})
-  end
+  # def fire(:action, a, _opts) do
+  #   GenServer.cast(Flamelex.FluxusRadix, {:action, a})
+  # end
 
   def fire_actions(actions) when is_list(actions) do
     Enum.each(actions, &fire_action(&1))
