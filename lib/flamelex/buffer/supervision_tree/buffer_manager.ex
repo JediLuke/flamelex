@@ -60,7 +60,8 @@ defmodule Flamelex.BufferManager do
     {:reply, count, state}
   end
 
-  def handle_call(:list_buffers, _from, state) do
+  # give the BufferManager state to anyone who asks
+  def handle_call(:get_state, _from, state) do
     {:reply, state, state}
   end
 

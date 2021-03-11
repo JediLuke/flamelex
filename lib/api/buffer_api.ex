@@ -9,7 +9,20 @@ defmodule Flamelex.API.Buffer do
   @doc """
   List all the open buffers.
   """
-  def list, do: GenServer.call(BufferManager, :list_buffers)
+  def list do
+    %{buffer_list: buffer_list} = GenServer.call(BufferManager, :get_state)
+    buffer_list
+  end
+
+  @doc """
+  Return the active Buffer.
+  """
+  def active_buffer do
+    %{active_buffer: active_buffer} = GenServer.call(BufferManager, :get_state)
+    active_buffer
+  end
+
+
 
 
   @doc """

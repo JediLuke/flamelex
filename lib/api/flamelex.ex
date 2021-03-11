@@ -4,7 +4,6 @@ defmodule Flamelex do
   """
   use Flamelex.ProjectAliases
 
-  @valid_modes [:command, :insert, :visual_select]
 
   @doc """
   `Know Thyself`
@@ -32,15 +31,24 @@ defmodule Flamelex do
     Application.start(:flamelex)
   end
 
+
   # def switch_mode(m) when m in @valid_modes do
   #   GenServer.cast(Flamelex.FluxusRadix, {:action, {:switch_mode, m}})
   # end
 
 
+  @doc """
+  #TODO
+  Increase or decrease the logging output of Flamelex during runtime.
+  """
   def set_log_level(:debug) do
     raise "How do I set the log level??"
   end
 
+
+  @doc """
+  Trigger help for the user.
+  """
   def help do
     raise "no help to be found :("
   end
