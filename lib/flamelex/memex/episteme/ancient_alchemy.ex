@@ -80,6 +80,10 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
         author: "Dr. David R. Hawkins"
       }),
       LiteraryQuote.construct(%{
+        text: ~s(The best tools are the ones you make yourself, to suit your exact need perfectly),
+        author: "Luke Taylor"
+      }),
+      LiteraryQuote.construct(%{
         text: ~s(This infinite presence which is all things ans everywhere, both the space in the room and the objects in the room, the figure & the ground simultaneously - is also exquisitely gentle. It's touch just melts you with it's exquisite gentleness, and whatever there was of individual self is melted by it - dissolved! Dissolved into it... like a salt when dropped into water, it just dissolves and becomes all at one with what is.),
         author: "Dr. David R. Hawkins"
       }),

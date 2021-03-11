@@ -6,6 +6,7 @@ defmodule Flamelex.Test.Buffers.BufferTest do
 
   @content_a "“This is why alchemy exists,\" the boy said. \"So that everyone will search for his treasure, find it, and then want to be better than he was in his former life. Lead will play its role until the world has no further need for lead; and then lead will have to turn itself into gold... "
   @content_b "That's what alchemists do. They show that, when we strive to become better than we are, everything around us becomes better, too.” ― Paulo Coelho, The Alchemist"
+  #TODO add a Random quote
 
 
 

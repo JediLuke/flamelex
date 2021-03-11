@@ -65,6 +65,7 @@ defmodule Flamelex.Buffer.Text do
 
   # this should only be sent msgs by Tasks running for this Buffer
   def handle_cast({:update, new_state}, _old_state) do
+    IO.puts "UPDATING... #{inspect new_state}"
     {:noreply, new_state}
   end
 end
