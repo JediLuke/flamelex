@@ -3,6 +3,7 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
   alias Flamelex.GUI.Structs.Frame
 
 
+  #TODO move this somewhere else
   def split_into_a_list_of_lines_of_text_structs(text) do
     {lines_of_text, _final_accumulator} =
         text
@@ -20,29 +21,22 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
     lines_of_text
   end
 
-
-  def render_lines(%Scenic.Graph{} = graph, %{ lines_of_text: [] }) do #NOTE: empty list...
+  def render_lines(graph, []) do # NOTE: empty list...
     graph
   end
-  def render_lines(
-    %Scenic.Graph{} = graph,
-    %{
-      lines_of_text: [ %LineOfText{} = _l | _rest] = lines,
-      # top_left_corner: %Coordinates{} = coords
-      frame: %Frame{top_left: %Coordinates{} = frame_top_left_coords} = frame
-    })
-  do
-    {new_graph, _final_line_num} = # REMINDER: this is the final accumulator, passed through by Enum.reduce/2
+
+  def render_lines(graph, %{frame: frame, lines: lines}) when is_list(lines) do
+    {new_graph, _final_line_num} = # REMINDER: this tuple is the final accumulator, passed through by Enum.reduce/2
       lines
         |> Enum.reduce(
-              {graph, 0}, # initialize the accumulator, line_num starts at zero
-              fn line_of_t, {graph, line_num} ->
+              {graph, 1}, # initialize the accumulator,- line_num starts at 1
+              fn %{text: line_of_text}, {graph, line_num} ->
                   new_graph =
                     graph
                     |> render_line(%{
-                          position_tuple: {line_num, frame_top_left_coords},
+                          position_tuple: {line_num, frame.top_left}, #TODO should be frame.coords.top_left
                           margin: frame.margin,
-                          text: line_of_t.text
+                          text: line_of_text
                         })
 
                   #REMINDER: Enum.reduce/2 expects the function to pass through the accumulator
@@ -51,9 +45,6 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
 
     new_graph # we return the graph as the last thing
   end
-
-  # h = Flamelex.GUI.Fonts.monospace_font_height(font, size)
-  def line_height, do: 24 #TODO get 24 here from somewhere real, something to do with Fonts surely
 
 
   def render_line(graph, %{
@@ -73,4 +64,9 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
            margin.top+frame_coords.y+line_number_y_offset },
          fill: :white)
   end
+
+
+  # h = Flamelex.GUI.Fonts.monospace_font_height(font, size)
+  def line_height, do: 24 #TODO get 24 here from somewhere real, something to do with Fonts surely
+
 end

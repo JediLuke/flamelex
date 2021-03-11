@@ -23,19 +23,11 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
 
-    #TODO can probs get this direct from buf state?
-    lines_of_text =
-      # Flamelex.API.Buffer.read(buf)
-      params.data
-      |> TextBoxDrawUtils.split_into_a_list_of_lines_of_text_structs()
-
-    #TODO this is the whole textbox
     params |> Map.merge(%{
       draw_footer?: true,
       cursors: [
         %{ frame: f, ref: rego_tag(params), num: 1 } #TODO use cursor struct, add frame to cursor struct
-      ],
-      num_lines: lines_of_text |> length()
+      ]
     })
   end
 
@@ -45,7 +37,7 @@ defmodule Flamelex.GUI.Component.TextBox do
     render(params |> Map.merge(%{frame: frame}))
   end
 
-  def render(%{ref: buf, frame: %Frame{} = frame} = params) do
+  def render(%{ref: buf, frame: %Frame{} = frame, lines: lines} = params) do
 
     #TODO make the frame, only 72 columns wide !!
     frame =
@@ -58,16 +50,15 @@ defmodule Flamelex.GUI.Component.TextBox do
     #TODO get margins from somewhere better
     frame = frame |> Frame.set_margin(%{top: 24, left: 8})
 
-    lines_of_text =
-      Flamelex.API.Buffer.read(buf)
-      |> TextBoxDrawUtils.split_into_a_list_of_lines_of_text_structs()
+    # lines_of_text =
+    #   Flamelex.API.Buffer.read(buf)
+    #   |> TextBoxDrawUtils.split_into_a_list_of_lines_of_text_structs()
 
     background_color = Flamelex.GUI.Colors.background()
 
     Draw.blank_graph()
     |> Draw.background(frame, background_color)
-    |> TextBoxDrawUtils.render_lines(%{ lines_of_text: lines_of_text,
-                                        frame: frame })
+    |> TextBoxDrawUtils.render_lines(%{lines: lines, frame: frame})
     |> draw_cursors(frame, params)
     |> Draw.border(frame)
   end
@@ -147,6 +138,12 @@ defmodule Flamelex.GUI.Component.TextBox do
   # def switch_mode(state, m) do
 
   # end
+
+  def handle_info({:buffer, buffer_rego, {:new_state, new_buffer_state}}, %{ref: gui_ref} = gui_component_state)
+  when buffer_rego == gui_ref do # this GUI component's buffer got an update
+    new_graph = render(new_buffer_state) #TODO does this kill the other processes???
+    {:noreply, {new_graph, gui_component_state}, push: new_graph} #TODO do I need to update the GUI component state??
+  end
 
   def handle_info(msg, state) do
     IO.puts "#{__MODULE__} got info msg: #{inspect msg}, state: #{inspect state}"
