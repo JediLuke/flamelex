@@ -127,6 +127,26 @@ end
 
 
 
+  # this came out of GUI.Controller...
+
+  # @impl true
+  # def handle_info(:check_reminders, state) do
+  #   # Logger.info("Checking reminders...")
+  #   state =
+  #     Utilities.Data.find(tags: "reminder") |> process_reminders(state)
+  #   Process.send_after(self(), :check_reminders, :timer.seconds(10))
+  #   {:noreply, state}
+  # end
+
+  # def handle_info({:reminder!, r}, state) do
+  #   Logger.warn "REMINDING YOU ABOUT! - #{inspect r}"
+  #   #TODO right now, schedule to remind me again (so I don't forget) - when it's acknowledged, this will stop
+  #   Process.send_after(self(), {:reminder!, r}, @default_reminder_time_in_minutes * (60 * 1000))
+  #   {:noreply, state}
+  # end
+
+
+
 
 
 

@@ -62,6 +62,7 @@ defmodule Flamelex.GUI.VimServer do
       active_buffer_process
       |> GenServer.call({:get_cursor_coords, 1}) #TODO how do we reference cursors here?
 
+    IO.puts "OPENINENINGING - #{inspect current_cursor_coords}"
 
     Flamelex.Fluxus.fire_actions([
       # append a new line to the current line
@@ -104,6 +105,8 @@ defmodule Flamelex.GUI.VimServer do
     last_line =
         active_buffer_process
         |> GenServer.call(:get_num_lines)
+
+    IO.inspect last_line, label: "LAST LINE???"
 
     # action = {:move_cursor, %{
     #              buffer: radix_state.active_buffer,

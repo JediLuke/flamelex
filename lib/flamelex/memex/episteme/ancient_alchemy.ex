@@ -8,7 +8,7 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
         author: "William H. Gass"
       }),
       LiteraryQuote.construct(%{
-        text: "One man's “kabalah” is another man's engineering.",
+        text: "One man's “magic” is another man's engineering.",
         author: "Robert A. Heinlein"
       }),
       LiteraryQuote.construct(%{
@@ -48,6 +48,14 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
         author: "Edith Wharton"
       }),
       LiteraryQuote.construct(%{
+        text: "Luke, you're going to find that many of the truths we cling to depend greatly on our own point of view.",
+        author: "Obiwan Kenobi - Jedi Knight"
+      }),
+      LiteraryQuote.construct(%{
+        text: "The force is what gives a Jedi their power. It's an energy field created by all living things. It surrounds us and penetrates us; it binds the galaxy together.",
+        author: "Obiwan Kenobi - Jedi Knight"
+      }),
+      LiteraryQuote.construct(%{
         text: ~s(The human mind adjusts itself to a certain point of view, and those who have regarded nature from one angle, during a portion of their life, can adopt new ideas only with difficulty.),
         author: "Antoine Lavoisier "
       }),
@@ -80,15 +88,16 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
         author: "Dr. David R. Hawkins"
       }),
       LiteraryQuote.construct(%{
-        text: ~s(The best tools are the ones you make yourself, to suit your exact need perfectly),
-        author: "Luke Taylor"
-      }),
-      LiteraryQuote.construct(%{
-        text: ~s(This infinite presence which is all things ans everywhere, both the space in the room and the objects in the room, the figure & the ground simultaneously - is also exquisitely gentle. It's touch just melts you with it's exquisite gentleness, and whatever there was of individual self is melted by it - dissolved! Dissolved into it... like a salt when dropped into water, it just dissolves and becomes all at one with what is.),
+        text: ~s(This infinite presence which is all things and everywhere, both the space in the room and the objects in the room - is also exquisitely gentle. It's touch just melts you with it's exquisite gentleness, and whatever there was of individual self is melted by it - dissolved! Dissolved into it... like a salt when dropped into water, it just dissolves and becomes all at one with what is.),
         author: "Dr. David R. Hawkins"
       }),
     ]
   end
+
+  # LiteraryQuote.construct(%{
+  #   text: ~s(The best tools are the ones you make yourself, to suit your exact need perfectly),
+  #   author: "Luke Taylor"
+  # })
 
   def alchemists do
     [

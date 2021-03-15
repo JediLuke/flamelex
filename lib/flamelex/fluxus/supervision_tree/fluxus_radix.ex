@@ -71,6 +71,10 @@ defmodule Flamelex.FluxusRadix do
 
     # |> #TODO broadcast to all :gui_components the updated state ??
 
+    #TODO lol - so, in lieu of a fancy buffer system, I'm just gonna add delay
+    #     here, so all my actions get processed in order :D
+    :timer.sleep(150) #TODO can confirm, without this, we get weird errors where cursors jump back to their previous line... we need to chain actions together else updates don't ever get "merged in" with each other, 2 tasks running async both update the same state, one of them is stale
+
     {:noreply, radix_state |> RadixState.record(action: a)}
 
     # #TODO maybe we dont even wait for a callback???
@@ -85,6 +89,10 @@ defmodule Flamelex.FluxusRadix do
     #TODO register callbacks & timeouts within ourself, if we need to get
     #     callbacks from actions
   end
+
+  # def process_inbox_buffer do
+
+  # end
 
 
   #TODO we just need to make sure we have a way, of checking the order? of callbacks? of timing em out?? something

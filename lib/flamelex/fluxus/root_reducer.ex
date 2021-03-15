@@ -9,6 +9,7 @@ defmodule Flamelex.Fluxus.RootReducer do
   if they were set further up the chain.
   """
   use Flamelex.ProjectAliases
+  require Logger
 
 
   def handle(radix_state, action) do
@@ -39,21 +40,30 @@ defmodule Flamelex.Fluxus.RootReducer do
   what we want to do instead is, the reducer broadcasts the message to
   the "actions" channel - all the managers are able to react to this event.
   """
-  def async_reduce(%{mode: _current_mode} = radix_state, {:action, {:switch_mode, m}}) do
+  def async_reduce(%{mode: current_mode} = radix_state, {:action, {:switch_mode, m}}) do
+    Logger.info "switching from `#{inspect current_mode}` to `#{inspect m}` mode..."
+
     new_radix_state = %{radix_state|mode: m} # update the state with the new mode
-    IO.puts "CHANGE MODE!!"
-    GenServer.cast(Flamelex.FluxusRadix, {:radix_state_update, new_radix_state}) # update FluxusRadix
-    PubSub.broadcast(topic: :gui_update_bus, msg: {:switch_mode, m})
-    :ok
+
+    # 1) update FluxusRadix, which needs to know which mode we are in because it affects how inputs & actions are processed
+    GenServer.cast(Flamelex.FluxusRadix, {:radix_state_update, new_radix_state})
+
+    # 2) broadcast to the GUI events bus about the mode switch
+    PubSub.broadcast(
+      topic: :gui_update_bus,
+        msg: {:switch_mode, m})
   end
+
 
   def async_reduce(radix_state, {:action, {KommandBuffer, x}}) do
     IO.puts "we're trying to do something with KommandBuffer..."
     GenServer.cast(Flamelex.Buffer.KommandBuffer, x)
   end
 
+  # if we get to here, we haven't matched on anything, so it's not a
+  # `root` action - we pubish it to the `:action_event_bus`, for each of
+  # the managers to handle, if it's relevent to them
   def async_reduce(radix_state, {:action, action}) do
-    IO.puts "Broadcasting action... #{inspect action}"
     Flamelex.Utils.PubSub.broadcast([
         topic: :action_event_bus,
         msg: %{
@@ -63,64 +73,3 @@ defmodule Flamelex.Fluxus.RootReducer do
     ])
   end
 end
-
-
-  # def handle(%RadixState{} = radix_state, {:action, a}) do
-
-  #   # we spin up a task for each reducer, for them to handle it (or not)
-
-  #   # #TODO automate this, search for compiled modules or something - maybe each module which uses ReducerBehaviour registers itself somehow
-  #   # all_reducers = [
-  #   #   Flamelex.Fluxus.Reducers.Core,
-  #   #   Flamelex.Fluxus.Reducers.Buffer,
-  #   #   Flamelex.Fluxus.Reducers.Journal,
-  #   # ]
-
-  #   # all_reducers |> Enum.each(fn reducer_module ->
-  #     Task.Supervisor.start_child(
-  #       Flamelex.Fluxus.HandleAction.TaskSupervisor,
-  #       __MODULE__,
-  #       # reducer_module,             # module
-  #       :async_reduce,              # function
-  #       [radix_state, a]            # args
-  #     )
-  #   # end)
-  # end
-
-
-
-
-
-
-    #TODO maybe Enum.each reducer?? Again, doesn't rly matter if they crash, right??
-
-    #TODO might work too??
-    # reducer_module = search_for_reducer(radix_state, a)
-
-
-
-    #NOTE - we can also import them all using macros, & then pattern match
-    #       here, & have 1 match right at the end as a catchall (or, let it crash...)
-
-    #NOTE: handle must return an ok/error tuple, & may update the RadixState
-
-    #TODO this is the tough thing... how do we update the state, if we
-    # want to broadcast to multiple reducers?
-    # receive do
-    #   {:ok, %RadixState{} = new_radix_state} ->
-    #     {:ok, new_radix_state}
-
-    #     #TODO other option to try is, we never wait for callbacks, we just
-    #     # allow reducers to optionally send us callbacks which we can catch
-
-    #     # I think this might actually be a good path...
-
-    # after
-    #   @action_timeout ->
-    #     {:error, "timed out waiting for a callback from the action handling process"}
-    # end
-
-  # def execute_action_async(%RadixState{} = radix_state, unmatched_action) do
-  #   IO.puts "received an action, that we just can't handle... #{inspect unmatched_action}"
-  #   Flamelex.FluxusRadix |> send({:ok, radix_state})
-  # end

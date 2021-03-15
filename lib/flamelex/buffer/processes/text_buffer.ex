@@ -5,6 +5,7 @@ defmodule Flamelex.Buffer.Text do
   use Flamelex.BufferBehaviour
   alias Flamelex.Buffer.Utils.TextBufferUtils
   alias Flamelex.Buffer.Utils.TextBuffer.ModifyHelper
+  alias Flamelex.Buffer.Utils.CursorMovementUtils, as: MoveCursor
   require Logger
 
 
@@ -26,6 +27,9 @@ defmodule Flamelex.Buffer.Text do
     {:ok, init_state}
   end
 
+  def find_supervisor_pid(%{rego_tag: rego_tag = {:buffer, _details}}) do
+    ProcessRegistry.find!({:buffer, :task_supervisor, rego_tag})
+  end
 
   #TODO right now, this only works for one cursor, i.e. cursor-1
   def handle_call({:get_cursor_coords, 1}, _from, %{cursors: [c]} = state) do
@@ -51,11 +55,10 @@ defmodule Flamelex.Buffer.Text do
     end
   end
 
-  # {:"$gen_cast", {:move_cursor, %{cursor_num: 1, instructions: {:right, 1, :column}}}}
   def handle_cast({:move_cursor, instructions}, state) do
-    #TODO so, these should all also have the same, Task.Supervisor pattern...
-    {:ok, new_state} = TextBufferUtils.move_cursor(state, instructions) #TODO then helper crashes... so this should all be under a new task sup
-    {:noreply, new_state}
+    start_sub_task(state,
+        MoveCursor, :move_cursor_and_update_gui, instructions)
+    {:noreply, state}
   end
 
   def handle_cast({:modify_buffer, specifics}, state) do
@@ -63,9 +66,31 @@ defmodule Flamelex.Buffer.Text do
     {:noreply, state}
   end
 
-  # this should only be sent msgs by Tasks running for this Buffer
-  def handle_cast({:update, new_state}, old_state) do
-    PubSub.broadcast(topic: :gui_update_bus, msg: {:buffer, old_state.rego_tag, {:new_state, new_state}})
+  # when a Task completes, if successful, it will most likely callback -
+  # so we update the state of the Buffer, & trigger a GUI update
+  #TODO maybe this is a little ambitious... we can just do what MoveCursor does, and have the task directly call the GUI to update it specifically
+  # def handle_cast({:state_update, new_state}, %{rego_tag: buffer_rego_tag = {:buffer, _details}}) do
+  #   PubSub.broadcast(
+  #     topic: :gui_update_bus,
+  #       msg: {buffer_rego_tag, {:new_state, new_state}})
+  #   {:noreply, new_state}
+  # end
+
+  def handle_cast({:state_update, new_state}, %{rego_tag: buffer_rego_tag = {:buffer, _details}}) do
     {:noreply, new_state}
+  end
+
+  def handle_cast({:state_update, :no_gui_change, new_state}, %{rego_tag: buffer_rego_tag = {:buffer, _details}}) do
+    {:noreply, new_state}
+  end
+
+  # spin up a new process to do the handling...
+  defp start_sub_task(state, module, function, args) do
+  Task.Supervisor.start_child(
+      # start the task under the Task.Supervisor specific to this Buffer
+      find_supervisor_pid(state),
+          module,
+          function,
+          [state, args])
   end
 end

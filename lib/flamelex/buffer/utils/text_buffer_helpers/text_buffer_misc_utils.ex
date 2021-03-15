@@ -41,7 +41,7 @@ defmodule Flamelex.Buffer.Utils.TextBufferUtils do #TODO rename module to MiscUt
 
   # the opposite of parse_raw_text_into_lines/1
   def join_lines_into_raw_text(lines) do
-    Enum.reduce(lines, "", fn %{text: t}, acc -> acc <> t end)
+    Enum.reduce(lines, "", fn %{text: t}, acc -> acc <> t <> "\n" end)
   end
 
 end

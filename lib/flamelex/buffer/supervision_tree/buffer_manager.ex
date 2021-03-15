@@ -67,7 +67,7 @@ defmodule Flamelex.BufferManager do
 
   @impl GenServer
   def handle_cast({:buffer_opened, %{rego_tag: {:buffer, KommandBuffer}}}, state) do
-    # just ignore it...
+    # KommandBuffer - just ignore it...
     {:noreply, state}
   end
 

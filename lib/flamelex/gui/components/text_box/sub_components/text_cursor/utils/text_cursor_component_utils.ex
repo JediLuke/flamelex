@@ -23,6 +23,7 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
   end
 
   def switch_mode({graph, %{ref: buf_ref} = state}, new_mode) do
+    IO.puts "DEEP DEEP - text cursor utils, switching to mode: #{inspect new_mode}"
     block_dimensions = {_w, _h} = cursor_box_dimensions(new_mode)
 
     new_state =
@@ -32,7 +33,7 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
       graph
       |> Scenic.Graph.modify(
                         buf_ref,
-                        &Scenic.Primitives.rectangle(&1, block_dimensions)) # resize the rectangle
+                        &Scenic.Primitives.rectangle(&1, block_dimensions)) # resize the rectangle based on what mode we're in
 
     {new_graph, new_state}
   end

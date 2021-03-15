@@ -12,6 +12,7 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
     active_buffer:        nil,        # We need to know the active buffer - must be a %Flamelex.Structs.BufRef{}
     keystroke_history:    [],         # A list of all previously entered user-input keystrokes
     action_history:       [],         # A history of actions sent to FluxusRadix
+    inbox_buffer:         [],         # when an action happens, we may need to buffer further actions until that one finishes - they are buffered here. we do same for keystrokes, so it's `inbox` buffer, to cover all cases
     runtime_config:       %{
       keymap:             Flamelex.API.KeyMappings.VimClone
     }

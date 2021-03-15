@@ -24,8 +24,6 @@ Flamelex is a self-contained Elixir app, build upon the Elixir GUI library
 REPL that can be personalized. The text-editing experience is also inspired
 by Vim.
 
-
-
 ## Installing Flamelex
 
 ### Install Scenic dependencies
@@ -36,21 +34,35 @@ in the [Scenic documentation](https://hexdocs.pm/scenic/install_dependencies.htm
 
 ### Running Flamelex from IEx
 
-From the repository, simply start the program in DEV mode, same way you
-most likely develop any other elixir program.
+From the repository, simply start the program in `dev` mode, the same way
+you would start basically any Elixir program using Mix:
 
 ```
 iex -S mix run
 ```
 
 This gives you an IEx session, and should have displayed the default
-Flamelex window showing a "transmutation circle" and a version number
+Flamelex window showing a "transmutation circle" and a version number:
 
 #TODO insert screenshot
 
-To get a feel for FLamelex, run some of the following commands:
+Now, of course Flamelex responds to keypresses - it is a text-editor after
+all. Butto get a feel for how the software works, we are going to start
+by just running some more commands in IEx. Flamelex was designed first and
+foremost as a GUI extension of the Elixer CLI, IEx, so understanding that
+under the hood, everything is just functions, is one of the key stepping
+stones to becoming proficient with Flamelex.
 
+Go back to the IEx terminal you used to start flamelex, and type:
+
+```
 Buffer.open!("README")
+```
+
+You should see a new Buffer open - if you are coming from a Vim or Emacs
+background, Buffers are exactly what you expect them to be - a window into
+a data-stream, usually a text-file, which lets you inspect and modify the
+contents of that data stream (or just, Buffer == file, for the simpletons).
 
 #TODO Transmute.main_circle()
 
@@ -68,7 +80,23 @@ of the transmutation circle, or even to speed it up!
 
 #TODO experiment with making a flamelex alias
 
-## Adjusting the window size
+## Getting Started
+
+### TL:DR; Up and Running in 5 minutes
+
+The first window is just a blank window showing the background. To do
+something useful, we need to open a `Buffer`. We can do this a few ways:
+
+* Click a MenuBar option #TODO
+* Put it in CLI
+
+We shall use the CLI for now:
+
+```Buffer.open()```
+
+#TODO explain the rest
+
+### Adjusting the window size
 
 Right now, because of the way Scenic works, we have to re-draw the gui
 if we want to resize the window. The way we do this, is to change the
@@ -83,10 +111,6 @@ Note that right now, all objects in the GUI are hard-coded in size, so
 adjusting the size of the window may make things render stragely. In the
 future, we want to look to incorporating the [Layout-o-Matic!](https://github.com/BWheatie/scenic_layout_o_matic)
 library to get flexible sizes/layouts.
-
-## How to use Flamelex
-
-#TODO
 
 ### Driving Flamelex via IEx
 
@@ -134,7 +158,28 @@ adding code to Flamelex, you *must* go through the designated flows. If you
 start calling things like Buffer.move_cursor(2), it will probably work,
 but your whole state tree might get out of whack...
 
+When developing or changing the functionality of the API, remember to respect
+the rest of Flamelex as a *seperate system*, so we can't just reach into
+the internals (even though Elixir would let us do that), because that's
+going to start screwing things up! e.g. to implement `Buffer.open`, we
+must never call up BufferManager and directly request the Buffer be opened -
+this breaks a whole chain of checks & event-triggers, starting way back
+up at FluxusRadix. We don't just directly affect Flamelex, we instead
+use the mechanism of firing actions, which correctly processes the input
+and propagates it through the internal messaging infrastructure of Flamelex.
+
 ### The Flamelex KommandBuffer #TODO
+
+The KommandBuffer is the flamelex version of `M-x` (execute-extended-command)
+in emacs. It brings the terminal directly into your editing experience.
+
+The iex console is quite powerful, capable of storing variables and running
+basically any Elixir code. In many ways, flamelex is just a GUI wrapper
+around the iex shell, with some libraries around editing text thrown in.
+Flamelex was, from the ground up, intended to work like emacs in the sense
+that it is an interactive lisp shell, with a runtime of variables (though
+in our case, we like to back it up to disk) and functions, including functions
+which can edit text files.
 
 historical note: The day I thought I had become an emacs convert for life,
 was the day I discovered `M-x` or `execute-extended-command`. This command
@@ -145,11 +190,56 @@ so much, that I re-mapped it to <leader>k, which is IMHO the most
 ergonomic and efficient leader keymapping - it earned that spot, because
 I used it so often.
 
+THe first way to activate the KommandBuffer is, of course, by calling
+the appropriate function in iex. In this case we call:
+
+```
+KommandBuffer.show()
+```
+
+You may notice, that an input has appeared at the bottom of the screen:
+
+#TODO show screenshot
+
+Here, you can type in any Elixir command you like - it's not really any
+different from typing it into iex.
+
+#TODO show example of, typing a function into iex, and typing one into KommandBuffer
+
+Now, we don't really want to have to go use iex each time we want to use
+the KommandBuffer - that would kind of defeat the point. Instead, we can
+map this function call to some keypresses, so we can activate the KommandBuffer
+with some simple keystrokes.
+
 When I implemented this feature in flamelex, I immediately mapped it to
 <leader>k again, which is how it ended up with the nomenclature of
 `KommandBuffer`
 
+This mapping is completely arbitrary! As demonstrated earlier, you can
+just as easily open the KommandBuffer by calling the function in iex, as
+by pressing this, completely arbitrary, combination of keypresses. This
+is just the default ones that *I* like to use, because I use this feature
+a lot, and <space>k is arguably the most ergonomic double-keystroke on
+the keyboard.
+
+See the section: `Handling user input` for a more detailed understanding
+of how keymappings are achieved.
+
+#TODO
+example:
+
+```
+Buffer.open() # becomes the active buffer by default
+Buffer.active_buffer() # fetches a reference to the active buffer
+|> Buffer.modify(insert: Memex.random_quote(), at: cursor(1))
+```
+
 ### The Flamelex MenuBar #TODO
+
+The MenuBar is currently not functional, but the idea in the future is to
+link buttons in the MenuBar directly to modules/functions inside flamelex,
+so clicking one will just call that function, probably in it's own MenuBar
+supervision tree.
 
 ## Basic text editing
 
@@ -215,6 +305,19 @@ functions that got called, and then we replay them.
 
 This is a great way of creating new functionality - we can construct programs
 easily this way, simply by doing the action.
+
+## the Flamelex API
+
+As a flamelex user, you shouldn't have to look "under the hood". You can,
+at any point in time, do so - but hopefully, unless you're merely interested,
+you won't ever have to.
+
+All actions that a user can take are defined in the API modules, which are
+stored in the API directory. If a user wants to do something, and no
+combination of API functions is capable of making it happen, then there
+is no other way of doing it safely - the API modules must be updated. But
+they must be done so in a safe way, we never want to reach diretly into
+the internals of Flamelex, because we might screw things up!
 
 ## Memex
 
@@ -358,6 +461,10 @@ around the start of 2021. Up until this point, all work was just one series of
 commits by me, JediLuke. I decided to keep this series of commits as the
 branch `franklin_dev`, as a tip-o'-the-hat to Franklin, the original seed
 that grew into Flamelex. Any code archaelogists out there?? here's a dig!
+
+## Detailed Flamelex manual
+
+
 
 ## Backlog / TODOs
 

@@ -6,13 +6,8 @@ defmodule Flamelex.GUI.Component.TextBox do
   alias Flamelex.GUI.Component.Utils.TextBox, as: TextBoxDrawUtils
   alias Flamelex.GUI.Component.MenuBar
   alias Flamelex.GUI.Component.TextCursor
+  require Logger
 
-
-
-
-  # def tag(%{}) do
-  #   {:gui_component, }
-  # end
 
   def rego_tag(%{ref: buffer}) do
     {:gui_component, buffer}
@@ -26,18 +21,19 @@ defmodule Flamelex.GUI.Component.TextBox do
     params |> Map.merge(%{
       draw_footer?: true,
       cursors: [
+        #TODO acc coords here maybe??
         %{ frame: f, ref: rego_tag(params), num: 1 } #TODO use cursor struct, add frame to cursor struct
       ]
     })
   end
 
   @impl Flamelex.GUI.ComponentBehaviour
-  #TODO this is a deprecated version of render
+  #TODO this is a deprecated version of render - enforced by behaviour...
   def render(%Frame{} = frame, params) do
     render(params |> Map.merge(%{frame: frame}))
   end
 
-  def render(%{ref: buf, frame: %Frame{} = frame, lines: lines} = params) do
+  def render(%{frame: %Frame{} = frame, lines: lines} = params) do
 
     #TODO make the frame, only 72 columns wide !!
     frame =
@@ -50,10 +46,6 @@ defmodule Flamelex.GUI.Component.TextBox do
     #TODO get margins from somewhere better
     frame = frame |> Frame.set_margin(%{top: 24, left: 8})
 
-    # lines_of_text =
-    #   Flamelex.API.Buffer.read(buf)
-    #   |> TextBoxDrawUtils.split_into_a_list_of_lines_of_text_structs()
-
     background_color = Flamelex.GUI.Colors.background()
 
     Draw.blank_graph()
@@ -64,11 +56,11 @@ defmodule Flamelex.GUI.Component.TextBox do
   end
 
   def draw_cursors(graph, _frame, %{cursors: []}), do: graph
-  def draw_cursors(graph, frame, %{cursors: cursors})
+  def draw_cursors(graph, frame, %{cursors: cursors} = params)
     when is_list(cursors) and length(cursors) >= 1
   do
     Enum.reduce(cursors, _init_acc={graph, _first_cursor_num=1}, fn c, {graph, n} ->
-      graph |> TextCursor.mount(c |> Map.merge(%{frame: frame, num: n}))
+      graph |> TextCursor.mount(c |> Map.merge(%{ref: rego_tag(params), frame: frame, num: n}))
     end)
   end
 
@@ -87,22 +79,22 @@ defmodule Flamelex.GUI.Component.TextBox do
   #   :ignore_action
   # end
 
-  def handle_cast({:move_cursor, %{last: :line, same: :column}} , {graph, state}) do
+  # def handle_cast({:move_cursor, %{last: :line, same: :column}} , {graph, state}) do
 
 
 
-  end
+  # end
 
-  def handle_cast({:move_cursor, details}, {graph, state}) do
+  # def handle_cast({:move_cursor, details}, {graph, state}) do
 
-    # instructions = translate_details(state, details)
+  #   # instructions = translate_details(state, details)
 
-    {:gui_component, {:text_cursor, state.ref.ref, 1}} #TODO standardize this bastard wannabee tree format, also lmao
-    |> ProcessRegistry.find!()
-    |> GenServer.cast({:move, details})
+  #   {:gui_component, {:text_cursor, state.ref.ref, 1}} #TODO standardize this bastard wannabee tree format, also lmao
+  #   |> ProcessRegistry.find!()
+  #   |> GenServer.cast({:move, details})
 
-    {:noreply, {graph, state}}
-  end
+  #   {:noreply, {graph, state}}
+  # end
 
   # defp translate_details(state, %{instructions: %{last: :line, same: :column}} = details) do
   #   IO.puts "I know you pressed G..."
@@ -129,41 +121,24 @@ defmodule Flamelex.GUI.Component.TextBox do
   #   :ignore_action
   # end
 
-  def handle_info({:switch_mode, m}, state) do
-    GenServer.cast(self(), {:action, {:switch_mode, m}})
-    # {:noreply, state |> switch_mode(m)}
-    {:noreply, state}
-  end
 
-  # def switch_mode(state, m) do
+  def handle_info({:switch_mode, new_mode}, {graph, state}) do
 
-  # end
+    IO.inspect "BOX SWITCHING MODE: #{inspect state}"
 
-  def handle_info({:buffer, buffer_rego, {:new_state, new_buffer_state}}, %{ref: gui_ref} = gui_component_state)
-  when buffer_rego == gui_ref do # this GUI component's buffer got an update
-    new_graph = render(new_buffer_state) #TODO does this kill the other processes???
-    {:noreply, {new_graph, gui_component_state}, push: new_graph} #TODO do I need to update the GUI component state??
-  end
+    #     new_graph =
+    #       Draw.blank_graph()
+    #       |> Draw.background(state.frame, Flamelex.GUI.Colors.background())
+    #       |> TextBoxDraw.render_text_grid(%{
+    #            frame: state.frame,
+    #            text: state.text,
+    #            cursor_position: state.cursor_position,
+    #            cursor_blink?: state.cursor_blink?,
+    #            mode: m
+    #          })
+    #       |> Frame.draw(state.frame, %{mode: m})
 
-  def handle_info(msg, state) do
-    IO.puts "#{__MODULE__} got info msg: #{inspect msg}, state: #{inspect state}"
-    {:noreply, state}
-  end
-
-
-  def handle_action({graph, state}, {:switch_mode, new_mode}) do
-
-
-    %{ref: buf_ref} = state
-
-    #assume its cursor 1 for now
-    # cursor_tag = {:gui_component, {:text_cursor, buf_ref, 1}} #TODO assume its cursor 1
-
-    cursor_tag =
-      Flamelex.GUI.Component.TextCursor.rego_tag(%{ref: {:gui_component, buf_ref}, num: 1}) #TODO only works for cursor 1 right now
-
-    ProcessRegistry.find!(cursor_tag)
-    |> GenServer.cast({:action, {:switch_mode, new_mode}})
+    #     new_state = %{state| graph: new_graph, mode: m}
 
     mode_string =
       case new_mode do
@@ -181,40 +156,79 @@ defmodule Flamelex.GUI.Component.TextBox do
     {:noreply, {new_graph, state}, push: new_graph}
   end
 
+  def handle_info({{:buffer, buffer_rego}, {:new_state, new_buffer_state}}, {old_graph, gui_component_state})
+  # when buffer_rego == gui_ref do # this GUI component's buffer got an update
+  do
+
+
+    IO.puts "OK, HERE IS THE BIG QUESTION - HOW CAN WE RE-render, from state, also destroy all the old processes"
+
+
+    new_graph =
+      old_graph
+      # |> Scenic.Graph.modify(@text_field_id, fn x ->
+      #   IO.puts "YES #{inspect x}"
+      #   x
+      # end)
+      # |> Flamelex.GUI.Component.TextBox.draw({frame, data, %{}}) #TODO check the old process is dieing...
+      # |> Flamelex.GUI.Component.TextBox.mount(%{frame: frame})
+      |> Draw.test_pattern()
+
+
+    #TODO stop using ref, use rego_tag
+    # new_graph = render(new_buffer_state |> Map.merge(%{ref: buffer_rego, frame: gui_component_state.frame})) #TODO does this kill the other processes???
+    # {:noreply, {new_graph, gui_component_state}, push: new_graph} #TODO do I need to update the GUI component state??
+    # IO.puts "HEY I THINK WERE HERE AT LEAST"
+    {:noreply, {new_graph, gui_component_state}, push: new_graph} #TODO do we need to update GUI component state??
+  end
+
+  # def handle_info(msg, state) do
+  #   IO.puts "#{__MODULE__} got info msg: #{inspect msg}, state: #{inspect state}"
+  #   {:noreply, state}
+  # end
+
+
+
   @doc """
   This callback is called whenever the component received input.
   """
   @impl Scenic.Scene
   def handle_input(event, _context, state) do
+    # Logger.info "#{__MODULE__} received some Scenic input. #{inspect event}"
     {:noreply, state}
   end
 
 
 
-  def handle_cast({:refresh, _buf_state, _gui_state}, {_graph, state}) do
+  # def handle_cast({:refresh, _buf_state, _gui_state}, {_graph, state}) do
 
-    new_graph = render(state)
+  #   new_graph = render(state)
 
-    {:noreply, {new_graph, state}, push: new_graph}
+  #   {:noreply, {new_graph, state}, push: new_graph}
 
-        # data  = Buffer.read(buf)
-    # frame = calculate_framing(filename, state.layout)
+  #       # data  = Buffer.read(buf)
+  #   # frame = calculate_framing(filename, state.layout)
 
-    # new_graph =
-    #   state.graph
-    #   # |> Scenic.Graph.modify(@text_field_id, fn x ->
-    #   #   IO.puts "YES #{inspect x}"
-    #   #   x
-    #   # end)
-    #   # |> Flamelex.GUI.Component.TextBox.draw({frame, data, %{}}) #TODO check the old process is dieing...
-    #   |> Flamelex.GUI.Component.TextBox.mount(%{frame: frame})
-    #   |> Draw.test_pattern()
+  #   # new_graph =
+  #   #   state.graph
+  #   #   # |> Scenic.Graph.modify(@text_field_id, fn x ->
+  #   #   #   IO.puts "YES #{inspect x}"
+  #   #   #   x
+  #   #   # end)
+  #   #   # |> Flamelex.GUI.Component.TextBox.draw({frame, data, %{}}) #TODO check the old process is dieing...
+  #   #   |> Flamelex.GUI.Component.TextBox.mount(%{frame: frame})
+  #   #   |> Draw.test_pattern()
 
-    # Flamelex.GUI.RootScene.redraw(new_graph)
+  #   # Flamelex.GUI.RootScene.redraw(new_graph)
 
-    # {:noreply, %{state|graph: new_graph}}
+  #   # {:noreply, %{state|graph: new_graph}}
 
-  end
+  # end
+
+
+
+
+
 
 
   @doc """
@@ -301,24 +315,6 @@ end
 
 #     new_state = %{state| graph: new_graph,
 #                          cursor_position: new_cursor_position }
-
-#     {:noreply, new_state, push: new_graph}
-#   end
-
-#   def handle_cast({:switch_mode, m}, state) do
-#     new_graph =
-#       Draw.blank_graph()
-#       |> Draw.background(state.frame, Flamelex.GUI.Colors.background())
-#       |> TextBoxDraw.render_text_grid(%{
-#            frame: state.frame,
-#            text: state.text,
-#            cursor_position: state.cursor_position,
-#            cursor_blink?: state.cursor_blink?,
-#            mode: m
-#          })
-#       |> Frame.draw(state.frame, %{mode: m})
-
-#     new_state = %{state| graph: new_graph, mode: m}
 
 #     {:noreply, new_state, push: new_graph}
 #   end

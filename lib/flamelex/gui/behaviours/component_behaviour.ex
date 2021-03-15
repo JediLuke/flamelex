@@ -20,20 +20,22 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       use Scenic.Component
 
 
-      #NOTE: This is just for convenience, so inside environment modules
-      #      we can easily use the unique part of the environment module name
-      alias __MODULE__
+      alias __MODULE__ #NOTE: This is just for convenience inside each module
       alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
       alias Flamelex.GUI.Utilities.Draw
       alias Flamelex.Utilities.ProcessRegistry
-      alias Flamelex.Structs.BufRef
 
 
       #NOTE: In our case, we always want a Component to be passed in a %Frame{}
       #      so we don't need specific ones, each Component implements them
       #      the same way. Also all components need a `ref`
       @impl Scenic.Component
-      def verify(%{ref: _r, frame: %Frame{} = _f} = params), do: {:ok, params}
+      def verify(%{
+        ref: _r,                # the `ref` refers back to the Buffer that this GUI.Component is for, e.g. {:buffer, {:file, "README.md"}}
+        frame: %Frame{} = _f    # the %Frame{} which defines this GUI.Component
+      } = params) do
+        {:ok, params}
+      end
       def verify(_else), do: :invalid_data
 
       @impl Scenic.Component
@@ -75,12 +77,13 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       end
 
 
-      def register_self(params) do
+      #TODO maybe put __MODULE__ in here, so we can see what type of component it is in the registration?
+      def register_self(%{ref: ref} = params) do
         tag =
           if function_exported?(__MODULE__, :rego_tag, 1) do
             apply(__MODULE__, :rego_tag, [params])
           else
-            {:gui_component, params.rego_tag}
+            {:gui_component, ref}
           end
 
         #TODO search for if the process is already registered, if it is, engage recovery procedure
@@ -93,30 +96,30 @@ defmodule Flamelex.GUI.ComponentBehaviour do
 
       This function allows for nice API, e.g. MenuBar.action({:click, button})
       """
-      def action(a) do
-        #TODO: We need some way of knowing that MenuBar has indeed been mounted
-        #      somewhere, or else the messages just go into the void (use call instead of cast?)
+      # def action(a) do
+      #   #TODO: We need some way of knowing that MenuBar has indeed been mounted
+      #   #      somewhere, or else the messages just go into the void (use call instead of cast?)
 
-        #REMINDER: `__MODULE__` will be the module which "uses" this macro
-        GenServer.cast(__MODULE__, {:action, a})
-      end
+      #   #REMINDER: `__MODULE__` will be the module which "uses" this macro
+      #   GenServer.cast(__MODULE__, {:action, a})
+      # end
 
-      @impl Scenic.Scene
-      def handle_cast({:action, action}, {%Scenic.Graph{} = graph, state}) do
-        case handle_action({graph, state}, action) do
-          #TODO this is actually kinda stupid now...
-          :ignore_action
-            -> {:noreply, {graph, state}}
-          {:redraw_graph, %Scenic.Graph{} = new_graph}
-            -> {:noreply, {new_graph, state}, push: new_graph}
-          # {:update_frame, %Frame{} = new_frame}
-          #   -> {:noreply, {graph, new_frame}}
-          {:update_graph_and_state, {%Scenic.Graph{} = new_graph, new_state}}
-            -> {:noreply, {new_graph, new_state}, push: new_graph}
-          deprecated_return ->
-            deprecated_return
-        end
-      end
+      # @impl Scenic.Scene
+      # def handle_cast({:action, action}, {%Scenic.Graph{} = graph, state}) do
+      #   case handle_action({graph, state}, action) do
+      #     #TODO this is actually kinda stupid now...
+      #     :ignore_action
+      #       -> {:noreply, {graph, state}}
+      #     {:redraw_graph, %Scenic.Graph{} = new_graph}
+      #       -> {:noreply, {new_graph, state}, push: new_graph}
+      #     # {:update_frame, %Frame{} = new_frame}
+      #     #   -> {:noreply, {graph, new_frame}}
+      #     {:update_graph_and_state, {%Scenic.Graph{} = new_graph, new_state}}
+      #       -> {:noreply, {new_graph, new_state}, push: new_graph}
+      #     deprecated_return ->
+      #       deprecated_return
+      #   end
+      # end
     end
   end
 

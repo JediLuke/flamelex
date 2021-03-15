@@ -23,5 +23,11 @@ defmodule Flamelex.API.Journal do
       append_new_timestamp?: false #TODO scan the file, look for most recent timestamp - if it's more than 15? minutes, append a new one
       # make_active_buffer?: true
     }})
+
+    #TODO here we need to get a callback when Journal opens, and return a ref to the caller
+    # i.e. j = Journal.now()
+    #      Buffer.read(j)
+    #
+    # should work
   end
 end

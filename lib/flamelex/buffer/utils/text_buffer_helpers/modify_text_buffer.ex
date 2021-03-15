@@ -20,18 +20,25 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
   """
   def call_modify_and_callback(state, params) do
     {:ok, new_state} = modify(state, params)
-    buffer_pid = ProcessRegistry.find!(state.rego_tag)
-    GenServer.cast(buffer_pid, {:update, new_state})
+    text_buffer_pid = ProcessRegistry.find!(state.rego_tag)
+    GenServer.cast(text_buffer_pid, {:state_update, new_state})
   end
 
 
   # special case for the newline character
-  def modify(state, %{append: text = "\n", line: l}) when is_integer(l) do
-    IO.puts "NEWLINE SPECIAL CASE!!!"
+  def modify(state, %{append: _text = "\n", line: l}) when is_integer(l) and l >= 1 do
 
-    new_lines = List.insert_at(state.lines, l, %{line: l, text: text}) #TODO create new Line struct here
-    new_data  = TextBufferUtils.join_lines_into_raw_text(new_lines)
 
+
+    IO.puts "NEWLINE SPECIAL CASE!!! #{inspect l}"
+
+    IO.inspect state.lines, label: "LINES??"
+
+    new_lines = List.insert_at(state.lines, l-1, %{line: l, text: ""}) # put anew line containing just a blank string in
+    #TODO need to bump all lines after aswell... fuck. Much smarter dont even worry about keeping a second index at this point
+    new_data  = TextBufferUtils.join_lines_into_raw_text(new_lines) # then re-crunch the raw_data from the lines
+
+    IO.puts "NEW LINES ??? #{inspect new_lines}"
 
     {:ok, %{state|data: new_data, lines: new_lines}}
   end
@@ -88,6 +95,7 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
                    |> Enum.at(l-1-1) #TODO lol this is a mistake somehow
                    |> IO.inspect(label: "WERERERERERERERER2222222ER")
                    |> insert_text_into_line(text, c)
+                   |>IO.inspect(label: "NEW - line")
 
         new_lines = state.lines
                     |> List.replace_at(l, new_line)

@@ -1,5 +1,7 @@
 # CHANGELOG
 
+NOTE: THis changelog needs to be deleted...
+
 ## v0.2.3
 
 These are the high level features that are apart of `v0.2.0`

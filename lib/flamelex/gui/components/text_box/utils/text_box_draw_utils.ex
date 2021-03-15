@@ -1,6 +1,6 @@
 defmodule Flamelex.GUI.Component.Utils.TextBox do
-  alias Flamelex.GUI.Structs.{Coordinates, LineOfText}
-  alias Flamelex.GUI.Structs.Frame
+  # alias Flamelex.GUI.Structs.{Coordinates, LineOfText}
+  # alias Flamelex.GUI.Structs.Frame
 
 
   #TODO move this somewhere else
@@ -25,6 +25,10 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
     graph
   end
 
+
+  #TODO - register all the lines, a single group, with a name like `text`
+  # then, we can update that text, instead of re-writing it...
+
   def render_lines(graph, %{frame: frame, lines: lines}) when is_list(lines) do
     {new_graph, _final_line_num} = # REMINDER: this tuple is the final accumulator, passed through by Enum.reduce/2
       lines
@@ -33,7 +37,7 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
               fn %{text: line_of_text}, {graph, line_num} ->
                   new_graph =
                     graph
-                    |> render_line(%{
+                    |> render_single_line(%{
                           position_tuple: {line_num, frame.top_left}, #TODO should be frame.coords.top_left
                           margin: frame.margin,
                           text: line_of_text
@@ -47,14 +51,14 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
   end
 
 
-  def render_line(graph, %{
+  def render_single_line(graph, %{
     position_tuple: {line_num, frame_coords},
     margin: margin,
     text: line_of_text
-  }) when is_map(margin) do
+  }) when is_map(margin) and is_integer(line_num) and line_num >= 1 do
 
     line_height          = line_height()
-    line_number_y_offset = line_num*line_height
+    line_number_y_offset = (line_num-1)*line_height #NOTE: we need the minus 1 here because lines start at 1, but we calculate the offset from 0...
 
     graph
     |> Scenic.Primitives.text(

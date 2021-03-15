@@ -24,6 +24,8 @@ defmodule Flamelex.GUI.Component.TextCursor do
 
     GenServer.cast(self(), :start_blink)
 
+    Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
+
     starting_coords = CursorUtils.calc_starting_coordinates(params.frame)
 
     params |> Map.merge(%{
@@ -57,8 +59,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
   end
 
 
-  def rego_tag(%{ref: ref, num: num}) when is_integer(num) and num >= 1 do
-    # {:gui_component, {:buffer, {:file, _filename}}} = ref
+  def rego_tag(%{ref: {:gui_component, _details} = ref, num: num}) when is_integer(num) and num >= 1 do
     {:text_cursor, num, ref}
   end
 
@@ -77,12 +78,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
   #   })
   # end
 
-  def handle_action(
-        {graph, %{ref: _buf_ref} = state},
-        {:switch_mode, new_mode}) do
-    {new_graph, new_state} = CursorUtils.switch_mode({graph, state}, new_mode)
-    {:update_graph_and_state, {new_graph, new_state}}
-  end
+
 
 
   def handle_cast(:start_blink, {graph, state}) do
@@ -96,8 +92,16 @@ defmodule Flamelex.GUI.Component.TextCursor do
     {:noreply, {new_graph, new_state}, push: new_graph}
   end
 
-  def handle_cast({:reposition, new_coords}, {graph, state}) do
+  def handle_cast({:update, new_coords}, {graph, state}) do
+    IO.puts "TEXT CURSOR UPDATING!! #{inspect new_coords}"
     {new_graph, new_state} = CursorUtils.reposition({graph, state}, new_coords)
+    IO.puts "DID IT WORK???"
+    {:noreply, {new_graph, new_state}, push: new_graph}
+  end
+
+  def handle_info({:switch_mode, new_mode}, {graph, %{ref: _buf_ref} = state}) do
+    IO.puts "CURSOR GETTING MSG TO SWITCH MODE!!"
+    {new_graph, new_state} = CursorUtils.switch_mode({graph, state}, new_mode)
     {:noreply, {new_graph, new_state}, push: new_graph}
   end
 

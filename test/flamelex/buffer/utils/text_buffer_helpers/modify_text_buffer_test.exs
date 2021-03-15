@@ -24,4 +24,7 @@ defmodule Flamelex.Test.Buffer.Utils.TextBuffer.ModifyHelperTest do
       %{line: 3, text: @sentence_c |> String.trim()}
     ]
   end
+
+  test "insert some text onto a line"
+  test "inserting newline chars into lines"
 end

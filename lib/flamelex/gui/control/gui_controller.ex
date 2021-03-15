@@ -8,6 +8,7 @@ defmodule Flamelex.GUI.Controller do
   use Flamelex.ProjectAliases
   alias Flamelex.GUI.Structs.{GUIState, GUiComponentRef}
   import Flamelex.GUI.Utilities.ControlHelper
+  require Logger
 
 
   def start_link(_params) do
@@ -17,29 +18,25 @@ defmodule Flamelex.GUI.Controller do
     GenServer.start_link(__MODULE__, initial_state)
   end
 
-  def action(a) do
-    GenServer.cast(__MODULE__, {:action, a})
-  end
+  # def action(a) do
+  #   GenServer.cast(__MODULE__, {:action, a})
+  # end
 
-  def hide(x) do
-    GenServer.cast(__MODULE__, {:hide, x})
-  end
+  # def hide(x) do
+  #   GenServer.cast(__MODULE__, {:hide, x})
+  # end
 
-  def refresh(buf) do
-    GenServer.cast(__MODULE__, {:refresh, buf})
-  end
+  # def refresh(buf) do
+  #   GenServer.cast(__MODULE__, {:refresh, buf})
+  # end
 
-  def show_cmd_buf do
-    GenServer.cast(__MODULE__, {:show, :command_buffer})
-  end
+  # def show_cmd_buf do
+  #   GenServer.cast(__MODULE__, {:show, :command_buffer})
+  # end
 
-  def hide_cmd_buf do
-    GenServer.cast(__MODULE__, {:hide, :command_buffer})
-  end
-
-  def switch_mode(m) do
-    GenServer.cast(__MODULE__, {:switch_mode, m})
-  end
+  # def hide_cmd_buf do
+  #   GenServer.cast(__MODULE__, {:hide, :command_buffer})
+  # end
 
 
 
@@ -66,9 +63,18 @@ defmodule Flamelex.GUI.Controller do
     {:noreply, %{state|graph: new_graph}}
   end
 
+
   def handle_call(:get_frame_stack, _from, state) do
     {:reply, state.layout.frames, state}
   end
+
+
+  # def handle_cast({:switch_mode, m}, state) do
+  #   # new_graph = default_gui(state)
+  #   # Flamelex.GUI.redraw(new_graph)
+  #   Logger.error "Need to forward this on to each buffer"
+  #   {:noreply, state}
+  # end
 
   def handle_cast({:action, :reset}, state) do
     new_graph = default_gui(state)
@@ -76,14 +82,19 @@ defmodule Flamelex.GUI.Controller do
     {:noreply, state}
   end
 
-  # def handle_cast({:switch_mode, m}, gui_state) do
+  #TODO maybe this doesn't need to be routed through here, but try it for now...
+  def handle_cast({:refresh, %{ref: ref} = buf_state}, gui_state) do
+    Logger.warn "I think this function might be deprecated..."
+    ref
+    |> GUiComponentRef.rego_tag()
+    |> ProcessRegistry.find!()
+    |> GenServer.cast({:refresh, buf_state, gui_state})
+
+    {:noreply, gui_state}
+  end
 
 
 
-  #   new_graph = gui_state.graph |> Draw.test_pattern()
-  #   Flamelex.GUI.redraw(new_graph)
-  #   {:noreply, gui_state}
-  # end
 
 
 
@@ -101,23 +112,6 @@ defmodule Flamelex.GUI.Controller do
   #   Flamelex.GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
 
   #   {:noreply, state}
-  # end
-
-
-
-
-  # def handle_cast({:action, action}, state) do
-  #   case Flamelex.GUI.Root.Reducer.process(state, action) do
-  #     # :ignore_action
-  #     #     -> {:noreply, {scene, graph}}
-  #     # {:update_state, new_scene} when is_map(new_scene)
-  #     #     -> {:noreply, {new_scene, graph}}
-  #     {:redraw_root_scene, %{graph: new_graph} = new_state}  ->
-  #       Flamelex.GUI.RootScene.redraw(new_graph)
-  #       {:noreply, new_state}
-  #     # {:update_state_and_graph, {new_scene, %Scenic.Graph{} = new_graph}} when is_map(new_scene)
-  #     #     -> {:noreply, {new_scene, new_graph}, push: new_graph}
-  #   end
   # end
 
 
@@ -146,32 +140,7 @@ defmodule Flamelex.GUI.Controller do
     end
   end
 
-  def handle_cast({:show, {:command_buffer, _data}}, state) do
 
-
-    #NOTE: Ok, so, this approach was wrong...
-    #      our issue is that we need to change the mode to :command, and the
-    #      instinct is to modify the graph here too - this is incorrect.
-    #      API.CommandBuffer is a Scenic.Component responsible for managing it's
-    #      own graph, so we have to forward on a msg to that component to
-    #      make the change, but we can't actually do it here.
-
-    # IO.puts "SHOW CMD BUF"
-    # new_graph =
-    #   state.graph
-    #   |> IO.inspect(label: "LABEL: GRAPH")
-    #   |> Scenic.Graph.modify(:command_buffer, &update_opts(&1, hidden: false))
-    #   #TODO find where we add this group to this levels' graph & give it an id
-    #   # |> Scenic.Graph.modify(:command_buffer, fn x ->
-    #   #       IO.puts "WE'RE DOING IT"
-    #   #       IO.inspect x
-    #   # end)
-
-    # Flamelex.GUI.RootScene.redraw(new_graph)
-    Flamelex.GUI.Component.CommandBuffer.show
-
-    {:noreply, state}
-  end
 
   # def handle_cast({:hide, :command_buffer}, state) do
 
@@ -202,35 +171,6 @@ defmodule Flamelex.GUI.Controller do
   # end
 
 
-  #TODO maybe this doesn't need to be routed through here, but try it for now...
-  def handle_cast({:refresh, %{ref: ref} = buf_state}, gui_state) do
-    ref
-    |> GUiComponentRef.rego_tag()
-    |> ProcessRegistry.find!()
-    |> GenServer.cast({:refresh, buf_state, gui_state})
-
-    {:noreply, gui_state}
-  end
-
-
-
-
-
-    # new_graph =
-    #   state.graph
-    #   |> Flamelex.GUI.Component.TextBox.draw({frame, data})
-
-
-    # case Flamelex.GUI.Root.Reducer.process(state, action) do
-    #   # :ignore_action
-    #   #     -> {:noreply, {scene, graph}}
-    #   # {:update_state, new_scene} when is_map(new_scene)
-    #   #     -> {:noreply, {new_scene, graph}}
-    #   {:redraw_root_scene, %{graph: new_graph} = new_state}  ->
-    #     Flamelex.GUI.RootScene.redraw(new_graph)
-    #     {:noreply, new_state}
-    #   # {:update_state_and_graph, {new_scene, %Scenic.Graph{} = new_graph}} when is_map(new_scene)
-    #   #     -> {:noreply, {new_scene, new_graph}, push: new_graph}
 
 
 
@@ -238,66 +178,51 @@ defmodule Flamelex.GUI.Controller do
 
 
 
-  # def handle_cast({:register_new_buffer, [type: :text, content: c, action: 'OPEN_FULL_SCREEN'] = args}, %{
-  #   buffer_list: [] # the case where we have no open buffers
-  # } = state) do
 
-
-  #   new_state =
-  #     state
-  #     |> Map.update!(:buffer_list, fn _b -> [1] end) #TODO have a buffer struct I guess...
-
-  #   #TODO call Scenic GUI component process (registered to this topic/whatever) &
-  #   Flamelex.GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: c]})
-
-  #   {:noreply, new_state}
-  # end
-
-  # def handle_cast({:show_fullscreen, %BufRef{} = buffer}, state) do
-  def handle_cast({:show_fullscreen, buffer}, state) do
-
-    # the reason we need this controller is, it can keep track of all the buffers that the GUI is managing. Ok fuck it we can maybe get rid of it
-
-    # new_state =
-    #   state
-    #   |> Map.update!(:buffer_list, fn b -> b ++ [buffer] end)
-    #   |> Map.update!(:active_buffer, fn _ab -> buffer end)
-
-    # IO.puts "SENDING --- #{new_state.active_buffer.content}"
-    # Flamelex.GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.content]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
-
-    Flamelex.GUI.Scene.Root.action({'NEW_FRAME', [type: :text, content: buffer.data]}) #TODO this action should be more like, SHOW_BUFFER_FULL_SCREEN
-
+  # ignore GUI broadcasts to Buffers
+  def handle_info({{:buffer, _details}, {:new_state, _buf_state}}, state) do
+    Logger.warn "#{__MODULE__} ignoring a GUI broadcast to a buffer..."
     {:noreply, state}
   end
-
-
-  # @impl true
-  # def handle_info({:active_buffer, :SWITCH_mode, _mode}, state) do
-  #   IO.puts "GUI controller ignoring switch mode cmd, since that will propagate via buffers themselves"
-  #   {:noreply, state}
-  # end
-
 
   # def handle_info(all_info, state) do
   #   IO.puts "BAD MASTVH?? #{inspect all_info}"
   #   {:noreply, state}
   # end
 
-  # @impl true
-  # def handle_info(:check_reminders, state) do
-  #   # Logger.info("Checking reminders...")
-  #   state =
-  #     Utilities.Data.find(tags: "reminder") |> process_reminders(state)
-  #   Process.send_after(self(), :check_reminders, :timer.seconds(10))
-  #   {:noreply, state}
-  # end
+  def handle_info({:switch_mode, _m}, state) do
+    {:noreply, state}
+  end
 
-  # def handle_info({:reminder!, r}, state) do
-  #   Logger.warn "REMINDING YOU ABOUT! - #{inspect r}"
-  #   #TODO right now, schedule to remind me again (so I don't forget) - when it's acknowledged, this will stop
-  #   Process.send_after(self(), {:reminder!, r}, @default_reminder_time_in_minutes * (60 * 1000))
-  #   {:noreply, state}
-  # end
 
 end
+
+
+
+
+  # def handle_cast({:show, {:command_buffer, _data}}, state) do
+
+
+  #   #NOTE: Ok, so, this approach was wrong...
+  #   #      our issue is that we need to change the mode to :command, and the
+  #   #      instinct is to modify the graph here too - this is incorrect.
+  #   #      API.CommandBuffer is a Scenic.Component responsible for managing it's
+  #   #      own graph, so we have to forward on a msg to that component to
+  #   #      make the change, but we can't actually do it here.
+
+  #   # IO.puts "SHOW CMD BUF"
+  #   # new_graph =
+  #   #   state.graph
+  #   #   |> IO.inspect(label: "LABEL: GRAPH")
+  #   #   |> Scenic.Graph.modify(:command_buffer, &update_opts(&1, hidden: false))
+  #   #   #TODO find where we add this group to this levels' graph & give it an id
+  #   #   # |> Scenic.Graph.modify(:command_buffer, fn x ->
+  #   #   #       IO.puts "WE'RE DOING IT"
+  #   #   #       IO.inspect x
+  #   #   # end)
+
+  #   # Flamelex.GUI.RootScene.redraw(new_graph)
+  #   Flamelex.GUI.Component.CommandBuffer.show
+
+  #   {:noreply, state}
+  # end
