@@ -175,13 +175,15 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   def keymap(%RadixState{mode: :insert, active_buffer: active_buf}, {:codepoint, {letter, _num}} = input)
   when input in @valid_text_input_characters
   and not is_nil(active_buf) do
+    IO.puts "VIM INPUT CAN DETECT LETTERS"
     #TODO maybe we get cursor 1 coords first, and then can move cursor directly
     #     to the new spot, and use that as the input
     {:fire_multiple_actions, [
         # update the buffer text
         {:modify_buffer, %{
             buffer: active_buf,
-            details: {:insert, letter, %{coords: {:cursor, 1}}} #TODO why is it always cursor 1?
+            details: {:insert, letter, %{coords: {:cursor, 1}}}, #TODO why is it always cursor 1?
+            update_buffer?: true #TODO kinda crude but lets do it
         }},
         # move the cursor along 1 character
         {:move_cursor, %{

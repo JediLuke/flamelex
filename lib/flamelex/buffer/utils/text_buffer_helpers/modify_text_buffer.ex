@@ -87,25 +87,24 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
       do
 
         %{col: c, line: l}  = Enum.at(cursors, n-1) # stupid indexing...
-
-        IO.puts "LINE: #{inspect l}"
+        if l < 1, do: raise "we are not able to process negative line numbers"
 
         new_line = state.lines
-                   |> IO.inspect(label: "WERERERERERERERERER")
-                   |> Enum.at(l-1-1) #TODO lol this is a mistake somehow
-                   |> IO.inspect(label: "WERERERERERERERER2222222ER")
+                   |> Enum.at(l-1) #NOTE: lines start at 1, but Enum indixes start at zero
                    |> insert_text_into_line(text, c)
-                   |>IO.inspect(label: "NEW - line")
 
         new_lines = state.lines
-                    |> List.replace_at(l, new_line)
+                    |> List.replace_at(l-1, new_line)
 
         new_data  = TextBufferUtils.join_lines_into_raw_text(new_lines)
 
+        #TODO need to trigger the GUI update, bother otherwise...
+        IO.puts "GOLDEN"
+
         {:ok, state
-              |> Map.put(:data, new_data)
-              |> Map.put(:lines, new_lines)
-              |> Map.put(:unsaved_changes?, true)}
+              |> Map.replace!(:data, new_data)
+              |> Map.replace!(:lines, new_lines)
+              |> Map.replace!(:unsaved_changes?, true)}
   end
 
   # `insertion_site` is a count of how many characters from the start of

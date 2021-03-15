@@ -76,13 +76,14 @@ defmodule Flamelex.Buffer.Text do
   #   {:noreply, new_state}
   # end
 
-  def handle_cast({:state_update, new_state}, %{rego_tag: buffer_rego_tag = {:buffer, _details}}) do
+  def handle_cast({:state_update, new_state}, _old_state) do
+    IO.puts "#{__MODULE__} updating state - #{inspect new_state.data}"
     {:noreply, new_state}
   end
 
-  def handle_cast({:state_update, :no_gui_change, new_state}, %{rego_tag: buffer_rego_tag = {:buffer, _details}}) do
-    {:noreply, new_state}
-  end
+  # def handle_cast({:state_update, :no_gui_change, new_state}, %{rego_tag: buffer_rego_tag = {:buffer, _details}}) do
+  #   {:noreply, new_state}
+  # end
 
   # spin up a new process to do the handling...
   defp start_sub_task(state, module, function, args) do

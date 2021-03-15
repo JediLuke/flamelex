@@ -9,7 +9,7 @@ defmodule Flamelex.Test.Buffer.Utils.TextBuffer.ModifyHelperTest do
   @sentence_c "There are also buffers not associated with any file.\n"
 
 
-  test "inserting new text into a buffer - {:insert, \"text\", x}" do
+  test "inserting text into a buffer, by specifying the overall character position to insert it" do
     buffer_state = %{data: @sentence_a <> @sentence_b <> @sentence_c}
     modification = {:insert, "Luke is the best!", String.length(@sentence_a)}
 
@@ -25,6 +25,31 @@ defmodule Flamelex.Test.Buffer.Utils.TextBuffer.ModifyHelperTest do
     ]
   end
 
-  test "insert some text onto a line"
-  test "inserting newline chars into lines"
+  # test "insert some text onto a line"
+
+  test "insert some text into a buffer based on the cursor coordinates" do
+    buffer_state = %{
+      data: %{data: @sentence_a <> @sentence_b <> @sentence_c},
+      lines: [ #NOTE: we trim there here, because, lines aren't supposed to contain newline chars
+        %{line: 1, text: @sentence_a |> String.trim()},
+        %{line: 2, text: @sentence_b |> String.trim()},
+        %{line: 3, text: @sentence_c |> String.trim()},
+      ],
+      cursors: [
+        # place the cursor a few words into the text
+        %{col: String.length("All opened files"), line: 2} #TODO edge cases - what if the cursor is on the end of a line? the start of a line? the middle of a line? does the cursor position mean, on the cursor position, or after it?
+      ],
+      unsaved_changes?: false
+    }
+    modification = {:insert, " are freee!! And never,", %{coords: {:cursor, 1}}}
+
+    {:ok, modified_buffer} = ModifyHelper.modify(buffer_state, modification)
+    assert Enum.count(modified_buffer.lines) == 3 # NOTE: I never added any newline in my Modification
+    assert modified_buffer.unsaved_changes? == true
+    assert modified_buffer.lines == [
+      %{line: 1, text: @sentence_a |> String.trim()},
+      %{line: 2, text: "All opened files are freee!! And never, are associated with a buffer.\n" |> String.trim()},
+      %{line: 3, text: @sentence_c |> String.trim()}
+    ]
+  end
 end
