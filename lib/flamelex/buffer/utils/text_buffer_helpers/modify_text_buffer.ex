@@ -86,20 +86,22 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
      and length(cursors) >= 1
       do
 
-        %{col: c, line: l}  = Enum.at(cursors, n-1) # stupid indexing...
-        if l < 1, do: raise "we are not able to process negative line numbers"
+        %{col: c, line: line_num} = Enum.at(cursors, n-1) # stupid indexing...
+        if line_num < 1, do: raise "we are not able to process negative line numbers"
+        if c < 1, do: raise "we are not able to process negative column numbers"
 
         new_line = state.lines
-                   |> Enum.at(l-1) #NOTE: lines start at 1, but Enum indixes start at zero
+                   |> Enum.at(line_num-1) #NOTE: lines start at 1, but Enum indixes start at zero
                    |> insert_text_into_line(text, c)
 
         new_lines = state.lines
-                    |> List.replace_at(l-1, new_line)
+                    |> List.replace_at(line_num-1, new_line) #NOTE: lines start at 1, but Enum indixes start at zero
 
         new_data  = TextBufferUtils.join_lines_into_raw_text(new_lines)
 
-        #TODO need to trigger the GUI update, bother otherwise...
-        IO.puts "GOLDEN"
+        #TODO here is where we update GUI... kinda... not perfect
+        ProcessRegistry.find!({:gui_component, state.rego_tag}) #TODO this should be a GUI.Component.TextBox, not, :gui_component !!
+        |> GenServer.cast({:modify, :lines, new_lines})
 
         {:ok, state
               |> Map.replace!(:data, new_data)

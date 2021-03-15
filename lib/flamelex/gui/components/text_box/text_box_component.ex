@@ -64,26 +64,15 @@ defmodule Flamelex.GUI.Component.TextBox do
     end)
   end
 
+  def handle_cast({:modify, :lines, new_lines}, {graph, state}) do
+    IO.puts "HERE THE GUI IS TRYING TO MAKE TEXT SHOW UP!!"
+    new_graph =
+      graph
+      |> TextBoxDrawUtils.re_render_lines(%{lines: new_lines})
 
-  # @impl Flamelex.GUI.ComponentBehaviour
-  # def handle_action({_graph, state}, {:move_cursor, _direction, _distance} = cursor_movement_action) do
+    {:noreply, {new_graph, state}, push: new_graph}
+  end
 
-  #   %{ref: %BufRef{ref: buf_ref}} = state
-
-  #   #assume its cursor 1 for now
-  #   cursor_tag = {:gui_component, {:text_cursor, buf_ref, 1}} #TODO assume its cursor 1
-
-  #   ProcessRegistry.find!(cursor_tag)
-  #   |> GenServer.cast({:action, cursor_movement_action})
-
-  #   :ignore_action
-  # end
-
-  # def handle_cast({:move_cursor, %{last: :line, same: :column}} , {graph, state}) do
-
-
-
-  # end
 
   # def handle_cast({:move_cursor, details}, {graph, state}) do
 
@@ -114,12 +103,6 @@ defmodule Flamelex.GUI.Component.TextBox do
   #   details
   # end
 
-
-
-  # def handle_action({_g, _s}, {:move_cursor, details}) do
-  #   IO.inspect details, label: "HERE IS WHERE THE ACTION IS"
-  #   :ignore_action
-  # end
 
 
   def handle_info({:switch_mode, new_mode}, {graph, state}) do

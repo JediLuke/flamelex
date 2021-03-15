@@ -2,6 +2,8 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
   # alias Flamelex.GUI.Structs.{Coordinates, LineOfText}
   # alias Flamelex.GUI.Structs.Frame
 
+  alias Flamelex.Buffer.Utils.TextBufferUtils #TODO this is prob stupid
+
 
   #TODO move this somewhere else
   def split_into_a_list_of_lines_of_text_structs(text) do
@@ -30,24 +32,47 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
   # then, we can update that text, instead of re-writing it...
 
   def render_lines(graph, %{frame: frame, lines: lines}) when is_list(lines) do
-    {new_graph, _final_line_num} = # REMINDER: this tuple is the final accumulator, passed through by Enum.reduce/2
-      lines
-        |> Enum.reduce(
-              {graph, 1}, # initialize the accumulator,- line_num starts at 1
-              fn %{text: line_of_text}, {graph, line_num} ->
-                  new_graph =
-                    graph
-                    |> render_single_line(%{
-                          position_tuple: {line_num, frame.top_left}, #TODO should be frame.coords.top_left
-                          margin: frame.margin,
-                          text: line_of_text
-                        })
+    #TODO here, we need to save the data - maybe dont render a single line after all for now
+    # {new_graph, _final_line_num} = # REMINDER: this tuple is the final accumulator, passed through by Enum.reduce/2
+    #   lines
+    #     |> Enum.reduce(
+    #           {graph, 1}, # initialize the accumulator,- line_num starts at 1
+    #           fn %{text: line_of_text}, {graph, line_num} ->
+    #               new_graph =
+    #                 graph
+    #                 |> render_single_line(%{
+    #                       position_tuple: {line_num, frame.top_left}, #TODO should be frame.coords.top_left
+    #                       margin: frame.margin,
+    #                       text: line_of_text
+    #                     })
 
-                  #REMINDER: Enum.reduce/2 expects the function to pass through the accumulator
-                  {new_graph, line_num+1}
-              end)
+    #               #REMINDER: Enum.reduce/2 expects the function to pass through the accumulator
+    #               {new_graph, line_num+1}
+    #           end)
+    new_text = TextBufferUtils.join_lines_into_raw_text(lines)
+
+    new_graph =
+      graph
+      |> Scenic.Primitives.text(new_text,
+            id: :text_body,
+            font: Flamelex.GUI.Fonts.primary(),
+            translate: {frame.margin.left+frame.top_left.x, frame.margin.top+frame.top_left.y})
+            # translate:  {x+left_margin, y+font_size+stroke_width}, # text draws from bottom-left corner??
+            # font_size:  font_size,
+            # fill:       :black)
+
+    # graph
+    # graph |> Graph.modify(:text, &text(&1, new_text, fill: :black))
 
     new_graph # we return the graph as the last thing
+  end
+
+  def re_render_lines(graph, %{lines: lines}) do
+    new_text = TextBufferUtils.join_lines_into_raw_text(lines)
+
+    graph
+    |> Scenic.Graph.modify(:text_body, &Scenic.Primitives.text(&1, new_text))
+
   end
 
 
