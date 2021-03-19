@@ -1,6 +1,7 @@
 defmodule Flamelex.GUI.RootScene do
   @moduledoc false
   use Scenic.Scene
+  use Flamelex.GUI.ScenicEventsDefinitions
   alias Flamelex.GUI.Utilities.Draw
 
 
@@ -41,8 +42,15 @@ defmodule Flamelex.GUI.RootScene do
   @ignorable_input_events [
     :viewport_enter,
     :viewport_exit,
-    :key # we use `:codepoint` to recognise when characters have been inputted...
+    :key # we use `:codepoint` for characters, some :keys are specifically matched, e.g. escape_key
   ]
+
+  @impl Scenic.Scene
+  def handle_input(@escape_key, _context, state) do
+    IO.puts "Escape key detected!"
+    Flamelex.Fluxus.handle_user_input(@escape_key)
+    {:noreply, state}
+  end
 
   @impl Scenic.Scene
   def handle_input({event, _details}, _context, state)

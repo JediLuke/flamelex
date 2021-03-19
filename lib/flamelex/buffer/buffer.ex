@@ -12,5 +12,13 @@ defmodule Flamelex.Buffer do
     Flamelex.Buffer.SeniorSupervisor.open_buffer!({buffer_module, params})
   end
 
+  def save do
+    save(:active_buffer)
+  end
+
+  def save(:active_buffer) do
+    GenServer.call(Flamelex.BufferManager, :save_active_buffer)
+  end
+
   # def modify()
 end

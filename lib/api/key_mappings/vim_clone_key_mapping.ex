@@ -170,6 +170,10 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   #   } #TODO generalize this to non-text buffers too
   # end
 
+  def keymap(%RadixState{mode: :insert, active_buffer: active_buf}, @escape_key) do
+    IO.puts "DETECTED ESCAPE KEY"
+    {:fire_action, {:switch_mode, :normal}}
+  end
 
   # inputting text when in insert mode
   def keymap(%RadixState{mode: :insert, active_buffer: active_buf}, {:codepoint, {letter, _num}} = input)
@@ -192,12 +196,12 @@ defmodule Flamelex.API.KeyMappings.VimClone do
     ]}
   end
 
-  def keymap(%RadixState{mode: :insert}) do
-    %{
-      @lowercase_x => {:execute_function, fn -> raise "intentionally raising! little x" end},
-      @escape_key => {:fire_action, {:switch_mode, :normal}}, #TODO change current buffer mode
-    }
-  end
+  # def keymap(%RadixState{mode: :insert}) do
+  #   %{
+  #     @lowercase_x => {:execute_function, fn -> raise "intentionally raising! little x" end},
+  #     @escape_key => {:fire_action, {:switch_mode, :normal}},
+  #   }
+  # end
 
 
   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
@@ -224,6 +228,8 @@ defmodule Flamelex.API.KeyMappings.VimClone do
       @lowercase_j => {:apply_mfa, {Flamelex.API.Journal, :now, []}},
       @lowercase_k => {:apply_mfa, {Flamelex.API.KommandBuffer, :show, []}},
       # @lowercase_t => {:apply_mfa, {Flamelex.API.Memex.TiddlyWiki, :open, []}}, #TODO Memex.open_catalog()
+
+      @lowercase_s => {:apply_mfa, {Flamelex.Buffer, :save, []}},
 
       #TODO these mappings are here for testing purposes, so make sure that leader commands are working as expected
       @lowercase_x => {:execute_function, fn -> raise "intentionally raising! little x" end},

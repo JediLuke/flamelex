@@ -4,7 +4,7 @@ defmodule Flamelex.BufferManager do
   """
   use GenServer
   use Flamelex.ProjectAliases
-  alias Flamelex.Buffer.Utils.OpenBuffer, as: BufferOpenUtils
+  # alias Flamelex.Buffer.Utils.OpenBuffer, as: BufferOpenUtils
 
   #TODO if a buffer crashes, need to catch it & alert Flamelex.GUI.Controller
   #TODO idea: the GUI should turn grey, with an x through it - but it has memory (text etc) in it - maybe it can be used to recover the Buffer state...
@@ -36,6 +36,7 @@ defmodule Flamelex.BufferManager do
 
   def handle_call({:find_buffer, search_term}, _from, state) do
 
+    #TODO move to a pure function, under a Task.Supervisor
     similarity_cutoff = 0.72 # used to compare how similar the strings are
 
     find_buf =
@@ -54,6 +55,15 @@ defmodule Flamelex.BufferManager do
         {:reply, {:ok, buf}, state}
     end
   end
+
+  def handle_call(:save_active_buffer, _from, state) do
+    results = state.active_buffer
+              |> ProcessRegistry.find!()
+              |> GenServer.call(:save)
+
+    {:reply, results, state}
+  end
+
 
   def handle_call(:count_buffers, _from, state) do
     count = Enum.count(state)
@@ -126,8 +136,8 @@ defmodule Flamelex.BufferManager do
   #   {:noreply, state}
   # end
 
-  # when new actions are published to the :action_event_bus, this is where
-  # BufferManager receives them
+  # when new actions are published to the `:action_event_bus`,
+  # this is where BufferManager receives them
   def handle_info(%{action: action, radix_state: radix_state}, bufr_mgr_state) do
 
     Flamelex.Fluxus.Reducers.Buffer.handle(%{

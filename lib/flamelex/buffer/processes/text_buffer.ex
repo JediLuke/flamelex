@@ -42,6 +42,7 @@ defmodule Flamelex.Buffer.Text do
 
   @impl GenServer
   def handle_call(:save, _from, %{source: {:file, _filepath}} = state) do
+    IO.puts "GOT THE CALL"
     {:ok, new_state} = TextBufferUtils.save(state)
     {:reply, :ok, new_state}
   end

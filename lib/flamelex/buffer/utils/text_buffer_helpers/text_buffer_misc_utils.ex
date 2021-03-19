@@ -1,8 +1,10 @@
 defmodule Flamelex.Buffer.Utils.TextBufferUtils do #TODO rename module to MiscUtils
   use Flamelex.ProjectAliases
+  require Logger
 
 
   def save(%{source: {:file, filepath}} = state) do
+    Logger.info "saving #{inspect filepath}..."
 
     {:ok, file} = File.open(filepath, [:write])
     IO.binwrite(file, state.data) #TODO - maybe?
