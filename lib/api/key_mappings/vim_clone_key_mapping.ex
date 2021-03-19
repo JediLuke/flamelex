@@ -50,7 +50,8 @@ defmodule Flamelex.API.KeyMappings.VimClone do
       # @lowercase_y => yank()
       # @lowercase_z => position_current_line()
 
-      # @uppercase_A => enter_insertion_mode_after_line()
+      @uppercase_A => {:vim_lang, :append, :end_of_current_line},
+
       # @uppercase_B => CoreActions.move_cursor(:back, 1, :word),
       # @uppercase_C => change(to: :end_of_line)
       # @uppercase_D => delete(to: :end_of_line)
@@ -233,6 +234,9 @@ defmodule Flamelex.API.KeyMappings.VimClone do
 
       #TODO these mappings are here for testing purposes, so make sure that leader commands are working as expected
       @lowercase_x => {:execute_function, fn -> raise "intentionally raising! little x" end},
+
+
+
       @uppercase_X => {:execute_function, fn -> raise "intentionally raising! big X" end}
     }
   end

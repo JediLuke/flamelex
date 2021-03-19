@@ -28,6 +28,14 @@ defmodule Flamelex.Buffer.Utils.CursorMovementUtils do
 
   # pure-functions only below this line
 
+  def move_cursor(buffer_state, %{cursor_num: n, instructions: {:last_col, :line, l}}) do
+    # get cursor position for the last char on line l, by counting chars in that line
+    %{line: ^l, text: t} = buffer_state.lines |> Enum.at(l-1)
+    num_chars = String.length(t)
+
+    move_cursor(buffer_state, %{cursor_num: n, instructions: {:goto, %{line: l, col: num_chars}}})
+  end
+
 
   def move_cursor(state, %{cursor_num: n, instructions: instructions}) when is_integer(n) do
     case state.cursors |> Enum.at(n-1) do # cursors start at 1, lists do not
@@ -50,6 +58,7 @@ defmodule Flamelex.Buffer.Utils.CursorMovementUtils do
         {:ok, new_state}
     end
   end
+
 
   # def handle_cast({:move_cursor, %{cursor_num: n=1, goto: %{col: col, line: line}}}, state) do #TODO hard-coded as first ursor for now
 

@@ -23,6 +23,28 @@ defmodule Flamelex.GUI.VimServer do
   end
 
 
+  @doc """
+  Queries Flamelex to get some details about the active buffer, and the
+  position of the first cursor.
+  """
+  def fetch_active_cursor(radix_state) do
+
+    active_buffer_pid = radix_state.active_buffer
+                        |> ProcessRegistry.find!()
+
+    current_cursor_coords = # %Coords{} = #TODO this should be a coords struct
+                            active_buffer_pid
+                            |> GenServer.call({:get_cursor_coords, 1}) #TODO how do we reference cursors here?
+
+    %{
+      active_buffer: %{
+        rego: radix_state.active_buffer,
+        pid: active_buffer_pid
+      },
+      cursor_coords: current_cursor_coords
+    }
+  end
+
   # def handle_cast({{:verb, v}, radix_state}, vim_state) do
   #   {:noreply, vim_state}
   # end
@@ -85,6 +107,26 @@ defmodule Flamelex.GUI.VimServer do
       {:switch_mode, :insert} #TODO don't use global modes, this should only affect the local buffer
     ])
 
+
+    {:noreply, vim_state}
+  end
+
+  # move the cursor to the end of the current line, and enter insert mode
+  def handle_cast({{:append, :end_of_current_line}, radix_state}, vim_state) do
+    %{cursor_coords: %{line: l}} = fetch_active_cursor(radix_state)
+
+    Flamelex.Fluxus.fire_actions([
+      # move the cursor down to the new line we just created
+      {:move_cursor, %{
+          buffer: radix_state.active_buffer,
+          details: %{
+            cursor_num: 1,
+            instructions: {:last_col, :line, l}
+          }
+      }},
+      # then, switch into insert mode
+      {:switch_mode, :insert} #TODO don't use global modes
+    ])
 
     {:noreply, vim_state}
   end
