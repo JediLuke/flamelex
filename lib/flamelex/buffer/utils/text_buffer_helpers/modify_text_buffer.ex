@@ -29,19 +29,21 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
   # special case for the newline character
   def modify(state, %{append: _text = "\n", line: l}) when is_integer(l) and l >= 1 do
 
+    #NOTE: newline is a special case - we want to get the line, UNDER the cursor, and insert a new line of `""`
+
+    new_lines = state.lines
+                #NOTE: we increment first, then insert, so we don't end up with 2 `line l`s in the list
+                |> increment_line_numbers_after(l)
+                |> List.insert_at(l, %{line: l+1, text: ""}) # put a new line containing just a blank string in
 
 
-    IO.puts "NEWLINE SPECIAL CASE!!! #{inspect l}"
-
-    IO.inspect state.lines, label: "LINES??"
-
-    new_lines = List.insert_at(state.lines, l-1, %{line: l, text: ""}) # put anew line containing just a blank string in
     #TODO need to bump all lines after aswell... fuck. Much smarter dont even worry about keeping a second index at this point
     new_data  = TextBufferUtils.join_lines_into_raw_text(new_lines) # then re-crunch the raw_data from the lines
 
     IO.puts "NEW LINES ??? #{inspect new_lines}"
 
-    {:ok, %{state|data: new_data, lines: new_lines}}
+
+    {:ok, %{state|data: new_data, lines: new_lines, unsaved_changes?: true}}
   end
 
   #TODO maybe? Do we need a special case here for empty text data & pressing backspace?
@@ -49,13 +51,9 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
     {:ok, state}
   end
 
-  #TODO here, I think we're trying to make text backspacable
-  # def modify(state, %{backspace: %{line: l, col: c}}) do
   def modify(state, %{backspace: {:cursor, n}}) do
 
     %{col: c, line: l} = Enum.at(state.cursors, n-1) # stupid indexing...
-
-    IO.puts "Applying the BACKSPACE mod..."
 
     # find cursor position
     %{text: line_of_text, line: ^l} = state.lines |> Enum.at(l-1)
@@ -152,6 +150,8 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
      and length(cursors) >= 1
       do
 
+        IO.puts "Inserting text..."
+
         %{col: c, line: line_num} = Enum.at(cursors, n-1) # stupid indexing...
         if line_num < 1, do: raise "we are not able to process negative line numbers"
         if c < 1, do: raise "we are not able to process negative column numbers"
@@ -218,6 +218,14 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
   #         updated_list_of_text_lines |> Enum.join()
   #       end
 
+  def increment_line_numbers_after(list, l) when is_integer(l) do
+    list
+    |> Enum.map(
+            fn
+              %{line: x} = line when x <= l -> line |> IO.inspect
+              %{line: x} = line             -> %{line|line: x+1}
+          end)
+  end
 
 
   def insert_text_into_line(%{text: line_of_text} = line, new_text, pos)

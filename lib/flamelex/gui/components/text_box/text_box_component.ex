@@ -10,7 +10,8 @@ defmodule Flamelex.GUI.Component.TextBox do
 
 
   def rego_tag(%{ref: buffer}) do
-    {:gui_component, buffer}
+    # {__MODULE__, buffer}
+    {:gui_component, buffer} #TODO replace :gui_component with the actual type of GUI component in the rego tag
   end
 
   @impl Flamelex.GUI.ComponentBehaviour
@@ -64,6 +65,7 @@ defmodule Flamelex.GUI.Component.TextBox do
     end)
   end
 
+  #TODO maybe dont use lines, too slow?
   def handle_cast({:modify, :lines, new_lines}, {graph, state}) do
     IO.puts "HERE THE GUI IS TRYING TO MAKE TEXT SHOW UP!!"
     new_graph =

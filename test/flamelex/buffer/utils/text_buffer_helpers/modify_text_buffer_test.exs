@@ -3,10 +3,10 @@ defmodule Flamelex.Test.Buffer.Utils.TextBuffer.ModifyHelperTest do
   alias Flamelex.Buffer.Utils.TextBuffer.ModifyHelper
 
 
-  # sourced from: https://vim.fandom.com/wiki/Vim_buffer_FAQ
-  @sentence_a "A buffer is a file loaded into memory for editing.\n"
-  @sentence_b "All opened files are associated with a buffer.\n"
-  @sentence_c "There are also buffers not associated with any file.\n"
+    # sourced from: https://vim.fandom.com/wiki/Vim_buffer_FAQ
+    @sentence_a "A buffer is a file loaded into memory for editing.\n"
+    @sentence_b "All opened files are associated with a buffer.\n"
+    @sentence_c "There are also buffers not associated with any file.\n"
 
 
   test "inserting text into a buffer, by specifying the overall character position to insert it" do
@@ -26,6 +26,28 @@ defmodule Flamelex.Test.Buffer.Utils.TextBuffer.ModifyHelperTest do
   end
 
   # test "insert some text onto a line"
+
+  describe "with standard test buffer" do
+    setup [:standard_test_buffer]
+
+    test "append a new line (insert under the current line)", %{buffer_state: buffer_state} do
+      assert Enum.count(buffer_state.lines) == 3
+
+      modification =  %{append: "\n", line: 1} # appent to line 1, means, we expect line 2 to be a blank new line
+      {:ok, modified_buffer} = ModifyHelper.modify(buffer_state, modification)
+
+      assert Enum.count(modified_buffer.lines) == 4
+      assert modified_buffer.unsaved_changes? == true
+      assert modified_buffer.data == @sentence_a <> "\n" <> @sentence_b <> @sentence_c
+      assert modified_buffer.lines == [
+        %{line: 1, text: @sentence_a |> String.trim()},
+        %{line: 2, text: ""},
+        %{line: 3, text: @sentence_b |> String.trim()},
+        %{line: 4, text: @sentence_c |> String.trim()}
+      ]
+    end
+  end
+
 
   test "insert some text into a buffer based on the cursor coordinates" do
     buffer_state = %{
@@ -51,5 +73,21 @@ defmodule Flamelex.Test.Buffer.Utils.TextBuffer.ModifyHelperTest do
       %{line: 2, text: "All opened files are freee!! And never, are associated with a buffer.\n" |> String.trim()},
       %{line: 3, text: @sentence_c |> String.trim()}
     ]
+  end
+
+
+  defp standard_test_buffer(context) do
+    buffer_state = %{
+      data: @sentence_a <> @sentence_b <> @sentence_c,
+      lines: [ #NOTE: we trim there here, because, lines aren't supposed to contain newline chars
+        %{line: 1, text: @sentence_a |> String.trim()},
+        %{line: 2, text: @sentence_b |> String.trim()},
+        %{line: 3, text: @sentence_c |> String.trim()},
+      ],
+      cursors: [%{line: 1, col: 1}],
+      unsaved_changes?: false
+    }
+
+    context |> Map.merge(%{buffer_state: buffer_state})
   end
 end

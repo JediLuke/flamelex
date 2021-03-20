@@ -50,6 +50,7 @@ defmodule Flamelex.GUI.RootScene do
 
   # accept the matched keys, before we ignore all other keys...
   def handle_input(input, _context, state) when input in @matched_keys do
+    #TODO we want to be able to hold dosn keys like backspace & trigger events while it's held
     Flamelex.Fluxus.handle_user_input(input)
     {:noreply, state}
   end
