@@ -78,47 +78,6 @@ defmodule Flamelex.Buffer.KommandBuffer do
 
 
 
-  # # def handle_cast(:backspace, %Buffer{content: ""} = buf) do
-  # #   {:noreply, buf}
-  # # end
-  # # def handle_cast(:backspace, %Buffer{content: c} = buf) when length(c) > 0 do
-  # #   {backspaced_text, _last_letter} = buf.content |> String.split_at(-1)
-
-  # #   new_buf =
-  # #     buf |> Buffer.update_content(with: backspaced_text)
-
-  # #   new_graph =
-  # #     graph |> Graph.modify(:buffer_text, &text(&1, @empty_command_buffer_text_prompt, fill: :dark_grey))
-  # #     #TODO render a helper string when the buffer is empty
-  # #     # case new_buf.content do
-  # #     #   "" -> # render msg but keep text buffer as empty string
-  # #     #     graph |> Graph.modify(:buffer_text, &text(&1, @empty_command_buffer_text_prompt, fill: :dark_grey))
-  # #     #   non_blank_string ->
-  # #     #     graph |> Graph.modify(:buffer_text, &text(&1, non_blank_string))
-  # #     # end
-
-  # #   #TODO ok so this is actually it. The last step every time needs to be "updateGUI"
-  # #   GUI.Component.CommandBuffer.redraw(new_graph)
-
-  # #   {new_state, new_graph}
-
-
-  # #   {:noreply, buf}
-  # # end
-
-  #   # def process({%{text: ""} = state, _graph}, 'COMMAND_BUFFER_BACKSPACE') do
-  # #   state
-  # # end
-  # # def process({state, graph}, 'COMMAND_BUFFER_BACKSPACE') do
-  # #
-
-  # #   {:cursor, pid} = state.component_ref |> hd #TODO, eventually we'll have more componenst
-  # #   GenServer.cast(pid, {:action, 'MOVE_LEFT_ONE_COLUMN'})
-
-
-  # # end
-
-
   # # @impl GenServer
   # # def handle_cast(:de_activate_command_buffer, state) do
   # #   new_state = %{state|content: ""}

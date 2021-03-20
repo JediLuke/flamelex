@@ -42,13 +42,15 @@ defmodule Flamelex.GUI.RootScene do
   @ignorable_input_events [
     :viewport_enter,
     :viewport_exit,
-    :key # we use `:codepoint` for characters, some :keys are specifically matched, e.g. escape_key
+    :key # we use `:codepoint` for characters, some :keys are specifically matched
   ]
 
-  @impl Scenic.Scene
-  def handle_input(@escape_key, _context, state) do
-    IO.puts "Escape key detected!"
-    Flamelex.Fluxus.handle_user_input(@escape_key)
+  # ignore all :key events, except these...
+  @matched_keys [@escape_key, @backspace_key]
+
+  # accept the matched keys, before we ignore all other keys...
+  def handle_input(input, _context, state) when input in @matched_keys do
+    Flamelex.Fluxus.handle_user_input(input)
     {:noreply, state}
   end
 
@@ -59,6 +61,7 @@ defmodule Flamelex.GUI.RootScene do
       {:noreply, state}
   end
 
+  # handle all unignored input...
   def handle_input(input, _context, state) do
     Flamelex.Fluxus.handle_user_input(input)
     {:noreply, state}

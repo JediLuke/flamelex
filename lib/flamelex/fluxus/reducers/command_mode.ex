@@ -47,10 +47,6 @@ defmodule Flamelex.Fluxus.Actions.CommandBuffer do
   #   state |> add_to_input_history(input)
   # end
 
-  # def process(%{input: %{mode: :command}} = state, @backspace_key) do
-  #   # Flamelex.Buffer.Command.backspace()
-  #   state
-  # end
 
   # def process(%{input: %{mode: :command}} = state, @enter_key) do
   #   # Flamelex.Buffer.Command.execute_contents()

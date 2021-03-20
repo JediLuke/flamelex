@@ -62,8 +62,14 @@ defmodule Flamelex.Buffer.Text do
     {:noreply, state}
   end
 
+  #TODO remove this eventually, just use :modify
   def handle_cast({:modify_buffer, specifics}, state) do
     ModifyHelper.start_modification_task(state, specifics)
+    {:noreply, state}
+  end
+
+  def handle_cast({:modify, details}, state) do
+    ModifyHelper.start_modification_task(state, details)
     {:noreply, state}
   end
 

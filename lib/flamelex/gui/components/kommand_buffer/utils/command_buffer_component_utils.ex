@@ -374,27 +374,6 @@ end
 #   end
 
 
-#   # def process({%{text: ""} = state, _graph}, 'COMMAND_BUFFER_BACKSPACE') do
-#   #   state
-#   # end
-#   # def process({state, graph}, 'COMMAND_BUFFER_BACKSPACE') do
-#   #   {backspaced_buffer_text, _last_letter} = state.text |> String.split_at(-1)
-
-#   #   {:cursor, pid} = state.component_ref |> hd #TODO, eventually we'll have more componenst
-#   #   GenServer.cast(pid, {:action, 'MOVE_LEFT_ONE_COLUMN'})
-
-#   #   new_state = state |> Map.replace!(:text, backspaced_buffer_text)
-
-#   #   new_graph =
-#   #     case new_state.text do
-#   #       "" -> # render msg but keep text buffer as empty string
-#   #         graph |> Graph.modify(:buffer_text, &text(&1, @empty_command_buffer_text_prompt, fill: :dark_grey))
-#   #       non_blank_string ->
-#   #         graph |> Graph.modify(:buffer_text, &text(&1, non_blank_string))
-#   #     end
-
-#   #   {new_state, new_graph}
-#   # end
 
 
 #   # def process({state, graph}, 'CLEAR_BUFFER_TEXT') do

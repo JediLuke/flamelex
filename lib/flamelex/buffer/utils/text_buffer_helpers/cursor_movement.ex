@@ -11,6 +11,8 @@ defmodule Flamelex.Buffer.Utils.CursorMovementUtils do
     update_gui(new_state)
     #TODO need to test this actually sends back the updates we expect!
     GenServer.cast(ProcessRegistry.find!(tag), {:state_update, new_state}) #TODO kinda shitty cause we did change the GUI...
+
+    new_state
   end
 
   #TODO

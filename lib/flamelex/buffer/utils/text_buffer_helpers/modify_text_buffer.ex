@@ -1,6 +1,7 @@
 defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
   use Flamelex.ProjectAliases
   alias Flamelex.Buffer.Utils.TextBufferUtils
+  alias Flamelex.Buffer.Utils.CursorMovementUtils
 
 
   def start_modification_task(state, params) do # params e.g.
@@ -42,6 +43,71 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
 
     {:ok, %{state|data: new_data, lines: new_lines}}
   end
+
+  #TODO maybe? Do we need a special case here for empty text data & pressing backspace?
+  def modify(%{data: ""} = state, %{backspace: _cursor}) do
+    {:ok, state}
+  end
+
+  #TODO here, I think we're trying to make text backspacable
+  # def modify(state, %{backspace: %{line: l, col: c}}) do
+  def modify(state, %{backspace: {:cursor, n}}) do
+
+    %{col: c, line: l} = Enum.at(state.cursors, n-1) # stupid indexing...
+
+    IO.puts "Applying the BACKSPACE mod..."
+
+    # find cursor position
+    %{text: line_of_text, line: ^l} = state.lines |> Enum.at(l-1)
+
+    # delete text left of this by 1 char
+    {before_cursor_text, after_and_under_cursor_text} =
+              line_of_text |> String.split_at(c)
+    {backspaced_text, _deleted_text} =
+              before_cursor_text |> String.split_at(-1)
+    full_backspaced_text =
+              backspaced_text <> after_and_under_cursor_text
+
+    new_state_lines_struct = state.lines
+                             |> List.replace_at(l-1, %{line: l, text: full_backspaced_text}) #NOTE: lines start at 1, but Enum indixes start at zero
+
+    IO.inspect new_state_lines_struct, label: "NSLS"
+
+    new_data  = TextBufferUtils.join_lines_into_raw_text(new_state_lines_struct)
+
+    #TODO here is where we update GUI... kinda... not perfect
+    ProcessRegistry.find!({:gui_component, state.rego_tag}) #TODO this should be a GUI.Component.TextBox, not, :gui_component !!
+    |> GenServer.cast({:modify, :lines, new_state_lines_struct})
+
+    {:ok, state
+          |> CursorMovementUtils.move_cursor_and_update_gui(%{cursor_num: 1, instructions: {:left, 1, :column}}) #TODO cursor 1 again
+          |> Map.replace!(:data, new_data)
+          |> Map.replace!(:lines, new_state_lines_struct)
+          |> Map.replace!(:unsaved_changes?, true)}
+  end
+
+  # #   new_graph =
+  # #     graph |> Graph.modify(:buffer_text, &text(&1, @empty_command_buffer_text_prompt, fill: :dark_grey))
+  # #     #TODO render a helper string when the buffer is empty
+  # #     # case new_buf.content do
+  # #     #   "" -> # render msg but keep text buffer as empty string
+  # #     #     graph |> Graph.modify(:buffer_text, &text(&1, @empty_command_buffer_text_prompt, fill: :dark_grey))
+  # #     #   non_blank_string ->
+  # #     #     graph |> Graph.modify(:buffer_text, &text(&1, non_blank_string))
+  # #     # end
+
+
+
+#   #   new_graph =
+#   #     case new_state.text do
+#   #       "" -> # render msg but keep text buffer as empty string
+#   #         graph |> Graph.modify(:buffer_text, &text(&1, @empty_command_buffer_text_prompt, fill: :dark_grey))
+#   #       non_blank_string ->
+#   #         graph |> Graph.modify(:buffer_text, &text(&1, non_blank_string))
+#   #     end
+
+#   #   {new_state, new_graph}
+#   # end
 
 
 

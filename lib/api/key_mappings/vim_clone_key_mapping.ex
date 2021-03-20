@@ -172,8 +172,14 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   # end
 
   def keymap(%RadixState{mode: :insert, active_buffer: active_buf}, @escape_key) do
-    IO.puts "DETECTED ESCAPE KEY"
     {:fire_action, {:switch_mode, :normal}}
+  end
+
+  def keymap(%RadixState{mode: :insert, active_buffer: active_buf}, @backspace_key) do
+    {:fire_action, {:modify_buffer, %{
+        buffer: active_buf,
+        details: %{backspace: {:cursor, 1}}, #TODO why is it always cursor 1?
+    }}}
   end
 
   # inputting text when in insert mode
