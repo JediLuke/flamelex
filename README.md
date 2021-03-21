@@ -32,7 +32,9 @@ As mentioned, we need Scenic. Scenic requires gfx drivers. The most up
 to date information on how to install Scenic for your platform can be found
 in the [Scenic documentation](https://hexdocs.pm/scenic/install_dependencies.html)
 
-### Running Flamelex from IEx
+## Getting Started
+
+### Operating Flamelex via the IEx console
 
 From the repository, simply start the program in `dev` mode, the same way
 you would start basically any Elixir program using Mix:
@@ -47,7 +49,7 @@ Flamelex window showing a "transmutation circle" and a version number:
 #TODO insert screenshot
 
 Now, of course Flamelex responds to keypresses - it is a text-editor after
-all. Butto get a feel for how the software works, we are going to start
+all. But to get a feel for how the software works, we are going to start
 by just running some more commands in IEx. Flamelex was designed first and
 foremost as a GUI extension of the Elixer CLI, IEx, so understanding that
 under the hood, everything is just functions, is one of the key stepping
@@ -56,7 +58,7 @@ stones to becoming proficient with Flamelex.
 Go back to the IEx terminal you used to start flamelex, and type:
 
 ```
-Buffer.open!("README")
+Buffer.open!("README.md")
 ```
 
 You should see a new Buffer open - if you are coming from a Vim or Emacs
@@ -80,21 +82,11 @@ of the transmutation circle, or even to speed it up!
 
 #TODO experiment with making a flamelex alias
 
-## Getting Started
-
 ### TL:DR; Up and Running in 5 minutes
 
 The first window is just a blank window showing the background. To do
-something useful, we need to open a `Buffer`. We can do this a few ways:
-
-* Click a MenuBar option #TODO
-* Put it in CLI
-
-We shall use the CLI for now:
-
-```Buffer.open()```
-
-#TODO explain the rest
+something useful, we need to open a `Buffer`. To start with, we shall use
+the IE
 
 ### Adjusting the window size
 
@@ -286,6 +278,8 @@ Ability to open & save files
 
 Ability to perform basic text editing (insertion / deletion / substitut-
     ion)
+
+Buffer.modify(Buffer.active_buffer(), {:insert, Memex.random_quote().text, %{coords: {:cursor, 1}}})
 
 ### Saving files
 

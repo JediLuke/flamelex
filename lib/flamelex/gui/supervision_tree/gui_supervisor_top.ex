@@ -9,8 +9,6 @@ defmodule Flamelex.GUI.TopLevelSupervisor do
   def init(_params) do
     IO.puts "#{__MODULE__} initializing..."
 
-    #TODO split this up, so that if VImServer crashes, it doesn't bring down the whole GUI...
-    # probably needs a supervisor above it
     children = [
       {Scenic, viewports: [default_viewport_config()]},
       Flamelex.GUI.Controller, #TODO which should boot first, Scenic, or GUiController?

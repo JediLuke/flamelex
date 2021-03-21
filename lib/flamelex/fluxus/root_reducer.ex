@@ -42,21 +42,22 @@ defmodule Flamelex.Fluxus.RootReducer do
   """
   def async_reduce(%{mode: current_mode} = radix_state, {:action, {:switch_mode, m}}) do
     Logger.info "switching from `#{inspect current_mode}` to `#{inspect m}` mode..."
-
-    new_radix_state = %{radix_state|mode: m} # update the state with the new mode
-
-    # 1) update FluxusRadix, which needs to know which mode we are in because it affects how inputs & actions are processed
-    GenServer.cast(Flamelex.FluxusRadix, {:radix_state_update, new_radix_state})
-
-    # 2) broadcast to the GUI events bus about the mode switch
-    PubSub.broadcast(
-      topic: :gui_update_bus,
-        msg: {:switch_mode, m})
+    radix_state |> switch_mode(m)
   end
 
+  def async_reduce(radix_state, {:action, {KommandBuffer, :show}}) do
+    GenServer.cast(Flamelex.Buffer.KommandBuffer, :show)
+    radix_state |> switch_mode(:command)
+  end
+
+  def async_reduce(radix_state, {:action, {KommandBuffer, :hide}}) do
+    IO.puts "HIDE 1"
+    GenServer.cast(Flamelex.Buffer.KommandBuffer, :hide)
+    radix_state |> switch_mode(:normal)
+  end
 
   def async_reduce(radix_state, {:action, {KommandBuffer, x}}) do
-    IO.puts "we're trying to do something with KommandBuffer..."
+    IO.puts "we're trying to do something with KommandBuffer... #{inspect x}"
     GenServer.cast(Flamelex.Buffer.KommandBuffer, x)
   end
 
@@ -71,5 +72,13 @@ defmodule Flamelex.Fluxus.RootReducer do
           action: action
         }
     ])
+  end
+
+  def switch_mode(radix_state, m) do
+    new_radix_state = %{radix_state|mode: m} # update the state with the new mode
+    Flamelex.Utils.PubSub.broadcast([ #TODO is this even broadcasting anything??
+      topic: :gui_update_bus,
+      msg: {:switch_mode, m}])
+    GenServer.cast(Flamelex.FluxusRadix, {:radix_state_update, new_radix_state})
   end
 end

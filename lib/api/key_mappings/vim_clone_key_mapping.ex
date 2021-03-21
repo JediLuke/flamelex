@@ -171,7 +171,15 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   #   } #TODO generalize this to non-text buffers too
   # end
 
-  def keymap(%RadixState{mode: :insert, active_buffer: active_buf}, @escape_key) do
+  def keymap(%RadixState{mode: :command}, @escape_key) do
+    # {:fire_action, {:switch_mode, :normal}} #TODO this doesn't de-activate the command buffer (unless we get gui broadcast working...)
+    {:fire_actions, [
+      {:switch_mode, :normal},
+      {KommandBuffer, :hide}
+    ]}
+  end
+
+  def keymap(%RadixState{mode: :insert}, @escape_key) do
     {:fire_action, {:switch_mode, :normal}}
   end
 
@@ -188,7 +196,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   and not is_nil(active_buf) do
     #TODO maybe we get cursor 1 coords first, and then can move cursor directly
     #     to the new spot, and use that as the input
-    {:fire_multiple_actions, [
+    {:fire_actions, [
         # update the buffer text
         {:modify_buffer, %{
             buffer: active_buf,

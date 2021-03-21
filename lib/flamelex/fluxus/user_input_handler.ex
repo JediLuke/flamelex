@@ -182,7 +182,7 @@ defmodule Flamelex.Fluxus.UserInputHandler do
           :ok
       {:fire_action, a} ->
           Flamelex.Fluxus.fire_action(a)
-      {:fire_multiple_actions, action_list} when is_list(action_list) and length(action_list) > 0 ->
+      {:fire_actions, action_list} when is_list(action_list) and length(action_list) > 0 ->
           action_list |> Enum.map(&Flamelex.Fluxus.fire_action/1)
       #TODO deprecate it, just have 1 pattern match for vim_lang here
       {:vim_lang, x, v} ->

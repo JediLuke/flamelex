@@ -1,14 +1,14 @@
-defmodule Flamelex.GUI.Utilities.ControlHelper do
+defmodule Flamelex.GUI.Utilities.ControlHelper do #TODO this is DrawDefaultGUI now
   use Flamelex.ProjectAliases
+  require Logger
 
 
+  #TODO here we need to implement layers... so that menubar and command buffer get drawn on top
   def default_gui(%{viewport: vp}) do
     Draw.blank_graph()
     |> draw_transmutation_circle(vp)
-    # |> GUI.Component.CommandBuffer.draw(viewport: vp)
-    # |> GUI.Component.CommandBuffer.draw(state)
-    |> mount_menubar(vp)
-    |> mount_command_buffer(vp)
+    # |> mount_menubar(vp)
+    |> mount_kommand_buffer(vp)
   end
 
 
@@ -40,9 +40,10 @@ defmodule Flamelex.GUI.Utilities.ControlHelper do
             size:     {vp.width, Flamelex.GUI.Component.MenuBar.height()})})
   end
 
-  defp mount_command_buffer(graph, vp) do
+  defp mount_kommand_buffer(graph, vp) do
+    Logger.debug "mounting KommandBuffer..."
     graph
-    |> Flamelex.GUI.Component.CommandBuffer.mount(%{
+    |> Flamelex.GUI.Component.KommandBuffer.mount(%{
          ref: :kommand_buffer,
          frame: Frame.new(
             top_left: {0, vp.height - Flamelex.GUI.Component.MenuBar.height()},

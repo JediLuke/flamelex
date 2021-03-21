@@ -49,11 +49,11 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
       }),
       LiteraryQuote.construct(%{
         text: "Luke, you're going to find that many of the truths we cling to depend greatly on our own point of view.",
-        author: "Obiwan Kenobi - Jedi Knight"
+        author: "Obiwan Kenobi; Jedi Knight"
       }),
       LiteraryQuote.construct(%{
         text: "The force is what gives a Jedi their power. It's an energy field created by all living things. It surrounds us and penetrates us; it binds the galaxy together.",
-        author: "Obiwan Kenobi - Jedi Knight"
+        author: "Obiwan Kenobi; Jedi Knight"
       }),
       LiteraryQuote.construct(%{
         text: ~s(The human mind adjusts itself to a certain point of view, and those who have regarded nature from one angle, during a portion of their life, can adopt new ideas only with difficulty.),
@@ -84,7 +84,7 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
         author: "Harold Abelson"
       }),
       LiteraryQuote.construct(%{
-        text: ~s(We each have a pre-deteriminned amount of time, to accomplish certain spiritual goals... so it behooves us all to be attentive to our spiritual growth, for no time is wasted there),
+        text: ~s(We each have a pre-deterimined amount of time, to accomplish certain spiritual goals... so it behooves us all to be attentive to our spiritual growth, for no time is wasted there),
         author: "Dr. David R. Hawkins"
       }),
       LiteraryQuote.construct(%{

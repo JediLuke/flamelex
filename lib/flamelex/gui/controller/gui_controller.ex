@@ -7,7 +7,7 @@ defmodule Flamelex.GUI.Controller do
   use GenServer
   use Flamelex.ProjectAliases
   alias Flamelex.GUI.Structs.{GUIState, GUiComponentRef}
-  import Flamelex.GUI.Utilities.ControlHelper
+  alias Flamelex.GUI.Utilities.ControlHelper, as: DrawDefaultGUI
   require Logger
 
 
@@ -17,27 +17,6 @@ defmodule Flamelex.GUI.Controller do
 
     GenServer.start_link(__MODULE__, initial_state)
   end
-
-  # def action(a) do
-  #   GenServer.cast(__MODULE__, {:action, a})
-  # end
-
-  # def hide(x) do
-  #   GenServer.cast(__MODULE__, {:hide, x})
-  # end
-
-  # def refresh(buf) do
-  #   GenServer.cast(__MODULE__, {:refresh, buf})
-  # end
-
-  # def show_cmd_buf do
-  #   GenServer.cast(__MODULE__, {:show, :command_buffer})
-  # end
-
-  # def hide_cmd_buf do
-  #   GenServer.cast(__MODULE__, {:hide, :command_buffer})
-  # end
-
 
 
   ## GenServer callbacks
@@ -57,7 +36,7 @@ defmodule Flamelex.GUI.Controller do
     #      this process is trying to re-draw th GUI before the RootScene is ready
     :timer.sleep(50)
 
-    new_graph = default_gui(state)
+    new_graph = DrawDefaultGUI.default_gui(state)
     Flamelex.GUI.redraw(new_graph)
 
     {:noreply, %{state|graph: new_graph}}
@@ -70,14 +49,14 @@ defmodule Flamelex.GUI.Controller do
 
 
   # def handle_cast({:switch_mode, m}, state) do
-  #   # new_graph = default_gui(state)
+  #   # new_graph = DrawDefaultGUI.default_gui(state)
   #   # Flamelex.GUI.redraw(new_graph)
   #   Logger.error "Need to forward this on to each buffer"
   #   {:noreply, state}
   # end
 
   def handle_cast({:action, :reset}, state) do
-    new_graph = default_gui(state)
+    new_graph =DrawDefaultGUI.default_gui(state)
     Flamelex.GUI.redraw(new_graph)
     {:noreply, state}
   end
@@ -191,6 +170,7 @@ defmodule Flamelex.GUI.Controller do
   # end
 
   def handle_info({:switch_mode, _m}, state) do
+    IO.puts "CONTROLLER SWITCHING MODE !!"
     {:noreply, state}
   end
 

@@ -49,7 +49,12 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
     #               #REMINDER: Enum.reduce/2 expects the function to pass through the accumulator
     #               {new_graph, line_num+1}
     #           end)
+    #TODO here we should strip any lines which are too long
+    lines = Enum.map(lines, fn
+              %{text: t} = line -> %{line|text: remove_first_n_chars(t, 72)}
+            end)
     new_text = TextBufferUtils.join_lines_into_raw_text(lines)
+
 
     new_graph =
       graph
@@ -64,6 +69,12 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
     # graph |> Graph.modify(:text, &text(&1, new_text, fill: :black))
 
     new_graph # we return the graph as the last thing
+  end
+
+  # https://stackoverflow.com/questions/48929159/how-to-remove-the-firsts-n-characters-from-a-string-in-elixir/48937826#48937826
+  def remove_first_n_chars(s, n) do
+    {_, new_string} = s |> String.codepoints() |> Enum.split(n)
+    new_string |> Enum.join()
   end
 
   def re_render_lines(graph, %{lines: lines}) do

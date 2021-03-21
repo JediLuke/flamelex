@@ -44,12 +44,16 @@ defmodule Flamelex.Test.Buffers.BufferTest do
 
     contents_after_modify = Buffer.read b # read it again to get the update...
 
+    :timer.sleep(:timer.seconds(1)) #TODO remove, for now just trying this...
+
     assert contents_after_modify ==
              @content_a <> "Luke is the best! " <> @content_b
 
     Buffer.save b
 
     assert Flamelex.BufferManager.count_open_buffers == 1
+
+    # Buffer.modify(Buffer.active_buffer(), {:insert, Memex.random_quote().text, {:cursor, 1}})
 
     Buffer.close b
 

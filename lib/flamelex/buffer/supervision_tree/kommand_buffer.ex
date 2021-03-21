@@ -5,6 +5,10 @@ defmodule Flamelex.Buffer.KommandBuffer do
   The KommandBuffer is special - other buffers hold & manipulate data,
   and so does the command buffer, but this data can be actioned upon to
   activate functions, achieve GUI changes etc.
+
+  The GUI component for the KommandBuffer is drawn as part of the Default
+  scene. GUIController creates the Default GUI immediately after boot &
+  re-draws - so that's how the KommandBuffer GUI component gets drawn.
   """
   use Flamelex.BufferBehaviour
 
@@ -21,6 +25,24 @@ defmodule Flamelex.Buffer.KommandBuffer do
 
   def handle_cast(:show, state) do
     IO.puts "if this works, we hit the KommandBuffer process!!"
+
+    #TODO this should be checking if the process exists
+    {:gui_component, KommandBuffer}
+    |> ProcessRegistry.find!()
+    |> GenServer.cast(:show)
+
+    {:noreply, state}
+  end
+
+
+
+  def handle_cast(:hide, state) do
+    IO.puts "if this works, we hit the KommandBuffer process!!"
+
+    #TODO this should be checking if the process exists
+    {:gui_component, KommandBuffer}
+    |> ProcessRegistry.find!()
+    |> GenServer.cast(:hide)
 
     {:noreply, state}
   end

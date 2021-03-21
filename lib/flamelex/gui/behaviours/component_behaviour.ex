@@ -20,30 +20,14 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       use Scenic.Component
 
 
-      alias __MODULE__ #NOTE: This is just for convenience inside each module
       alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
       alias Flamelex.GUI.Utilities.Draw
       alias Flamelex.Utilities.ProcessRegistry
 
 
-      #NOTE: In our case, we always want a Component to be passed in a %Frame{}
-      #      so we don't need specific ones, each Component implements them
-      #      the same way. Also all components need a `ref`
-      @impl Scenic.Component
-      def verify(%{
-        ref: _r,                # the `ref` refers back to the Buffer that this GUI.Component is for, e.g. {:buffer, {:file, "README.md"}}
-        frame: %Frame{} = _f    # the %Frame{} which defines this GUI.Component
-      } = params) do
-        {:ok, params}
-      end
-      def verify(_else), do: :invalid_data
-
-      @impl Scenic.Component
-      def info(_data), do: ~s(Invalid data)
-
-
-      #NOTE: The following functions are common to all Flamelex.GUI.Components
-      #      and they can share the same implementation, so we include them here
+      #NOTE:
+      # The following functions are common to all Flamelex.GUI.Components
+      # and they can share the same implementation, so we include them here.
 
 
       @doc """
@@ -56,9 +40,25 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       end
 
 
+      #NOTE:
+      # In our case, we always want a Component to be passed in a %Frame{}
+      # so we don't need specific ones, each Component implements them
+      # the same way. Also all components need a `ref`
+      @impl Scenic.Component
+      def verify(%{
+        ref: _r,                # the `ref` refers back to the Buffer that this GUI.Component is for, e.g. {:buffer, {:file, "README.md"}}
+        frame: %Frame{} = _f    # the %Frame{} which defines this GUI.Component
+      } = params) do
+        {:ok, params}
+      end
+      def verify(_else), do: :invalid_data
+      @impl Scenic.Component
+      def info(_data), do: ~s(Invalid data)
+
+
       @impl Scenic.Scene
       def init(%{frame: %Frame{} = frame} = params, _scenic_opts) do
-        register_self(params)
+        {:rego_tag, _tag} = register_self(params)
 
         #NOTE: This little trick is so that `custom_init_logic` is optional
         params =
@@ -67,6 +67,8 @@ defmodule Flamelex.GUI.ComponentBehaviour do
           else
             params
           end
+
+        true = Flamelex.Utils.PubSub.subscribe(topic: :gui_event_bus)
 
         graph =
           #TODO change this to just render/1 eventually...
@@ -83,56 +85,27 @@ defmodule Flamelex.GUI.ComponentBehaviour do
           if function_exported?(__MODULE__, :rego_tag, 1) do
             apply(__MODULE__, :rego_tag, [params])
           else
-            {:gui_component, ref}
+            {:gui_component, ref} #TODO {__MODULE__, ref}
           end
 
         #TODO search for if the process is already registered, if it is, engage recovery procedure
         #TODO this should be {:gui_component, frame.id}, or maybe other way around. It could also subscribe to the channel for this id
         ProcessRegistry.register(tag)
+        {:rego_tag, tag}
       end
-
-      @doc """
-      All %Flamelex.GUI.Component{}'s are triggered by being cast an %Action{}. #TODO
-
-      This function allows for nice API, e.g. MenuBar.action({:click, button})
-      """
-      # def action(a) do
-      #   #TODO: We need some way of knowing that MenuBar has indeed been mounted
-      #   #      somewhere, or else the messages just go into the void (use call instead of cast?)
-
-      #   #REMINDER: `__MODULE__` will be the module which "uses" this macro
-      #   GenServer.cast(__MODULE__, {:action, a})
-      # end
-
-      # @impl Scenic.Scene
-      # def handle_cast({:action, action}, {%Scenic.Graph{} = graph, state}) do
-      #   case handle_action({graph, state}, action) do
-      #     #TODO this is actually kinda stupid now...
-      #     :ignore_action
-      #       -> {:noreply, {graph, state}}
-      #     {:redraw_graph, %Scenic.Graph{} = new_graph}
-      #       -> {:noreply, {new_graph, state}, push: new_graph}
-      #     # {:update_frame, %Frame{} = new_frame}
-      #     #   -> {:noreply, {graph, new_frame}}
-      #     {:update_graph_and_state, {%Scenic.Graph{} = new_graph, new_state}}
-      #       -> {:noreply, {new_graph, new_state}, push: new_graph}
-      #     deprecated_return ->
-      #       deprecated_return
-      #   end
-      # end
     end
   end
 
 
-  @doc """
-  This is called when the scene first renders. It appends the Scene (which
-  is represented by Scenic as a reference to a `Scenic.Component` process,
-  see: #TODO-[fetch link] for more info)
+  # @doc """
+  # This is called when the scene first renders. It appends the Scene (which
+  # is represented by Scenic as a reference to a `Scenic.Component` process,
+  # see: #TODO-[fetch link] for more info)
 
-  We have actually implemented this in the __using__ macro, but my heart
-  tells me to leave this here anyway... maybe it'll save us some pain later.
-  """
-  @callback mount(%Scenic.Graph{}, map()) :: %Scenic.Graph{}
+  # We have actually implemented this in the __using__ macro, but my heart
+  # tells me to leave this here anyway... maybe it'll save us some pain later.
+  # """
+  # @callback mount(%Scenic.Graph{}, map()) :: %Scenic.Graph{}
 
   @doc """
   We have a nice little method for initializing all components, but
@@ -148,37 +121,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
   %Frame{} datastructure. This function takes in that Component definition
   and returns a %Scenic.Graph{} which can be drawn by Scenic.
   """
+  #TODO just make this a map & pass both in the map...
   @callback render(%Flamelex.GUI.Structs.Frame{}, map()) :: %Scenic.Graph{}
 
-  @doc """
-  This function may be implemented as many times as necessary, to handle
-  any variety of action. You send Components actions by calling them, e.g.char()
-
-  MenuBar.action({:click, button})
-
-  Then, the Component.MenuBar must implement a corresponding handle_action
-
-  ```
-  def handle_action({:click, button}) do
-    #   .... whatever
-    #   ....
-  ```
-
-  What happens if we don't have a corresponding handle_action? There are
-  2 cases... (if you do nothing, then you will get the second case):
-
-    1) You did implement a default handler
-
-    2) You did not implement a default handler
-
-    You are going to crash & see errors #TODO confirm this
-
-    #TODO I want to implement a default catcher, so that rather than crashing
-    # we could ignore it, but that looks too annoying for now, see: https://elixirforum.com/t/how-to-inject-macro-functions-at-end-of-module/19434
-
-  """
-  #NOTE: Phoenix.LiveView uses this callback to handle events. I want to
-  #      be compatible with that idea... I do effectively the same thing,
-  #      but I call the concept "actions".
-  @callback handle_action(tuple(), any()) :: atom() | tuple() #TODO this type def could definitely be cleaned up...
 end

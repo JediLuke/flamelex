@@ -8,6 +8,8 @@ defmodule Flamelex.GUI.Component.TextBox do
   alias Flamelex.GUI.Component.TextCursor
   require Logger
 
+  #TODO render line numbers
+
 
   def rego_tag(%{ref: buffer}) do
     # {__MODULE__, buffer}
@@ -17,7 +19,7 @@ defmodule Flamelex.GUI.Component.TextBox do
   @impl Flamelex.GUI.ComponentBehaviour
   def custom_init_logic(%{frame: %Frame{} = f} = params) do
 
-    Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
+    # Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
 
     params |> Map.merge(%{
       draw_footer?: true,

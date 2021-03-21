@@ -24,7 +24,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
 
     GenServer.cast(self(), :start_blink)
 
-    Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
+    # Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
 
     starting_coords = CursorUtils.calc_starting_coordinates(params.frame)
 
