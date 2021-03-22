@@ -11,7 +11,7 @@ defmodule Flamelex.BufferBehaviour do
       #          must implement all the callbacks defined in *this* module,
       #          `Flamelex.GUI.ComponentBehaviour`, or else a warning is raised.
       @behaviour Flamelex.BufferBehaviour
-      use GenServer
+      use GenServer, restart: :transient
       use Flamelex.ProjectAliases
 
 

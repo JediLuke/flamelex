@@ -229,6 +229,16 @@ defmodule Flamelex.GUI.Component.TextBox do
   #   :ignore_action
   # end
 
+  #NOTE: The below is deprecated... the answer (I think, still need to
+  # manually test it) was indeed to go up a level, to where we originally
+  # mounted the scenic component into the graph, and delete it there
+  # def handle_cast(:close, state) do
+  #   #TODO how can I shut down a Scenic process? They keep getting restarted...
+  #   # do I need to remove it from the actual upper graph? Even then, it's tough
+  #   {:stop, :normal, state}
+  # end
+
+
 
   defp we_are_drawing_a_footer_bar?(%{draw_footer?: df?}), do: df?
   defp we_are_drawing_a_footer_bar?(_else), do: false

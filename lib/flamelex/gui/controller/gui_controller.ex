@@ -72,6 +72,19 @@ defmodule Flamelex.GUI.Controller do
     {:noreply, gui_state}
   end
 
+  def handle_cast({:close, buffer_tag}, gui_state) do
+    IO.puts "GUI CONTROLLER CLOSING A BUFFER"
+    new_graph =
+      gui_state.graph
+      |> IO.inspect(label: "BEFORE")
+      |> Scenic.Graph.delete({:textbox, buffer_tag}) #TODO here we want to remove the open buffer TextBox component, when the buffer closes, so the GUI changes
+      |> IO.inspect(label: "AFTER")
+
+    Flamelex.GUI.redraw(new_graph)
+
+    {:noreply, %{gui_state|graph: new_graph}, push: new_graph}
+  end
+
 
 
 
@@ -100,7 +113,7 @@ defmodule Flamelex.GUI.Controller do
     frame = Frame.new(gui_state, buf_state)
     # data  = Buffer.read(buf)
 
-    gui_component_process_alive? = false
+    gui_component_process_alive? = false #TODO
     if gui_component_process_alive? do
       raise "well that's a surprise"
     else
@@ -109,7 +122,7 @@ defmodule Flamelex.GUI.Controller do
         |> Flamelex.GUI.Component.TextBox.mount(
              buf_state
              |> Map.merge(%{
-                  ref: buf_state.rego_tag,
+                  ref: buf_state.rego_tag, #NOTE: this becomes the id of this Scenic primitive
                   frame: frame,
                   mode: :normal
              }))
@@ -120,17 +133,19 @@ defmodule Flamelex.GUI.Controller do
   end
 
 
+  def handle_cast({:hide, _buf}, state) do
 
-  # def handle_cast({:hide, :command_buffer}, state) do
+    raise "cant hide yet but we should be able to!"
+    # new_graph =
+    #   state.graph
+    #   |> Scenic.Graph.modify(
+    #                     KommandBuffer,
+    #                     &Scenic.Primitives.update_opts(&1, hidden: true))
 
-  #   new_graph =
-  #     state.graph
-  #     |> Scenic.Graph.modify(:command_buffer, &update_opts(&1, hidden: true))
+    # Flamelex.GUI.RootScene.redraw(new_graph)
 
-  #   Flamelex.GUI.RootScene.redraw(new_graph)
-
-  #   {:noreply, %{state|graph: new_graph}}
-  # end
+    # {:noreply, %{state|graph: new_graph}}
+  end
 
   # def handle_cast({:show, {:buffer, name} = buf}, state) do #TODO this is implicitely assuming we want a text buffer
 

@@ -84,6 +84,11 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
           |> Map.replace!(:unsaved_changes?, true)}
   end
 
+  def cast_gui_component(%{rego_tag: tag}, msg) do
+    ProcessRegistry.find!({:gui_component, tag}) #TODO this should be a GUI.Component.TextBox, not, :gui_component !!
+    |> GenServer.cast(msg)
+  end
+
   # #   new_graph =
   # #     graph |> Graph.modify(:buffer_text, &text(&1, @empty_command_buffer_text_prompt, fill: :dark_grey))
   # #     #TODO render a helper string when the buffer is empty

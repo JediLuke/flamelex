@@ -36,11 +36,14 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do #TODO rename module
 
   # modifying buffers...
   def async_reduce(%{action: {:modify_buffer, specifics}}) do
-    IO.puts "OK, we got to 1 - async reduce modifying buffer"
     %{buffer: buffer, details: details} = specifics
 
     ProcessRegistry.find!(buffer)
     |> GenServer.cast({:modify_buffer, details})
+  end
+
+  def async_reduce(%{action: {:close_buffer, buffer}}) do
+    GenServer.cast(Flamelex.BufferManager, {:close, buffer})
   end
 
 

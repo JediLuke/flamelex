@@ -93,25 +93,36 @@ defmodule Flamelex.BufferManager do
   end
 
   # #TODO need to give each buffer a new number...
-  # def handle_call({:close_buffer, buf}, _from, state) do
-  #   if state |> Enum.member?(buf) do
-  #     #TODO this needs cleanup...
-  #     case ProcessRegistry.find_buffer(buf) do
-  #       pid when is_pid(pid) ->
-  #           pid |> GenServer.cast(:close)
-  #           new_state = state |> Enum.reject(& &1 == buf)
-  #           {:reply, :ok, new_state}
-  #       {:ok, pid} ->
-  #           pid |> GenServer.cast(:close)
-  #           new_state = state |> Enum.reject(& &1 == buf)
-  #           {:reply, :ok, new_state}
-  #       {:error, reason} ->
-  #           {:reply, {:error, "not an open buffer: " <> reason}, state}
-  #     end
-  #   else
-  #     {:reply, {:error, "not an open buffer"}, state}
-  #   end
-  # end
+  def handle_cast({:close, buf}, state) do
+    # if state |> Enum.member?(buf) do
+    #   #TODO this needs cleanup...
+    #   case ProcessRegistry.find_buffer(buf) do
+    #     pid when is_pid(pid) ->
+    #         pid |> GenServer.cast(:close)
+    #         new_state = state |> Enum.reject(& &1 == buf)
+    #         {:reply, :ok, new_state}
+    #     {:ok, pid} ->
+    #         pid |> GenServer.cast(:close)
+    #         new_state = state |> Enum.reject(& &1 == buf)
+    #         {:reply, :ok, new_state}
+    #     {:error, reason} ->
+    #         {:reply, {:error, "not an open buffer: " <> reason}, state}
+    #   end
+    # else
+    #   {:reply, {:error, "not an open buffer"}, state}
+    # end
+
+    #TODO remove from the list of buffers, and remove from active buffer if that was the active buffer
+
+    #TODO talk to the other process & say hey close plz
+    IO.puts "BUFMGR CLOSING A BUF"
+
+    ProcessRegistry.find!(buf)
+    |> GenServer.cast(:close)
+
+    {:noreply, state}
+
+  end
 
   # @impl true
   # def handle_info({:active_buffer, :switch_mode, _new_mode}, %{active_buffer: nil} = state) do

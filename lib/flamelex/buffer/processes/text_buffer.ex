@@ -18,7 +18,7 @@ defmodule Flamelex.Buffer.Text do
     init_state =
       params |> Map.merge(%{
         data: file_contents,    # the raw data
-        unsaved_changes?: nil,  # a flag to say if we have unsaved changes
+        unsaved_changes?: false,  # a flag to say if we have unsaved changes
         # time_opened #TODO
         cursors: [%{line: 1, col: 1}],
         lines: file_contents |> TextBufferUtils.parse_raw_text_into_lines()
@@ -42,18 +42,28 @@ defmodule Flamelex.Buffer.Text do
 
   @impl GenServer
   def handle_call(:save, _from, %{source: {:file, _filepath}} = state) do
-    IO.puts "GOT THE CALL"
     {:ok, new_state} = TextBufferUtils.save(state)
     {:reply, :ok, new_state}
   end
 
-  def handle_cast(:close, state) do
-    if state.unsaved_changes? do
-      raise "need to be able to interact with the user here I guess..."
-    else
-      Logger.warn "Closing a buffer..."
-      {:stop, :normal, state}
-    end
+  def handle_cast(:close, %{unsaved_changes?: true} = state) do
+    #TODO need to raise a bigger alarm here
+    Logger.warn "unable to save buffer: #{inspect state.rego_tag}, as it contains unsaved changes."
+    {:noreply, state}
+  end
+
+  def handle_cast(:close, %{unsaved_changes?: false} = state) do
+    # {:buffer, source} = state.rego_tag
+    # Logger.warn "Closing a buffer... #{inspect source}"
+    # ModifyHelper.cast_gui_component(source, :close)
+    IO.puts "#TODO need to actually close the buffer - close the FIle?"
+
+    # ProcessRegistry.find!({:gui_component, state.rego_tag}) #TODO this should be a GUI.Component.TextBox, not, :gui_component !!
+    # |> GenServer.cast(:close)
+
+    GenServer.cast(Flamelex.GUI.Controller, {:close, state.rego_tag})
+
+    {:stop, :normal, state}
   end
 
   def handle_cast({:move_cursor, instructions}, state) do
@@ -63,15 +73,16 @@ defmodule Flamelex.Buffer.Text do
   end
 
   #TODO remove this eventually, just use :modify
-  def handle_cast({:modify_buffer, specifics}, state) do
-    ModifyHelper.start_modification_task(state, specifics)
-    {:noreply, state}
-  end
+  # def handle_cast({:modify_buffer, specifics}, state) do
+  #   ModifyHelper.start_modification_task(state, specifics)
+  #   {:noreply, state}
+  # end
 
   def handle_cast({:modify, details}, state) do
     ModifyHelper.start_modification_task(state, details)
     {:noreply, state}
   end
+
 
   # when a Task completes, if successful, it will most likely callback -
   # so we update the state of the Buffer, & trigger a GUI update
@@ -88,15 +99,11 @@ defmodule Flamelex.Buffer.Text do
     {:noreply, new_state}
   end
 
-  # def handle_cast({:state_update, :no_gui_change, new_state}, %{rego_tag: buffer_rego_tag = {:buffer, _details}}) do
-  #   {:noreply, new_state}
-  # end
 
   # spin up a new process to do the handling...
   defp start_sub_task(state, module, function, args) do
   Task.Supervisor.start_child(
-      # start the task under the Task.Supervisor specific to this Buffer
-      find_supervisor_pid(state),
+      find_supervisor_pid(state), # start the task under the Task.Supervisor specific to this Buffer
           module,
           function,
           [state, args])
