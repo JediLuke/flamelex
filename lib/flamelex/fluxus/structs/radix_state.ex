@@ -6,6 +6,7 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
   @max_keystroke_history_limit 50
   @max_action_history_limit 50
 
+  #TODO it should be possible to use the action/keystroke history to record macros
 
   defstruct [
     mode:                 :normal,    # The input mode

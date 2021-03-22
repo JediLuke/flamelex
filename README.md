@@ -10,83 +10,35 @@ archaelogical reasons - once `v0.2.7-alfonz` has been officially released,
 the default branch will revert to `trunk`, and development will move over
 to the `jediluke/develop` branch.
 
-## TODOs
-
-* update instructions about loading in a Memex
-* show popup to new users
-
 # Flamelex
 
 A combination text-editor & memex written in Elixir.
 
 Flamelex is a self-contained Elixir app, build upon the Elixir GUI library
 `Scenic`. The main inspiration is emacs, especially the idea of having a
-REPL that can be personalized. The text-editing experience is also inspired
-by Vim.
+REPL that can be personalized. The text-editing experience is a ViM derivation,
+so as one programmer has summarized it, "Flamelex is a Spacemacs clone in Elixir,
+with built-in TiddlyWiki"
 
 ## Installing Flamelex
 
-### Install Scenic dependencies
+### clone the repo & install dependencies
 
-As mentioned, we need Scenic. Scenic requires gfx drivers. The most up
-to date information on how to install Scenic for your platform can be found
-in the [Scenic documentation](https://hexdocs.pm/scenic/install_dependencies.html)
-
-## Getting Started
-
-### Operating Flamelex via the IEx console
-
-From the repository, simply start the program in `dev` mode, the same way
-you would start basically any Elixir program using Mix:
+Simply navigate to a directory you would like to put a new git project.
 
 ```
+git clone https://github.com/JediLuke/flamelex.git
+cd flamelex
+mix deps.get
 iex -S mix run
 ```
 
-This gives you an IEx session, and should have displayed the default
-Flamelex window showing a "transmutation circle" and a version number:
+### Install Scenic dependencies
 
-#TODO insert screenshot
+The GUI in Flamelex is built with Scenic. Scenic requires gfx drivers.
+The most up to date information on how to install Scenic for your platform
+can be found in the [Scenic documentation](https://hexdocs.pm/scenic/install_dependencies.html)
 
-Now, of course Flamelex responds to keypresses - it is a text-editor after
-all. But to get a feel for how the software works, we are going to start
-by just running some more commands in IEx. Flamelex was designed first and
-foremost as a GUI extension of the Elixer CLI, IEx, so understanding that
-under the hood, everything is just functions, is one of the key stepping
-stones to becoming proficient with Flamelex.
-
-Go back to the IEx terminal you used to start flamelex, and type:
-
-```
-Buffer.open!("README.md")
-```
-
-You should see a new Buffer open - if you are coming from a Vim or Emacs
-background, Buffers are exactly what you expect them to be - a window into
-a data-stream, usually a text-file, which lets you inspect and modify the
-contents of that data stream (or just, Buffer == file, for the simpletons).
-
-#TODO Transmute.main_circle()
-
-All editing & processing can be achieved via IEx, including drawing graphics
-and all edits of any text, so you can kind of think of it as a shell with
-better graphics/feedback - but, we do go a little bit further -> we also
-allow inputs into the GUI (mouse clicks / keypresses / etc) to be collected
-and then transformed into function calls.
-
-#TODO example
-
-All inputs in Flamelex are simply mappings. We can also use memory, to get
-effects such as a leader key. You can press space + c to shift the color
-of the transmutation circle, or even to speed it up!
-
-#TODO experiment with making a flamelex alias
-
-### TL:DR; Up and Running in 5 minutes
-
-The first window is just a blank window showing the background. To do
-something useful, we need to open a `Buffer`. To start with, we shall use
-the IE
 
 ### Adjusting the window size
 
@@ -104,7 +56,49 @@ adjusting the size of the window may make things render stragely. In the
 future, we want to look to incorporating the [Layout-o-Matic!](https://github.com/BWheatie/scenic_layout_o_matic)
 library to get flexible sizes/layouts.
 
-### Driving Flamelex via IEx
+## Beginners guide to using Flamelex
+
+### How to start/open/run Flamelex
+
+From the repository, simply start the program in `dev` mode, the same way
+you would start basically any Elixir program using Mix:
+
+```
+iex -S mix run
+```
+
+This gives you an IEx session, and should have displayed the default
+Flamelex window showing a "transmutation circle" and a version number: #TODO
+
+### Opening a text file (through the IEx console)
+
+We are going to start out by explaining the way to drive Flamelex, via
+it's Elixir API - if you started Flamelex according to the instructions,
+it is now running locally in a `dev` Mix environment. This is how flamelex
+is intended to operate - with an open IEx shell, where a user can enter
+commands, and an open GUI, to give the user feedback and accept direct input.
+Yes, you can interact with the flamelex GUI directly (the default editing
+experience is similar to Vim/Emacs); but to get a feel for how everything
+really works, let's start by using the Flamelex user-API modules in a
+running IEx console session.
+
+#TODO would be cool to have some kind of test function that just prints
+# the current version back to the user, so they can verify the install worked & all is OK up to this point
+
+Go back to the IEx terminal you used to start flamelex, and type:
+
+```
+Buffer.open!("README.md")
+```
+
+You should see a new Buffer open - if you are coming from a Vim or Emacs
+background, Buffers are exactly what you expect them to be - a window into
+a data-stream, usually a text-file, which lets you inspect and modify the
+contents of that data stream (or just, Buffer == file, for my fellow simpletons).
+
+
+
+<!-- ### Driving Flamelex via IEx
 
 Flamelex is entirely based upon calling Elixir functions. We do some fancy
 magic to make it seem like clicking a button actually performs the action
@@ -125,40 +119,191 @@ Buffer.list()
 
 #TODO Frame.move(1, left: {10, :px}) # move first frame left 10 pixels
 
+``` -->
+
+
+### Editing an open text file (through the IEx console)
+
+At this point in the tutorial, we have successfully opened a text file
+(which is the same thing as saying, we have opened a text buffer), which
+happens to be the README.md file for this project. You can see a flashing
+cursor in the top left.
+
+Let's say you want to move the cursor. If you know ViM, your instinct might
+be to reach for HJKL - and you are correct! But, for a short time, forget
+that - we have just a few more functions to run in the IEx console, to drive
+home the point that in flamelex, *everything is a function call*
+
+```
+Buffer.active_buffer()
+```
+#TODO show correct ouput here
+
+At this point in the tutorial, we have already opened a buffer (the README
+file for flamelex). So calling `Buffer.active_buffer/0` returned a reference
+to that buffer, because, that is the *active buffer* - being the active
+buffer just means that it is the one we are interacting with at the moment,
+certain commands are (by default) applied to whichever buffer is currently
+designated as the *active buffer*.
+
+```
+Buffer.list()
 ```
 
-#### using the API modules
+Should show a list of buffers, exactly 1. You can open any other file using
+the following function:
 
-The way it works is this - users should only need to use the API to achieve
-what they want to do. If this isn't the case, then adding this functionality
-is not difficult, but it needs to be added in a way that's consistent with
-how flamelex works.
+#TODO WARNING - DONT DO THIS... ITS EXPERIMENTAL... IT MIGHT CRASH !!!
 
-The API can call directly into the underlying sub-tree for information
-requests, e.g. Buffer.list calls BufferManager, but to trigger actions,
-it should only call `Flamelex.Fluxus.fire_action/2`
+```
+Buffer.open("/your/file/here.txt")
+```
 
-Then, these actions will go through Fluxus and eventually propagate through
-to the reducer. Then, in the reducers, *that's* where you can call things
-like Buffer.move_cursor, etc.
+The buffer you just opened will now become the `active buffer`. You can
+assign this Buffer reference to a variable, as you can any other piece of
+primitive data in Elixir:
 
-The unguarded nature of Elixir modules is both a strength and a weakness,
-and overall I prefer to be given the freedom to build amazing things with
-some gotchas, rather than be forced to jump through unnecessary hoops that
-just get in the way once I know what I'm doing - but this is a gotcha for
-adding code to Flamelex, you *must* go through the designated flows. If you
-start calling things like Buffer.move_cursor(2), it will probably work,
-but your whole state tree might get out of whack...
+```
+b = Buffer.active_buffer()
+```
 
-When developing or changing the functionality of the API, remember to respect
-the rest of Flamelex as a *seperate system*, so we can't just reach into
-the internals (even though Elixir would let us do that), because that's
-going to start screwing things up! e.g. to implement `Buffer.open`, we
-must never call up BufferManager and directly request the Buffer be opened -
-this breaks a whole chain of checks & event-triggers, starting way back
-up at FluxusRadix. We don't just directly affect Flamelex, we instead
-use the mechanism of firing actions, which correctly processes the input
-and propagates it through the internal messaging infrastructure of Flamelex.
+Now to modify the buffer, use another function in the `Flamelex.API.Buffer`
+module, `modify/x`
+
+```
+b = Buffer.active_buffer()
+Buffer.modify(b, {:insert, "“The future depends on what you do today.”", 3})
+```
+
+This will insert some text (in this case, a quote), 3 characters (because that
+is the number we passed in as a parameter) of text from the beginning of
+the buffer. There are other, usually more convenient ways to tell flamelex
+where you want to modify a text buffer, e.g.
+
+```
+text_quote = Memex.random_quote().text
+Buffer.active_buffer()
+|> Buffer.modify({:insert, text_quote, {:cursor, 1}})
+```
+
+This will insert the text at the position of the first cursor. So if you
+want to move the cursor around:
+
+```
+Buffer.active_buffer()
+|> Buffer.move_cursor(1, {:down, 2, :lines})
+|> Buffer.move_cursor(1, {:right, 5, :columns})
+|> Buffer.modify({:insert, Memex.My.first_name(), {:cursor, 1}})
+```
+
+If you are wondering what that `Memex.My` stuff is all about... don't
+worry, that's just a sneak peak. For now, just know that this function
+returns a string of text, which should have just been inserted at the
+position of cursor 1 in the active buffer.
+
+Flamelex was implemented to be an API-driven application, right from the
+initial commit. Every action you can take in flamelex is also possible
+via the IEx console. When you type the letter "e" in :insert mode, that
+is simply mapped to the function `Buffer.modify(:insert, "e")`, and if you
+were of a particular mood that you didn't want to type your text "directly
+in" to the GUI (the so called WYSIWYG experience), but instead wanted to
+do all your editing by calling the specific functions in the IEx console,
+that would be totally possible - and hey, it's your life, I say do what
+makes you happy! Let me know how it goes.
+
+In the next section, we shall show the user some commands they can initiate
+via keystroke, when the software is in a specific input mode. However it
+is important to remember that behind the scenes, everything is just a
+combination of function calls, sending messages to stateful processes. How
+that mapping is defined, is covered next up.
+
+
+
+
+
+
+<!-- 
+## Basic text editing
+
+Before we start down this journey, let's take a moment to stop and reflect
+one last time on how under the hood, all things that happen in flamelex
+are just function calls - we are just interacting with the REPL (and
+sometimes storing some stuff on some disk/network), and the only way we
+do that is via the IEx console.
+
+So then, why do we have a GUI? Well obviously a GUI organizes the information
+in a way which is useful for human brains - and those same brains, when
+they want to take an action (like, for example, putting a new letter on
+the end of a word), would rather achieve that action by pressing a single
+button which they have already mentally mapped to that action occuring,
+rather than going back to the command line and typing in a more thorough
+specification (e.g. `Buffer.modify(b, {:insert, "x"})`) #TODO
+
+In other text-editors, it seems that the specific sequence of button-presses
+required to achieve an action, seems to end up defining the entire editor.
+I have implemented a few defaults, based on my preferences & history of
+using text-editors, but I want to stress that in flamelex, what functions
+any particular keystroke or menu-button may take, is completely opaque -
+you can peek right on into the code, because *they're all just mappings
+to functions*. Hopefully, this will clear up a lot of previous confusion,
+and allow a greater ease of customizability for the end user.
+
+The directions given in this README only apply when the default GUI-keymappings
+are being used - if that is changed, these will obviously no longer work.
+
+How inputs get mapped to these functions is covered in this document -
+you don't have to understand how that works to use flamelex, but if you
+would like to know more, please refer to the section
+sub-titled: `Handling user input`
+
+### Opening files
+
+Either local, or via HTTP
+
+Ability to open & save files
+* extra points - able to open text-only webpages (requires using HTTP c-
+  lient to fetch raw text)
+
+### Making basic edits
+
+Ability to perform basic text editing (insertion / deletion / substitut-
+    ion)
+
+Buffer.modify(Buffer.active_buffer(), {:insert, Memex.random_quote().text, %{coords: {:cursor, 1}}}) -->
+
+
+
+
+
+
+
+
+
+
+### Editing an open text file (via the ViM key-mappings)
+
+Starting from the bottom left, you will see a box - this box tells you
+what *mode* you are in - at this point in the tutorial, you should be
+in _normal_ mode. If you know the commands for ViM in normal mode, you
+should feel right at home - press `i` to enter `:insert` mode, and away you
+go.
+
+If you aren't familiar with ViM... this, sorry, but this probably isn't
+your text editor at this point in time.
+
+Here I take another moment to yet again explain that  all inputs in
+Flamelex are simply mappings. For the ViM commands, the way it works is
+the input is collected and forwarded to a specific process `ViMServer`
+which knows the input languag of ViM, remembers the last few keystrokes,
+and translates that input language into calls using the Flamelex API -
+but that's all it's doing, calling the same functions you called before
+in the IEx console - you could create your entire own input mapping (or
+go rip off kakoune or emacs or whoever you want), and without too much
+effort, you could get it working in flamelex because the `functionality`
+is de-coupled from the `UI`
+
+To save the file, you can use the leader binding `<space>s` or go back
+to the IEx console and type `Buffer.save()`
 
 ### The Flamelex KommandBuffer #TODO
 
@@ -220,11 +365,6 @@ of how keymappings are achieved.
 #TODO
 example:
 
-```
-Buffer.open() # becomes the active buffer by default
-Buffer.active_buffer() # fetches a reference to the active buffer
-|> Buffer.modify(insert: Memex.random_quote(), at: cursor(1))
-```
 
 ### The Flamelex MenuBar #TODO
 
@@ -233,72 +373,39 @@ link buttons in the MenuBar directly to modules/functions inside flamelex,
 so clicking one will just call that function, probably in it's own MenuBar
 supervision tree.
 
-## Basic text editing
+#### using the API modules
 
-Before we start down this journey, let's take a moment to stop and reflect
-one last time on how under the hood, all things that happen in flamelex
-are just function calls - we are just interacting with the REPL (and
-sometimes storing some stuff on some disk/network), and the only way we
-do that is via the IEx console.
+The way it works is this - users should only need to use the API to achieve
+what they want to do. If this isn't the case, then adding this functionality
+is not difficult, but it needs to be added in a way that's consistent with
+how flamelex works.
 
-So then, why do we have a GUI? Well obviously a GUI organizes the information
-in a way which is useful for human brains - and those same brains, when
-they want to take an action (like, for example, putting a new letter on
-the end of a word), would rather achieve that action by pressing a single
-button which they have already mentally mapped to that action occuring,
-rather than going back to the command line and typing in a more thorough
-specification (e.g. `Buffer.modify(b, {:insert, "x"})`) #TODO
+The API can call directly into the underlying sub-tree for information
+requests, e.g. Buffer.list calls BufferManager, but to trigger actions,
+it should only call `Flamelex.Fluxus.fire_action/2`
 
-In other text-editors, it seems that the specific sequence of button-presses
-required to achieve an action, seems to end up defining the entire editor.
-I have implemented a few defaults, based on my preferences & history of
-using text-editors, but I want to stress that in flamelex, what functions
-any particular keystroke or menu-button may take, is completely opaque -
-you can peek right on into the code, because *they're all just mappings
-to functions*. Hopefully, this will clear up a lot of previous confusion,
-and allow a greater ease of customizability for the end user.
+Then, these actions will go through Fluxus and eventually propagate through
+to the reducer. Then, in the reducers, *that's* where you can call things
+like Buffer.move_cursor, etc.
 
-The directions given in this README only apply when the default GUI-keymappings
-are being used - if that is changed, these will obviously no longer work.
+The unguarded nature of Elixir modules is both a strength and a weakness,
+and overall I prefer to be given the freedom to build amazing things with
+some gotchas, rather than be forced to jump through unnecessary hoops that
+just get in the way once I know what I'm doing - but this is a gotcha for
+adding code to Flamelex, you *must* go through the designated flows. If you
+start calling things like Buffer.move_cursor(2), it will probably work,
+but your whole state tree might get out of whack...
 
-How inputs get mapped to these functions is covered in this document -
-you don't have to understand how that works to use flamelex, but if you
-would like to know more, please refer to the section
-sub-titled: `Handling user input`
+When developing or changing the functionality of the API, remember to respect
+the rest of Flamelex as a *seperate system*, so we can't just reach into
+the internals (even though Elixir would let us do that), because that's
+going to start screwing things up! e.g. to implement `Buffer.open`, we
+must never call up BufferManager and directly request the Buffer be opened -
+this breaks a whole chain of checks & event-triggers, starting way back
+up at FluxusRadix. We don't just directly affect Flamelex, we instead
+use the mechanism of firing actions, which correctly processes the input
+and propagates it through the internal messaging infrastructure of Flamelex.
 
-### Opening files
-
-Either local, or via HTTP
-
-Ability to open & save files
-* extra points - able to open text-only webpages (requires using HTTP c-
-  lient to fetch raw text)
-
-### Making basic edits
-
-Ability to perform basic text editing (insertion / deletion / substitut-
-    ion)
-
-Buffer.modify(Buffer.active_buffer(), {:insert, Memex.random_quote().text, %{coords: {:cursor, 1}}})
-
-### Saving files
-
-## Command mode
-
-Ability to execute commands via IEx and/or the command buffer
-
-
-Ability to Load "environments" (saved config/data-store/knowledge-base/
-    organizer)
-
-### Recording macros
-
-When we press a key, we record it - but when it comes to actions, we don't
-record keystrokes. When we record a macro, we store a list of all the
-functions that got called, and then we replay them.
-
-This is a great way of creating new functionality - we can construct programs
-easily this way, simply by doing the action.
 
 ## the Flamelex API
 
@@ -380,7 +487,7 @@ Some of my main goals are:
 * REPL driven for absolute programmability
 * modal-editing, but with inputs completely de-coupled from functionality
 
-## The flamelex architecture
+## The flamelex GUI architecture
 
 flamelex used the `flux` architecture - we hold a store of state, and
 use reducer functions, combined with actions/input (and they are capable

@@ -7,6 +7,9 @@ defmodule Flamelex.Application do
 
     IO.puts "#{__MODULE__} initializing..."
 
+    #TODO do we want to show a popup / println / anything to "new" users? (no environment detected)
+    # maybe show a popup about loading in a Memex environment? Maybe load in a sample one?
+
     start_gui? = true
 
     children =
