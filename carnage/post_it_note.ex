@@ -277,3 +277,17 @@
 #     {:noreply, new_state}
 #   end
 # end
+
+
+
+
+# THIS WAS IN THE ORIGINAL CommandBuffer
+
+
+
+#   describe "the command" do
+#     test "`note` - creates a new note"
+#     test "`restart` - restarts Franklin"
+#     test "`help` - opens help", do: flunk "not yet implemented."
+#     test "`reload GUI` - reloads the GUI"
+#   end

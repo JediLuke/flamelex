@@ -1,7 +1,12 @@
-defmodule Flamelex.API.KommandBuffer do
+defmodule Flamelex.API.Kommander do
   @moduledoc """
   This API module is the interface for all functionality relating to the
   KommandBuffer.
+
+  Note that it is called `Kommander` in order to distinguish it from the
+  actual KommandBuffer module - initially, this module was API.KommandBuffer,
+  but there was some confusion due to a double-use, especially when you
+  start to use module alias'... it's just better this way.
   """
 
 
@@ -10,6 +15,15 @@ defmodule Flamelex.API.KommandBuffer do
   """
   def show do
     Flamelex.Fluxus.fire_action({KommandBuffer, :show})
+  end
+
+
+  @doc """
+  Same as show/0 - open up (or, make visible) the KommandBuffer, and put
+  us in :command mode.
+  """
+  def open do
+    show()
   end
 
 
@@ -46,9 +60,9 @@ defmodule Flamelex.API.KommandBuffer do
   @doc """
   Send input to the API.CommandBuffer
   """
-  def input(x) do
-    Flamelex.Fluxus.fire_action({KommandBuffer, {:input, x}})
-  end
+  # def input(x) do
+  #   Flamelex.Fluxus.fire_action({KommandBuffer, {:input, x}})
+  # end
 
 
   @doc """
