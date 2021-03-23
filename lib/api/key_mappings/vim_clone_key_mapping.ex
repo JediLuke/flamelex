@@ -241,7 +241,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   def leader_keybindings(%RadixState{mode: :normal}) do
     %{
       @lowercase_j => {:apply_mfa, {Flamelex.API.Journal, :now, []}},
-      @lowercase_k => {:apply_mfa, {Flamelex.API.KommandBuffer, :show, []}},
+      @lowercase_k => {:apply_mfa, {Flamelex.API.Kommander, :show, []}},
       # @lowercase_t => {:apply_mfa, {Flamelex.API.Memex.TiddlyWiki, :open, []}}, #TODO Memex.open_catalog()
 
       @lowercase_s => {:apply_mfa, {Flamelex.Buffer, :save, []}},

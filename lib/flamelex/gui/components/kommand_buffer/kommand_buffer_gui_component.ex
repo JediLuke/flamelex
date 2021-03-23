@@ -30,7 +30,8 @@ defmodule Flamelex.GUI.Component.KommandBuffer do
     default_kommand_buffer_graph(frame)
   end
 
-  def handle_cast(:show, {graph, state}) do #TODO components have ordering reversed :(
+  def handle_cast(:show, {graph, state}) do #TODO components have ordering reversed :( it should be {state, graph} to be consistent with the rest of the application
+    Logger.debug "#{__MODULE__} - GUI got msg to :show the KommandBuffer..."
     new_graph = graph |> set_visibility(:show)
     {:noreply, {new_graph, state}, push: new_graph}
   end
@@ -88,7 +89,7 @@ defmodule Flamelex.GUI.Component.KommandBuffer do
         #  |> DrawingHelpers.draw_text_field("", textbox_frame, id: text_field_id) #NOTE: Start with an empty string
     end, [
       id: @component_id,
-      hidden: false
+      hidden: true
     ])
   end
 

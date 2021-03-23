@@ -16,7 +16,10 @@ defmodule Flamelex.Buffer.TopLevelSupervisor do
 
     children = [
       # {Registry, keys: :unique, name: Flamelex.Buffer.ProcessRegistry},
+      #TODO put all these tasks supervisors, under 1 supervisors? Or, marry
+      # them up to one higher-up supervisor per sub-area??
       {Task.Supervisor, name: Flamelex.Buffer.Reducer.TaskSupervisor},
+      {Task.Supervisor, name: KommandBuffer.Reducer},
       Flamelex.Buffer.SeniorSupervisor,
       Flamelex.BufferManager,
       {Flamelex.Buffer.KommandBuffer, %{rego_tag: {:buffer, KommandBuffer}}},
