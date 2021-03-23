@@ -9,7 +9,7 @@ defmodule Flamelex.ProjectAliases do
 
       # alias Flamelex.Utilities.TerminalIO
 
-      alias Flamelex.API.{Buffer, CommandBuffer, GUI, Memex, Journal}
+      alias Flamelex.API.{Buffer, Kommander, GUI, Memex, Journal}
 
       alias Flamelex.Utilities.ProcessRegistry
       alias Flamelex.Utils.PubSub

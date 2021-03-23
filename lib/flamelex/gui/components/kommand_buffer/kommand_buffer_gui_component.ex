@@ -82,13 +82,13 @@ defmodule Flamelex.GUI.Component.KommandBuffer do
     |> Scenic.Primitives.group(fn graph ->
          graph
          |> Draw.background(frame, command_mode_background_color)
-         |> DrawingHelpers.draw_command_prompt(frame)
-         |> DrawingHelpers.draw_input_textbox(textbox_frame)
+        #  |> DrawingHelpers.draw_command_prompt(frame)
+        #  |> DrawingHelpers.draw_input_textbox(textbox_frame)
         #  |> DrawingHelpers.draw_cursor(textbox_frame, id: cursor_component_id)
-         |> DrawingHelpers.draw_text_field("", textbox_frame, id: text_field_id) #NOTE: Start with an empty string
+        #  |> DrawingHelpers.draw_text_field("", textbox_frame, id: text_field_id) #NOTE: Start with an empty string
     end, [
       id: @component_id,
-      hidden: true
+      hidden: false
     ])
   end
 

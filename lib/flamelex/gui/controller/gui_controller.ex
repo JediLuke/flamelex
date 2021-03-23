@@ -34,9 +34,10 @@ defmodule Flamelex.GUI.Controller do
     #TODO
     #NOTE: This is here because sometimes, when we restart the app, I think
     #      this process is trying to re-draw th GUI before the RootScene is ready
-    :timer.sleep(50)
+    :timer.sleep(200)
 
     new_graph = DrawDefaultGUI.default_gui(state)
+    # new_graph = Draw.blank_graph()
     Flamelex.GUI.redraw(new_graph)
 
     {:noreply, %{state|graph: new_graph}}

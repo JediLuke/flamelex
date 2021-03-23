@@ -17,9 +17,12 @@ defmodule Flamelex.Buffer.KommandBuffer do
   def boot_sequence(params) do
     IO.inspect params, label: "BOOTING KOMMAND #{inspect params}"
 
-    Process.register(self(), __MODULE__) #TODO this process also gets named in BuferBehaviour... any issues then with doing this?
+    #NOTE: this process also gets named according to the {:buffer, details}
+    #      system as defined in BufferBehaviour... but this is much more
+    #      convenient, being able to hard-code sending msgs to KommandBuffer
+    Process.register(self(), __MODULE__)
 
-    {:ok, params}
+    {:ok, Map.merge(params, %{content: ""})}
   end
 
 
@@ -27,25 +30,25 @@ defmodule Flamelex.Buffer.KommandBuffer do
     IO.puts "if this works, we hit the KommandBuffer process!!"
 
     #TODO this should be checking if the process exists
-    {:gui_component, KommandBuffer}
-    |> ProcessRegistry.find!()
-    |> GenServer.cast(:show)
+    # {:gui_component, KommandBuffer}
+    # |> ProcessRegistry.find!()
+    # |> GenServer.cast(:show)
 
     {:noreply, state}
   end
 
 
 
-  def handle_cast(:hide, state) do
-    IO.puts "if this works, we hit the KommandBuffer process!!"
+  # def handle_cast(:hide, state) do
+  #   IO.puts "if this works, we hit the KommandBuffer process!!"
 
-    #TODO this should be checking if the process exists
-    {:gui_component, KommandBuffer}
-    |> ProcessRegistry.find!()
-    |> GenServer.cast(:hide)
+  #   #TODO this should be checking if the process exists
+  #   {:gui_component, KommandBuffer}
+  #   |> ProcessRegistry.find!()
+  #   |> GenServer.cast(:hide)
 
-    {:noreply, state}
-  end
+  #   {:noreply, state}
+  # end
 
 
 

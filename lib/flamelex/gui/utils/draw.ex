@@ -1,7 +1,5 @@
 defmodule Flamelex.GUI.Utilities.Draw do
   use Flamelex.{ProjectAliases, CustomGuards}
-  # alias Flamelex.GUI.GeometryLib.Trigonometry
-  # alias Flamelex.GUI.Component.CommandBuffer
   alias Flamelex.GUI.Component.MenuBar
 
 

@@ -46,6 +46,7 @@ defmodule Flamelex.FluxusRadix do
   use GenServer
   use Flamelex.ProjectAliases
   alias Flamelex.Fluxus.Structs.RadixState
+  require Logger
 
 
   def start_link(_params) do
@@ -67,6 +68,7 @@ defmodule Flamelex.FluxusRadix do
   end
 
   def handle_cast({:action, a}, radix_state) do #TODO this should be :new_action, it's clearer, other places I pattern match directly on :action ' sthat have atually been fired
+    Logger.debug "#{__MODULE__} processing action: #{inspect a}..."
     Flamelex.Fluxus.RootReducer.handle(radix_state, {:action, a})
 
     # |> #TODO broadcast to all :gui_components the updated state ??
