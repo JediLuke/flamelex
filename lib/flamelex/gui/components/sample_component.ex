@@ -45,7 +45,8 @@ defmodule Flamelex.GUI.Component.SampleComponent do
   @impl Flamelex.GUI.ComponentBehaviour
   def render(%Frame{} = frame, _params) do
 
-    Draw.blank_graph()
+    # Draw.blank_graph()
+    Scenic.Graph.build()
     # |> Draw.background(frame, :green)
     |> Draw.test_pattern()
     |> Draw.border(frame)

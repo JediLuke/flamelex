@@ -61,6 +61,10 @@ defmodule Flamelex.FluxusRadix do
     {:ok, radix_state}
   end
 
+  def handle_call(:get_state, _from, state) do
+    {:reply, state, state}
+  end
+
 
   def handle_cast({:user_input, ii}, radix_state) do
     Flamelex.Fluxus.UserInputHandler.handle(radix_state, {:user_input, ii})

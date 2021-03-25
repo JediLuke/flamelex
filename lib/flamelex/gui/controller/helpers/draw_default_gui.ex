@@ -5,7 +5,8 @@ defmodule Flamelex.GUI.Utilities.ControlHelper do #TODO this is DrawDefaultGUI n
 
   #TODO here we need to implement layers... so that menubar and command buffer get drawn on top
   def default_gui(%{viewport: vp}) do
-    Draw.blank_graph()
+    # Draw.blank_graph()
+    Scenic.Graph.build()
     |> draw_transmutation_circle(vp)
     # |> mount_menubar(vp)
     |> mount_kommand_buffer(vp)

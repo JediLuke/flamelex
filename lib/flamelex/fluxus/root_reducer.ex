@@ -48,17 +48,21 @@ defmodule Flamelex.Fluxus.RootReducer do
   def async_reduce(radix_state, {:action, {KommandBuffer, :show}}) do
     Logger.debug "#{__MODULE__} calling `:show` on KommandBuffer..."
     GenServer.cast(Flamelex.Buffer.KommandBuffer, :show)
-    radix_state |> switch_mode(:command)
+    radix_state |> switch_mode(:kommand)
   end
 
   def async_reduce(radix_state, {:action, {KommandBuffer, :hide}}) do
-    IO.puts "HIDE 1"
     GenServer.cast(Flamelex.Buffer.KommandBuffer, :hide)
     radix_state |> switch_mode(:normal)
   end
 
-  def async_reduce(radix_state, {:action, {KommandBuffer, x}}) do
-    IO.puts "we're trying to do something with KommandBuffer... #{inspect x}"
+  def async_reduce(radix_state, {:action, {KommandBuffer, :execute}}) do
+    GenServer.cast(Flamelex.Buffer.KommandBuffer, :execute)
+    radix_state |> switch_mode(:normal)
+  end
+
+  def async_reduce(_radix_state, {:action, {KommandBuffer, x}}) do
+    Logger.warn "received an unmatched action: #{inspect x} - forwarding to KommandBuffer..."
     GenServer.cast(Flamelex.Buffer.KommandBuffer, x)
   end
 

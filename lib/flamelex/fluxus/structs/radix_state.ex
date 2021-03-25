@@ -19,7 +19,7 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
     }
   ]
 
-  @modes [:normal, :insert, {:command_buffer_active, :insert}]
+  @modes [:normal, :insert, {:kommand_buffer_active, :insert}]
 
   def new, do: default() #TODO deprecate
 

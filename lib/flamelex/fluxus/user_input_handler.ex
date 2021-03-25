@@ -49,18 +49,18 @@ defmodule Flamelex.Fluxus.UserInputHandler do
   #   # ## -------------------------------------------------------------------
 
 
-  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: mode} = state, @escape_key) when mode in [:kommand, :insert] do
   #   #   Flamelex.API.CommandBuffer.deactivate()
   #   #   Flamelex.FluxusRadix.switch_mode(:normal)
   #   #   state |> RadixState.set(mode: :normal)
   #   # end
 
-  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :command} = state, input) when input in @valid_command_buffer_inputs do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :kommand} = state, input) when input in @valid_command_buffer_inputs do
   #   #   Flamelex.API.CommandBuffer.input(input)
   #   #   state
   #   # end
 
-  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :command} = state, @enter_key) do
+  #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :kommand} = state, @enter_key) do
   #   #   Flamelex.API.CommandBuffer.execute()
   #   #   Flamelex.API.CommandBuffer.deactivate()
   #   #   state |> RadixState.set(mode: :normal)
@@ -178,6 +178,8 @@ defmodule Flamelex.Fluxus.UserInputHandler do
           details = %{radix_state: radix_state, key_mapping: key_mapping, user_input: user_input}
           Logger.warn "no KeyMapping found for recv'd user_input. #{inspect details, pretty: true}"
           :no_mapping_found
+      :ok ->
+          :ok
       :ignore_input ->
           :ok
       {:fire_action, a} ->

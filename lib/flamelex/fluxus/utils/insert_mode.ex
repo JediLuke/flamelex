@@ -33,7 +33,7 @@
 #   #   state |> RadixState.add_to_history(input)
 #   # end
 
-#   # def handle_input(%RadixState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
+#   # def handle_input(%RadixState{mode: mode} = state, @escape_key) when mode in [:kommand, :insert] do
 #   #   Flamelex.API.CommandBuffer.deactivate()
 #   #   Flamelex.FluxusRadix.switch_mode(:normal)
 #   #   state |> RadixState.set(mode: :normal)

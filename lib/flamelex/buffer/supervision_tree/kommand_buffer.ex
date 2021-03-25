@@ -11,18 +11,28 @@ defmodule Flamelex.Buffer.KommandBuffer do
   re-draws - so that's how the KommandBuffer GUI component gets drawn.
   """
   use Flamelex.BufferBehaviour
+  alias Flamelex.Buffer.Utils.KommandBuffer.ExecuteCommandHelper
 
 
   @impl Flamelex.BufferBehaviour
   def boot_sequence(params) do
+
     #NOTE: this process also gets named according to the {:buffer, details}
     #      system as defined in BufferBehaviour... but this is much more
     #      convenient, being able to hard-code sending msgs to KommandBuffer
     Process.register(self(), __MODULE__)
 
-    {:ok, Map.merge(params, %{content: ""})}
+    {:ok, Map.merge(params, %{data: ""})}
   end
 
+  def get_data do
+    GenServer.call(__MODULE__, :get_data)
+  end
+
+
+  def handle_call(:get_data, _from, state) do
+    {:reply, state.data, state}
+  end
 
   def handle_cast(:show, state) do
     IO.puts "if this works, we hit the KommandBuffer process!!"
@@ -54,86 +64,35 @@ defmodule Flamelex.Buffer.KommandBuffer do
     {:noreply, state}
   end
 
+  def handle_cast({:input, {:codepoint, {letter, _num?}}}, state) do
+    new_state = %{state|data: state.data <> letter}
+    update_gui(new_state)
+    {:noreply, new_state}
+  end
 
 
 
 
-  # def handle_cast(:execute, state) do
-
-  #   Task.Supervisor.start_child(KommandBuffer.Reducer, :execute_command) #TODO do this under the KommandBuffer.Reducer
-  #   execute_command(state.data)
-  #   {:noreply, %{state|data: ""}}
-  # end
-
-  # def execute_command("temet nosce") do
-  #   IO.puts "!! Rebooting Flamelex !!"
-  #   Flamelex.temet_nosce()
-  # end
-
-  # def execute_command("new " <> something) do
-  #   case something do
-  #     "note" ->
-  #       raise "can't do new notes@!"
-  #     otherwise ->
-  #       IO.inspect otherwise
-  #       IO.puts "Making new things all the time!! What a lovething #{inspect something}"
-  #   end
-  # end
+  # @impl GenServer
+  def handle_cast(:clear, state) do
+    new_state = %{state|data: ""}
+    update_gui(new_state)
+    {:noreply, new_state} # reset the content to blank
+  end
 
 
+  def handle_cast(:execute, state) do
 
-  # # def execute_command("open") do
-  # #   file_name = "/Users/luke/workbench/elixir/flamelex/README.md"
-  # #   Logger.info "Opening a file... #{inspect file_name}"
-  # #   Flamelex.CLI.open(file: file_name) # will open as the active buffer
-  # # end
-
-  # # def execute_command("edit") do
-  # #   file_name = "/Users/luke/workbench/elixir/flamelex/README.md"
-
-  # #   string = "Luke"
-  # #   Flamelex.Buffer.Text.insert(file_name, string, after: 3)
-  # # end
+    # Task.Supervisor.start_child(KommandBuffer.Reducer, :execute_command) #TODO do this under the KommandBuffer.Reducer
+    ExecuteCommandHelper.execute_command(state.data)
+    # {:noreply, %{state|data: ""}}
+    {:noreply, state}
+  end
 
 
-
-
-  # def execute_command(unrecognised_command) do
-  #   Logger.warn "#{__MODULE__} unrecognised command. Attempting to run as Elixir code... #{inspect unrecognised_command}"
-  #   Code.eval_string(unrecognised_command)
-  # end
-
-
-
-
-
-
-
-  # # @impl GenServer
-  # # def handle_cast(:de_activate_command_buffer, state) do
-  # #   new_state = %{state|content: ""}
-
-  # #   GenServer.cast(__MODULE__, :reset_text_field)
-  # #   GUI.Component.CommandBuffer.action(:hide_command_buffer)
-
-  # #   {:noreply, new_state} # reset the content to blank
-  # # end
-
-  # # @impl true
-  # # def handle_cast({:command_buffer_command, command}, state) do
-
-  # # end
-
-
-  # # def new_note do
-  # #   Franklin.BufferSupervisor.note(%{title: "", text: ""})
-  # # end
-
-  # # def list_notes do
-  # #   Franklin.BufferSupervisor.list(:notes)
-  # # end
-
-
-
-
+  #TODO this is difficult to test... we need to test, that we sent a correctly updated state?
+  def update_gui(state) do
+    ProcessRegistry.find!({:gui_component, KommandBuffer})
+    |> GenServer.cast({:update, state})
+  end
 end

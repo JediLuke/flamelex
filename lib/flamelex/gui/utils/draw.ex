@@ -7,9 +7,9 @@ defmodule Flamelex.GUI.Utilities.Draw do
   @default_text_size Flamelex.GUI.Fonts.size()
 
 
-  def blank_graph(text_size \\ @default_text_size) when is_integer(text_size) do
-    Scenic.Graph.build(font: @ibm_plex_mono, font_size: text_size)
-  end
+  # def blank_graph(text_size \\ @default_text_size) when is_integer(text_size) do
+  #   Scenic.Graph.build(font: @ibm_plex_mono, font_size: text_size)
+  # end
 
   @doc """
   Draw a test pattern.

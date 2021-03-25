@@ -196,11 +196,11 @@ end
 
 
 
-  # def handle_cast({:show, {:command_buffer, _data}}, state) do
+  # def handle_cast({:show, {:kommand_buffer, _data}}, state) do
 
 
   #   #NOTE: Ok, so, this approach was wrong...
-  #   #      our issue is that we need to change the mode to :command, and the
+  #   #      our issue is that we need to change the mode to :kommand, and the
   #   #      instinct is to modify the graph here too - this is incorrect.
   #   #      API.CommandBuffer is a Scenic.Component responsible for managing it's
   #   #      own graph, so we have to forward on a msg to that component to
@@ -210,9 +210,9 @@ end
   #   # new_graph =
   #   #   state.graph
   #   #   |> IO.inspect(label: "LABEL: GRAPH")
-  #   #   |> Scenic.Graph.modify(:command_buffer, &update_opts(&1, hidden: false))
+  #   #   |> Scenic.Graph.modify(:kommand_buffer, &update_opts(&1, hidden: false))
   #   #   #TODO find where we add this group to this levels' graph & give it an id
-  #   #   # |> Scenic.Graph.modify(:command_buffer, fn x ->
+  #   #   # |> Scenic.Graph.modify(:kommand_buffer, fn x ->
   #   #   #       IO.puts "WE'RE DOING IT"
   #   #   #       IO.inspect x
   #   #   # end)

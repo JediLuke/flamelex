@@ -69,8 +69,6 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
     new_state_lines_struct = state.lines
                              |> List.replace_at(l-1, %{line: l, text: full_backspaced_text}) #NOTE: lines start at 1, but Enum indixes start at zero
 
-    IO.inspect new_state_lines_struct, label: "NSLS"
-
     new_data  = TextBufferUtils.join_lines_into_raw_text(new_state_lines_struct)
 
     #TODO here is where we update GUI... kinda... not perfect
@@ -154,8 +152,6 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
     when is_list(cursors)
      and length(cursors) >= 1
       do
-
-        IO.puts "Inserting text..."
 
         %{col: c, line: line_num} = Enum.at(cursors, n-1) # stupid indexing...
         if line_num < 1, do: raise "we are not able to process negative line numbers"

@@ -13,7 +13,7 @@ defmodule Flamelex.GUI.Structs.GUIState do
   use Flamelex.ProjectAliases
 
   @valid_modes [
-    :edit, :command, :select
+    :edit, :kommand, :select
   ]
 
 
@@ -32,7 +32,8 @@ defmodule Flamelex.GUI.Structs.GUIState do
     %__MODULE__{
       viewport: vp,
       layout: Layout.default(vp),
-      graph: Draw.blank_graph()
+      # graph: Draw.blank_graph()
+      graph: Scenic.Graph.build()
     }
   end
 end

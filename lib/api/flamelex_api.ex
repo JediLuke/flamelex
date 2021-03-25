@@ -47,6 +47,13 @@ defmodule Flamelex do
 
 
   @doc """
+  Returns the current input mode.
+  """
+  def mode do
+    GenServer.call(Flamelex.FluxusRadix, :get_state).mode
+  end
+
+  @doc """
   Trigger help for the user.
   """
   def help do

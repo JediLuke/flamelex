@@ -51,7 +51,8 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     background_color = Flamelex.GUI.Colors.background()
 
-    Draw.blank_graph()
+    # Draw.blank_graph()
+    Scenic.Graph.build()
     |> Draw.background(frame, background_color)
     |> TextBoxDrawUtils.render_lines(%{lines: lines, frame: frame})
     |> draw_cursors(frame, params)
@@ -68,7 +69,7 @@ defmodule Flamelex.GUI.Component.TextBox do
   end
 
   #TODO maybe dont use lines, too slow?
-  def handle_cast({:modify, :lines, new_lines}, {graph, state}) do
+  def handle_cast({:modify, :lines, new_lines}, {graph, state}) when is_list(new_lines) do
     IO.puts "HERE THE GUI IS TRYING TO MAKE TEXT SHOW UP!!"
     new_graph =
       graph
@@ -131,7 +132,7 @@ defmodule Flamelex.GUI.Component.TextBox do
       case new_mode do
         :normal -> "NORMAL-MODE"
         :insert -> "INSERT-MODE"
-        :command -> "COMMAND-MODE"
+        :kommand -> "COMMAND-MODE"
       end
 
     new_graph =

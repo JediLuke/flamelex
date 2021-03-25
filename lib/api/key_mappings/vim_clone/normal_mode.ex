@@ -1,23 +1,19 @@
-defmodule Flamelex.API.KeyMappings.VimClone do
-  @moduledoc """
-  Implements the Vim keybindings for editing text inside flamelex.
-
-  https://hea-www.harvard.edu/~fine/Tech/vi.html
-  """
-  use Flamelex.Fluxux.KeyMappingBehaviour
+defmodule Flamelex.API.KeyMappings.VimClone.NormalMode do
+  alias Flamelex.Fluxus.Structs.RadixState
+  use Flamelex.GUI.ScenicEventsDefinitions
 
 
-  @doc ~s(Define the leader key here.)
-  def leader, do: @space_bar
+  def keymap(_state, @space_bar) do
+    :ignore_input # this is the Leader key
+  end
 
 
-  # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal, active_buffer: nil} = state, input) do
-  #   Logger.debug "received some input whilst in :normal mode, but ignoring it because there's no active buffer... #{inspect input}"
-  #   state |> RadixState.add_to_history(input)
-  # end
+  def keymap(%RadixState{mode: :normal} = state, input) do
+    map(state)[input]
+  end
 
-  @doc ~s(This function maps defines the act of pressing a key, to an action.)
-  def keymap(%RadixState{mode: :normal, active_buffer: active_buf}) do #TODO so, we used to have BufRef here, which let us pattern match on the type of buffer the active buffer was... and I liked that :(
+
+  def map(%{active_buffer: active_buf}) do
     %{
       # enter_insert_mode_after_current_character
       # @lowercase_a => [:active_buffer |> CoreActions.move_cursor(:forward, 1, :character),
@@ -157,101 +153,6 @@ defmodule Flamelex.API.KeyMappings.VimClone do
       # ^^	switch file buffers
       # ^_	UNBOUND
       # ^?	(DELETE) UNBOUND
-
-    }
-  end
-
-  # def lookup(%RadixState{mode: :insert} = radix_state, input) when input in @valid_text_input_characters do
-  #   #TODO how do we know its cursor 1?
-  #   {:apply_mfa, {
-  #                   Flamelex.API.Buffer,
-  #                   :modify,
-  #                   [:active_buffer, {:insert, input, {:cursor, 1}}]
-  #                 }
-  #   } #TODO generalize this to non-text buffers too
-  # end
-
-  def keymap(%RadixState{mode: :command}, @escape_key) do
-    # {:fire_action, {:switch_mode, :normal}} #TODO this doesn't de-activate the command buffer (unless we get gui broadcast working...)
-    {:fire_actions, [
-      {:switch_mode, :normal},
-      {KommandBuffer, :hide}
-    ]}
-  end
-
-  def keymap(%RadixState{mode: :insert}, @escape_key) do
-    {:fire_action, {:switch_mode, :normal}}
-  end
-
-  def keymap(%RadixState{mode: :insert, active_buffer: active_buf}, @backspace_key) do
-    {:fire_action, {:modify_buffer, %{
-        buffer: active_buf,
-        details: %{backspace: {:cursor, 1}}, #TODO why is it always cursor 1?
-    }}}
-  end
-
-  # inputting text when in insert mode
-  def keymap(%RadixState{mode: :insert, active_buffer: active_buf}, {:codepoint, {letter, _num}} = input)
-  when input in @valid_text_input_characters
-  and not is_nil(active_buf) do
-    #TODO maybe we get cursor 1 coords first, and then can move cursor directly
-    #     to the new spot, and use that as the input
-    {:fire_actions, [
-        # update the buffer text
-        {:modify_buffer, %{
-            buffer: active_buf,
-            details: {:insert, letter, %{coords: {:cursor, 1}}}, #TODO why is it always cursor 1?
-            update_buffer?: true #TODO kinda crude but lets do it
-        }},
-        # move the cursor along 1 character
-        {:move_cursor, %{
-            buffer: active_buf,
-            details: %{cursor_num: 1, instructions: {:right, 1, :column}}
-        }}
-    ]}
-  end
-
-  # def keymap(%RadixState{mode: :insert}) do
-  #   %{
-  #     @lowercase_x => {:execute_function, fn -> raise "intentionally raising! little x" end},
-  #     @escape_key => {:fire_action, {:switch_mode, :normal}},
-  #   }
-  # end
-
-
-  # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: mode} = state, @escape_key) when mode in [:command, :insert] do
-  #   Flamelex.API.CommandBuffer.deactivate()
-  #   Flamelex.FluxusRadix.switch_mode(:normal)
-  #   state |> RadixState.set(mode: :normal)
-  # end
-
-  # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :command} = state, input) when input in @valid_command_buffer_inputs do
-  #   Flamelex.API.CommandBuffer.input(input)
-  #   state
-  # end
-
-  # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :command} = state, @enter_key) do
-  #   Flamelex.API.CommandBuffer.execute()
-  #   Flamelex.API.CommandBuffer.deactivate()
-  #   state |> RadixState.set(mode: :normal)
-  # end
-
-
-  @doc ~s(This function allows users to define custom leader key-bindings.)
-  def leader_keybindings(%RadixState{mode: :normal}) do
-    %{
-      @lowercase_j => {:apply_mfa, {Flamelex.API.Journal, :now, []}},
-      @lowercase_k => {:apply_mfa, {Flamelex.API.Kommander, :show, []}},
-      # @lowercase_t => {:apply_mfa, {Flamelex.API.Memex.TiddlyWiki, :open, []}}, #TODO Memex.open_catalog()
-
-      @lowercase_s => {:apply_mfa, {Flamelex.Buffer, :save, []}},
-
-      #TODO these mappings are here for testing purposes, so make sure that leader commands are working as expected
-      @lowercase_x => {:execute_function, fn -> raise "intentionally raising! little x" end},
-
-
-
-      @uppercase_X => {:execute_function, fn -> raise "intentionally raising! big X" end}
     }
   end
 end

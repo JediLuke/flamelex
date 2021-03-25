@@ -33,7 +33,7 @@ defmodule Flamelex.GUI.RootScene do
 
     #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
     #      the scene, so we just need to initialize it with *something*
-    {:ok, push: Draw.blank_graph()}
+    {:ok, push: Scenic.Graph.build()}
   end
 
   # Scenic sends us lots of keypresses etc... easiest to just filter them
@@ -46,7 +46,7 @@ defmodule Flamelex.GUI.RootScene do
   ]
 
   # ignore all :key events, except these...
-  @matched_keys [@escape_key, @backspace_key]
+  @matched_keys [@escape_key, @backspace_key, @enter_key]
 
   # accept the matched keys, before we ignore all other keys...
   def handle_input(input, _context, state) when input in @matched_keys do

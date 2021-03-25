@@ -133,9 +133,6 @@ defmodule Flamelex.GUI.ScenicEventsDefinitions do
 
       @valid_text_input_characters @all_letters ++ @all_punctuation ++ [@space_bar]
 
-      #TODO deprecate
-      @valid_command_buffer_inputs @valid_text_input_characters
-
     end
   end
 end

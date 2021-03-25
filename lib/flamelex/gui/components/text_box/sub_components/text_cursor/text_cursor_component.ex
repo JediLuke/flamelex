@@ -49,7 +49,8 @@ defmodule Flamelex.GUI.Component.TextCursor do
 
 
   def render(%{ref: buf_ref, current_coords: coords, mode: mode}) do
-    Draw.blank_graph()
+    # Draw.blank_graph()
+    Scenic.Graph.build()
     |> Scenic.Primitives.rect(
           CursorUtils.cursor_box_dimensions(mode),
             id: buf_ref,

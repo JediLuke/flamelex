@@ -53,7 +53,8 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do #TODO rename to Renseiji
       gap_size: 4
     }
 
-    Draw.blank_graph()
+    # Draw.blank_graph()
+    Scenic.Graph.build()
     |> Scenic.Primitives.group(fn graph ->
           graph
           |> draw_circles(params)

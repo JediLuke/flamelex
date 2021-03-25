@@ -1,20 +1,48 @@
-defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
+defmodule Flamelex.GUI.Component.KommandBuffer.Utils do
   use Flamelex.ProjectAliases
+
+
+  # @font_size Flamelex.GUI.Fonts.size()
+  # @cursor_width GUI.Fonts.monospace_font_width(:ibm_plex, @font_size) #TODO get this properly
+  # @cursor_width 16
+
+  # @text_field_left_margin 2 # distance between the left-hand side of the text field box, and the start of the actual text. We want a little margin here for aesthetics
+  # @prompt_to_blinker_distance 22
+  # @empty_command_buffer_text_prompt "Enter a command..."
+
+
+  @component_id KommandBuffer   # Scenic required we register groups/components
+                                # with a name - this is the name of this component
+
+
+  def default_kommand_buffer_graph(%Frame{} = frame) do
+    # the textbox is internal to the command buffer, but we need the
+    # coordinates of it in a few places, so we pre-calculate it here
+
+    command_mode_background_color = :cornflower_blue
+    # cursor_component_id         = {component_id, :cursor, 1}
+    text_field_id                 = {@component_id, :text_field}
+
+    # Draw.blank_graph()
+    Scenic.Graph.build()
+    |> Scenic.Primitives.group(fn graph ->
+         graph
+         |> Draw.background(frame, command_mode_background_color)
+         |> draw_command_prompt(frame)
+         |> draw_textbox(frame)
+        #  |> DrawingHelpers.draw_input_textbox(textbox_frame)
+        #  |> DrawingHelpers.draw_cursor(textbox_frame, id: cursor_component_id)
+        #  |> DrawingHelpers.draw_text_field("", textbox_frame, id: text_field_id) #NOTE: Start with an empty string
+    end, [
+      id: @component_id,
+      hidden: true
+    ])
+  end
 
 
   @prompt_color :ghost_white
   @prompt_size 18
   @prompt_margin 12
-
-  @font_size Flamelex.GUI.Fonts.size()
-  # @cursor_width GUI.Fonts.monospace_font_width(:ibm_plex, @font_size) #TODO get this properly
-  @cursor_width 16
-
-  @text_field_left_margin 2 # distance between the left-hand side of the text field box, and the start of the actual text. We want a little margin here for aesthetics
-  # @prompt_to_blinker_distance 22
-  # @empty_command_buffer_text_prompt "Enter a command..."
-
-
   def draw_command_prompt(graph, %Frame{
     #NOTE: These are the coords/dimens for the whole CommandBuffer Frame
     top_left: %Coordinates{x: _top_left_x, y: top_left_y},
@@ -48,6 +76,22 @@ defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
     |> Scenic.Primitives.triangle({point1, point2, point3}, fill: @prompt_color)
   end
 
+
+  def draw_textbox(graph, %Frame{} = outer_frame) do
+    # text_field_id                 = {@component_id, :text_field}
+
+    graph
+    |> Flamelex.GUI.Component.TextBox.mount(%{
+         ref: {@component_id, TextBox}, #TODO just pass in rego & be done with it
+         frame: calc_textbox_frame(outer_frame),
+         border: {:solid, 1, :px},
+         lines: [%{line: 1, text: ""}],
+         draw_footer?: false
+    })
+  end
+
+
+  # figure out the size of the text box
   def calc_textbox_frame(_buffer_frame = %Frame{
     #NOTE: These are the coords/dimens for the whole CommandBuffer Frame
     top_left: %Coordinates{x: cmd_buf_top_left_x, y: cmd_buf_top_left_y},
@@ -70,72 +114,86 @@ defmodule Flamelex.GUI.Component.CommandBuffer.DrawingHelpers do
         top_left:   textbox_coordinates |> Coordinates.new(),
         dimensions: textbox_dimensions  |> Dimensions.new())
 
-    # return
     textbox_frame
   end
 
-  def draw_input_textbox(graph, %Frame{} = textbox_frame) do
+
+  def set_visibility(graph, reveal?) when reveal? in [:show, :hide] do
+    hidden? = case reveal? do :show -> false
+                              :hide -> true  end
     graph
-    |> Draw.border_box(textbox_frame)
+    |> Scenic.Graph.modify(
+         @component_id,
+         &Scenic.Primitives.update_opts(&1, hidden: hidden?))
   end
 
-  def draw_cursor(
-        graph,
-        %Frame{
-           top_left:   %Coordinates{x: container_top_left_x, y: container_top_left_y},
-           dimensions: %Dimensions{height: container_height, width: _container_width}
-        },
-        id: cursor_component_id)
-  do
 
-    cursor_frame = Frame.new(
-      top_left:   {container_top_left_x, container_top_left_y},
-      dimensions: {@cursor_width, container_height})
+  # def draw_command_buffer(graph) do
+  #   graph
+  #   |> GUI.Component.CommandBuffer.add_to_graph(%{
+  #     id: :kommand_buffer,
+  #     # top_left_corner: {0, h - command_buffer.data.height},
+  #     top_left_corner: {0, 400},
+  #     # dimensions: {w, command_buffer.data.height},
+  #     dimensions: {400, 20},
+  #     mode: :echo,
+  #     text: "Welcome to Franklin. Press <f1> for help."
+  #   })
+  # end
 
-    graph
-    |> GUI.Component.Cursor.add_to_graph(cursor_frame)
-  end
 
-  def draw_text_field(
-        graph,
-        content,
-        %Frame{
-           top_left:    %Coordinates{x: container_top_left_x, y: container_top_left_y},
-           dimensions:  %Dimensions{height: container_height, width: _container_width}
-        },
-        id: text_field_id)
-  do
-
-    graph
-    |> Scenic.Primitives.text(
-         content,
-         id:        text_field_id,
-         translate: # {x_coord, y_coord}
-                    {container_top_left_x + @text_field_left_margin,
-                     container_top_left_y + (container_height-4)}, # text draws from bottom-left corner?? :( also, how high is it??? #TODO
-         font_size: @font_size,
-         fill:      :white)
-
-  end
-
-  defp prompt_width(prompt_size) do
+  def prompt_width(prompt_size) do
     prompt_size * 0.67
   end
+
+
+  # def draw_input_textbox(graph, %Frame{} = textbox_frame) do
+  #   graph |> Draw.border_box(textbox_frame)
+  # end
+
+  # def draw_cursor(
+  #       graph,
+  #       %Frame{
+  #          top_left:   %Coordinates{x: container_top_left_x, y: container_top_left_y},
+  #          dimensions: %Dimensions{height: container_height, width: _container_width}
+  #       },
+  #       id: cursor_component_id)
+  # do
+
+  #   cursor_frame = Frame.new(
+  #     top_left:   {container_top_left_x, container_top_left_y},
+  #     dimensions: {@cursor_width, container_height})
+
+  #   graph
+  #   |> GUI.Component.Cursor.add_to_graph(cursor_frame)
+  # end
+
+  # def draw_text_field(
+  #       graph,
+  #       content,
+  #       %Frame{
+  #          top_left:    %Coordinates{x: container_top_left_x, y: container_top_left_y},
+  #          dimensions:  %Dimensions{height: container_height, width: _container_width}
+  #       },
+  #       id: text_field_id)
+  # do
+
+  #   graph
+  #   |> Scenic.Primitives.text(
+  #        content,
+  #        id:        text_field_id,
+  #        translate: # {x_coord, y_coord}
+  #                   {container_top_left_x + @text_field_left_margin,
+  #                    container_top_left_y + (container_height-4)}, # text draws from bottom-left corner?? :( also, how high is it??? #TODO
+  #        font_size: @font_size,
+  #        fill:      :white)
+
+  # end
+
 end
 
 
 
-
-# defmodule Flamelex.GUI.Utilities.Drawing.CommandBufferDrawingLib do
-#   use Flamelex.ProjectAliases
-
-#   def frame(%Dimensions{} = viewport, name \\ "CommandBuffer") do
-#     Frame.new(
-#       name:     name,
-#       top_left: {0, 0},
-#       size:     {viewport.width, Flamelex.GUI.Component.MenuBar.height()})
-#   end
-# end
 
 
 
@@ -290,7 +348,7 @@ end
 #   use Flamelex.ProjectAliases
 
 
-#   @component_id :command_buffer
+#   @component_id :kommand_buffer
 
 #   @cursor_component_id {@component_id, :cursor, 1}
 #   @text_field_id {@component_id, :text_field}
@@ -333,7 +391,7 @@ end
 #   {:update_graph, new_graph}
 # end
 
-#   # def process({%{mode: :command} = state, _graph}, 'de_activate_command_buffer') do
+#   # def process({%{mode: :kommand} = state, _graph}, 'de_activate_command_buffer') do
 #   #   new_state =
 #   #     state
 #   #     |> Map.replace!(:mode, :echo)
@@ -394,11 +452,3 @@ end
 #   #   GUI.Scene.Root.action('CLEAR_AND_CLOSE_COMMAND_BUFFER')
 #   #   {state, graph}
 #   # end
-
-#   # #NOTE: This must go on the bottom, as it's the catch-all...
-#   # def process({state, _graph}, unknown_action) do
-#   #   IO.puts "SHOW?????"
-#   #   Logger.error "#{__MODULE__} received unknown state/action combination: action: #{inspect unknown_action}, state: #{inspect state}"
-#   #   :ignore_action
-#   # end
-# end
