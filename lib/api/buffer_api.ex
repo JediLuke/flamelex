@@ -135,6 +135,7 @@ defmodule Flamelex.API.Buffer do
 
 
   def close(buf) do
+    #TODO this is causing GUI controller & VimServer to also restart??
     Flamelex.Fluxus.fire_action({:close_buffer, buf})
   end
 

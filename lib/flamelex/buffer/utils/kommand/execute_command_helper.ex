@@ -17,6 +17,9 @@ defmodule Flamelex.Buffer.Utils.KommandBuffer.ExecuteCommandHelper do
   #   end
   # end
 
+  def execute_command("book") do
+    Flamelex.API.Buffer.open!("/Users/luke/Documents/Writing/book1.txt")
+  end
 
 
   # # def execute_command("open") do

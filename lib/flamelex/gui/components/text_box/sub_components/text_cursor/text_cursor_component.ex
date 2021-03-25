@@ -100,6 +100,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
     {:noreply, {new_graph, new_state}, push: new_graph}
   end
 
+  #TODO why isn't this getting updates to switch mode???
   def handle_info({:switch_mode, new_mode}, {graph, %{ref: _buf_ref} = state}) do
     IO.puts "CURSOR GETTING MSG TO SWITCH MODE!!"
     {new_graph, new_state} = CursorUtils.switch_mode({graph, state}, new_mode)

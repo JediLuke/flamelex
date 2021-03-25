@@ -49,7 +49,7 @@ defmodule Flamelex.API.Kommander do
   away we also want to forget all the state in the KommandBuffer - like
   when you mash escape to go back to :edit mode
   """
-  def deactivate do
+  def reset do
     Flamelex.Fluxus.fire_actions([
       clear(),
       hide()
