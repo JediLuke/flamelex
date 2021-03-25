@@ -74,14 +74,11 @@ defmodule Flamelex.GUI.Controller do
   end
 
   def handle_cast({:close, buffer_tag}, gui_state) do
-    IO.puts "GUI CONTROLLER CLOSING A BUFFER"
     new_graph =
       gui_state.graph
-      |> IO.inspect(label: "BEFORE")
       |> Scenic.Graph.delete({:textbox, buffer_tag}) #TODO here we want to remove the open buffer TextBox component, when the buffer closes, so the GUI changes
-      |> IO.inspect(label: "AFTER")
 
-    Flamelex.GUI.redraw(new_graph)
+    # Flamelex.GUI.redraw(new_graph)
 
     {:noreply, %{gui_state|graph: new_graph}, push: new_graph}
   end

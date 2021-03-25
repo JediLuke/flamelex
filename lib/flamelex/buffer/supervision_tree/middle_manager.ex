@@ -9,12 +9,12 @@ defmodule Flamelex.Buffer.MiddleManager do
   require Logger
 
 
-  def start_link(request_params) do
-    Supervisor.start_link(__MODULE__, request_params)
+  def start_link(%{source: _s, type: _t} = params) do
+    Supervisor.start_link(__MODULE__, params)
   end
 
 
-  def init(params) do
+  def init(%{source: _s, type: _t} = params) do
 
     # create a unique name for the Task.Supervisor
     tag  = {:buffer, :task_supervisor, {:buffer, params.source}}

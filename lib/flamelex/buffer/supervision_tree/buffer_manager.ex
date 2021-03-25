@@ -76,27 +76,12 @@ defmodule Flamelex.BufferManager do
   end
 
   @impl GenServer
-  #TODO note - we cant use `KommandBuffer` here because, after it's been aliased, in this code it shows up as Flamelex.Api.KommandBuffer
-  def handle_cast({:buffer_opened, %{rego_tag: {:buffer, kommandBuffer}}}, state) do
-
+  def handle_cast({:buffer_opened, %{rego_tag: {:buffer, KommandBuffer}}}, state) do
     # KommandBuffer - just ignore it...
-    IO.puts "GOT KOMMAND BUF OPENER 333333 #{inspect kommandBuffer}"
-    {:buffer, KommandBuffer}
-    {:noreply, state}
-  end
-
-  def handle_cast({:buffer_opened, %{rego_tag: rego_tag}}, state) do
-
-    # KommandBuffer - just ignore it...
-    IO.puts "GOT KOMMAND BUF OPENER #{inspect rego_tag}"
-    {:buffer, KommandBuffer}
     {:noreply, state}
   end
 
   def handle_cast({:buffer_opened, buf_state}, state) do
-    #TODO omg we're getting KommandBuffer here
-    IO.puts "BUF STATE: #{inspect buf_state.rego_tag}"
-
     #TODO we can do better than this (though, this is still better I think, at least it's BuffERManager doing it)
     if Flamelex.Buffer.Utils.OpenBuffer.open_this_buffer_in_gui?(buf_state) do
       #TODO maybe replace this with GUI.Controller.fire_action({:show, buf}) - it' more consistent with the rest of flamelex, and then we dont need to keep adding new interface functions inside gui controller
