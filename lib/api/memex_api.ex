@@ -23,11 +23,6 @@ defmodule Flamelex.API.Memex do
 
   @doc """
   Look in the memex & return a random %LiteraryQuote{}.
-
-  e.g.
-
-  Memex.random_quote.text
-  “One man's “magic” is another man's engineering.”
   """
   def random_quote do
     Enum.random(

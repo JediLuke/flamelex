@@ -27,6 +27,10 @@ defmodule Flamelex.Memex.My do
     memex_env().todo_list()
   end
 
+  def passwords do
+    memex_env().passwords(:all)
+  end
+
   # def save_memex_file do
   #   DataFile.read()
   #     |> Map.merge(%{

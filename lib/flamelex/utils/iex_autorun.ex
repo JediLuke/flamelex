@@ -17,7 +17,14 @@ defmodule Flamelex.IExAutoRun do
 
       IO.puts "Executing the code in `Flamelex.IExAutoRun`, via the `.iex.exs` file..."
 
-      use Flamelex.ProjectAliases
+      # use Flamelex.ProjectAliases
+      alias Flamelex.API.Buffer
+      alias Flamelex.API.Kommander
+      alias Flamelex.API.Memex
+      alias Flamelex.API.Journal
+      alias Flamelex.API.Buffer
+      # alias Flamelex.API.GUI
+      # alias Flamelex.API.{Buffer, Kommander, GUI, Memex, Journal}
 
       Flamelex.IExAutoRun.print_welcome_msg()
 
