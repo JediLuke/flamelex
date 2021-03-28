@@ -9,11 +9,9 @@ defmodule Flamelex.Memex.Journal do
   Uses the local time to figure out the filename of todays Journal entry.
   """
   def todays_page do
-    now = now_as_map()
 
-    # memex_id = "jediluke"
-    memex_id = Flamelex.API.Memex.current_env().id |> Atom.to_string()
-    IO.inspect memex_id, label: "MEMEX"
+    now       = now_as_map()
+    memex_id  = Flamelex.API.Memex.current_env().id
 
     journal_dir =
       Flamelex.Utils.RuntimeTools.project_root_dir()
@@ -21,15 +19,14 @@ defmodule Flamelex.Memex.Journal do
       |> Path.join("/journal")
       |> Path.join(now.year <> "/" <> now.month)
 
-    # current_journal_dir = journal_dir
-    #                       |> Path.join(now.year <> "/" <> now.month)
-
+    # create this months journal entries directory, if it doesn't exist yet
     if not (journal_dir |> File.exists?()) do
       File.mkdir_p(journal_dir)
     end
 
     todays_journal_entry_filepath =
-      journal_dir |> Path.join("/" <> now.todays_00day)
+      journal_dir
+      |> Path.join("/" <> now.todays_00day)
 
     todays_journal_entry_filepath # return value
   end
