@@ -4,13 +4,44 @@ defmodule Flamelex.API.Memex do
   """
   use Flamelex.ProjectAliases
 
+
   @doc """
   This function must return the Module name for the Memex.Environment
   being used.
   """
-  def default_env do
-    Flamelex.Memex.Env.JediLuke
+  def current_env do
+    Flamelex.Memex.Env.JediLuke #TODO this should be via config!
   end
+
+
+  defmodule My do
+    @moduledoc """
+    This module proves an interface for retrieving information from the
+    Memex which is unique to the loaded environment.
+    """
+    alias Flamelex.API.Memex
+
+    def todos,        do: my().todo_list()
+    def current_time, do: my().timezone() |> DateTime.now!()
+
+    defp my(), do: Memex.current_env()
+  end
+
+
+  # def save_memex_file do
+  #   DataFile.read()
+  #     |> Map.merge(%{
+  #          state.uuid => %{
+  #            title: state.title,
+  #            text: state.text,
+  #            datetime_utc: DateTime.utc_now(),
+  #            #TODO hash entire contents
+  #            #TODO handle timezones
+  #            tags: ["note"]
+  #          },
+  #        })
+  #     |> DataFile.write()
+  # end
 
   def set_env do
     raise "right now, no way to change your environment unfortuntely"

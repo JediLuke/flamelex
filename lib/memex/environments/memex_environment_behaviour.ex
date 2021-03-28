@@ -18,9 +18,9 @@ defmodule Flamelex.Memex.EnvironmentBehaviour do
       """
       def id, do: __MODULE__ #NOTE: environments are registered as atoms
 
-      #NOTE: This is just for convenience, so inside environment modules
-      #      we can easily use the unique part of the environment module name
-      alias __MODULE__
+      # #NOTE: This is just for convenience, so inside environment modules
+      # #      we can easily use the unique part of the environment module name
+      # alias __MODULE__
 
     end
   end

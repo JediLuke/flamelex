@@ -5,6 +5,32 @@ defmodule Flamelex.API.Journal do
   use Flamelex.ProjectAliases
 
 
+    # def open_journal_entry(:today) do
+  #   now = now_as_map()
+
+  #   current_journal_dir = @journal_dir
+  #                         |> Path.join(now.year <> "/" <> now.month)
+
+  #   if not (current_journal_dir |> File.exists?()) do
+  #     File.mkdir_p(current_journal_dir)
+  #   end
+
+  #   #TODO scan the file, look for most recent timestamp - if it's more than 15? minutes, append a new one
+  #   todays_journal_entry_file = current_journal_dir |> Path.join("/" <> now.todays_day)
+
+  #   if todays_journal_entry_file |> File.exists?() do
+  #     Flamelex.API.Buffer.open!(todays_journal_entry_file)
+  #   else
+  #     journal_entry = generate_new_journal_entry_for_today()
+
+  #     {:ok, file} = File.open(todays_journal_entry_file, [:write])
+  #     IO.binwrite(file, journal_entry)
+  #     :ok = File.close(file)
+
+  #     Flamelex.API.Buffer.open!(todays_journal_entry_file)
+  #   end
+  # end
+
   def now do
     todays_page_filepath = Flamelex.Memex.Journal.todays_page()
 

@@ -26,6 +26,7 @@ defmodule Flamelex.IExAutoRun do
       # alias Flamelex.API.GUI
       # alias Flamelex.API.{Buffer, Kommander, GUI, Memex, Journal}
 
+
       Flamelex.IExAutoRun.print_welcome_msg()
 
     end
