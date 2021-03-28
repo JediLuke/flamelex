@@ -445,11 +445,96 @@ iex> Memex.random_quote().text
 
 The Memex is heavily inspired by Tiddlywiki.
 
-### Creating your own Memex environment
+### Introduction to the Memex - general episteme
 
-#TODO
-Flamelex must be configured with a Memex?
-Flamelex will look for a Memex?
+```Episteme (Ancient Greek: ἐπιστήμη, epistēmē, 'science' or 'knowledge';
+French: épistémè) is a philosophical term that refers to a principled
+system of understanding; scientific knowledge. The term comes from the
+Ancient-Greek verb epístamai (ἐπῐ́στᾰμαι), meaning 'to know, to understand, 
+to be acquainted with'.
+```
+
+Because "knowledge base" looks rather ugly, I plucked this word `episteme`
+out of ancient greek and used it to mean "any and all, pieces of codified
+knowledge, stored in the Memex". So one's epistime is the grand sum of
+all ones knowledge.
+
+In Flamelex, the `general_episteme` is all the "general" knowledge, common
+to all users, which is accepted as general fact. It is, basically, an attempt
+to clone all of Wikipedia in Elixir - imagine being able to access all of
+Wikipedia, from the command line!! We are getting there, module by module,
+func-def by func-def...
+
+
+### Personalizing your Memex environments
+
+When you first open Flamelex, it will load the Memex with a `sample` environment -
+this is to give the user an introduction to the power of the Memex, via
+example.
+
+```
+Memex.current_env()
+Flamelex.Memex.Env.SampleEnv
+Memex.My.timezone()
+"Etc/UTC"
+Memex.My.todos()
+["mow the lawn", "call grandma"]
+```
+
+As you can see, the things in one's personal Memex are usually only of
+interest to oneself, and if you're putting your flamelex codebase into
+version control (which I, as the currently sole creator & user, obviously
+do) you might want to keep some of this Memex knowledge secret, and not
+checked in to Github. Also, to offer a multi-user perspective for users
+of Flamelex, we use the `Memex.My` interface throughout Flamelex - via
+this interface, we reach into your own personal Memex and extract some
+information, e.g. when opening up a new Journal entry, we look into the
+`Memex.My.current_timezone()` to detect the date & time of the user.
+
+To load your own custom Memex, create a new directory in the `lib/memex/environments`
+directory. Give the directory the same "name" you want to give your Memex
+environment, e.g. my online tag (slack/github/etc) is "JediLuke", so that's
+what I called my Memex environment. So my new file will be located at
+`lib/memex/environments/jediluke`.
+
+In that directory, create a file, `jediluke.ex` (or whatever your environment
+is going to be called). This is going to be the highest-level Elixir module
+in your environment, so that's the one where we are going to use the
+Memex Environment behaviour.
+
+```
+defmodule Flamelex.Memex.Env.SampleEnv do
+  @moduledoc """
+  A sample Memex environment.
+  """
+  use Flamelex.Memex.EnvironmentBehaviour
+
+
+
+
+  def timezone, do: "Etc/UTC"
+
+  def todo_list, do: [
+    "mow the lawn",
+    "read a philosophy book",
+    "call grandma"
+  ]
+
+  def reminders, do: []
+
+  def journal, do: raise "Not implemented!"
+
+end
+```
+
+For a more thorough example, please see: `lib/memex/environments/sample/sample_env.ex`
+
+By calling `use Flamelex.Memex.EnvironmentBehaviour`, you will inherit
+a bunch of functions, and be forced to implement a bunch of callbacks that
+every Memex environment should/must implement.
+
+We also need to update the config variable which defines your Memex - to
+do this, go to the `Flamelex.API.Memex` and change the hard-coded value. #TODO
 
 ### Showing the memex-feed
 
@@ -565,6 +650,10 @@ that grew into Flamelex. Any code archaelogists out there?? here's a dig!
 
 ## Detailed Flamelex manual
 
+
+## FAQ / common issues
+
+* 
 
 
 ## Backlog / TODOs
