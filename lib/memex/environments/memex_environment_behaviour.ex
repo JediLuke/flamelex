@@ -16,7 +16,7 @@ defmodule Flamelex.Memex.EnvironmentBehaviour do
       Each environment has to return an id, which is also the module name which
       provides the entry-point into that environment.
       """
-      def id, do: __MODULE__ #NOTE: environments are registered as atoms
+      # def id, do: __MODULE__ #NOTE: environments are registered as atoms
 
       # #NOTE: This is just for convenience, so inside environment modules
       # #      we can easily use the unique part of the environment module name
