@@ -28,6 +28,8 @@ defmodule Flamelex.GUI.Component.TextCursor do
 
     starting_coords = CursorUtils.calc_starting_coordinates(params.frame)
 
+    mode = if params.mode == :insert, do: :insert, else: :normal
+
     params |> Map.merge(%{
       #TODO do everything in terms of grids...
       # grid_pos: nil,  # where we are in the file, e.g. line 3, column 5
@@ -37,7 +39,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
       hidden?: false,                               # internal variable used to control blinking
       override?: nil,                               # override lets us disable the blinking temporarily, for when we want to move the cursor
       timer: nil,                                   # holds an erlang :timer for the blink
-      mode: :normal,                                # start out in normal mode, if insert mode we just have a line
+      mode: mode,                                   # normal mode renders a block, insert mode renders a vertical line
       draw_footer?: false                           # cursors will never (?) need to draw their Frame
     })
   end

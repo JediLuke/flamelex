@@ -86,7 +86,8 @@ defmodule Flamelex.GUI.Component.KommandBuffer.Utils do
          frame: calc_textbox_frame(outer_frame),
          border: {:solid, 1, :px},
          lines: [%{line: 1, text: ""}],
-         draw_footer?: false
+         draw_footer?: false,
+         mode: :insert
     })
   end
 

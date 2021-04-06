@@ -20,11 +20,13 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     # Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
 
+    mode = if params.mode == :insert, do: :insert, else: :normal
+
     params |> Map.merge(%{
       # draw_footer?: true, #AHAHA the culprit! This isn't true by default any more, since we use this with KommandBuffer!!
       cursors: [
         #TODO acc coords here maybe??
-        %{ frame: f, ref: rego_tag(params), num: 1 } #TODO use cursor struct, add frame to cursor struct
+        %{ frame: f, ref: rego_tag(params), num: 1, mode: mode } #TODO use cursor struct, add frame to cursor struct
       ]
     })
   end
