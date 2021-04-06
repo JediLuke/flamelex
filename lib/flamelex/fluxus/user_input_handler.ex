@@ -26,29 +26,6 @@ defmodule Flamelex.Fluxus.UserInputHandler do
   # # end
 
 
-
-
-  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal} = state, @lowercase_h) do
-  # #   Logger.info "Lowercase h was pressed !!"
-  # #   Flamelex.Buffer.load(type: :text, file: @readme)
-  # #   state
-  # # end
-
-  # # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: :normal} = state, @lowercase_d) do
-  # #   Logger.info "Lowercase d was pressed !!"
-  # #   Flamelex.Buffer.load(type: :text, file: @dev_tools)
-  # #   state
-  # # end
-
-
-
-
-
-  #   # ## -------------------------------------------------------------------
-  #   # ## Command mode
-  #   # ## -------------------------------------------------------------------
-
-
   #   # def handle_input(%Flamelex.Fluxus.Structs.RadixState{mode: mode} = state, @escape_key) when mode in [:kommand, :insert] do
   #   #   Flamelex.API.CommandBuffer.deactivate()
   #   #   Flamelex.FluxusRadix.switch_mode(:normal)
@@ -192,27 +169,28 @@ defmodule Flamelex.Fluxus.UserInputHandler do
       {:vim_lang, v} ->
           GenServer.cast(Flamelex.GUI.VimServer, {v, radix_state})
       {:apply_mfa, {module, function, args}} ->
-          # apply_mfa(module, function, args)
-          Kernel.apply(module, function, args)
+          apply_mfa(module, function, args)
       {:execute_function, f} when is_function(f) ->
           f.()
     end
   end
 
   defp apply_mfa(module, function, args) do
-    try do
-      result = Kernel.apply(module, function, args)
-      if result == :err_not_handled do
-        IO.puts "Unable to find module/func/args: #{inspect module}, #{inspect function}, #{inspect args}"
-      else
-        result |> IO.inspect(label: "Apply_MFA") # this is so the result will show up in console...
-      end
-    rescue
-      _e in UndefinedFunctionError ->
-        Flamelex.Utilities.TerminalIO.red("Mod: #{inspect module}\nFun: #{inspect function}\nArg: #{inspect args}\n\nnot found.\n\n")
-        |> IO.puts()
-      e ->
-        raise e
-    end
+    Kernel.apply(module, function, args)
+    # try do
+    #   result = Kernel.apply(module, function, args)
+    #   if result == :err_not_handled do
+    #     IO.puts "Unable to find module/func/args: #{inspect module}, #{inspect function}, #{inspect args}"
+    #   else
+    #     result |> IO.inspect(label: "Apply_MFA") # this is so the result will show up in console...
+    #   end
+    # rescue
+    #   _e in UndefinedFunctionError ->
+    #     Flamelex.Utilities.TerminalIO.red("Mod: #{inspect module}\nFun: #{inspect function}\nArg: #{inspect args}\n\nnot found.\n\n")
+    #     |> IO.puts()
+    #   e ->
+    #     raise e
+    # end
   end
+
 end

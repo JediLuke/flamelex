@@ -6,12 +6,15 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   """
   use Flamelex.Fluxux.KeyMappingBehaviour
   alias Flamelex.API.KeyMappings.VimClone.{NormalMode, KommandMode,
-          InsertMode, LeaderBindings}
+                                           InsertMode, LeaderBindings}
+
+
+  # this is our vim leader
+  def leader, do: @space_bar
 
 
   def keymap(%RadixState{mode: :normal} = state, input) do
     if last_keystroke_was_leader?(state) do
-      IO.puts "LAST KEYSTROKE WAS LEADER"
       LeaderBindings.keymap(state, input)
     else
       NormalMode.keymap(state, input)
@@ -30,12 +33,9 @@ defmodule Flamelex.API.KeyMappings.VimClone do
 
 
   def keymap(state, input) do
-    raise "failed to pattern-match on a known :mode in the RadixState"
+    context = %{state: state, input: input}
+    raise "failed to pattern-match on a known :mode in the RadixState. #{inspect context}"
   end
-
-
-  # this is our vim leader
-  def leader, do: @space_bar
 
 
   # returns true if the last key was pressed was the leader key

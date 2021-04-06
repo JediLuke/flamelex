@@ -47,7 +47,6 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       # In our case, we always want a Component to be passed in a %Frame{}
       # so we don't need specific ones, each Component implements them
       # the same way. Also all components need a `ref`
-      @impl Scenic.Component
       def verify(%{
         ref: _r,                # the `ref` refers back to the Buffer that this GUI.Component is for, e.g. {:buffer, {:file, "README.md"}}
         frame: %Frame{} = _f    # the %Frame{} which defines this GUI.Component
@@ -59,7 +58,6 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       def info(_data), do: ~s(Invalid data)
 
 
-      @impl Scenic.Scene
       def init(%{frame: %Frame{} = frame} = params, _scenic_opts) do
         {:rego_tag, _tag} = register_self(params)
 
@@ -71,7 +69,9 @@ defmodule Flamelex.GUI.ComponentBehaviour do
             params
           end
 
-        true = Flamelex.Utils.PubSub.subscribe(topic: :gui_event_bus)
+        Flamelex.Utils.PubSub.subscribe(topic: :gui_event_bus)
+
+        IO.inspect params, label: "ComponentBehaviour.init/x is executing..."
 
         graph =
           #TODO change this to just render/1 eventually...

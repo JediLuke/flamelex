@@ -38,6 +38,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
       override?: nil,                               # override lets us disable the blinking temporarily, for when we want to move the cursor
       timer: nil,                                   # holds an erlang :timer for the blink
       mode: :normal,                                # start out in normal mode, if insert mode we just have a line
+      draw_footer?: false                           # cursors will never (?) need to draw their Frame
     })
   end
 

@@ -11,8 +11,8 @@ defmodule Flamelex.GUI.Component.KommandBuffer.Utils do
   # @empty_command_buffer_text_prompt "Enter a command..."
 
 
-  @component_id KommandBuffer   # Scenic required we register groups/components
-                                # with a name - this is the name of this component
+  @component_id KommandBufferGUI   # Scenic required we register groups/components
+                                   # with a name - this is the name of this component
 
 
   def default_kommand_buffer_graph(%Frame{} = frame) do
@@ -21,7 +21,7 @@ defmodule Flamelex.GUI.Component.KommandBuffer.Utils do
 
     command_mode_background_color = :cornflower_blue
     # cursor_component_id         = {component_id, :cursor, 1}
-    text_field_id                 = {@component_id, :text_field}
+    text_field_id                 = {KommandBufferGUI, :text_field}
 
     # Draw.blank_graph()
     Scenic.Graph.build()
@@ -34,7 +34,7 @@ defmodule Flamelex.GUI.Component.KommandBuffer.Utils do
         #  |> DrawingHelpers.draw_cursor(textbox_frame, id: cursor_component_id)
         #  |> DrawingHelpers.draw_text_field("", textbox_frame, id: text_field_id) #NOTE: Start with an empty string
     end, [
-      id: @component_id,
+      id: @component_id, # Scenic required we register groups/components with a name
       hidden: true
     ])
   end
@@ -82,7 +82,7 @@ defmodule Flamelex.GUI.Component.KommandBuffer.Utils do
 
     graph
     |> Flamelex.GUI.Component.TextBox.mount(%{
-         ref: {@component_id, TextBox}, #TODO just pass in rego & be done with it
+         ref: {KommandBufferGUI, TextBox},
          frame: calc_textbox_frame(outer_frame),
          border: {:solid, 1, :px},
          lines: [%{line: 1, text: ""}],
@@ -119,11 +119,15 @@ defmodule Flamelex.GUI.Component.KommandBuffer.Utils do
 
 
   def set_visibility(graph, reveal?) when reveal? in [:show, :hide] do
-    hidden? = case reveal? do :show -> false
-                              :hide -> true  end
+
+    hidden? = case reveal? do
+                     :show -> false
+                     :hide -> true
+              end
+
     graph
     |> Scenic.Graph.modify(
-         @component_id,
+         KommandBufferGUI,
          &Scenic.Primitives.update_opts(&1, hidden: hidden?))
   end
 

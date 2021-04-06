@@ -14,9 +14,9 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
 
     _block_dimensions = {_w, block_height} = cursor_box_dimensions(:normal) #NOTE start in normal mode
 
-    cursor_y_aesthetic_offset = 4
+    cursor_y_aesthetic_offset = 3
 
-    cursor_x_pos = frame.top_left.x+frame.margin.left
+    cursor_x_pos = frame.top_left.x+frame.margin.left - 5 #TODO
     cursor_y_pos = frame.top_left.y+frame.margin.top-block_height+cursor_y_aesthetic_offset
 
     {cursor_x_pos, cursor_y_pos}

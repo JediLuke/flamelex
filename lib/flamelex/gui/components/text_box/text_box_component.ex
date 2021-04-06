@@ -16,13 +16,12 @@ defmodule Flamelex.GUI.Component.TextBox do
     {:gui_component, buffer} #TODO replace :gui_component with the actual type of GUI component in the rego tag
   end
 
-  @impl Flamelex.GUI.ComponentBehaviour
   def custom_init_logic(%{frame: %Frame{} = f} = params) do
 
     # Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
 
     params |> Map.merge(%{
-      draw_footer?: true,
+      # draw_footer?: true, #AHAHA the culprit! This isn't true by default any more, since we use this with KommandBuffer!!
       cursors: [
         #TODO acc coords here maybe??
         %{ frame: f, ref: rego_tag(params), num: 1 } #TODO use cursor struct, add frame to cursor struct
@@ -30,7 +29,6 @@ defmodule Flamelex.GUI.Component.TextBox do
     })
   end
 
-  @impl Flamelex.GUI.ComponentBehaviour
   #TODO this is a deprecated version of render - enforced by behaviour...
   def render(%Frame{} = frame, params) do
     render(params |> Map.merge(%{frame: frame}))
@@ -51,12 +49,11 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     background_color = Flamelex.GUI.Colors.background()
 
-    # Draw.blank_graph()
     Scenic.Graph.build()
     |> Draw.background(frame, background_color)
     |> TextBoxDrawUtils.render_lines(%{lines: lines, frame: frame})
     |> draw_cursors(frame, params)
-    |> Draw.border(frame)
+    # |> Draw.border(frame)
   end
 
   def draw_cursors(graph, _frame, %{cursors: []}), do: graph
@@ -70,7 +67,6 @@ defmodule Flamelex.GUI.Component.TextBox do
 
   #TODO maybe dont use lines, too slow?
   def handle_cast({:modify, :lines, new_lines}, {graph, state}) when is_list(new_lines) do
-    IO.puts "HERE THE GUI IS TRYING TO MAKE TEXT SHOW UP!!"
     new_graph =
       graph
       |> TextBoxDrawUtils.re_render_lines(%{lines: new_lines})
@@ -140,6 +136,8 @@ defmodule Flamelex.GUI.Component.TextBox do
       |> Scenic.Graph.modify(:mode_string, &Scenic.Primitives.text(&1, mode_string))
       #TODO also we want to change the color of the box!
       # |> Frame.redraw()
+
+    IO.puts "HERHERHER"
 
     {:noreply, {new_graph, state}, push: new_graph}
   end

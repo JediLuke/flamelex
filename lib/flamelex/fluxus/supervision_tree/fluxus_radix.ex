@@ -110,7 +110,7 @@ defmodule Flamelex.FluxusRadix do
   # end
 
   def handle_cast({:radix_state_update, %RadixState{} = new_radix_state}, _old_radix_state) do
-    IO.puts "\n\n\n\nupdating radix state !! \n\n\n\n"
+    Logger.debug "#{__MODULE__} updating RadixState..."
     {:noreply, new_radix_state}
   end
 end

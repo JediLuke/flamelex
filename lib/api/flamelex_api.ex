@@ -32,11 +32,6 @@ defmodule Flamelex do
   end
 
 
-  # def switch_mode(m) when m in @valid_modes do
-  #   GenServer.cast(Flamelex.FluxusRadix, {:action, {:switch_mode, m}})
-  # end
-
-
   @doc """
   #TODO
   Increase or decrease the logging output of Flamelex during runtime.
@@ -45,13 +40,6 @@ defmodule Flamelex do
     raise "How do I set the log level??"
   end
 
-
-  @doc """
-  Returns the current input mode.
-  """
-  def mode do
-    GenServer.call(Flamelex.FluxusRadix, :get_state).mode
-  end
 
   @doc """
   Trigger help for the user.

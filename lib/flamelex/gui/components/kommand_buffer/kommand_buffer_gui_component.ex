@@ -15,12 +15,13 @@ defmodule Flamelex.GUI.Component.KommandBuffer do
   @impl Flamelex.GUI.ComponentBehaviour
   def custom_init_logic(params) do
 
-    #TODO set up links/monitors
-    # Process.link(Process.whereis(KommandBuffer)) # if KommandBuffer crashes, we crash!
+    #TODO manually test this & remind myself what kind of msg gets sent
+    Process.monitor(Process.whereis(KommandBuffer)) # if KommandBuffer crashes, we crash!
 
     # res = Flamelex.Utils.PubSub.subscribe(topic: :gui_event_bus)
     params |> Map.merge(%{
-      contents: ""
+      contents: "",
+      draw_footer?: false # NOTE: enforce this here, see what happens...
     })
   end
 
@@ -47,12 +48,9 @@ defmodule Flamelex.GUI.Component.KommandBuffer do
   def handle_cast({:update, %{data: new_text}}, graph_state) do
     IO.puts "GUI COMP GETTING MSG #{inspect new_text}"
 
-    ProcessRegistry.find!({:gui_component, {KommandBuffer, TextBox}})
+    {:gui_component, {KommandBufferGUI, TextBox}}
+    |> ProcessRegistry.find!()
     |> GenServer.cast({:modify, :lines, [%{line: 1, text: new_text}]})
-
-
-    # new_graph = graph |> KommandBufrUtils.update(kommand_bufr_state)
-    # {:noreply, {new_graph, state}, push: new_graph}
 
     {:noreply, graph_state}
   end
@@ -61,6 +59,11 @@ defmodule Flamelex.GUI.Component.KommandBuffer do
   #TODO so, we should be able to just, subscribe to mode changes... dunno why it's not working
   def handle_info({:switch_mode, m}, state) do
     IO.puts "KOMMAND MSG - #{inspect m}"
+    {:noreply, state}
+  end
+
+  def handle_info({:DOWN, _ref, _not_sure, _dunno, _cant_remember}, state) do
+    Logger.error "#{__MODULE__} received a :DOWN message."
     {:noreply, state}
   end
 end

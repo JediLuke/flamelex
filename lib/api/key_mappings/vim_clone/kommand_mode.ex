@@ -1,6 +1,7 @@
 defmodule Flamelex.API.KeyMappings.VimClone.KommandMode do
   alias Flamelex.Fluxus.Structs.RadixState
   use Flamelex.GUI.ScenicEventsDefinitions
+  require Logger
 
 
   def keymap(%RadixState{mode: :kommand}, @escape_key) do
@@ -25,7 +26,8 @@ defmodule Flamelex.API.KeyMappings.VimClone.KommandMode do
   def keymap(%RadixState{mode: :kommand}, input)
   #TODO maybe this should be an action...
     when input in @valid_text_input_characters do
-      GenServer.cast(Flamelex.Buffer.KommandBuffer, {:input, input})
+      Logger.debug "detected a valid character as input in :kommand mode: #{inspect input}"
+      GenServer.cast(KommandBuffer, {:input, input})
   end
 
 

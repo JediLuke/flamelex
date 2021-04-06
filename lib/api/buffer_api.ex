@@ -11,6 +11,7 @@ defmodule Flamelex.API.Buffer do
   """
   def list do
     %{buffer_list: buffer_list} = GenServer.call(BufferManager, :get_state)
+    #TODO we ought to trigger a GUI update here - possibly, this should indeed reside in BufferManager... since then at least GUI updates wiull be in sync
     buffer_list
   end
 
