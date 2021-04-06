@@ -60,7 +60,8 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
       graph
       |> Scenic.Primitives.text(new_text,
             id: :text_body,
-            translate: {frame.margin.left+frame.top_left.x, frame.margin.top+frame.top_left.y})
+            #TODO dont hardcode, figure out why this is bonked
+            translate: {frame.margin.left+frame.top_left.x-4, frame.margin.top+frame.top_left.y})
             # translate:  {x+left_margin, y+font_size+stroke_width}, # text draws from bottom-left corner??
             # font_size:  font_size,
             # fill:       :black)

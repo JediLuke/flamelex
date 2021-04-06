@@ -27,3 +27,6 @@ franklin-*.tar
 tags
 /data/
 lib/memex/environments/jediluke
+
+# no peeking ;)
+DEV_LOG.md

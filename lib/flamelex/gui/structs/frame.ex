@@ -112,8 +112,7 @@ def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when 
     }
   end
 
-  def set_margin(frame, %{top: t, left: l})
-    when t == 24 and l == 8 do #TODO bad bad
+  def set_margin(frame, %{top: t, left: l}) do
       %{frame|margin: %{
           top: t,
           right: 0,
