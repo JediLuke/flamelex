@@ -52,7 +52,8 @@ defmodule Flamelex.Fluxus.Reducers.Kommand do
   end
 
   defp reduce(radix_state, :execute) do
-    GenServer.cast(Flamelex.Buffer.KommandBuffer, :execute)
+    Logger.debug "KommandReducer received action saying :execute..."
+    GenServer.cast(KommandBuffer, :execute)
 
     #NOTE: If successful, the KommandBuffer will, in turn, initiate
     #      switching us back to normal mode - return the state unchanged
@@ -61,7 +62,7 @@ defmodule Flamelex.Fluxus.Reducers.Kommand do
 
   defp reduce(_radix_state, {:action, {KommandBuffer, x}}) do
     Logger.warn "KommandBuffer received an unmatched action: #{inspect x} - forwarding to KommandBuffer..."
-    GenServer.cast(Flamelex.Buffer.KommandBuffer, x)
+    GenServer.cast(KommandBuffer, x)
   end
 
   #NOTE: This is just an aesthetic function, to make sure all mode-changes
