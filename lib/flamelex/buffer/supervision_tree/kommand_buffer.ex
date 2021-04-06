@@ -12,7 +12,8 @@ defmodule Flamelex.Buffer.KommandBuffer do
   """
   use Flamelex.BufferBehaviour
   alias Flamelex.Buffer.Utils.KommandBuffer.ExecuteCommandHelper
-
+  alias Flamelex.Buffer.Utils.TextBuffer.ModifyHelper
+  alias Flamelex.Utils.TextManipulationTools, as: TextTools
 
   @impl Flamelex.BufferBehaviour
   def boot_sequence(params) do
@@ -29,6 +30,22 @@ defmodule Flamelex.Buffer.KommandBuffer do
   def handle_cast({:input, {:codepoint, {letter, _num?}}}, state) do
     new_state = %{state|data: state.data <> letter}
     update_gui(new_state |> Map.merge(%{move_cursor: {1, :column, :right}}))
+    {:noreply, new_state}
+  end
+
+  # def handle_cast({:backspace, x}, state) do
+  #   new_data = state.data - x
+  #   new_state = %{state|data: new_data}
+  #   update_gui(new_state |> Map.merge(%{move_cursor: {1, :column, :left}}))
+  #   {:noreply, new_state}
+  # end
+
+  def handle_cast({:modify, %{backspace: {:cursor, 1}}}, state) do
+    # ModifyHelper.start_modification_task(state, details)
+    IO.puts "KommandBuffer is modifying! "
+    # {:ok, new_state} = ModifyHelper.modify(state, details)
+    new_state = %{state|data: state.data |> TextTools.delete(:last_character)}
+    update_gui(new_state |> Map.merge(%{move_cursor: {1, :column, :left}}))
     {:noreply, new_state}
   end
 

@@ -131,6 +131,10 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
     {old_x-cursor_box_width()*x, old_y} # subtraction means left
   end
 
+  defp reposition_cursor(%{current_coords: {old_x, old_y}}, %{move: {x, :column, :left}}) do
+    {old_x-cursor_box_width()*x, old_y} # subtraction means left
+  end
+
   defp reposition_cursor(%{current_coords: {old_x, old_y}}, %{move: {:right, x, :column}}) when is_integer(x) and x >= 1 do
     {old_x+cursor_box_width()*x, old_y} # addition means right
   end

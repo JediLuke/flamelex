@@ -22,6 +22,11 @@ defmodule Flamelex.API.KeyMappings.VimClone.KommandMode do
     # GenServer.cast(Flamelex.Buffer.KommandBuffer, :hide)
   end
 
+  def keymap(%RadixState{mode: :kommand}, @backspace_key) do
+    # GenServer.cast(KommandBuffer, {:backspace, 1})
+    GenServer.cast(KommandBuffer, {:modify, %{backspace: {:cursor, 1}}}) #TODO hard-coded 1, again!
+  end
+
 
   def keymap(%RadixState{mode: :kommand}, input)
   #TODO maybe this should be an action...
