@@ -45,12 +45,17 @@ defmodule Flamelex.GUI.Component.KommandBuffer do
   end
 
 
-  def handle_cast({:update, %{data: new_text}}, graph_state) do
-    IO.puts "GUI COMP GETTING MSG #{inspect new_text}"
+  def handle_cast({:update, %{data: new_text, move_cursor: cursor_move_details}}, graph_state) do
 
+    # update the text
     {:gui_component, {KommandBufferGUI, TextBox}}
     |> ProcessRegistry.find!()
     |> GenServer.cast({:modify, :lines, [%{line: 1, text: new_text}]})
+
+    # move the cursor
+    {:text_cursor, 1, {:gui_component, {KommandBufferGUI, TextBox}}}
+    |> ProcessRegistry.find!()
+    |> GenServer.cast({:move, %{instructions: cursor_move_details}})
 
     {:noreply, graph_state}
   end

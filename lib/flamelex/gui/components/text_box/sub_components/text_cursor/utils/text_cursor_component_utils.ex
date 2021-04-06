@@ -135,6 +135,10 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
     {old_x+cursor_box_width()*x, old_y} # addition means right
   end
 
+  defp reposition_cursor(%{current_coords: {old_x, old_y}}, %{move: {x, :column, :right}}) do
+    {old_x+cursor_box_width()*x, old_y} # addition means righte
+  end
+
   defp reposition_cursor(%{original_coordinates: {_x, original_y}} = state, %{move: %{last: :line, same: :column}}) do
 
     lines_of_text =

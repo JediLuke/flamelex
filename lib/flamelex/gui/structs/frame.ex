@@ -113,11 +113,14 @@ def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when 
   end
 
   def set_margin(frame, %{top: t, left: l}) do
-      %{frame|margin: %{
-          top: t,
-          right: 0,
-          bottom: 0,
-          left: l }}
+      %{frame|
+          margin: %{
+            top: t,
+            right: 0,
+            bottom: 0,
+            left: l
+          }
+      }
   end
 
   def draw_frame_footer(

@@ -28,7 +28,7 @@ defmodule Flamelex.Buffer.KommandBuffer do
 
   def handle_cast({:input, {:codepoint, {letter, _num?}}}, state) do
     new_state = %{state|data: state.data <> letter}
-    update_gui(new_state)
+    update_gui(new_state |> Map.merge(%{move_cursor: {1, :column, :right}}))
     {:noreply, new_state}
   end
 
