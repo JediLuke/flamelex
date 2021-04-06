@@ -648,6 +648,17 @@ commits by me, JediLuke. I decided to keep this series of commits as the
 branch `franklin_dev`, as a tip-o'-the-hat to Franklin, the original seed
 that grew into Flamelex. Any code archaelogists out there?? here's a dig!
 
+I went back & forth a lot over various design - before I totally understood
+gproc, I wasn't able to structure the GUI components in a heirarchical manner
+which made sense. The heirarchical tuples were (not the, just one) solution
+to this (now we use PubSub).
+
+I also suffered from a lot of scope creep - I went from doing basic editing,
+to developing a new CLI GUI, to developing a TiddlyWIki, to developing software
+agents that are always running to help you. This version tries to show a
+MVP for all these features, but is just enough to "get it out the door" and
+show the community what I've done so far.`
+
 ## Detailed Flamelex manual
 
 

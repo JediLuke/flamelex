@@ -27,10 +27,10 @@ defmodule Flamelex.Memex.EnvironmentBehaviour do
 
 
   @doc """
-  The environments unique id, which is also the module name of the
-  environment we want to load.
+  #TODO rename this field to "name" - is is the name of this environment,
+  iit must be unique to this session of Flamelex.
   """
-  @callback id() :: atom()
+  @callback id() :: String.t()
 
 
   @doc """
@@ -53,5 +53,5 @@ defmodule Flamelex.Memex.EnvironmentBehaviour do
   @doc """
   Return the journal module for this environment.
   """
-  @callback journal() :: atom()
+  # @callback journal() :: atom()
 end
