@@ -30,6 +30,7 @@ defmodule Flamelex.MixProject do
     [
       {:scenic, "~> 0.10"},
       {:scenic_driver_glfw, "~> 0.10", targets: :host},
+      {:scenic_layout_o_matic, "~> 0.4.0"},
       {:ecto_sql, "~> 3.0"},
       {:truetype_metrics, "~> 0.3"},
       {:font_metrics, "~> 0.3"},
