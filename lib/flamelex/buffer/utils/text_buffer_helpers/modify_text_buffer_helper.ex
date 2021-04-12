@@ -2,6 +2,7 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
   use Flamelex.ProjectAliases
   alias Flamelex.Buffer.Utils.TextBufferUtils
   alias Flamelex.Buffer.Utils.CursorMovementUtils
+  require Logger
 
 
   def start_modification_task(state, params) do # params e.g.

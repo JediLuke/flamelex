@@ -8,6 +8,8 @@ defmodule Flamelex.GUI.Component.TextBox do
   alias Flamelex.GUI.Component.TextCursor
   require Logger
 
+  alias LayoutOMatic.Layouts.Grid
+
   #TODO render line numbers
 
 
@@ -18,7 +20,7 @@ defmodule Flamelex.GUI.Component.TextBox do
 
   def custom_init_logic(%{frame: %Frame{} = f} = params) do
 
-    # Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
+    Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
 
     mode = if params.mode == :insert, do: :insert, else: :normal
 
@@ -49,9 +51,16 @@ defmodule Flamelex.GUI.Component.TextBox do
     #TODO get margins from somewhere better
     frame = frame |> Frame.set_margin(%{top: 24, left: 8})
 
+    IO.inspect frame, label: "FRAME", pretty: true
+
     background_color = Flamelex.GUI.Colors.background()
 
+
+    # viewport_size = Application.get_env(:layout_demo, :viewport) |> Map.get(:size) #TODO
+    %{size: dimensions} = Flamelex.GUI.ScenicInitialize.viewport_config()
+
     Scenic.Graph.build()
+    # |> Scenic.Primitives.add_specs_to_graph(Grid.simple({0, 0}, dimensions, [:top, :right, :bottom, :left, :center]), id: :root_grid)
     |> Draw.background(frame, background_color)
     |> TextBoxDrawUtils.render_lines(%{lines: lines, frame: frame})
     |> draw_cursors(frame, params)
@@ -110,7 +119,7 @@ defmodule Flamelex.GUI.Component.TextBox do
 
   def handle_info({:switch_mode, new_mode}, {graph, state}) do
 
-    IO.inspect "BOX SWITCHING MODE: #{inspect state}"
+    #TODO dont do anything when we're hiding the Footer
 
     #     new_graph =
     #       Draw.blank_graph()
@@ -138,8 +147,6 @@ defmodule Flamelex.GUI.Component.TextBox do
       |> Scenic.Graph.modify(:mode_string, &Scenic.Primitives.text(&1, mode_string))
       #TODO also we want to change the color of the box!
       # |> Frame.redraw()
-
-    IO.puts "HERHERHER"
 
     {:noreply, {new_graph, state}, push: new_graph}
   end

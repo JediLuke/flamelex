@@ -60,14 +60,21 @@ defmodule Flamelex.Buffer.KommandBuffer do
 
 
   def handle_cast(:execute, state) do
+
     # Task.Supervisor.start_child(KommandBuffer.Reducer, :execute_command) #TODO do this under the KommandBuffer.Reducer
     ExecuteCommandHelper.execute_command(state.data)
-    # {:noreply, %{state|data: ""}}
-    {:noreply, state}
+
+    #NOTE: This seemed good, but only led to problems...
+    # only, after executing the commands (successfully!),
+    # do we want to go back into normal mode
+    # GenServer.cast(Flamelex.FluxusRadix, {:radix_state_update, mode: :normal})
+
+    {:noreply, %{state|data: ""}}
   end
 
 
   #TODO this is difficult to test... we need to test, that we sent a correctly updated state?
+  #TODO this should probably be a PubSub anyway
   def update_gui(state) do
     ProcessRegistry.find!({:gui_component, KommandBuffer})
     |> GenServer.cast({:update, state})

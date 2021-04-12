@@ -183,10 +183,9 @@ defmodule Flamelex.GUI.Controller do
   # end
 
   def handle_info({:switch_mode, _m}, state) do
-    IO.puts "CONTROLLER SWITCHING MODE !!"
+    # ignore...
     {:noreply, state}
   end
-
 
 end
 

@@ -24,7 +24,7 @@ defmodule Flamelex.GUI.Component.TextCursor do
 
     GenServer.cast(self(), :start_blink)
 
-    # Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
+    Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
 
     starting_coords = CursorUtils.calc_starting_coordinates(params.frame)
 
@@ -97,15 +97,11 @@ defmodule Flamelex.GUI.Component.TextCursor do
   end
 
   def handle_cast({:update, new_coords}, {graph, state}) do
-    IO.puts "TEXT CURSOR UPDATING!! #{inspect new_coords}"
     {new_graph, new_state} = CursorUtils.reposition({graph, state}, new_coords)
-    IO.puts "DID IT WORK???"
     {:noreply, {new_graph, new_state}, push: new_graph}
   end
 
-  #TODO why isn't this getting updates to switch mode???
   def handle_info({:switch_mode, new_mode}, {graph, %{ref: _buf_ref} = state}) do
-    IO.puts "CURSOR GETTING MSG TO SWITCH MODE!!"
     {new_graph, new_state} = CursorUtils.switch_mode({graph, state}, new_mode)
     {:noreply, {new_graph, new_state}, push: new_graph}
   end

@@ -23,7 +23,6 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
   end
 
   def switch_mode({graph, %{ref: buf_ref} = state}, new_mode) do
-    IO.puts "DEEP DEEP - text cursor utils, switching to mode: #{inspect new_mode}"
     block_dimensions = {_w, _h} = cursor_box_dimensions(new_mode)
 
     new_state =

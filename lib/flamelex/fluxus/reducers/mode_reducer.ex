@@ -45,9 +45,7 @@ defmodule Flamelex.Fluxus.Reducers.Mode do
   defp switch_mode(radix_state, m) do
     new_radix_state = %{radix_state|mode: m} # update the state with the new mode
 
-    IO.puts "UNDER THE HOOD ~~~ (switching modes, inside the ModeReducer)"
-
-    Flamelex.Utils.PubSub.broadcast([ #TODO is this even broadcasting anything??
+    Flamelex.Utils.PubSub.broadcast([
       topic: :gui_update_bus,
       msg: {:switch_mode, m}])
 

@@ -13,6 +13,17 @@ defmodule Flamelex.Buffer.Utils.TextBufferUtils do #TODO rename module to MiscUt
     {:ok, state |> Map.put(:unsaved_changes?, false)}
   end
 
+
+  # if we open a file, and pipe the contents into this function, then this
+  # is where we need to handle the nil case where the file is empty...
+  def parse_raw_text_into_lines(nil) do
+    [%{text: "", line: 1}]
+  end
+
+  def parse_raw_text_into_lines("") do
+    [%{text: "", line: 1}]
+  end
+
   def parse_raw_text_into_lines(raw_text) do
     {lines_of_text, _final_accumulator} =
         raw_text

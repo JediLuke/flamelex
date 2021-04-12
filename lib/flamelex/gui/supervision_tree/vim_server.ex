@@ -71,7 +71,7 @@ defmodule Flamelex.GUI.VimServer do
     # http://vimdoc.sourceforge.net/htmldoc/insert.html#o
     # The following commands can be used to insert new text into the buffer.
     # They can all be undone and repeated with the "." command.
-    IO.puts "for now, just open below current line... every time"
+    # IO.puts "for now, just open below current line... every time"
 
     # 2 - insert newline character at end
     # 1 - open insert mode
@@ -84,7 +84,7 @@ defmodule Flamelex.GUI.VimServer do
       active_buffer_process
       |> GenServer.call({:get_cursor_coords, 1}) #TODO how do we reference cursors here?
 
-    IO.puts "OPENINENINGING - #{inspect current_cursor_coords}"
+    # IO.puts "OPENINENINGING - #{inspect current_cursor_coords}"
 
     Flamelex.Fluxus.fire_actions([
       # append a new line to the current line
@@ -182,7 +182,7 @@ defmodule Flamelex.GUI.VimServer do
 
       # if x >= 2, we do indeed have a count so that modifies the behaviour of :goto_line
 
-    IO.puts "JUMP TO LINE BUT YES WE HAVE A COUNT"
+    # IO.puts "JUMP TO LINE BUT YES WE HAVE A COUNT"
 
     # here what we want to do, is jump the cursor down x lines, because
     # we have a count in our vim_state, so that's just what we do

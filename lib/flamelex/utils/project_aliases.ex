@@ -7,19 +7,13 @@ defmodule Flamelex.ProjectAliases do
   defmacro __using__(_opts) do
     quote do
 
-      # alias Flamelex.Utilities.TerminalIO
-
       alias Flamelex.API.{Buffer, Kommander, GUI, Memex, Journal}
 
-      alias Flamelex.Utilities.ProcessRegistry
+      alias Flamelex.Utilities.ProcessRegistry #TODO make this Utils.
       alias Flamelex.Utils.PubSub
 
-      # alias Flamelex.Memex.Structs.LiteraryQuote
-
       alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
-      alias Flamelex.GUI.Utilities.Draw
-
-      alias Flamelex.Fluxus.Actions.CoreActions
+      alias Flamelex.GUI.Utilities.Draw #TODO this should also be Utils.
 
     end
   end

@@ -5,7 +5,7 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
     [
       LiteraryQuote.construct(%{
         text: "The true alchemists do not change lead into gold; they change the world into words.",
-        author: "William H. Gass"
+        author: "A Temple of Texts (2006) - William H. Gass"
       }),
       LiteraryQuote.construct(%{
         text: "One man's “magic” is another man's engineering.",
@@ -81,7 +81,7 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
       }),
       LiteraryQuote.construct(%{
         text: ~s(As `eval`d, So `apply`d),
-        author: "Harold Abelson"
+        author: "JediLuke"
       }),
       LiteraryQuote.construct(%{
         text: ~s(We each have a pre-deterimined amount of time, to accomplish certain spiritual goals... so it behooves us all to be attentive to our spiritual growth, for no time is wasted there),
@@ -90,6 +90,10 @@ defmodule Flamelex.Memex.Episteme.AncientAlchemy do
       LiteraryQuote.construct(%{
         text: ~s(This infinite presence which is all things and everywhere, both the space in the room and the objects in the room - is also exquisitely gentle. It's touch just melts you with it's exquisite gentleness, and whatever there was of individual self is melted by it - dissolved! Dissolved into it... like a salt when dropped into water, it just dissolves and becomes all at one with what is.),
         author: "Dr. David R. Hawkins"
+      }),
+      LiteraryQuote.construct(%{
+        text: ~s(Alchemy, derived from the Hermetic philosophy - the only Art able to complete and bring light not only medicine, but also a universal Philosophy\n\nquaeque sola non Medicinam tantum, sed et universam Philosophiam valde perficere et illustrare possit.),
+        author: "Isaac Barrow (1859)"
       }),
     ]
   end

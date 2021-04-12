@@ -2,6 +2,7 @@ defmodule Flamelex.GUI.Utilities.ControlHelper do #TODO this is DrawDefaultGUI n
   use Flamelex.ProjectAliases
   require Logger
 
+  #TODO here, we need, layers. 7 layers...
 
   #TODO here we need to implement layers... so that menubar and command buffer get drawn on top
   def default_gui(%{viewport: vp}) do

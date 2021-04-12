@@ -110,7 +110,18 @@ defmodule Flamelex.FluxusRadix do
   # end
 
   def handle_cast({:radix_state_update, %RadixState{} = new_radix_state}, _old_radix_state) do
-    Logger.debug "#{__MODULE__} updating RadixState..."
+    {:noreply, new_radix_state}
+  end
+
+  def handle_cast({:radix_state_update, mode: new_mode}, radix_state) do
+    new_radix_state = %{radix_state|mode: new_mode}
+
+    IO.puts "GOT A NEW MODE & WE WANT TO UPDATE>>>>>>"
+
+    # Flamelex.Utils.PubSub.broadcast([
+    #   topic: :gui_update_bus,
+    #   msg: {:switch_mode, new_mode}])
+
     {:noreply, new_radix_state}
   end
 end

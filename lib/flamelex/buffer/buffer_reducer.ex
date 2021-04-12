@@ -22,8 +22,12 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do #TODO rename module
 
     # step 2 - update FluxusRadix (because we forced a root-level update)
     radix_update =
-      {:radix_state_update, params.radix_state |> RadixState.set_active_buffer(buf)}
+      {:radix_state_update, params.radix_state
+                            |> RadixState.set_active_buffer(buf)}
+
     GenServer.cast(Flamelex.FluxusRadix, radix_update)
+
+    Flamelex.API.Mode.switch_mode(:insert)
 
   end
 

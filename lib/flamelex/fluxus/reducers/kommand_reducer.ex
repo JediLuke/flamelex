@@ -55,8 +55,9 @@ defmodule Flamelex.Fluxus.Reducers.Kommand do
     Logger.debug "KommandReducer received action saying :execute..."
     GenServer.cast(KommandBuffer, :execute)
 
-    #NOTE: If successful, the KommandBuffer will, in turn, initiate
-    #      switching us back to normal mode - return the state unchanged
+    #NOTE: If successful, the KommandBuffer will, in turn, call us (FluxusRadix)
+    #      back, telling us to switch back to normal mode.
+    #      Return the state unchanged.
     radix_state
   end
 

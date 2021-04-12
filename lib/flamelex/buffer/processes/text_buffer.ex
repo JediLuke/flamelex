@@ -11,7 +11,7 @@ defmodule Flamelex.Buffer.Text do
 
   @impl Flamelex.BufferBehaviour
   def boot_sequence(%{source: {:file, filepath}} = params) do
-    Logger.info "#{__MODULE__} booting up..."
+    Logger.info "#{__MODULE__} booting up... #{inspect params, pretty: true}"
 
     {:ok, file_contents} = File.read(filepath)
 
@@ -67,16 +67,11 @@ defmodule Flamelex.Buffer.Text do
   end
 
   def handle_cast({:move_cursor, instructions}, state) do
-    start_sub_task(state,
-        MoveCursor, :move_cursor_and_update_gui, instructions)
+    start_sub_task(state, MoveCursor,
+                          :move_cursor_and_update_gui,
+                          instructions)
     {:noreply, state}
   end
-
-  #TODO remove this eventually, just use :modify
-  # def handle_cast({:modify_buffer, specifics}, state) do
-  #   ModifyHelper.start_modification_task(state, specifics)
-  #   {:noreply, state}
-  # end
 
   def handle_cast({:modify, details}, state) do
     ModifyHelper.start_modification_task(state, details)
@@ -96,6 +91,7 @@ defmodule Flamelex.Buffer.Text do
 
   def handle_cast({:state_update, new_state}, _old_state) do
     IO.puts "#{__MODULE__} updating state - #{inspect new_state.data}"
+    #TODO need to update the GUI here?
     {:noreply, new_state}
   end
 
