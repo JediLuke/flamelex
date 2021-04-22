@@ -7,7 +7,7 @@ defmodule Flamelex.GUI.Controller do
   use GenServer
   use Flamelex.ProjectAliases
   alias Flamelex.GUI.Structs.{GUIState, GUiComponentRef}
-  alias Flamelex.GUI.Utilities.ControlHelper, as: DrawDefaultGUI
+  alias Flamelex.GUI.Utils.DefaultGUI
   require Logger
 
 
@@ -16,6 +16,10 @@ defmodule Flamelex.GUI.Controller do
     initial_state = GUIState.initialize(viewport_size)
 
     GenServer.start_link(__MODULE__, initial_state)
+  end
+
+  def toggle_layer(x) do
+    "This is what I can use to manually test the layers concept..."
   end
 
 
@@ -34,19 +38,18 @@ defmodule Flamelex.GUI.Controller do
     #TODO
     #NOTE: This is here because sometimes, when we restart the app, I think
     #      this process is trying to re-draw th GUI before the RootScene is ready
-    :timer.sleep(200)
+    # :timer.sleep(200)
 
-    new_graph = DrawDefaultGUI.default_gui(state)
-    # new_graph = Draw.blank_graph()
-    Flamelex.GUI.redraw(new_graph)
+    new_graph = DefaultGUI.draw(state)
+    GenServer.cast(Flamelex.GUI.RootScene, {:redraw, new_graph})
 
     {:noreply, %{state|graph: new_graph}}
   end
 
 
-  def handle_call(:get_frame_stack, _from, state) do
-    {:reply, state.layout.frames, state}
-  end
+  # def handle_call(:get_frame_stack, _from, state) do
+  #   {:reply, state.layout.frames, state}
+  # end
 
 
   # def handle_cast({:switch_mode, m}, state) do
@@ -56,22 +59,25 @@ defmodule Flamelex.GUI.Controller do
   #   {:noreply, state}
   # end
 
-  def handle_cast({:action, :reset}, state) do
-    new_graph =DrawDefaultGUI.default_gui(state)
-    Flamelex.GUI.redraw(new_graph)
-    {:noreply, state}
-  end
+  # def handle_cast({:action, :reset}, state) do
+  #   #TODO this should - query the buffers etc, and attempt tp re-draw it
+  #   # failing that, this is the controller - this :reset ought to just,
+  #   # re-draw the GUI from the existing state, more like a refresh
+  #   new_graph = DrawDefaultGUI.default_gui(state)
+  #   Flamelex.GUI.redraw(new_graph)
+  #   {:noreply, state}
+  # end
 
-  #TODO maybe this doesn't need to be routed through here, but try it for now...
-  def handle_cast({:refresh, %{ref: ref} = buf_state}, gui_state) do
-    Logger.warn "I think this function might be deprecated..."
-    ref
-    |> GUiComponentRef.rego_tag()
-    |> ProcessRegistry.find!()
-    |> GenServer.cast({:refresh, buf_state, gui_state})
+  # #TODO maybe this doesn't need to be routed through here, but try it for now...
+  # def handle_cast({:refresh, %{ref: ref} = buf_state}, gui_state) do
+  #   Logger.warn "I think this function might be deprecated..."
+  #   ref
+  #   |> GUiComponentRef.rego_tag()
+  #   |> ProcessRegistry.find!()
+  #   |> GenServer.cast({:refresh, buf_state, gui_state})
 
-    {:noreply, gui_state}
-  end
+  #   {:noreply, gui_state}
+  # end
 
   def handle_cast({:close, buffer_tag}, gui_state) do
     new_graph =

@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Component.TransmutationCircle do #TODO rename to Renseijin
+defmodule Flamelex.GUI.Component.TransmutationCircle do
   @moduledoc """
   In order to begin an alchemical transmutation, a symbol called a
   Transmutation Circle (錬成陣, Renseijin) is necessary. A Transmutation
@@ -53,7 +53,6 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do #TODO rename to Renseiji
       gap_size: 4
     }
 
-    # Draw.blank_graph()
     Scenic.Graph.build()
     |> Scenic.Primitives.group(fn graph ->
           graph

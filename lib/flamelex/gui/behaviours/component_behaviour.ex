@@ -71,7 +71,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
 
         Flamelex.Utils.PubSub.subscribe(topic: :gui_event_bus)
 
-        IO.inspect params, label: "ComponentBehaviour.init/x is executing..."
+        # IO.inspect params, label: "ComponentBehaviour.init/x is executing..."
 
         graph =
           #TODO change this to just render/1 eventually...

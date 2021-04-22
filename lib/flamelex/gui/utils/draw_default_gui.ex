@@ -1,17 +1,40 @@
-defmodule Flamelex.GUI.Utilities.ControlHelper do #TODO this is DrawDefaultGUI now
+defmodule Flamelex.GUI.Utils.DefaultGUI do
   use Flamelex.ProjectAliases
   require Logger
 
-  #TODO here, we need, layers. 7 layers...
 
-  #TODO here we need to implement layers... so that menubar and command buffer get drawn on top
-  def default_gui(%{viewport: vp}) do
-    # Draw.blank_graph()
+#   # tiddlywiki
+#   created: 20191106045137712
+# modified: 20191106045315363
+# tags: dubber
+# title: Using the `luketest` account in dev.dubber.io rails console
+# tmap.id: cdef6cc3-4881-4934-978f-6146f2a99c58
+# type: text/vnd.tiddlywiki
+
+# ```
+# luketest = Dub::Account.where(slug: 'luketest').first
+# luketest.recordings.last
+# ```
+
+
+
+
+  def draw(%{viewport: vp}) do
+
+    #TODO this should probably be pre-compiled
     Scenic.Graph.build()
-    |> draw_transmutation_circle(vp)
-    # |> mount_menubar(vp)
-    |> mount_kommand_buffer(vp)
+    # |> draw_layer(1, "The transmutation circle")
+    # |> draw_layer(2, "")
+    # |> draw_layer(3, "Active Buffer")
+    # |> draw_layer(4, "Interrupts/Popups")
+    # |> draw_layer(5, "Menubar")
+    # |> draw_layer(6, "Kommander")
+    # |> draw_layer(7, "")
+
   end
+
+  #NOTE: Layers need to be able to be hidden/shown, and then rendered on
+  #      top of each other
 
 
   def draw_transmutation_circle(graph, vp) do

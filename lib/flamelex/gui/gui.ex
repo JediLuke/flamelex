@@ -1,8 +1,8 @@
 defmodule Flamelex.GUI do
   @moduledoc """
   This module provides an interface for controlling the Flamelex GUI. It
-  is mostly a container for several sub-modules, which in-turn are interfaces
-  for various parts of the GUI.
+  is mostly a container for several sub-modules, which in-turn are
+  interfaces for various parts of the GUI.
   """
   alias Flamelex.GUI.Controller, as: GUIControl
 
@@ -38,7 +38,7 @@ defmodule Flamelex.GUI do
   @doc """
   Re-draw the entire GUI.
   """
-  def redraw(%Scenic.Graph{} = g) do
-    Flamelex.GUI.RootScene.redraw(g)
-  end
+  # def redraw(%Scenic.Graph{} = g) do
+  #   Flamelex.GUI.RootScene.redraw(g)
+  # end
 end
