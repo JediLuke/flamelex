@@ -4,7 +4,7 @@ defmodule Flamelex.GUI.Utilities.Draw do
 
 
   @ibm_plex_mono Flamelex.GUI.Fonts.metrics_hash(:ibm_plex_mono) #NOTE: we use the metrics-hash here, not the font-hash
-  @default_text_size Flamelex.GUI.Fonts.size()
+  # @default_text_size Flamelex.GUI.Fonts.size()
 
 
   # def blank_graph(text_size \\ @default_text_size) when is_integer(text_size) do

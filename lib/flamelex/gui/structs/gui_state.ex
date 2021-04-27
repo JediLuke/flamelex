@@ -12,18 +12,13 @@ defmodule Flamelex.GUI.Structs.GUIState do
   """
   use Flamelex.ProjectAliases
 
-  @valid_modes [
-    :edit, :kommand, :select
-  ]
 
-
-  @components [
+  defstruct [
     viewport: nil, # %Dimensions{},
       layout: nil, # %Layout{},
        graph: nil, # %Scenic.Graph{}
   ]
 
-  defstruct @components
 
   @doc """
   Return the default initial state for the `Flamelex.GUI.Controller`
@@ -31,8 +26,7 @@ defmodule Flamelex.GUI.Structs.GUIState do
   def initialize(%Dimensions{} = vp) do
     %__MODULE__{
       viewport: vp,
-      layout: Layout.default(vp),
-      # graph: Draw.blank_graph()
+      layout: Layout.default(vp), #TODO so, each Layer, has a layout??
       graph: Scenic.Graph.build()
     }
   end

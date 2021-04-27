@@ -18,20 +18,92 @@ defmodule Flamelex.GUI.Utils.DefaultGUI do
 
 
 
+#TODO 3 layers, of layered down squares - need to be able to hide/dhow them, and change the color of the middle one or translate it or something - it should stay on top of the one below it, and below the one above it
 
   def draw(%{viewport: vp}) do
 
     #TODO this should probably be pre-compiled
     Scenic.Graph.build()
-    # |> draw_layer(1, "The transmutation circle")
-    # |> draw_layer(2, "")
-    # |> draw_layer(3, "Active Buffer")
-    # |> draw_layer(4, "Interrupts/Popups")
-    # |> draw_layer(5, "Menubar")
-    # |> draw_layer(6, "Kommander")
-    # |> draw_layer(7, "")
-
+    |> draw_layer(%{num: 1, id: :renseijin, draw_function: renseijin()})
+    |> draw_layer(%{num: 2, id: :test,      draw_function: test_draw()})
+    |> draw_layer(%{num: 3, id: :test,      draw_function: test_draw(:yellow)})
   end
+
+  def draw_layer(graph, %{id: id, num: x, draw_function: draw_fn}) when x >= 1 do
+
+    #TODO each layer, needs an AutoLayout, a level (they render on top of eachother, and we can re-order them?) & the ability to hide
+    # needs vidibility toggle
+    # needs viewport/max size
+
+    #TODO add a test overlay which shows the layer number
+
+    graph |> Scenic.Primitives.group(draw_fn, id: {:layer, id, x})
+  end
+
+  def renseijin() do
+    # returns a function, which takes a graph, which will be passed to the Scenic group
+
+    fn(graph) ->
+      graph
+      |> Draw.test_pattern()
+      |> test_fun()
+      |> test_fun(:green)
+    end
+  end
+
+  def test_draw do
+
+    color = :red
+
+    fn (graph) ->
+      graph
+      |> Scenic.Primitives.rect({200, 200},
+            translate: {200, 200},
+            fill: color,
+            stroke: {1, :ghost_white})
+    end
+  end
+
+  def test_draw(color = :yellow) do
+
+    fn (graph) ->
+      graph
+      |> Scenic.Primitives.rect({200, 200},
+            translate: {275, 386},
+            fill: color,
+            stroke: {1, :ghost_white})
+    end
+  end
+
+  def test_fun(graph) do
+    graph
+    |> Scenic.Primitives.group(fn graph ->
+         graph
+         |> Scenic.Primitives.rect({200, 200},
+              id: :red_square,
+              translate: {200, 200},
+              fill: :red,
+              stroke: {1, :ghost_white},
+              hidden: true)
+    end)
+  end
+
+  def test_fun(graph, color) do
+    graph
+    |> Scenic.Primitives.group(fn graph ->
+         graph
+         |> Scenic.Primitives.rect({200, 200}, translate: {300, 300}, fill: color)
+    end)
+
+    #           |> Scenic.Primitives.group(fn graph ->
+#                graph
+#                |> Scenic.Primitives.rect({w / 2, 100}, translate: {10, 10 + offset_count * 110}, fill: :cornflower_blue, stroke: {1, :ghost_white})
+#                |> Scenic.Primitives.text(note.title, font: @ibm_plex_mono,
+#                     translate: {25, 50 + offset_count * 110}, # text draws from bottom-left corner?? :( also, how high is it???
+#                     font_size: 24, fill: :black)
+#              end)
+  end
+
 
   #NOTE: Layers need to be able to be hidden/shown, and then rendered on
   #      top of each other

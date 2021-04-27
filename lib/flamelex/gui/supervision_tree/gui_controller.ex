@@ -6,7 +6,7 @@ defmodule Flamelex.GUI.Controller do
   """
   use GenServer
   use Flamelex.ProjectAliases
-  alias Flamelex.GUI.Structs.{GUIState, GUiComponentRef}
+  alias Flamelex.GUI.Structs.GUIState
   alias Flamelex.GUI.Utils.DefaultGUI
   require Logger
 
@@ -19,7 +19,8 @@ defmodule Flamelex.GUI.Controller do
   end
 
   def toggle_layer(x) do
-    "This is what I can use to manually test the layers concept..."
+    # "This is what I can use to manually test the layers concept..."
+    GenServer.cast(__MODULE__, {:toggle_layer, x})
   end
 
 
@@ -110,6 +111,34 @@ defmodule Flamelex.GUI.Controller do
   #   {:noreply, state}
   # end
 
+  def handle_cast({:toggle_layer, x}, gui_state) do
+
+    layer = {:layer, :test, x}
+
+    # look in the graph, find this primitive, & extract it's `hidden?` option field
+    %{ids: %{^layer => [n]}, primitives: p} = gui_state.graph
+
+    currently_hidden? =
+        # Scenic doesn't really encourage you reading back from the Graph...
+        if Map.has_key?(p[n], :styles) do
+          case p[n].styles do
+            %{hidden: hidden?} when is_boolean(hidden?) ->
+                hidden?
+            _otherwise ->
+                false
+          end
+        else
+          false
+        end
+
+    new_graph =
+      gui_state.graph
+      |> Scenic.Graph.modify(layer, &Scenic.Primitives.update_opts(&1, hidden: not currently_hidden?))
+
+    GenServer.cast(Flamelex.GUI.RootScene, {:redraw, new_graph})
+
+    {:noreply, %{gui_state|graph: new_graph}}
+  end
 
 
   def handle_cast({:show, buf_state}, gui_state) do #TODO this assumes it isn't hibernated or whatever
