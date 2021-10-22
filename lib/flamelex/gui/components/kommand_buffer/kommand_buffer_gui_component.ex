@@ -12,6 +12,39 @@ defmodule Flamelex.GUI.Component.KommandBuffer do
   end
 
 
+  def validate(data) do
+    IO.inspect data, label: "MENU BAR"
+    {:ok, data}
+  end
+
+
+  def init(scene, params, opts) do
+
+    IO.puts "YEH WE BE INITIN"
+    # IO.inspect params
+    # IO.inspect opts
+    # Process.register(self(), __MODULE__)
+    # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
+
+    #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
+    #      the scene, so we just need to initialize it with *something*
+    new_graph = 
+      render(params.frame, %{})
+
+    IO.inspect new_graph
+
+      # new_graph = 
+      # Scenic.Graph.build()
+      # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
+    # # new_scene =
+      scene
+    #   # |> assign(graph: new_graph)
+      |> push_graph(new_graph)
+
+    {:ok, scene}
+  end
+
+
   @impl Flamelex.GUI.ComponentBehaviour
   def custom_init_logic(params) do
 

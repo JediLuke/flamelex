@@ -5,7 +5,9 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
 
 
   def inactive_menubar(frame) do
-    Draw.blank_graph()
+    IO.puts "HIHIHIHIHIHI"
+    # Draw.blank_graph()
+    Scenic.Graph.build()
     |> Draw.background(frame, :grey)
     |> render_menu_buttons(frame, MenuBar.menu_buttons_mapping())
     # |> Draw.border(frame)
@@ -76,9 +78,9 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
 
     graph
     |> Scenic.Primitives.rect({item_width, MenuBar.height()}, fill: :dark_blue, translate: {margin, 0})
-    # |> Scenic.Primitives.text(text, fill: :white, translate: {MenuBar.menu_item(:left_margin) + margin,  MenuBar.height() + 24}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
+    |> Scenic.Primitives.text(text, font: :ibm_plex_mono, fill: :white, translate: {MenuBar.menu_item(:left_margin) + margin,  MenuBar.height() + 24}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
     #TODO 28 is correct here but got it through trial & error...
-    |> Scenic.Primitives.text(text, fill: :white, translate: {MenuBar.menu_item(:left_margin) + margin, y + 28}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
+    |> Scenic.Primitives.text(text, font: :ibm_plex_mono, fill: :white, translate: {MenuBar.menu_item(:left_margin) + margin, y + 28}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
   end
 
 
@@ -94,7 +96,7 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
         new_graph =
           graph
           |> Scenic.Primitives.rect({item_width, height}, fill: :white, translate: {margin, y + height + height*sub_index})
-          |> Scenic.Primitives.text(menu_item, fill: color, translate: {left_margin + margin,  y + height + height*sub_index + 24}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
+          # |> Scenic.Primitives.text(menu_item, fill: color, translate: {left_margin + margin,  y + height + height*sub_index + 24}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
 
         {new_graph, sub_index+1}
       end)
@@ -103,8 +105,8 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
     # graph
     # |> (fn graph ->
 
-    # |> Scenic.Primitives.rect({item_width, 120}, fill: :white, translate: {margin, y + Flamelex.GUI.Component.MenuBar.height()})
-    # |> Scenic.Primitives.text(text, font: @ibm_plex_mono, fill: :blue, translate: {left_margin + margin, y + 2*Flamelex.GUI.Component.MenuBar.height()})
+    |> Scenic.Primitives.rect({item_width, 120}, fill: :white, translate: {margin, y + Flamelex.GUI.Component.MenuBar.height()})
+    # |> Scenic.Primitives.text(text, font: :ibm_plex_mono, fill: :blue, translate: {left_margin + margin, y + 2*Flamelex.GUI.Component.MenuBar.height()})
   end
 
 
@@ -118,6 +120,7 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
       |> Scenic.Primitives.text(
             button_text,
               fill: :black,
+              font: :ibm_plex_mono,
               #TODO get this height from good science not a guess
               translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
 

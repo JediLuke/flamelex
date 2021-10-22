@@ -58,13 +58,13 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
 
     new_graph =
       graph
-      |> Scenic.Primitives.text(new_text,
-            id: :text_body,
-            #TODO dont hardcode, figure out why this is bonked
-            translate: {frame.margin.left+frame.top_left.x-4, frame.margin.top+frame.top_left.y})
-            # translate:  {x+left_margin, y+font_size+stroke_width}, # text draws from bottom-left corner??
-            # font_size:  font_size,
-            # fill:       :black)
+      # |> Scenic.Primitives.text(new_text,
+      #       id: :text_body,
+      #       #TODO dont hardcode, figure out why this is bonked
+      #       translate: {frame.margin.left+frame.top_left.x-4, frame.margin.top+frame.top_left.y})
+      #       # translate:  {x+left_margin, y+font_size+stroke_width}, # text draws from bottom-left corner??
+      #       # font_size:  font_size,
+      #       # fill:       :black)
 
     # graph
     # graph |> Graph.modify(:text, &text(&1, new_text, fill: :black))

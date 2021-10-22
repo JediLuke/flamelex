@@ -105,13 +105,15 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
     # font = Flamelex.GUI.Fonts.primary(:font)
     # size = Flamelex.GUI.Fonts.size()
     # Flamelex.GUI.Fonts.monospace_font_height(font, size)
-    Flamelex.GUI.Component.Utils.TextBox.line_height()
+    # Flamelex.GUI.Component.Utils.TextBox.line_height()
+    24
   end
 
   def cursor_box_width do
-    font = Flamelex.GUI.Fonts.primary(:font)
-    size = Flamelex.GUI.Fonts.size()
-    Flamelex.GUI.Fonts.monospace_font_width(font, size)
+    # font = Flamelex.GUI.Fonts.primary(:font)
+    # size = Flamelex.GUI.Fonts.size()
+    # Flamelex.GUI.Fonts.monospace_font_width(font, size)
+    12
   end
 
 

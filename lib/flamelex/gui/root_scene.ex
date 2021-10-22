@@ -12,19 +12,27 @@ defmodule Flamelex.GUI.RootScene do
   # since FluxusRadix holds the global state, and we need that to lookup
   # what to do with this input, as illustrated below:
   #
-  #     %RadixState{}  +  %Keystroke{}  ->   %Action{}
+  #     %RadixState{}  +  %Keystroke{}  ->  %Action{}
   #
 
 
   @impl Scenic.Scene
-  def init(_params, _opts) do
+  def init(scene, _params, _opts) do
+    Process.register(self(), __MODULE__)
+    {:ok, scene}
+  end
+
+
+
+  @impl Scenic.Scene
+  def init(scene, _params, _opts) do
 
     Process.register(self(), __MODULE__)
-    Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
+    # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
 
     #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
     #      the scene, so we just need to initialize it with *something*
-    {:ok, push: Scenic.Graph.build()}
+    {:ok, scene}
   end
 
 
@@ -41,28 +49,35 @@ defmodule Flamelex.GUI.RootScene do
   @matched_keys [@escape_key, @backspace_key, @enter_key]
 
   # match on these specific keys here, above the `ignorable_input`, so they're not ignored
-  def handle_input(input, _context, state) when input in @matched_keys do
+  def handle_input(input, _context, scene) when input in @matched_keys do
     #TODO we want to be able to hold down keys like backspace & trigger events while it's held
     Flamelex.Fluxus.handle_user_input(input)
-    {:noreply, state}
+    {:noreply, scene}
   end
 
   @impl Scenic.Scene
-  def handle_input({event, _details}, _context, state)
+  def handle_input({event, _details}, _context, scene)
     when event in @ignorable_input_events do
       # ignore...
-      {:noreply, state}
+      {:noreply, scene}
   end
 
   # handle all other (not-ignored) input...
-  def handle_input(input, _context, state) do
+  def handle_input(input, _context, scene) do
     Flamelex.Fluxus.handle_user_input(input)
-    {:noreply, state}
+    {:noreply, scene}
   end
 
   @impl Scenic.Scene
   #NOTE: The only process which should be sending us these is GUI.Controller
-  def handle_cast({:redraw, new_graph}, state) do
-    {:noreply, state, push: new_graph}
+  # def handle_cast({:redraw, new_graph}, scene) do
+  def handle_cast({blank, new_graph}, scene) do
+    new_scene =
+      scene
+      |> assign(graph: new_graph)
+      |> push_graph(new_graph)
+
+    {:noreply, new_scene}
   end
+
 end

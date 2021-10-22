@@ -5,6 +5,8 @@ config :elixir,
   # https://hexdocs.pm/elixir/DateTime.html#module-time-zone-database
   :time_zone_database, Tzdata.TimeZoneDatabase
 
+config :scenic,
+  :assets, module: Flamelex.Assets
 
 config :flamelex,
   :key_mapping, Flamelex.API.KeyMappings.VimClone

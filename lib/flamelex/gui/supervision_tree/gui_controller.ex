@@ -6,14 +6,22 @@ defmodule Flamelex.GUI.Controller do
   """
   use GenServer
   use Flamelex.ProjectAliases
-  alias Flamelex.GUI.Structs.GUIState
+  # alias Flamelex.GUI.Structs.GUIState
   alias Flamelex.GUI.Utils.DefaultGUI
   require Logger
 
+  # just do it simple - a stack of frames. Frames are kind of analogous to layers, but they have restrictions on size
+  # can be put on top/over eachother
+  # can overlap
+  # can be dragged/moved, can be toggled visible/inisible, can be moved around (re-ordered)
+  # frames have layouts - can contain splits / hjave alignments / margins etc
 
   def start_link(_params) do
-    viewport_size = Dimensions.new(:viewport_size)
-    initial_state = GUIState.initialize(viewport_size)
+    initial_state = %{
+      viewport: Dimensions.new(:viewport_size),
+      frames: [],
+      graph: nil
+    }
 
     GenServer.start_link(__MODULE__, initial_state)
   end
@@ -24,7 +32,11 @@ defmodule Flamelex.GUI.Controller do
   end
 
 
+  #
+  #
   ## GenServer callbacks
+  #
+  #
 
 
   def init(state) do
@@ -35,15 +47,8 @@ defmodule Flamelex.GUI.Controller do
   end
 
   def handle_continue(:draw_default_gui, state) do
-
-    #TODO
-    #NOTE: This is here because sometimes, when we restart the app, I think
-    #      this process is trying to re-draw th GUI before the RootScene is ready
-    # :timer.sleep(200)
-
     new_graph = DefaultGUI.draw(state)
     GenServer.cast(Flamelex.GUI.RootScene, {:redraw, new_graph})
-
     {:noreply, %{state|graph: new_graph}}
   end
 
@@ -110,6 +115,30 @@ defmodule Flamelex.GUI.Controller do
 
   #   {:noreply, state}
   # end
+
+  def handle_cast(:swap_layer_2_and_3, gui_state) do
+    #TODO this is just temporary, for testing - might be impssible and probably isnt needed
+    IO.inspect gui_state.graph
+
+    layer_2 = gui_state.graph.primitives |> find_layer(1) # extract lower frame  & save in a variable
+    layer_1 = gui_state.graph.primitives |> find_layer(2) # and uppder frame, at least make the reference to it for later use
+
+    # copy the higher frame into the lower one
+    new_graph =
+      gui_state.graph
+      |> Scenic.Graph.modify({:layer, :renseijen, 1}, fn _p ->
+            layer_1
+      end)
+      |> Scenic.Graph.modify({:layer, :work_layer, 2}, fn _p ->
+            layer_2
+      end)
+
+    # overwrite the higher frame, with the saved version we cached above
+
+    # redraw
+
+    {:noreply, %{gui_state|graph: new_graph}, push: new_graph}
+  end
 
   def handle_cast({:toggle_layer, x}, gui_state) do
 
@@ -222,6 +251,19 @@ defmodule Flamelex.GUI.Controller do
     {:noreply, state}
   end
 
+
+  # private functions
+
+
+  defp find_layer(primitives, x) do
+    primitives
+    |> Enum.find(fn
+          {:layer, _name, ^x} ->
+              true
+          _p ->
+              false
+       end)
+  end
 end
 
 

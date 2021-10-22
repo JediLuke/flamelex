@@ -33,10 +33,48 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
 
     - https://fma.fandom.com/wiki/Alchemy
   """
-  use Flamelex.GUI.ComponentBehaviour
+  # use Flamelex.GUI.ComponentBehaviour
+  use Scenic.Component
   alias Flamelex.GUI.GeometryLib.Trigonometry
+  alias Flamelex.GUI.Structs.Frame
 
   @primary_color :dark_violet
+
+  def validate(data) do
+    {:ok, data}
+  end
+
+  def mount(%Scenic.Graph{} = graph, %{ref: r} = params) do
+    graph |> add_to_graph(params, id: r) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
+  end
+  def mount(%Scenic.Graph{} = graph, params) do
+    graph |> add_to_graph(params) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
+  end
+
+
+  def init(scene, params, opts) do
+
+    # IO.inspect params
+    # IO.inspect opts
+    # Process.register(self(), __MODULE__)
+    # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
+
+    #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
+    #      the scene, so we just need to initialize it with *something*
+    new_graph = 
+      render(params.frame, %{})
+      # |> Scenic.Primitives.text("Lukey", font: :ibm_plex_mono, t: {200, 200}, font_size: 24, fill: :white)
+#                     translate: {25, 50 + offset_count * 110}, # text draws from bottom-left corner?? :( also, how high is it???
+#                     font_size: 24, fill: :black)
+      # Scenic.Graph.build()
+      # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
+    # # new_scene =
+      scene
+    #   # |> assign(graph: new_graph)
+      |> push_graph(new_graph)
+
+    {:ok, scene}
+  end
 
   def rego_tag(_), do: {:gui_component, :renseijin}
 

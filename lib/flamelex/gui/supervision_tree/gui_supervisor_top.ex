@@ -10,10 +10,9 @@ defmodule Flamelex.GUI.TopLevelSupervisor do
     IO.puts "#{__MODULE__} initializing..."
 
     children = [
-      {Scenic, viewports: [default_viewport_config()]},
-      Flamelex.GUI.Controller, #TODO which should boot first, Scenic, or GUiController?
-      Flamelex.GUI.VimSupervisor
-
+      {Scenic, [default_viewport_config()]},
+      Flamelex.GUI.Controller,
+      # Flamelex.GUI.VimSupervisor
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

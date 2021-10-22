@@ -3,13 +3,14 @@ defmodule Flamelex.GUI.Utilities.Draw do
   alias Flamelex.GUI.Component.MenuBar
 
 
-  @ibm_plex_mono Flamelex.GUI.Fonts.metrics_hash(:ibm_plex_mono) #NOTE: we use the metrics-hash here, not the font-hash
+  # @ibm_plex_mono Flamelex.GUI.Fonts.metrics_hash(:ibm_plex_mono) #NOTE: we use the metrics-hash here, not the font-hash
   # @default_text_size Flamelex.GUI.Fonts.size()
+  @default_text_size 24
 
 
-  # def blank_graph(text_size \\ @default_text_size) when is_integer(text_size) do
-  #   Scenic.Graph.build(font: @ibm_plex_mono, font_size: text_size)
-  # end
+  def blank_graph(text_size \\ @default_text_size) when is_integer(text_size) do
+    Scenic.Graph.build(font: @ibm_plex_mono, font_size: text_size)
+  end
 
   @doc """
   Draw a test pattern.
@@ -131,7 +132,8 @@ defmodule Flamelex.GUI.Utilities.Draw do
   #TODO remove this hideous function, right now it just works for rending fullscreen frames, but having card-coded coords like this is just wrong
   def text(%Scenic.Graph{} = graph, t, translate \\ {20, 20}) do
     graph
-    |> Scenic.Primitives.text(t, font: @ibm_plex_mono,
+    # |> Scenic.Primitives.text(t, font: @ibm_plex_mono,
+    |> Scenic.Primitives.text(t,
                translate: translate, # text draws from bottom-left corner?? :( also, how high is it???
                font_size: Flamelex.GUI.Fonts.size(), fill: :blue)
   end

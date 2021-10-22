@@ -8,9 +8,41 @@ defmodule Flamelex.GUI.Component.TextBox do
   alias Flamelex.GUI.Component.TextCursor
   require Logger
 
-  alias LayoutOMatic.Layouts.Grid
+  # alias LayoutOMatic.Layouts.Grid
 
   #TODO render line numbers
+
+  def validate(data) do
+    IO.inspect data, label: "TXTBOX"
+    {:ok, data}
+  end
+
+  def init(scene, params, opts) do
+
+    params = custom_init_logic(params)
+    IO.puts "YEH WE BE INITIN"
+    # IO.inspect params
+    # IO.inspect opts
+    # Process.register(self(), __MODULE__)
+    # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
+
+    #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
+    #      the scene, so we just need to initialize it with *something*
+    new_graph = 
+      render(params.frame, params)
+
+    IO.inspect new_graph
+
+      # new_graph = 
+      # Scenic.Graph.build()
+      # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
+    # # new_scene =
+      scene
+    #   # |> assign(graph: new_graph)
+      |> push_graph(new_graph)
+
+    {:ok, scene}
+  end
 
 
   def rego_tag(%{ref: buffer}) do
@@ -57,7 +89,9 @@ defmodule Flamelex.GUI.Component.TextBox do
 
 
     # viewport_size = Application.get_env(:layout_demo, :viewport) |> Map.get(:size) #TODO
-    %{size: dimensions} = Flamelex.GUI.ScenicInitialize.viewport_config()
+    # %{size: dimensions} = Flamelex.GUI.ScenicInitialize.viewport_config()
+    vpcfg = Flamelex.GUI.ScenicInitialize.viewport_config()
+    {:ok, dimensions} = Keyword.fetch(vpcfg, :size)
 
     Scenic.Graph.build()
     # |> Scenic.Primitives.add_specs_to_graph(Grid.simple({0, 0}, dimensions, [:top, :right, :bottom, :left, :center]), id: :root_grid)

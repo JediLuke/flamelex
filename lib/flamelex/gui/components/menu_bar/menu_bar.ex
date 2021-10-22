@@ -8,6 +8,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
   use Flamelex.GUI.ComponentBehaviour
 
   import Flamelex.GUI.Utilities.Drawing.MenuBarHelper
+  # use Scenic.Component
 
   #TODO deprecate these, but also come up eith a better name!!
   @left_margin 15
@@ -17,6 +18,43 @@ defmodule Flamelex.GUI.Component.MenuBar do
   def menu_item(:left_margin), do: 15
   def menu_item_width, do: 190
 
+  def validate(data) do
+    IO.inspect data, label: "MENU BAR"
+    {:ok, data}
+  end
+
+  # def mount(%Scenic.Graph{} = graph, %{ref: r} = params) do
+  #   graph |> add_to_graph(params, id: r) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
+  # end
+  # def mount(%Scenic.Graph{} = graph, params) do
+  #   graph |> add_to_graph(params) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
+  # end
+
+  def init(scene, params, opts) do
+
+    IO.puts "YEH WE BE INITIN"
+    # IO.inspect params
+    # IO.inspect opts
+    # Process.register(self(), __MODULE__)
+    # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
+
+    #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
+    #      the scene, so we just need to initialize it with *something*
+    new_graph = 
+      render(params.frame, %{})
+
+    IO.inspect new_graph
+
+      # new_graph = 
+      # Scenic.Graph.build()
+      # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
+    # # new_scene =
+      scene
+    #   # |> assign(graph: new_graph)
+      |> push_graph(new_graph)
+
+    {:ok, scene}
+  end
 
   @impl Flamelex.GUI.ComponentBehaviour
   def render(frame, _params) do
@@ -66,6 +104,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
 
   @impl Scenic.Scene
   def handle_input({:cursor_pos, {_x, _y} = coords}, _context, frame) do
+    IO.puts "CURSOR POS"
     case coords |> hovering_over_item?() do
       {:main_menubar, index} ->
           MenuBar.action({:animate_menu, index})

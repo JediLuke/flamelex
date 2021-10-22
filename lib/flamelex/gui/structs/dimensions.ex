@@ -15,7 +15,8 @@ defmodule Flamelex.GUI.Structs.Dimensions do
   def new(:viewport_size) do
     #TODO this is actually just getting us the *default* viewport,
     #     not necessarily the current one
-    %{size: dimensions} = Flamelex.GUI.ScenicInitialize.viewport_config()
+    dimensions = Flamelex.GUI.ScenicInitialize.viewport_config()
+                 |> Keyword.get(:size)
     new(dimensions)
   end
 

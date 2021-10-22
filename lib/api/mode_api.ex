@@ -17,7 +17,8 @@ defmodule Flamelex.API.Mode do
   it's worth learning a modal editor.
 
   In a future life, when we're all Start Fleet officers, we can continue
-  the discussion, about whether or not modes would be a good/bad idea in LCARS.
+  the discussion, about whether or not modes would be a good/bad idea in
+  LCARS.
 
   In Flamelex, I treat modes as a strictly user-input side concern. The
   mode changes what happens when you press the buttons. It changes how

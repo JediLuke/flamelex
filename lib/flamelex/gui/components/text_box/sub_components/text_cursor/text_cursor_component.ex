@@ -18,6 +18,37 @@ defmodule Flamelex.GUI.Component.TextCursor do
   #   |> GenServer.cast({:reposition, new_cursor}) #TODO change this to update
   # end
 
+  def validate(data) do
+    IO.inspect data, label: "TXTBOX"
+    {:ok, data}
+  end
+
+  def init(scene, params, opts) do
+
+    params = custom_init_logic(params)
+    IO.puts "YEH WE BE INITIN"
+    # IO.inspect params
+    # IO.inspect opts
+    # Process.register(self(), __MODULE__)
+    # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
+
+    #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
+    #      the scene, so we just need to initialize it with *something*
+    new_graph = 
+      render(params.frame, params)
+
+    IO.inspect new_graph
+
+      # new_graph = 
+      # Scenic.Graph.build()
+      # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
+    # # new_scene =
+      scene
+    #   # |> assign(graph: new_graph)
+      |> push_graph(new_graph)
+
+    {:ok, scene}
+  end
 
   @impl Flamelex.GUI.ComponentBehaviour
   def custom_init_logic(%{num: _n} = params) do # buffers need to keep track of cursors somehow, so we just use simple numbering
@@ -99,6 +130,11 @@ defmodule Flamelex.GUI.Component.TextCursor do
   def handle_cast({:update, new_coords}, {graph, state}) do
     {new_graph, new_state} = CursorUtils.reposition({graph, state}, new_coords)
     {:noreply, {new_graph, new_state}, push: new_graph}
+  end
+
+  def handle_cast(any, state) do
+    IO.warn "GOT ANY #{inspect any}"
+    {:noreply, state}
   end
 
   def handle_info({:switch_mode, new_mode}, {graph, %{ref: _buf_ref} = state}) do

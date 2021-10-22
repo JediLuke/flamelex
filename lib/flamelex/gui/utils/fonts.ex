@@ -5,9 +5,10 @@ defmodule Flamelex.GUI.Fonts do
   #TODO the font should be a config
 
 
-  def primary do
-    Flamelex.GUI.Fonts.font_hash(:ibm_plex_mono)
-  end
+  # def primary do
+  #   # Flamelex.GUI.Fonts.font_hash(:ibm_plex_mono)
+  #   "fonts/custom_font.ttf"
+  # end
 
   def primary(:font) do
     :ibm_plex_mono

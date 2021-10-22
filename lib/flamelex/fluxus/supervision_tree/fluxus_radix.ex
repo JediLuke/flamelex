@@ -71,30 +71,34 @@ defmodule Flamelex.FluxusRadix do
     {:noreply, radix_state |> RadixState.record(keystroke: ii)}
   end
 
-  def handle_cast({:action, a}, radix_state) do #TODO this should be :new_action, it's clearer, other places I pattern match directly on :action ' sthat have atually been fired
+  def handle_cast({:action, a}, radix_state) do
     Logger.debug "#{__MODULE__} processing action: #{inspect a}..."
     Flamelex.Fluxus.RootReducer.handle(radix_state, {:action, a})
-
-    # |> #TODO broadcast to all :gui_components the updated state ??
-
-    #TODO lol - so, in lieu of a fancy buffer system, I'm just gonna add delay
-    #     here, so all my actions get processed in order :D
-    :timer.sleep(150) #TODO can confirm, without this, we get weird errors where cursors jump back to their previous line... we need to chain actions together else updates don't ever get "merged in" with each other, 2 tasks running async both update the same state, one of them is stale
-
     {:noreply, radix_state |> RadixState.record(action: a)}
-
-    # #TODO maybe we dont even wait for a callback???
-    # case radix_state |> Flamelex.Fluxus.RootReducer.handle({:action, a}) do
-    #   {:ok, %RadixState{} = updated_radix_state} ->
-    #       {:noreply, updated_radix_state |> RadixState.record(action: a)}
-    #   {:error, reason} ->
-    #       IO.puts "error handling action: #{inspect a}, #{inspect reason}"
-    #       {:noreply, radix_state}
-    # end
-
-    #TODO register callbacks & timeouts within ourself, if we need to get
-    #     callbacks from actions
   end
+
+  # #TODO this should be :new_action, it's clearer, other places I pattern match directly on :action ' sthat have atually been fired
+
+
+  #   # |> #TODO broadcast to all :gui_components the updated state ??
+
+  #   #TODO lol - so, in lieu of a fancy buffer system, I'm just gonna add delay
+  #   #     here, so all my actions get processed in order :D
+  #   :timer.sleep(150) #TODO can confirm, without this, we get weird errors where cursors jump back to their previous line... we need to chain actions together else updates don't ever get "merged in" with each other, 2 tasks running async both update the same state, one of them is stale
+
+
+  #   # #TODO maybe we dont even wait for a callback???
+  #   # case radix_state |> Flamelex.Fluxus.RootReducer.handle({:action, a}) do
+  #   #   {:ok, %RadixState{} = updated_radix_state} ->
+  #   #       {:noreply, updated_radix_state |> RadixState.record(action: a)}
+  #   #   {:error, reason} ->
+  #   #       IO.puts "error handling action: #{inspect a}, #{inspect reason}"
+  #   #       {:noreply, radix_state}
+  #   # end
+
+  #   #TODO register callbacks & timeouts within ourself, if we need to get
+  #   #     callbacks from actions
+  # end
 
   # def process_inbox_buffer do
 
