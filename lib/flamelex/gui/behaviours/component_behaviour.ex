@@ -4,6 +4,9 @@ defmodule Flamelex.GUI.ComponentBehaviour do
   """
 
 
+  #TODO either deprecate this component or make it mandatory!!
+
+
   #NOTE: Here's a little reminder...
   # the __using__ macro allows us to `use ComponentBehaviour` and automatically
   # run, not just the behaviour contract code, but a whole bunch of useful
@@ -18,6 +21,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       # `Flamelex.GUI.ComponentBehaviour`
       @behaviour Flamelex.GUI.ComponentBehaviour
       use Scenic.Component
+      require Logger
 
 
       alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
@@ -70,8 +74,6 @@ defmodule Flamelex.GUI.ComponentBehaviour do
           end
 
         Flamelex.Utils.PubSub.subscribe(topic: :gui_event_bus)
-
-        # IO.inspect params, label: "ComponentBehaviour.init/x is executing..."
 
         graph =
           #TODO change this to just render/1 eventually...

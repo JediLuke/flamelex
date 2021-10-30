@@ -16,7 +16,7 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
 
     cursor_y_aesthetic_offset = 3
 
-    cursor_x_pos = frame.top_left.x+frame.margin.left - 5 #TODO
+    cursor_x_pos = frame.top_left.x+frame.margin.left - 4 #TODO
     cursor_y_pos = frame.top_left.y+frame.margin.top-block_height+cursor_y_aesthetic_offset
 
     {cursor_x_pos, cursor_y_pos}
@@ -38,6 +38,7 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
   end
 
   def handle_blink({graph, %{ref: buf_ref} = state}) do
+    # IO.puts "BLINK"
     new_state =
       case state.override? do
         :visible ->
@@ -95,7 +96,23 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
     {w, h}
   end
 
+  def reset_position({graph, state}) do
+    new_state =
+      %{state|current_coords: state.assigns.starting_coords, override?: :visible} # the visual effect is better if you dont blink the cursor when moving it
+
+    new_graph =
+      graph |> modify_cursor_position(new_state)
+
+    {new_graph, new_state}
+  end
+
   def cursor_box_dimensions(:insert) do
+    w = 2
+    h = cursor_box_height()
+    {w, h}
+  end
+
+  def cursor_box_dimensions(:kommand) do
     w = 2
     h = cursor_box_height()
     {w, h}
@@ -113,7 +130,7 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
     # font = Flamelex.GUI.Fonts.primary(:font)
     # size = Flamelex.GUI.Fonts.size()
     # Flamelex.GUI.Fonts.monospace_font_width(font, size)
-    12
+    12 #TODO this should definitely come from calculating from the font!
   end
 
 

@@ -1,9 +1,11 @@
 defmodule Flamelex.API.KeyMappings.VimClone.NormalMode do
   alias Flamelex.Fluxus.Structs.RadixState
   use Flamelex.GUI.ScenicEventsDefinitions
+  require Logger
 
 
   def keymap(_state, @space_bar) do
+    Logger.debug " <<-- Leader key pressed -->>"
     :ignore_input # this is the Leader key
   end
 

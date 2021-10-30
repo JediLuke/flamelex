@@ -32,7 +32,7 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
     %{radix_state|mode: m}
   end
 
-  def record(%__MODULE__{keystroke_history: keystroke_history} = radix_state, keystroke: k) do
+  def record(%__MODULE__{keystroke_history: keystroke_history} = radix_state, keystroke: %{input: k}) do
     new_keystroke_history =
         keystroke_history
         |> add_to_list(k, max_length: @max_keystroke_history_limit)

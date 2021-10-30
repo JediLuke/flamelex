@@ -32,7 +32,6 @@ defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
     #           row: num_rows, #TODO rename to max
     #           col: num_cols })
 
-    # IO.inspect tiles, label: "TTT"
 
     # opts = %{ block_width: block_width,
     #           block_height: block_height,

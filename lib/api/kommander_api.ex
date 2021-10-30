@@ -8,12 +8,14 @@ defmodule Flamelex.API.Kommander do
   but there was some confusion due to a double-use, especially when you
   start to use module alias'... it's just better this way.
   """
+  require Logger
 
 
   @doc """
   Make the KommandBuffer visible, and put us in :kommand mode.
   """
   def show do
+
     Flamelex.Fluxus.fire_action({KommandBuffer, :show})
   end
 
@@ -23,6 +25,7 @@ defmodule Flamelex.API.Kommander do
   us in :kommand mode.
   """
   def open do
+    Logger.debug "opening KommandBuffer..."
     show()
   end
 

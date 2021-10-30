@@ -1,3 +1,22 @@
+defmodule Flamelex.GUI.Renseijin do
+  @moduledoc """
+  This module provides a nice CLAPI (Command-line API) - intended to be
+  used by a programmer via IEx.
+  """
+  require Logger
+  use Flamelex.ProjectAliases
+
+  def transmote do
+    {:ok, pid} =
+      Flamelex.GUI.Component.TransmutationCircle.rego_tag(%{})
+      |> ProcessRegistry.lookup()
+
+    GenServer.cast(pid, :transmotion_begin)
+
+    Logger.info "~~ Double, double toil and trouble; Fire burn and caldron bubble ~~"
+  end
+end
+
 defmodule Flamelex.GUI.Component.TransmutationCircle do
   @moduledoc """
   In order to begin an alchemical transmutation, a symbol called a
@@ -37,10 +56,13 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
   use Scenic.Component
   alias Flamelex.GUI.GeometryLib.Trigonometry
   alias Flamelex.GUI.Structs.Frame
+  require Logger
 
   @primary_color :dark_violet
+  @pi 3.14159265359
 
-  def validate(data) do
+  def validate(%{ref: r} = data) do
+    Logger.debug "#{__MODULE__} has valid input data."
     {:ok, data}
   end
 
@@ -53,32 +75,64 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
 
 
   def init(scene, params, opts) do
-
-    # IO.inspect params
-    # IO.inspect opts
+    Logger.debug "#{__MODULE__} initializing..."
     # Process.register(self(), __MODULE__)
     # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
 
+    Flamelex.Utilities.ProcessRegistry.register(rego_tag())
     #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
     #      the scene, so we just need to initialize it with *something*
     new_graph = 
       render(params.frame, %{})
+
       # |> Scenic.Primitives.text("Lukey", font: :ibm_plex_mono, t: {200, 200}, font_size: 24, fill: :white)
 #                     translate: {25, 50 + offset_count * 110}, # text draws from bottom-left corner?? :( also, how high is it???
 #                     font_size: 24, fill: :black)
       # Scenic.Graph.build()
       # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
-    # # new_scene =
+
+    new_scene =
       scene
-    #   # |> assign(graph: new_graph)
+      |> assign(graph: new_graph)
+      |> assign(frame: params.frame)
+      |> assign(rotation: 0)
       |> push_graph(new_graph)
 
-    {:ok, scene}
+    {:ok, new_scene}
   end
 
-  def rego_tag(_), do: {:gui_component, :renseijin}
+  @animation_rate 10 # 100ms framerate? tick every 100ms?
+
+  def handle_cast(:transmotion_begin, scene) do
+    Logger.debug "#{__MODULE__} received msg: :transmotion_begin"
+    {:ok, timer} = :timer.send_interval(@animation_rate, :animation_tick)
+    new_scene = scene
+    |> assign(timer: timer)
+    {:noreply, new_scene}
+  end
+
+  def rego_tag, do: {:gui_component, :renseijin}
+  def rego_tag(_), do: rego_tag()
 
   @impl Flamelex.GUI.ComponentBehaviour
+  # def render(%{assigns: %{graph: graph, rotation: r, frame: frame}} = scene) do
+  #   params = %{
+  #     radius: frame.dimensions.width/2, # we can get the scale_factor back this way!
+  #     center: Frame.find_center(frame),
+  #     outer_rim: 42,
+  #     gap_size: 4,
+  #     rotation: r
+  #   }
+  #   Scenic.Graph.build()
+  #   |> Scenic.Primitives.group(fn graph ->
+  #         graph
+  #         |> draw_circles(params)
+  #         |> draw_triangles(params)
+  #      end, [
+  #         id: __MODULE__,
+  #         hidden: false
+  #      ])
+  # end
   def render(frame, _params) do
 
 
@@ -88,7 +142,8 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
       radius: frame.dimensions.width/2, # we can get the scale_factor back this way!
       center: Frame.find_center(frame),
       outer_rim: 42,
-      gap_size: 4
+      gap_size: 4,
+      rotation: 0
     }
 
     Scenic.Graph.build()
@@ -111,6 +166,9 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
     } = params
 
     graph
+    |> Scenic.Primitives.circle(radius-170,
+                stroke: {1, @primary_color},
+                translate: {center.x, center.y})
     |> Scenic.Primitives.circle(radius,
                 stroke: {1, @primary_color},
                 translate: {center.x, center.y})
@@ -127,7 +185,8 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
       radius: radius,
       center: center,
       outer_rim: rim,
-      gap_size: size
+      gap_size: size,
+      rotation: r
     } = params
 
     graph
@@ -135,16 +194,20 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
                 Trigonometry.equilateral_triangle_coords(
                   center,
                   radius),
+                id: :inner_triangle,
                 stroke: {1, @primary_color})
     |> Scenic.Primitives.triangle(
                 Trigonometry.equilateral_triangle_coords(
                   center,
                   radius - rim + size),
-                stroke: {1, @primary_color})
+                id: :mid_triangle,
+                stroke: {1, @primary_color},
+                rotate: r)
     |> Scenic.Primitives.triangle(
                 Trigonometry.equilateral_triangle_coords(
                   center,
                   radius - rim + 2 * size + size/2),
+                id: :outer_triangle,
                 stroke: {1, @primary_color})
   end
 
@@ -160,6 +223,51 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
   @impl Flamelex.GUI.ComponentBehaviour
   def handle_action({_state, _graph}, :hide) do
     raise "Can't hide TransmutationCircle yet"
+  end
+
+  def handle_info(:animation_tick, %{assigns: %{rotation: r}} = scene)
+    when scene.assigns.rotation >= 0 and scene.assigns.rotation <= 360 do
+      # Logger.debug "#{__MODULE__} received: :animation_tick"
+
+      scene = scene
+      |> assign(rotation: scene.assigns.rotation + 0.2)
+
+      new_graph =
+        scene.assigns.graph
+        |> Scenic.Graph.modify(:inner_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
+        |> Scenic.Graph.modify(:mid_triangle, &Scenic.Primitives.update_opts(&1, rotate: degree_in_radians(scene.assigns.rotation)))
+        |> Scenic.Graph.modify(:outer_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
+
+      new_scene =
+        scene
+        |> assign(graph: new_graph)
+        |> push_graph(new_graph)
+    
+    {:noreply, new_scene}
+  end
+
+  def handle_info(:animation_tick, %{assigns: %{rotation: r}} = scene) do
+      # Logger.debug "#{__MODULE__} received: :animation_tick - and we need to reset our timer!"
+
+      scene = scene
+      |> assign(rotation: 0)
+
+      new_graph =
+        scene.assigns.graph
+        |> Scenic.Graph.modify(:inner_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
+        |> Scenic.Graph.modify(:mid_triangle, &Scenic.Primitives.update_opts(&1, rotate: degree_in_radians(scene.assigns.rotation)))
+        |> Scenic.Graph.modify(:outer_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
+
+      new_scene =
+        scene
+        |> assign(graph: new_graph)
+        |> push_graph(new_graph)
+    
+    {:noreply, new_scene}
+  end
+
+  def degree_in_radians(x) do
+    (2*@pi*x)/360
   end
 
   def kaomoji do

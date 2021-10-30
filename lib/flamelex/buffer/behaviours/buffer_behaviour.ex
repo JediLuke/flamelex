@@ -13,6 +13,7 @@ defmodule Flamelex.BufferBehaviour do
       @behaviour Flamelex.BufferBehaviour
       use GenServer, restart: :transient
       use Flamelex.ProjectAliases
+      require Logger
 
 
       @doc """
@@ -21,14 +22,14 @@ defmodule Flamelex.BufferBehaviour do
       """
       #TODO this is currently only going to work for text files...
       def start_link(%{source: source} = params) do
-        IO.puts "#{__MODULE__} starting... params: #{inspect params}"
+        Logger.debug "#{__MODULE__} starting... params: #{inspect params}"
         tag  = {:buffer, source}
         name = Flamelex.Utilities.ProcessRegistry.via_tuple_name(:gproc, tag)
         GenServer.start_link(__MODULE__, Map.merge(params, %{rego_tag: tag}), name: name)
       end
 
       def start_link(%{rego_tag: {:buffer, _b} = tag} = params) do #TODO should we enforce this tuple shape here?? dunno
-        IO.puts "#{__MODULE__} starting... params: #{inspect params}"
+        Logger.debug "#{__MODULE__} starting... params: #{inspect params}"
         name = Flamelex.Utilities.ProcessRegistry.via_tuple_name(:gproc, tag)
         GenServer.start_link(__MODULE__, %{rego_tag: tag, params: params}, name: name)
       end

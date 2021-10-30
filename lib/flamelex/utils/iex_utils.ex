@@ -7,8 +7,8 @@ defmodule Flamelex.Utilities.IExUtils do
   """
   def query_module(m) do
     help = IEx.Helpers.h m
-    IO.inspect "-------------"
-    IO.inspect help
+    IO.puts "-------------"
+    IO.puts help
     help
   end
 end

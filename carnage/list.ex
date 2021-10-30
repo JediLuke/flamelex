@@ -56,7 +56,6 @@
 #   } = data, _opts) do
 #     Logger.info "#{__MODULE__} initializing...#{inspect data}"
 
-#     IO.inspect contents, label: "CCC"
 
 #     graph =
 #       Scenic.Graph.build()
@@ -72,7 +71,6 @@
 #       #TODO have a note data structure
 #       Enum.reduce(contents, {graph, _offset_count = 0}, fn {_key, note} = iter, {graph, offset_count} ->
 
-#         IO.inspect iter, label: "HIHIHI"
 
 #         graph =
 #           graph

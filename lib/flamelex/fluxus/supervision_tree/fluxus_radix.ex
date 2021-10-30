@@ -56,7 +56,7 @@ defmodule Flamelex.FluxusRadix do
 
 
   def init(%RadixState{} = radix_state) do
-    IO.puts "#{__MODULE__} initializing..."
+    Logger.debug "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
     {:ok, radix_state}
   end
@@ -71,10 +71,16 @@ defmodule Flamelex.FluxusRadix do
     {:noreply, radix_state |> RadixState.record(keystroke: ii)}
   end
 
-  def handle_cast({:action, a}, radix_state) do
+  def handle_call(:get_mode, _from, state) do
+    {:reply, state.mode, state}
+  end
+
+  # def handle_cast({:action, a}, radix_state) do
+  def handle_call({:action, a}, _from, radix_state) do
     Logger.debug "#{__MODULE__} processing action: #{inspect a}..."
     Flamelex.Fluxus.RootReducer.handle(radix_state, {:action, a})
-    {:noreply, radix_state |> RadixState.record(action: a)}
+    new_radix_state = radix_state |> RadixState.record(action: a)
+    {:reply, :ok, new_radix_state}
   end
 
   # #TODO this should be :new_action, it's clearer, other places I pattern match directly on :action ' sthat have atually been fired

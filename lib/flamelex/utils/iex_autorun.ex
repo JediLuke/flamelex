@@ -22,8 +22,10 @@ defmodule Flamelex.IExAutoRun do
       # these alias` are conveniences which I like to have pre-bound in my IEx
       alias Flamelex.API.Buffer
       alias Flamelex.API.Memex
+      alias Flamelex.API.Kommander
+      alias Flamelex.GUI
+      alias Flamelex.GUI.RenSeijin
 
-      # alias Flamelex.API.Kommander
       # alias Flamelex.API.Memex.My
       # alias Flamelex.API.Journal
       # alias Flamelex.API.GUI
@@ -43,15 +45,17 @@ defmodule Flamelex.IExAutoRun do
     -------------------
     v0.2.7
 
-    " <> punctuated_quote())
+    ")
+
+    # " <> punctuated_quote())
   end
 
-  def punctuated_quote do
-    q = Flamelex.API.Memex.random_quote()
+  # def punctuated_quote do
+  #   q = Flamelex.API.Memex.random_quote()
 
-    ~s(“#{q.text}”
-     - #{q.author}
+  #   ~s(“#{q.text}”
+  #    - #{q.author}
 
-    )
-  end
+  #   )
+  # end
 end

@@ -5,7 +5,6 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
 
 
   def inactive_menubar(frame) do
-    IO.puts "HIHIHIHIHIHI"
     # Draw.blank_graph()
     Scenic.Graph.build()
     |> Draw.background(frame, :grey)
@@ -29,9 +28,9 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
     # sub_menu = fetch_submenu(index)
 
     # graph
-    # |> IO.inspect
 
-    inactive_menubar(frame)
+    # inactive_menubar(frame)
+    graph
     |> draw_menu_highlight(details, index, sub_index, top_left: {0, 0})
     # |> Draw.border(frame)
   end
@@ -96,7 +95,7 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
         new_graph =
           graph
           |> Scenic.Primitives.rect({item_width, height}, fill: :white, translate: {margin, y + height + height*sub_index})
-          # |> Scenic.Primitives.text(menu_item, fill: color, translate: {left_margin + margin,  y + height + height*sub_index + 24}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
+          |> Scenic.Primitives.text(menu_item, font: :ibm_plex_mono, fill: color, translate: {left_margin + margin,  y + height + height*sub_index + 24}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
 
         {new_graph, sub_index+1}
       end)
@@ -105,7 +104,7 @@ defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
     # graph
     # |> (fn graph ->
 
-    |> Scenic.Primitives.rect({item_width, 120}, fill: :white, translate: {margin, y + Flamelex.GUI.Component.MenuBar.height()})
+    # |> Scenic.Primitives.rect({item_width, 120}, fill: :white, translate: {margin, y + Flamelex.GUI.Component.MenuBar.height()})
     # |> Scenic.Primitives.text(text, font: :ibm_plex_mono, fill: :blue, translate: {left_margin + margin, y + 2*Flamelex.GUI.Component.MenuBar.height()})
   end
 

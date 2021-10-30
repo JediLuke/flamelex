@@ -4,6 +4,7 @@ defmodule Flamelex.GUI.VimServer do
   """
   use GenServer
   use Flamelex.ProjectAliases
+  require Logger
 
   def default_state do
     %{
@@ -17,7 +18,7 @@ defmodule Flamelex.GUI.VimServer do
   end
 
   def init(init_state) do
-    IO.puts "#{__MODULE__} initializing..."
+    Logger.debug "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
     {:ok, init_state}
   end
@@ -148,7 +149,6 @@ defmodule Flamelex.GUI.VimServer do
         active_buffer_process
         |> GenServer.call(:get_num_lines)
 
-    IO.inspect last_line, label: "LAST LINE???"
 
     # action = {:move_cursor, %{
     #              buffer: radix_state.active_buffer,
@@ -163,7 +163,6 @@ defmodule Flamelex.GUI.VimServer do
           instructions: {:goto, %{line: last_line, col: current_cursor_coords.col}}
     }}})
 
-    IO.inspect current_cursor_coords, label: "GOT THE CURENT CURSOR"
 
     # # You can return to that position with the "''"' and "``" command, #TODO no fkin idea what these characters are lol
     # # unless the line containing that position was changed or deleted. #TODO maybe we can be more clever here
@@ -182,14 +181,11 @@ defmodule Flamelex.GUI.VimServer do
 
       # if x >= 2, we do indeed have a count so that modifies the behaviour of :goto_line
 
-    # IO.puts "JUMP TO LINE BUT YES WE HAVE A COUNT"
-
     # here what we want to do, is jump the cursor down x lines, because
     # we have a count in our vim_state, so that's just what we do
 
     {:noreply, vim_state |> reset_count()}
 
-    # IO.inspect radix_state
     # # If you make the cursor "jump" with one of these commands, the
     # # position of the cursor before the jump is remembered.
     # current_cursor_coords =

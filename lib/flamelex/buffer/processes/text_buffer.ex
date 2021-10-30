@@ -6,12 +6,12 @@ defmodule Flamelex.Buffer.Text do
   alias Flamelex.Buffer.Utils.TextBufferUtils
   alias Flamelex.Buffer.Utils.TextBuffer.ModifyHelper
   alias Flamelex.Buffer.Utils.CursorMovementUtils, as: MoveCursor
-  require Logger
+  # require Logger
 
 
   @impl Flamelex.BufferBehaviour
   def boot_sequence(%{source: {:file, filepath}} = params) do
-    Logger.info "#{__MODULE__} booting up... #{inspect params, pretty: true}"
+    # Logger.info "#{__MODULE__} booting up... #{inspect params, pretty: true}"
 
     {:ok, file_contents} = File.read(filepath)
 
@@ -48,7 +48,7 @@ defmodule Flamelex.Buffer.Text do
 
   def handle_cast(:close, %{unsaved_changes?: true} = state) do
     #TODO need to raise a bigger alarm here
-    Logger.warn "unable to save buffer: #{inspect state.rego_tag}, as it contains unsaved changes."
+    # Logger.warn "unable to save buffer: #{inspect state.rego_tag}, as it contains unsaved changes."
     {:noreply, state}
   end
 
@@ -73,9 +73,11 @@ defmodule Flamelex.Buffer.Text do
     {:noreply, state}
   end
 
-  def handle_cast({:modify, details}, state) do
+  # def handle_cast({:modify, details}, state) do
+  def handle_call({:modify, details}, _from, state) do
     ModifyHelper.start_modification_task(state, details)
-    {:noreply, state}
+    # :timer.sleep(100)
+    {:reply, :ok, state}
   end
 
 
@@ -90,7 +92,8 @@ defmodule Flamelex.Buffer.Text do
   # end
 
   def handle_cast({:state_update, new_state}, _old_state) do
-    IO.puts "#{__MODULE__} updating state - #{inspect new_state.data}"
+    Logger.debug "#{__MODULE__} updating state - #{inspect new_state.data}"
+    #TODO this is where the GUI should be triggered, not the othe way around
     #TODO need to update the GUI here?
     {:noreply, new_state}
   end

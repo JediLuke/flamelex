@@ -61,7 +61,7 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
 
     # delete text left of this by 1 char
     {before_cursor_text, after_and_under_cursor_text} =
-              line_of_text |> String.split_at(c)
+              line_of_text |> String.split_at(c-1)
     {backspaced_text, _deleted_text} =
               before_cursor_text |> String.split_at(-1)
     full_backspaced_text =
@@ -74,11 +74,12 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
 
     #TODO here is where we update GUI... kinda... not perfect
     ProcessRegistry.find!({:gui_component, state.rego_tag}) #TODO this should be a GUI.Component.TextBox, not, :gui_component !!
-    |> GenServer.cast({:modify, :lines, new_state_lines_struct})
+    |> GenServer.call({:modify, :lines, new_state_lines_struct})
 
     {:ok, state
           |> CursorMovementUtils.move_cursor_and_update_gui(%{cursor_num: 1, instructions: {:left, 1, :column}}) #TODO cursor 1 again
           |> Map.replace!(:data, new_data)
+          |> Map.replace!(:cursors, [%{col: c-1, line: l}]) #TODO this isnt really very flexible, it's hard coded for 1 cursor
           |> Map.replace!(:lines, new_state_lines_struct)
           |> Map.replace!(:unsaved_changes?, true)}
   end
@@ -153,6 +154,7 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
     when is_list(cursors)
      and length(cursors) >= 1
       do
+        start_coords = Enum.at(cursors, n-1) # stupid indexing...
 
         %{col: c, line: line_num} = Enum.at(cursors, n-1) # stupid indexing...
         if line_num < 1, do: raise "we are not able to process negative line numbers"
@@ -160,7 +162,7 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
 
         new_line = state.lines
                    |> Enum.at(line_num-1) #NOTE: lines start at 1, but Enum indixes start at zero
-                   |> insert_text_into_line(text, c)
+                   |> insert_text_into_line(text, c-1) # TODO dunno why we need this -1 all of a sudden
 
         new_lines = state.lines
                     |> List.replace_at(line_num-1, new_line) #NOTE: lines start at 1, but Enum indixes start at zero
@@ -169,10 +171,11 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
 
         #TODO here is where we update GUI... kinda... not perfect
         ProcessRegistry.find!({:gui_component, state.rego_tag}) #TODO this should be a GUI.Component.TextBox, not, :gui_component !!
-        |> GenServer.cast({:modify, :lines, new_lines})
+        |> GenServer.call({:modify, :lines, new_lines})
 
         {:ok, state
               |> Map.replace!(:data, new_data)
+              |> Map.replace!(:cursors, [%{col: c+1, line: line_num}]) #TODO this isnt really very flexible, it's hard coded for 1 cursor
               |> Map.replace!(:lines, new_lines)
               |> Map.replace!(:unsaved_changes?, true)}
   end
@@ -224,7 +227,7 @@ defmodule Flamelex.Buffer.Utils.TextBuffer.ModifyHelper do
     list
     |> Enum.map(
             fn
-              %{line: x} = line when x <= l -> line |> IO.inspect
+              %{line: x} = line when x <= l -> line
               %{line: x} = line             -> %{line|line: x+1}
           end)
   end

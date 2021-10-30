@@ -32,6 +32,7 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
   # then, we can update that text, instead of re-writing it...
 
   def render_lines(graph, %{frame: frame, lines: lines}) when is_list(lines) do
+
     #TODO here, we need to save the data - maybe dont render a single line after all for now
     # {new_graph, _final_line_num} = # REMINDER: this tuple is the final accumulator, passed through by Enum.reduce/2
     #   lines
@@ -50,21 +51,33 @@ defmodule Flamelex.GUI.Component.Utils.TextBox do
     #               {new_graph, line_num+1}
     #           end)
     #TODO here we should strip any lines which are too long
-    lines = Enum.map(lines, fn
-              %{text: t} = line -> %{line|text: remove_first_n_chars(t, 72)}
-            end)
+    # lines = Enum.map(lines, fn
+    #           %{text: t} = line -> %{line|text: remove_first_n_chars(t, 72)}
+    #         end)
     new_text = TextBufferUtils.join_lines_into_raw_text(lines)
 
 
+    # new_graph =
+    #   Enum.map_reduce(lines, {graph, line_number: 1}, fn line, {graph, line_number: l} ->
+    #     # IO.puts "line #{l |> Integer.to_string()}"
+    #     new_graph = graph |> Scenic.Primitives.text(new_text,
+    #                            id: {:line, l},
+    #                            font: :ibm_plex_mono,
+    #                            translate: {(frame.margin.left+frame.top_left.x-4)+((l-1)*24), frame.margin.top+frame.top_left.y},
+    #                            font_size: 24)
+    #     {new_graph, l+1}
+    #   end)
+
     new_graph =
       graph
-      # |> Scenic.Primitives.text(new_text,
-      #       id: :text_body,
-      #       #TODO dont hardcode, figure out why this is bonked
-      #       translate: {frame.margin.left+frame.top_left.x-4, frame.margin.top+frame.top_left.y})
-      #       # translate:  {x+left_margin, y+font_size+stroke_width}, # text draws from bottom-left corner??
-      #       # font_size:  font_size,
-      #       # fill:       :black)
+      |> Scenic.Primitives.text(new_text,
+            id: :text_body,
+            font: :ibm_plex_mono,
+            #TODO dont hardcode, figure out why this is bonked
+            translate: {frame.margin.left+frame.top_left.x-4, frame.margin.top+frame.top_left.y},
+            # translate:  {x+left_margin, y+font_size+stroke_width}, # text draws from bottom-left corner??
+            font_size:  20)
+            # fill:       :black)
 
     # graph
     # graph |> Graph.modify(:text, &text(&1, new_text, fill: :black))

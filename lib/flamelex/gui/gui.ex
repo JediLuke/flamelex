@@ -22,6 +22,10 @@ defmodule Flamelex.GUI do
     def move(frame_id),        do: GUIControl.action({:move_frame, frame_id, :right_and_down_25_px})
   end
 
+  def mode do
+    GenServer.call(Flamelex.FluxusRadix, :get_mode)
+  end
+
   defmodule MenuBar do
     def show, do: Flamelex.GUI.Component.MenuBar.action(:show)
     def hide, do: Flamelex.GUI.Component.MenuBar.action(:hide)

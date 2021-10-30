@@ -6,6 +6,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
   them to be triggered via the GUI.
   """
   use Flamelex.GUI.ComponentBehaviour
+  alias Flamelex.GUI.Component.MenuBar
 
   import Flamelex.GUI.Utilities.Drawing.MenuBarHelper
   # use Scenic.Component
@@ -19,7 +20,6 @@ defmodule Flamelex.GUI.Component.MenuBar do
   def menu_item_width, do: 190
 
   def validate(data) do
-    IO.inspect data, label: "MENU BAR"
     {:ok, data}
   end
 
@@ -30,12 +30,17 @@ defmodule Flamelex.GUI.Component.MenuBar do
   #   graph |> add_to_graph(params) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
   # end
 
+  def action(a) do
+    #TODO: We need some way of knowing that MenuBar has indeed been mounted
+    #      somewhere, or else the messages just go into the void (use call instead of cast?)
+
+    #REMINDER: `__MODULE__` will be the module which "uses" this macro
+    GenServer.cast(__MODULE__, {:action, a})
+  end
+
   def init(scene, params, opts) do
 
-    IO.puts "YEH WE BE INITIN"
-    # IO.inspect params
-    # IO.inspect opts
-    # Process.register(self(), __MODULE__)
+    Process.register(self(), __MODULE__)
     # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
 
     #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
@@ -43,17 +48,20 @@ defmodule Flamelex.GUI.Component.MenuBar do
     new_graph = 
       render(params.frame, %{})
 
-    IO.inspect new_graph
 
       # new_graph = 
       # Scenic.Graph.build()
       # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
-    # # new_scene =
+
+    new_scene =
       scene
-    #   # |> assign(graph: new_graph)
+      |> assign(graph: new_graph)
+      |> assign(frame: params.frame)
       |> push_graph(new_graph)
 
-    {:ok, scene}
+    capture_input(new_scene, [:cursor_pos])
+
+    {:ok, new_scene}
   end
 
   @impl Flamelex.GUI.ComponentBehaviour
@@ -97,20 +105,52 @@ defmodule Flamelex.GUI.Component.MenuBar do
   end
 
 
+    # def handle_cast({:action, action}, {%Scenic.Graph{} = graph, state}) do
+    def handle_cast({:action, action}, scene) do
+      case handle_action(scene, action) do
+        #TODO this is actually kinda stupid now...
+        :ignore_action
+          -> {:noreply, scene}
+        {:redraw_graph, %Scenic.Graph{} = new_graph}
+          -> 
+            new_scene =
+              scene
+              |> assign(graph: new_graph)
+              # |> assign(frame: params.frame)
+              |> push_graph(new_graph)
+            
+            {:noreply, new_scene}
+        # {:update_frame, %Frame{} = new_frame}
+        #   -> {:noreply, {graph, new_frame}}
+        # {:update_graph_and_state, {%Scenic.Graph{} = new_graph, new_state}}
+        #   -> 
+        #     new_scene =
+        #     scene
+        #     |> assign(graph: new_graph)
+        #     # |> assign(frame: params.frame)
+        #     |> push_graph(new_graph)
+          
+        #   {:noreply, new_scene}
+        #     {:noreply, {new_graph, new_state}, push: new_graph}
+        # deprecated_return ->
+        #   deprecated_return
+      end
+    end
 
   ##  handle_input callbacks
 
 
-
   @impl Scenic.Scene
   def handle_input({:cursor_pos, {_x, _y} = coords}, _context, frame) do
-    IO.puts "CURSOR POS"
     case coords |> hovering_over_item?() do
       {:main_menubar, index} ->
+          # Flamelex.Fluxus.fire_action({:animate_menu, index})
           MenuBar.action({:animate_menu, index})
+          # GenServer.cast(__MODULE__, {:animate_menu, index})
           {:noreply, frame}
       {:sub_menu, index, sub_index} ->
-          MenuBar.action({:animate_menu, index, sub_index})
+          # Flamelex.Fluxus.fire_action({:animate_menu, index, sub_index})
+          # MenuBar.action()
           {:noreply, frame}
     end
   end
@@ -121,7 +161,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
           # MenuBar.action({:animate_menu, index})
           {:noreply, frame}
       {:sub_menu, index, sub_index} ->
-          MenuBar.action({:call_function, index, sub_index})
+          # MenuBar.action({:call_function, index, sub_index})
           {:noreply, frame}
     end
   end
@@ -167,20 +207,19 @@ defmodule Flamelex.GUI.Component.MenuBar do
   def handle_action({_graph, frame}, {:call_function, index, sub_index}) do
 
     {:ok, {key, first_sub_menu}} = MenuBar.menu_buttons_mapping() |> Enum.fetch(index)
-    # IO.inspect key, label: "KEY"
     # %{"paracelsize" => {Flamelex, :paracelsize, []}}
-    # IO.inspect first_sub_menu
     {:ok, {_key, {m, f, a}}} = first_sub_menu |> Enum.fetch(sub_index)
 
     # {:ok, {m, f, _a} = MenuBar.menu_buttons_mapping() |> Enum.fetch(index) |> Enum.fetch(sub_index)
     Kernel.apply(m, f, a)
-    |> IO.inspect
 
     {:redraw_graph, inactive_menubar(frame)}
   end
 
-  def handle_action({graph, frame}, {:animate_menu, index}) do
-    {:redraw_graph, draw_dropdown_menu(graph, frame, index, _sub_index = 0)}
+  # def handle_action({graph, frame}, {:animate_menu, index}) do
+  def handle_action(scene, {:animate_menu, index}) do
+  # def handle_cast({graph, frame}, {:animate_menu, index}) do
+    {:redraw_graph, draw_dropdown_menu(scene.assigns.graph, scene.assigns.frame, index, _sub_index = 0)}
   end
 
   def handle_action({graph, frame}, {:animate_menu, index, sub_index}) do

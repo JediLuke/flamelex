@@ -20,7 +20,8 @@ defmodule Flamelex.GUI.Controller do
     initial_state = %{
       viewport: Dimensions.new(:viewport_size),
       frames: [],
-      graph: nil
+      graph: nil,
+      show_menubar?: true
     }
 
     GenServer.start_link(__MODULE__, initial_state)
@@ -40,7 +41,7 @@ defmodule Flamelex.GUI.Controller do
 
 
   def init(state) do
-    IO.puts "#{__MODULE__} initializing..."
+    Logger.debug "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
     Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
     {:ok, state, {:continue, :draw_default_gui}}
@@ -118,7 +119,6 @@ defmodule Flamelex.GUI.Controller do
 
   def handle_cast(:swap_layer_2_and_3, gui_state) do
     #TODO this is just temporary, for testing - might be impssible and probably isnt needed
-    IO.inspect gui_state.graph
 
     layer_2 = gui_state.graph.primitives |> find_layer(1) # extract lower frame  & save in a variable
     layer_1 = gui_state.graph.primitives |> find_layer(2) # and uppder frame, at least make the reference to it for later use
@@ -186,10 +186,12 @@ defmodule Flamelex.GUI.Controller do
              |> Map.merge(%{
                   ref: buf_state.rego_tag, #NOTE: this becomes the id of this Scenic primitive
                   frame: frame,
-                  mode: :normal
+                  mode: :normal,
+                  draw_footer?: true
              }))
 
-      Flamelex.GUI.RootScene.redraw(new_graph)
+      # Flamelex.GUI.RootScene.redraw(new_graph)
+      GenServer.cast(Flamelex.GUI.RootScene, {:redraw, new_graph})
       {:noreply, %{gui_state|graph: new_graph}}
     end
   end
@@ -282,12 +284,10 @@ end
   #   # IO.puts "SHOW CMD BUF"
   #   # new_graph =
   #   #   state.graph
-  #   #   |> IO.inspect(label: "LABEL: GRAPH")
   #   #   |> Scenic.Graph.modify(:kommand_buffer, &update_opts(&1, hidden: false))
   #   #   #TODO find where we add this group to this levels' graph & give it an id
   #   #   # |> Scenic.Graph.modify(:kommand_buffer, fn x ->
   #   #   #       IO.puts "WE'RE DOING IT"
-  #   #   #       IO.inspect x
   #   #   # end)
 
   #   # Flamelex.GUI.RootScene.redraw(new_graph)

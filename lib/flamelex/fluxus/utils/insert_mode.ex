@@ -13,7 +13,6 @@
 #           state |> RadixState.add_to_history(input)
 #       {:apply_mfa, {module, function, args}} ->
 #           Kernel.apply(module, function, args)
-#             |> IO.inspect
 #           state |> RadixState.add_to_history(input)
 #     end
 #   end

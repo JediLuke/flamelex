@@ -4,4 +4,4 @@ defmodule Flamelex.Assets do
     alias: [
       ibm_plex_mono: "fonts/IBMPlexMono-Regular.ttf"
     ]
-  end
+end

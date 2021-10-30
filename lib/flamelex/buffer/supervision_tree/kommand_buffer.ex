@@ -15,6 +15,7 @@ defmodule Flamelex.Buffer.KommandBuffer do
   alias Flamelex.Buffer.Utils.TextBuffer.ModifyHelper
   alias Flamelex.Utils.TextManipulationTools, as: TextTools
   require Logger
+  use Flamelex.GUI.ScenicEventsDefinitions
 
   @impl Flamelex.BufferBehaviour
   def boot_sequence(params) do
@@ -28,7 +29,8 @@ defmodule Flamelex.Buffer.KommandBuffer do
   end
 
 
-  def handle_cast({:input, {:codepoint, {letter, _num?}}}, state) do
+  def handle_cast({:input, ii = {:key, {_key_x, _num, _list}}}, state) do
+    letter = key2string(ii)
     new_state = %{state|data: state.data <> letter}
     update_gui(new_state |> Map.merge(%{move_cursor: {1, :column, :right}}))
     {:noreply, new_state}
@@ -53,9 +55,10 @@ defmodule Flamelex.Buffer.KommandBuffer do
 
   # @impl GenServer
   def handle_cast(:clear, state) do
-    new_state = %{state|data: ""}
-    update_gui(new_state)
-    {:noreply, new_state} # reset the content to blank
+    {:gui_component, KommandBuffer}
+    |> ProcessRegistry.find!()
+    |> GenServer.cast(:clear)
+    {:noreply, %{state|data: ""}} # reset the content to blank
   end
 
 
@@ -69,7 +72,10 @@ defmodule Flamelex.Buffer.KommandBuffer do
     # do we want to go back into normal mode
     # GenServer.cast(Flamelex.FluxusRadix, {:radix_state_update, mode: :normal})
 
-    {:noreply, %{state|data: ""}}
+    GenServer.cast(self(), :clear)
+
+    # {:noreply, %{state|data: ""}}
+    {:noreply, state}
   end
 
 

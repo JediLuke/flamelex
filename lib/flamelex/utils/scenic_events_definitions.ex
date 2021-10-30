@@ -15,85 +15,85 @@ defmodule Flamelex.GUI.ScenicEventsDefinitions do
         :cursor_exit
       ]
 
-      @left_shift_press {:key, {"left_shift", :press, 1}}
-      @escape_key {:key, {"escape", :press, 0}}
-      @enter_key {:key, {"enter", :press, 0}}
-      @backspace_key {:key, {"backspace", :press, 0}}
-      @backspace_repeat {:key, {"backspace", :repeat, 0}}
-      @backspace_input [@backspace_key, @backspace_repeat]
-      @tab_key {:key, {"tab", :press, 0}}
+      @left_shift_press {:key, {:key_leftshift, 0, []}}
+      @escape_key {:key, {:key_esc, 0, []}}
+      @enter_key {:key, {:key_enter, 0, []}}
+      @backspace_key {:key, {:key_backspace, 0, []}}
+      # @backspace_repeat {:key, {"backspace", :repeat, 0}}
+      # @backspace_input [@backspace_key, @backspace_repeat]
+      @tab_key {:key, {:key_tab, 0, []}}
 
-      @space_bar {:codepoint, {" ", 0}}
+      @space_bar {:key, {:key_space, 0, []}}
 
-      @left_shift_and_space_bar {:key, {" ", :press, 1}}
-      @left_shift_and_tab {:key, {"tab", :press, 1}}
+      @left_shift_and_space_bar {:key, {:key_space, 0, [:shift]}} # {:key, {" ", :press, 1}}
+      @left_shift_and_tab {:key, {:key_tab, 0, [:shift]}} # {:key, {"tab", :press, 1}}
 
       #NOTE: even though these are numbers, the last one in the tuple
       #      we send, is still always zero
-      @number_0 {:codepoint, {"0", 0}}
-      @number_1 {:codepoint, {"1", 0}}
-      @number_2 {:codepoint, {"2", 0}}
-      @number_3 {:codepoint, {"3", 0}}
-      @number_4 {:codepoint, {"4", 0}}
-      @number_5 {:codepoint, {"5", 0}}
-      @number_6 {:codepoint, {"6", 0}}
-      @number_7 {:codepoint, {"7", 0}}
-      @number_8 {:codepoint, {"8", 0}}
-      @number_9 {:codepoint, {"9", 0}}
+      @number_0 {:key, {:key_0, 0, []}}
+      @number_1 {:key, {:key_1, 0, []}}
+      @number_2 {:key, {:key_2, 0, []}}
+      @number_3 {:key, {:key_3, 0, []}}
+      @number_4 {:key, {:key_4, 0, []}}
+      @number_5 {:key, {:key_5, 0, []}}
+      @number_6 {:key, {:key_6, 0, []}}
+      @number_7 {:key, {:key_7, 0, []}}
+      @number_8 {:key, {:key_8, 0, []}}
+      @number_9 {:key, {:key_9, 0, []}}
 
-      @lowercase_a {:codepoint, {"a", 0}}
-      @lowercase_b {:codepoint, {"b", 0}}
-      @lowercase_c {:codepoint, {"c", 0}}
-      @lowercase_d {:codepoint, {"d", 0}}
-      @lowercase_e {:codepoint, {"e", 0}}
-      @lowercase_f {:codepoint, {"f", 0}}
-      @lowercase_g {:codepoint, {"g", 0}}
-      @lowercase_h {:codepoint, {"h", 0}}
-      @lowercase_i {:codepoint, {"i", 0}}
-      @lowercase_j {:codepoint, {"j", 0}}
-      @lowercase_k {:codepoint, {"k", 0}}
-      @lowercase_l {:codepoint, {"l", 0}}
-      @lowercase_m {:codepoint, {"m", 0}}
-      @lowercase_n {:codepoint, {"n", 0}}
-      @lowercase_o {:codepoint, {"o", 0}}
-      @lowercase_p {:codepoint, {"p", 0}}
-      @lowercase_q {:codepoint, {"q", 0}}
-      @lowercase_r {:codepoint, {"r", 0}}
-      @lowercase_s {:codepoint, {"s", 0}}
-      @lowercase_t {:codepoint, {"t", 0}}
-      @lowercase_u {:codepoint, {"u", 0}}
-      @lowercase_v {:codepoint, {"v", 0}}
-      @lowercase_w {:codepoint, {"w", 0}}
-      @lowercase_x {:codepoint, {"x", 0}}
-      @lowercase_y {:codepoint, {"y", 0}}
-      @lowercase_z {:codepoint, {"z", 0}}
+      @lowercase_a {:key, {:key_a, 0, []}}
+      @lowercase_b {:key, {:key_b, 0, []}}
+      @lowercase_c {:key, {:key_c, 0, []}}
+      @lowercase_d {:key, {:key_d, 0, []}}
+      @lowercase_e {:key, {:key_e, 0, []}}
+      @lowercase_f {:key, {:key_f, 0, []}}
+      @lowercase_g {:key, {:key_g, 0, []}}
+      @lowercase_h {:key, {:key_h, 0, []}}
+      @lowercase_i {:key, {:key_i, 0, []}}
+      @lowercase_j {:key, {:key_j, 0, []}}
+      @lowercase_k {:key, {:key_k, 0, []}}
+      @lowercase_l {:key, {:key_l, 0, []}}
+      @lowercase_m {:key, {:key_m, 0, []}}
+      @lowercase_n {:key, {:key_n, 0, []}}
+      @lowercase_o {:key, {:key_o, 0, []}}
+      @lowercase_p {:key, {:key_p, 0, []}}
+      @lowercase_q {:key, {:key_q, 0, []}}
+      @lowercase_r {:key, {:key_r, 0, []}}
+      @lowercase_s {:key, {:key_s, 0, []}}
+      @lowercase_t {:key, {:key_t, 0, []}}
+      @lowercase_u {:key, {:key_u, 0, []}}
+      @lowercase_v {:key, {:key_v, 0, []}}
+      @lowercase_w {:key, {:key_w, 0, []}}
+      @lowercase_x {:key, {:key_x, 0, []}}
+      @lowercase_y {:key, {:key_y, 0, []}}
+      @lowercase_z {:key, {:key_z, 0, []}}
 
-      @uppercase_A {:codepoint, {"A", 1}}
-      @uppercase_B {:codepoint, {"B", 1}}
-      @uppercase_C {:codepoint, {"C", 1}}
-      @uppercase_D {:codepoint, {"D", 1}}
-      @uppercase_E {:codepoint, {"E", 1}}
-      @uppercase_F {:codepoint, {"F", 1}}
-      @uppercase_G {:codepoint, {"G", 1}}
-      @uppercase_H {:codepoint, {"H", 1}}
-      @uppercase_I {:codepoint, {"I", 1}}
-      @uppercase_J {:codepoint, {"J", 1}}
-      @uppercase_K {:codepoint, {"K", 1}}
-      @uppercase_L {:codepoint, {"L", 1}}
-      @uppercase_M {:codepoint, {"M", 1}}
-      @uppercase_N {:codepoint, {"N", 1}}
-      @uppercase_O {:codepoint, {"O", 1}}
-      @uppercase_P {:codepoint, {"P", 1}}
-      @uppercase_Q {:codepoint, {"Q", 1}}
-      @uppercase_R {:codepoint, {"R", 1}}
-      @uppercase_S {:codepoint, {"S", 1}}
-      @uppercase_T {:codepoint, {"T", 1}}
-      @uppercase_U {:codepoint, {"U", 1}}
-      @uppercase_V {:codepoint, {"V", 1}}
-      @uppercase_W {:codepoint, {"W", 1}}
-      @uppercase_X {:codepoint, {"X", 1}}
-      @uppercase_Y {:codepoint, {"Y", 1}}
-      @uppercase_Z {:codepoint, {"Z", 1}}
+      @uppercase_A {:key, {:key_a, 0, [:shift]}}
+      @uppercase_B {:key, {:key_b, 0, [:shift]}}
+      @uppercase_C {:key, {:key_c, 0, [:shift]}}
+      @uppercase_D {:key, {:key_d, 0, [:shift]}}
+      @uppercase_E {:key, {:key_e, 0, [:shift]}}
+      @uppercase_F {:key, {:key_f, 0, [:shift]}}
+      @uppercase_G {:key, {:key_g, 0, [:shift]}}
+      @uppercase_H {:key, {:key_h, 0, [:shift]}}
+      @uppercase_I {:key, {:key_i, 0, [:shift]}}
+      @uppercase_J {:key, {:key_j, 0, [:shift]}}
+      @uppercase_K {:key, {:key_k, 0, [:shift]}}
+      @uppercase_L {:key, {:key_l, 0, [:shift]}}
+      @uppercase_M {:key, {:key_m, 0, [:shift]}}
+      @uppercase_N {:key, {:key_n, 0, [:shift]}}
+      @uppercase_O {:key, {:key_o, 0, [:shift]}}
+      @uppercase_P {:key, {:key_p, 0, [:shift]}}
+      @uppercase_Q {:key, {:key_q, 0, [:shift]}}
+      @uppercase_R {:key, {:key_r, 0, [:shift]}}
+      @uppercase_S {:key, {:key_s, 0, [:shift]}}
+      @uppercase_T {:key, {:key_t, 0, [:shift]}}
+      @uppercase_U {:key, {:key_u, 0, [:shift]}}
+      @uppercase_V {:key, {:key_v, 0, [:shift]}}
+      @uppercase_W {:key, {:key_w, 0, [:shift]}}
+      @uppercase_X {:key, {:key_x, 0, [:shift]}}
+      @uppercase_Y {:key, {:key_y, 0, [:shift]}}
+      @uppercase_Z {:key, {:key_z, 0, [:shift]}}
 
       @lowercase_letters [
         @lowercase_a, @lowercase_b, @lowercase_c, @lowercase_d, @lowercase_e,
@@ -115,23 +115,109 @@ defmodule Flamelex.GUI.ScenicEventsDefinitions do
 
       @all_letters @lowercase_letters ++ @uppercase_letters
 
-      @period {:codepoint, {".", 0}}
-      @bang {:codepoint, {"!", 1}}
-      @question_mark {:codepoint, {"?", 1}}
-      @colon {:codepoint, {":", 1}}
-      @comma {:codepoint, {",", 0}}
-      @quote_character {:codepoint, {"\"", 1}}
-      @percent_sign {:codepoint, {"%", 1}}
-      @left_parenthesis {:codepoint, {"(", 1}} #TODO left_parenthesis
-      @right_parenthesis {:codepoint, {")", 1}}
-      @left_brace {:codepoint, {"{", 1}}
-      @right_brace {:codepoint, {"}", 1}}
+      @period {:key, {:key_dot, 0, []}}
+      @bang {:key, {:key_1, 0, [:shift]}}
+      @question_mark {:key, {:key_slash, 0, [:shift]}}
+      @colon {:key, {:key_semicolon, 0, [:shift]}}
+      @comma {:key, {:key_comma, 0, []}}
+      @quote_character {:key, {:key_apostrophe, 0, [:shift]}}
+      @underscore {:key, {:key_minus, 1, [:shift]}}
+      @percent_sign {:key, {:key_5, 0, [:shift]}}
+      @left_parenthesis {:key, {:key_9, 1, [:shift]}}
+      @right_parenthesis {:key, {:key_0, 1, [:shift]}}
+      @left_brace {:key, {:key_leftbrace, 1, [:shift]}}
+      @right_brace {:key, {:key_rightbrace, 1, [:shift]}}
 
       @all_punctuation [@period, @bang, @question_mark, @colon, @comma,
         @quote_character, @percent_sign, @left_parenthesis, @right_parenthesis,
         @left_brace, @right_brace]
 
       @valid_text_input_characters @all_letters ++ @all_punctuation ++ [@space_bar]
+
+      ## convert a keystroke into a string - used for inputing text
+
+      def key2string(@number_0), do: "0"
+      def key2string(@number_1), do: "1"
+      def key2string(@number_2), do: "2"
+      def key2string(@number_3), do: "3"
+      def key2string(@number_4), do: "4"
+      def key2string(@number_5), do: "5"
+      def key2string(@number_6), do: "6"
+      def key2string(@number_7), do: "7"
+      def key2string(@number_8), do: "8"
+      def key2string(@number_9), do: "9"
+
+      def key2string(@escape), do: "escape"
+      def key2string(@space_bar), do: " "
+
+      def key2string(@lowercase_a), do: "a"
+      def key2string(@lowercase_b), do: "b"
+      def key2string(@lowercase_c), do: "c"
+      def key2string(@lowercase_d), do: "d"
+      def key2string(@lowercase_e), do: "e"
+      def key2string(@lowercase_f), do: "f"
+      def key2string(@lowercase_g), do: "g"
+      def key2string(@lowercase_h), do: "h"
+      def key2string(@lowercase_i), do: "i"
+      def key2string(@lowercase_j), do: "j"
+      def key2string(@lowercase_k), do: "k"
+      def key2string(@lowercase_l), do: "l"
+      def key2string(@lowercase_m), do: "m"
+      def key2string(@lowercase_n), do: "n"
+      def key2string(@lowercase_o), do: "o"
+      def key2string(@lowercase_p), do: "p"
+      def key2string(@lowercase_q), do: "q"
+      def key2string(@lowercase_r), do: "r"
+      def key2string(@lowercase_s), do: "s"
+      def key2string(@lowercase_t), do: "t"
+      def key2string(@lowercase_u), do: "u"
+      def key2string(@lowercase_v), do: "v"
+      def key2string(@lowercase_w), do: "w"
+      def key2string(@lowercase_x), do: "x"
+      def key2string(@lowercase_y), do: "y"
+      def key2string(@lowercase_z), do: "z"
+
+      def key2string(@uppercase_A), do: "A"
+      def key2string(@uppercase_B), do: "B"
+      def key2string(@uppercase_C), do: "C"
+      def key2string(@uppercase_D), do: "D"
+      def key2string(@uppercase_E), do: "E"
+      def key2string(@uppercase_F), do: "F"
+      def key2string(@uppercase_G), do: "G"
+      def key2string(@uppercase_H), do: "H"
+      def key2string(@uppercase_I), do: "I"
+      def key2string(@uppercase_J), do: "J"
+      def key2string(@uppercase_K), do: "K"
+      def key2string(@uppercase_L), do: "L"
+      def key2string(@uppercase_M), do: "M"
+      def key2string(@uppercase_N), do: "N"
+      def key2string(@uppercase_O), do: "O"
+      def key2string(@uppercase_P), do: "P"
+      def key2string(@uppercase_Q), do: "Q"
+      def key2string(@uppercase_R), do: "R"
+      def key2string(@uppercase_S), do: "S"
+      def key2string(@uppercase_T), do: "T"
+      def key2string(@uppercase_U), do: "U"
+      def key2string(@uppercase_V), do: "V"
+      def key2string(@uppercase_W), do: "W"
+      def key2string(@uppercase_X), do: "X"
+      def key2string(@uppercase_Y), do: "Y"
+      def key2string(@uppercase_Z), do: "Z"
+
+      def key2string(@period), do: "."
+      def key2string(@bang), do: "!"
+      def key2string(@question_mark), do: "?"
+
+      def key2string(@underscore), do: "_"
+
+      def key2string(@left_parenthesis), do: "("
+      def key2string(@right_parenthesis), do: ")"
+
+
+      def key2string(x) do
+        IO.inspect x, label: "COULD NOT CONVERT"
+        raise "no"
+      end
 
     end
   end

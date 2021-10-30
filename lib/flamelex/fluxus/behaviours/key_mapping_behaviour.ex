@@ -35,19 +35,22 @@ defmodule Flamelex.Fluxux.KeyMappingBehaviour do
 
       def lookup(radix_state, input) do
         try do
+          Logger.debug "#{__MODULE__} looking up input from the keymap"
           keymap(radix_state, input)
         rescue
-          _e in FunctionClauseError ->
+          e in FunctionClauseError ->
                   context = %{radix_state: radix_state, input: input}
 
                   error_msg = ~s(#{__MODULE__} failed to process some input due to a FunctionClauseError.
+
+                  #{inspect e}
 
                   Most likely this KeyMapping module did not have a function
                   implemented which pattern-matched on this input.
 
                   context: #{inspect context})
 
-                  Logger.error error_msg
+                  # Logger.warn error_msg
                   :ignore_input
         end
       end

@@ -13,35 +13,36 @@ defmodule Flamelex.GUI.Component.TextBox do
   #TODO render line numbers
 
   def validate(data) do
-    IO.inspect data, label: "TXTBOX"
     {:ok, data}
   end
 
   def init(scene, params, opts) do
 
     params = custom_init_logic(params)
-    IO.puts "YEH WE BE INITIN"
-    # IO.inspect params
-    # IO.inspect opts
-    # Process.register(self(), __MODULE__)
     # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
+    ProcessRegistry.register(rego_tag(params))
+
+    draw_footer_if_reqd = fn(graph) ->
+      if params.draw_footer? do
+        graph
+        |> Frame.draw_frame_footer(params)
+      else
+        graph
+      end 
+    end
 
     #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
     #      the scene, so we just need to initialize it with *something*
     new_graph = 
-      render(params.frame, params)
+      render(scene, params.frame, params)
+      |> draw_footer_if_reqd.()
 
-    IO.inspect new_graph
-
-      # new_graph = 
-      # Scenic.Graph.build()
-      # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
-    # # new_scene =
+    new_scene =
       scene
-    #   # |> assign(graph: new_graph)
+      |> assign(graph: new_graph)
       |> push_graph(new_graph)
 
-    {:ok, scene}
+    {:ok, new_scene}
   end
 
 
@@ -57,7 +58,8 @@ defmodule Flamelex.GUI.Component.TextBox do
     mode = if params.mode == :insert, do: :insert, else: :normal
 
     params |> Map.merge(%{
-      # draw_footer?: true, #AHAHA the culprit! This isn't true by default any more, since we use this with KommandBuffer!!
+      draw_footer?: true, #AHAHA the culprit! This isn't true by default any more, since we use this with KommandBuffer!!
+      status_line: params[:status_line] || "",
       cursors: [
         #TODO acc coords here maybe??
         %{ frame: f, ref: rego_tag(params), num: 1, mode: mode } #TODO use cursor struct, add frame to cursor struct
@@ -66,24 +68,22 @@ defmodule Flamelex.GUI.Component.TextBox do
   end
 
   #TODO this is a deprecated version of render - enforced by behaviour...
-  def render(%Frame{} = frame, params) do
-    render(params |> Map.merge(%{frame: frame}))
+  def render(scene, %Frame{} = frame, params) do
+    render(scene, params |> Map.merge(%{frame: frame}))
   end
 
-  def render(%{frame: %Frame{} = frame, lines: lines} = params) do
+  def render(scene, %{frame: %Frame{} = frame, lines: lines} = params) do
 
     #TODO make the frame, only 72 columns wide !!
-    frame =
-      if we_are_drawing_a_footer_bar?(params) do
-        frame |> Frame.resize(reduce_height_by: MenuBar.height()+1) #TODO why do we need +1 here??
-      else
-        frame # no need to make any adjustments
-      end
+    # frame =
+    #   if we_are_drawing_a_footer_bar?(params) do
+    #     frame |> Frame.resize(reduce_height_by: MenuBar.height()+1) #TODO why do we need +1 here??
+    #   else
+    #     frame # no need to make any adjustments
+    #   end
 
     #TODO get margins from somewhere better
     frame = frame |> Frame.set_margin(%{top: 24, left: 8})
-
-    IO.inspect frame, label: "FRAME", pretty: true
 
     background_color = Flamelex.GUI.Colors.background()
 
@@ -93,6 +93,7 @@ defmodule Flamelex.GUI.Component.TextBox do
     vpcfg = Flamelex.GUI.ScenicInitialize.viewport_config()
     {:ok, dimensions} = Keyword.fetch(vpcfg, :size)
 
+    IO.inspect frame, label: "FRAME"
     Scenic.Graph.build()
     # |> Scenic.Primitives.add_specs_to_graph(Grid.simple({0, 0}, dimensions, [:top, :right, :bottom, :left, :center]), id: :root_grid)
     |> Draw.background(frame, background_color)
@@ -111,12 +112,17 @@ defmodule Flamelex.GUI.Component.TextBox do
   end
 
   #TODO maybe dont use lines, too slow?
-  def handle_cast({:modify, :lines, new_lines}, {graph, state}) when is_list(new_lines) do
+  # def handle_cast({:modify, :lines, new_lines}, scene) when is_list(new_lines) do
+  def handle_call({:modify, :lines, new_lines}, _from, scene) when is_list(new_lines) do
     new_graph =
-      graph
+      scene.assigns.graph
       |> TextBoxDrawUtils.re_render_lines(%{lines: new_lines})
 
-    {:noreply, {new_graph, state}, push: new_graph}
+    new_scene = scene
+      |> assign(graph: new_graph)
+      |> push_graph(new_graph)
+
+    {:reply, :ok, new_scene}
   end
 
 
@@ -151,7 +157,8 @@ defmodule Flamelex.GUI.Component.TextBox do
 
 
 
-  def handle_info({:switch_mode, new_mode}, {graph, state}) do
+  # def handle_info({:switch_mode, new_mode}, {graph, state}) do
+  def handle_info({:switch_mode, new_mode}, scene) do
 
     #TODO dont do anything when we're hiding the Footer
 
@@ -177,12 +184,19 @@ defmodule Flamelex.GUI.Component.TextBox do
       end
 
     new_graph =
-      graph
+      scene.assigns.graph
       |> Scenic.Graph.modify(:mode_string, &Scenic.Primitives.text(&1, mode_string))
       #TODO also we want to change the color of the box!
       # |> Frame.redraw()
 
-    {:noreply, {new_graph, state}, push: new_graph}
+    new_scene =
+      scene
+      |> assign(graph: new_graph)
+      |> push_graph(new_graph)
+
+
+    {:noreply, new_scene}
+    # {:noreply, {new_graph, state}, push: new_graph}
   end
 
   def handle_info({{:buffer, buffer_rego}, {:new_state, new_buffer_state}}, {old_graph, gui_component_state})
@@ -190,13 +204,12 @@ defmodule Flamelex.GUI.Component.TextBox do
   do
 
 
-    IO.puts "OK, HERE IS THE BIG QUESTION - HOW CAN WE RE-render, from state, also destroy all the old processes"
+    # IO.puts "OK, HERE IS THE BIG QUESTION - HOW CAN WE RE-render, from state, also destroy all the old processes"
 
 
     new_graph =
       old_graph
       # |> Scenic.Graph.modify(@text_field_id, fn x ->
-      #   IO.puts "YES #{inspect x}"
       #   x
       # end)
       # |> Flamelex.GUI.Component.TextBox.draw({frame, data, %{}}) #TODO check the old process is dieing...

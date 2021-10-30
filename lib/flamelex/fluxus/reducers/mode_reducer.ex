@@ -7,7 +7,7 @@ defmodule Flamelex.Fluxus.Reducers.Mode do
   require Logger
 
   def handle(%{mode: current_mode} = radix_state, {:action, {:switch_mode, m}}) do
-    Logger.info "switching from `#{inspect current_mode}` to `#{inspect m}` mode..."
+    Logger.debug "#{__MODULE__} switching from `#{inspect current_mode}` to `#{inspect m}` mode..."
     radix_state |> switch_mode(m)
   end
 

@@ -62,7 +62,6 @@ defmodule Flamelex.Fluxus.UserInputHandler do
   #   #         |> RadixState.add_to_history(input)
   #   #     {:apply_mfa, {module, function, args}} ->
   #   #         Kernel.apply(module, function, args)
-  #   #           |> IO.inspect
   #   #         state |> RadixState.add_to_history(input)
   #   #   end
   #   # end
@@ -150,19 +149,23 @@ defmodule Flamelex.Fluxus.UserInputHandler do
 
     #TODO this should probably be a lookup inside the module?
     #     or rather, maybe we pass the module into the lookup function?
-    case key_mapping.lookup(radix_state, user_input) do
+    #TODO here user_input still has all this shit in it
+    case key_mapping.lookup(radix_state, user_input.input) do #TODO this is not grat, probably need to ditch the rest first
       nil ->
-          details = %{radix_state: radix_state, key_mapping: key_mapping, user_input: user_input}
-          Logger.warn "no KeyMapping found for recv'd user_input. #{inspect details, pretty: true}"
+          _details = %{radix_state: radix_state, key_mapping: key_mapping, user_input: user_input}
+          # Logger.warn "no KeyMapping found for recv'd user_input. #{inspect details, pretty: true}"
           :no_mapping_found
       :ok ->
           :ok
       :ignore_input ->
           :ok
       {:fire_action, a} ->
+          Logger.debug " -- FIRING ACTION --> #{inspect a}"
           Flamelex.Fluxus.fire_action(a)
       {:fire_actions, action_list} when is_list(action_list) and length(action_list) > 0 ->
-          action_list |> Enum.map(&Flamelex.Fluxus.fire_action/1)
+          action_list |> Enum.map(fn (m) -> 
+            Flamelex.Fluxus.fire_action(m)
+        end)
       #TODO deprecate it, just have 1 pattern match for vim_lang here
       {:vim_lang, x, v} ->
           GenServer.cast(Flamelex.GUI.VimServer, {{x, v}, radix_state})

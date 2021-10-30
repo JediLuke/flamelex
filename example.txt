@@ -1,0 +1,5 @@
+This is an example text file.
+
+We should be able to edit it.
+
+Note - I cheated! It never goes over 72 characters wide ;)

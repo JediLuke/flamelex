@@ -7,6 +7,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   use Flamelex.Fluxux.KeyMappingBehaviour
   alias Flamelex.API.KeyMappings.VimClone.{NormalMode, KommandMode,
                                            InsertMode, LeaderBindings}
+  require Logger
 
 
   # this is our vim leader
@@ -15,8 +16,10 @@ defmodule Flamelex.API.KeyMappings.VimClone do
 
   def keymap(%RadixState{mode: :normal} = state, input) do
     if last_keystroke_was_leader?(state) do
+      Logger.debug "doing a LeaderBindings lookup on: #{inspect input}"
       LeaderBindings.keymap(state, input)
     else
+      Logger.debug "doing a NormalMode lookup on #{inspect input}"
       NormalMode.keymap(state, input)
     end
   end
@@ -28,6 +31,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
 
 
   def keymap(%RadixState{mode: :insert} = state, input) do
+    Logger.debug "#{__MODULE__} received input: #{inspect input}, routing it to InsertMode..."
     InsertMode.keymap(state, input)
   end
 

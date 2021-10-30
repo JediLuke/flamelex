@@ -126,7 +126,6 @@ end
   end
 
   defp mount_kommand_buffer(graph, vp) do
-    Logger.debug "mounting KommandBuffer..."
     graph
     |> Flamelex.GUI.Component.KommandBuffer.mount(%{
          ref: :kommand_buffer,
@@ -295,7 +294,6 @@ end
 
 
 #   def process(a, b) do
-#     IO.inspect b, label: "ACTION"
 #     raise "NO #{inspect a} #{inspect b}"
 #   end
 

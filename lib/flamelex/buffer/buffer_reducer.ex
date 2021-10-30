@@ -17,7 +17,6 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do #TODO rename module
   def async_reduce(%{action: {:open_buffer, opts}} = params) do
 
     # step 1 - open the buffer
-    IO.inspect(opts)
     buf = Flamelex.Buffer.open!(opts)
 
     # step 2 - update FluxusRadix (because we forced a root-level update)
@@ -27,7 +26,7 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do #TODO rename module
 
     GenServer.cast(Flamelex.FluxusRadix, radix_update)
 
-    Flamelex.API.Mode.switch_mode(:insert)
+    # Flamelex.API.Mode.switch_mode(:insert)
 
   end
 
@@ -44,7 +43,9 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do #TODO rename module
     %{buffer: buffer, details: details} = specifics
 
     ProcessRegistry.find!(buffer)
-    |> GenServer.cast({:modify, details})
+    |> GenServer.call({:modify, details})
+
+    #TODO update GUI here
   end
 
   def async_reduce(%{action: {:close_buffer, buffer}}) do

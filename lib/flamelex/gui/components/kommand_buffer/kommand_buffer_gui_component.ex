@@ -7,41 +7,36 @@ defmodule Flamelex.GUI.Component.KommandBuffer do
   def height, do: 32
 
 
-  def rego_tag(_params) do
-    {:gui_component, KommandBuffer}
-  end
 
 
   def validate(data) do
-    IO.inspect data, label: "MENU BAR"
     {:ok, data}
   end
 
 
   def init(scene, params, opts) do
 
-    IO.puts "YEH WE BE INITIN"
-    # IO.inspect params
-    # IO.inspect opts
     # Process.register(self(), __MODULE__)
     # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
+
+
+    ProcessRegistry.register({:gui_component, KommandBuffer})
 
     #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
     #      the scene, so we just need to initialize it with *something*
     new_graph = 
       render(params.frame, %{})
 
-    IO.inspect new_graph
 
       # new_graph = 
       # Scenic.Graph.build()
       # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
-    # # new_scene =
+    new_scene =
       scene
-    #   # |> assign(graph: new_graph)
+      |> assign(graph: new_graph)
       |> push_graph(new_graph)
 
-    {:ok, scene}
+    {:ok, new_scene}
   end
 
 
@@ -65,32 +60,50 @@ defmodule Flamelex.GUI.Component.KommandBuffer do
   end
 
 
-  def handle_cast(:show, {graph, state}) do #TODO components have ordering reversed :( it should be {state, graph} to be consistent with the rest of the application
-    Logger.debug "#{__MODULE__} - GUI got msg to :show the KommandBuffer..."
-    new_graph = graph |> KommandBufrUtils.set_visibility(:show)
-    {:noreply, {new_graph, state}, push: new_graph}
+  # # def handle_cast(:show, {graph, state}) do #TODO components have ordering reversed :( it should be {state, graph} to be consistent with the rest of the application
+  # def handle_cast(vis = :show, scene) do #TODO components have ordering reversed :( it should be {state, graph} to be consistent with the rest of the application
+  #   new_scene = update_visibility(scene, vis)
+  #   {:noreply, new_scene}
+  # end
+
+
+  def handle_cast(vis, scene) when vis in [:show, :hide] do
+    Logger.debug "#{__MODULE__} - GUI got msg to `#{inspect vis}` the KommandBuffer..."
+    new_graph = scene.assigns.graph |> KommandBufrUtils.set_visibility(vis)
+    new_scene = scene
+      |> assign(graph: new_graph)
+      |> push_graph(new_graph)
+    {:noreply, new_scene}
   end
 
 
-  def handle_cast(:hide, {graph, state}) do
-    new_graph = graph |> KommandBufrUtils.set_visibility(:hide)
-    {:noreply, {new_graph, state}, push: new_graph}
-  end
-
-
-  def handle_cast({:update, %{data: new_text, move_cursor: cursor_move_details}}, graph_state) do
+  def handle_cast({:update, %{data: new_text, move_cursor: cursor_move_details}}, scene) do
 
     # update the text
     {:gui_component, {KommandBufferGUI, TextBox}}
     |> ProcessRegistry.find!()
-    |> GenServer.cast({:modify, :lines, [%{line: 1, text: new_text}]})
+    |> GenServer.call({:modify, :lines, [%{line: 1, text: new_text}]})
 
     # move the cursor
     {:text_cursor, 1, {:gui_component, {KommandBufferGUI, TextBox}}}
     |> ProcessRegistry.find!()
     |> GenServer.cast({:move, %{instructions: cursor_move_details}})
 
-    {:noreply, graph_state}
+    {:noreply, scene}
+  end
+
+  def handle_cast(:clear, scene) do
+    # update the text
+    {:gui_component, {KommandBufferGUI, TextBox}}
+    |> ProcessRegistry.find!()
+    |> GenServer.call({:modify, :lines, [%{line: 1, text: ""}]})
+
+    # move the cursor
+    {:text_cursor, 1, {:gui_component, {KommandBufferGUI, TextBox}}}
+    |> ProcessRegistry.find!()
+    |> GenServer.cast(:reset)
+
+    {:noreply, scene}
   end
 
 

@@ -109,7 +109,7 @@ defmodule Flamelex.Agent.Reminders do
     {:ok, remind_me_utc, 0} = remind_me_datetime |> DateTime.from_iso8601()
     case DateTime.compare(remind_me_utc, now_utc) do
       future when future in [:gt] ->
-        notify_delay_ms = DateTime.diff(remind_me_utc, DateTime.utc_now()) * 1000 |> IO.inspect
+        notify_delay_ms = DateTime.diff(remind_me_utc, DateTime.utc_now()) * 1000
         Process.send_after(self(), {:reminder!, r}, notify_delay_ms)
         state ++ [r]
       past_or_present when past_or_present in [:lt, :eq] ->
@@ -191,7 +191,7 @@ end
   #   {:ok, remind_me_utc, 0} = remind_me_datetime |> DateTime.from_iso8601()
   #   case DateTime.compare(remind_me_utc, now_utc) do
   #     future when future in [:gt] ->
-  #       notify_delay_ms = DateTime.diff(remind_me_utc, DateTime.utc_now()) * 1000 |> IO.inspect
+  #       notify_delay_ms = DateTime.diff(remind_me_utc, DateTime.utc_now()) * 1000
   #       Process.send_after(self(), {:reminder!, r}, notify_delay_ms)
   #       state ++ [r]
   #     past_or_present when past_or_present in [:lt, :eq] ->

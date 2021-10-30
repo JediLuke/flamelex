@@ -19,16 +19,13 @@ defmodule Flamelex.GUI.Component.TextCursor do
   # end
 
   def validate(data) do
-    IO.inspect data, label: "TXTBOX"
     {:ok, data}
   end
 
   def init(scene, params, opts) do
 
     params = custom_init_logic(params)
-    IO.puts "YEH WE BE INITIN"
-    # IO.inspect params
-    # IO.inspect opts
+    ProcessRegistry.register(rego_tag(params))
     # Process.register(self(), __MODULE__)
     # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
 
@@ -37,17 +34,17 @@ defmodule Flamelex.GUI.Component.TextCursor do
     new_graph = 
       render(params.frame, params)
 
-    IO.inspect new_graph
 
       # new_graph = 
       # Scenic.Graph.build()
       # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
-    # # new_scene =
+    new_scene =
       scene
-    #   # |> assign(graph: new_graph)
+      |> assign(graph: new_graph)
+      |> assign(params: params)
       |> push_graph(new_graph)
 
-    {:ok, scene}
+    {:ok, new_scene}
   end
 
   @impl Flamelex.GUI.ComponentBehaviour
@@ -114,38 +111,83 @@ defmodule Flamelex.GUI.Component.TextCursor do
   # end
 
 
+  # NEXT TODOs
+  # - get blinking working
+  # - get status bar rendering
+  # - be able to move between modes / input text / move cursor
+  # - get KommandBuffer going
 
 
-  def handle_cast(:start_blink, {graph, state}) do
+
+  #TODO this needs to become a SCENE
+  def handle_cast(:start_blink, scene) do
     {:ok, timer} = :timer.send_interval(@blink_ms, :blink)
-    new_state = %{state | timer: timer}
-    {:noreply, {graph, new_state}}
+    # new_state = %{state | timer: timer}
+    scene = scene
+    |> assign(timer: timer)
+    {:noreply, scene}
   end
 
-  def handle_cast({:move, details}, {graph, state}) do
-    {new_graph, new_state} = CursorUtils.move_cursor({graph, state}, details)
-    {:noreply, {new_graph, new_state}, push: new_graph}
+  def handle_cast({:move, details}, scene) do
+    {new_graph, new_params} = CursorUtils.move_cursor({scene.assigns.graph, scene.assigns.params}, details)
+    scene =
+      scene
+      |> assign(graph: new_graph)
+      |> assign(params: new_params)
+      |> push_graph(new_graph)
+    {:noreply, scene}
   end
 
-  def handle_cast({:update, new_coords}, {graph, state}) do
-    {new_graph, new_state} = CursorUtils.reposition({graph, state}, new_coords)
-    {:noreply, {new_graph, new_state}, push: new_graph}
+  def handle_cast({:update, new_coords}, scene) do
+    # {new_graph, new_state} = CursorUtils.reposition({graph, state}, new_coords)
+    {new_graph, new_params} = CursorUtils.reposition({scene.assigns.graph, scene.assigns.params}, new_coords)
+    scene =
+      scene
+      |> assign(graph: new_graph)
+      |> assign(params: new_params)
+      |> push_graph(new_graph)
+    {:noreply, scene}
+  end
+
+  def handle_cast(:reset, scene) do
+    {new_graph, new_params} = CursorUtils.reset_position({scene.assigns.graph, scene.assigns.params})
+    scene =
+      scene
+      |> assign(graph: new_graph)
+      |> assign(params: new_params)
+      |> push_graph(new_graph)
+    {:noreply, scene}
   end
 
   def handle_cast(any, state) do
-    IO.warn "GOT ANY #{inspect any}"
+    # IO.warn "GOT ANY #{inspect any}"
     {:noreply, state}
   end
 
-  def handle_info({:switch_mode, new_mode}, {graph, %{ref: _buf_ref} = state}) do
-    {new_graph, new_state} = CursorUtils.switch_mode({graph, state}, new_mode)
-    {:noreply, {new_graph, new_state}, push: new_graph}
+  # def handle_info({:switch_mode, new_mode}, {graph, %{ref: _buf_ref} = state}) do
+  def handle_info({:switch_mode, new_mode}, scene) do
+    {new_graph, new_params} = CursorUtils.switch_mode({scene.assigns.graph, scene.assigns.params}, new_mode)
+    # {:noreply, {new_graph, new_state}, push: new_graph}
+    # new_state = new_state |> |> assign(params: params)
+    new_scene =
+      scene
+      |> assign(graph: new_graph)
+      |> assign(params: new_params)
+      |> push_graph(new_graph)
+    {:noreply, new_scene}
   end
 
   @impl Scenic.Scene
-  def handle_info(:blink, {graph, %{ref: _buf_ref} = state}) do
-    {new_graph, new_state} = CursorUtils.handle_blink({graph, state})
-    {:noreply, {new_graph, new_state}, push: new_graph}
+  # def handle_info(:blink, {graph, %{ref: _buf_ref} = state}) do
+  def handle_info(:blink, scene) do
+    # {new_graph, new_state} = CursorUtils.handle_blink({graph, state})
+    {new_graph, new_params} = CursorUtils.handle_blink({scene.assigns.graph, scene.assigns.params})
+    new_scene =
+      scene
+      |> assign(graph: new_graph)
+      |> assign(params: new_params)
+      |> push_graph(new_graph)
+    {:noreply, new_scene}
   end
 end
 

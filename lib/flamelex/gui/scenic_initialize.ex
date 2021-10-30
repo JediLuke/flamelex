@@ -18,7 +18,8 @@ defmodule Flamelex.GUI.ScenicInitialize do
       drivers: [
         [
           module: Scenic.Driver.Local,
-          name: :Flamelex
+          window: [title: "Flamelex", resizeable: true],
+          on_close: :stop_system
         ]
       ]
     ]

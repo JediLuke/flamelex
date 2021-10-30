@@ -45,11 +45,11 @@ defmodule Flamelex.API.Buffer do
   """
 
   #TODO make this open a new blank buffer
-  def open!, do: open!(File.cwd! <> "/README.md") #NOTE: this only works from the root directory of the Flamelex project...
+  def open!, do: open!(File.cwd! <> "/example.txt") #NOTE: this only works from the root directory of the Flamelex project...
 
   def open!(filepath) do
 
-    GenServer.cast(Flamelex.FluxusRadix, {:action, {
+    GenServer.call(Flamelex.FluxusRadix, {:action, {
         :open_buffer, %{
             type: Flamelex.Buffer.Text,
             source: {:file, filepath},
@@ -102,7 +102,8 @@ defmodule Flamelex.API.Buffer do
   ```
   """
   def modify(buf, modification) do
-    GenServer.cast(Flamelex.FluxusRadix, {:action, {
+    # GenServer.cast(Flamelex.FluxusRadix, {:action, {
+    GenServer.call(Flamelex.FluxusRadix, {:action, {
         :modify_buffer, %{
             buffer: buf,
             details: modification

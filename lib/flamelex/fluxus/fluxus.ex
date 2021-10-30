@@ -22,7 +22,14 @@ defmodule Flamelex.Fluxus do
   on this list, and eventually someone will call you back..."
   """
   def fire_action(a) do
-    GenServer.cast(Flamelex.FluxusRadix, {:action, a})
+    # GenServer.cast(Flamelex.FluxusRadix, {:action, a})
+    #TODO this is kind of experimental, we have to call FluxuxRadix
+    # the idea is that it might solve a problem I have where I fire
+    # actions too fast, & so they get executed "out of order" - or, rather,
+    # n or more actions end up running in parallel on the same RadixState,
+    # which means the actions aren't applied in order - whoever finished
+    # last, will actually get their changes in, the others will be reverted!
+    :ok = GenServer.call(Flamelex.FluxusRadix, {:action, a})
   end
 
   #TODO opts is either, expects_callback? or nothing
@@ -67,6 +74,9 @@ defmodule Flamelex.Fluxus do
   will in turn be handled by spinning up a new Task process to handle it.
   """
   def handle_user_input(ii) do
+    #TODO so eventually the way this will work is, all user input
+    #     goes into the FluxusQueue, and workers will get spawned
+    #     for each msg that needs to be processed
     GenServer.cast(Flamelex.FluxusRadix, {:user_input, ii})
   end
 end

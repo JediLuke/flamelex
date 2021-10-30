@@ -5,6 +5,7 @@ defmodule Flamelex.BufferManager do
   use GenServer
   use Flamelex.ProjectAliases
   # alias Flamelex.Buffer.Utils.OpenBuffer, as: BufferOpenUtils
+  require Logger
 
   #TODO if a buffer crashes, need to catch it & alert Flamelex.GUI.Controller
   #TODO idea: the GUI should turn grey, with an x through it - but it has memory (text etc) in it - maybe it can be used to recover the Buffer state...
@@ -15,7 +16,7 @@ defmodule Flamelex.BufferManager do
 
   @impl GenServer
   def init(_params) do
-    IO.puts "#{__MODULE__} initializing..."
+    Logger.debug "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
 
     init_state = %{
@@ -114,7 +115,6 @@ defmodule Flamelex.BufferManager do
     #TODO remove from the list of buffers, and remove from active buffer if that was the active buffer
 
     #TODO talk to the other process & say hey close plz
-    IO.puts "BUFMGR CLOSING A BUF"
 
     ProcessRegistry.find!(buf)
     |> GenServer.cast(:close)
@@ -135,7 +135,6 @@ defmodule Flamelex.BufferManager do
   #   ProcessRegistry.find!({:gui_component, ref})
   #   # Flamelex.GUI.Component.TextBox.rego_tag(active_buf)
   #   # |> ProcessRegistry.find!()
-  #   |> IO.inspect(label: "gui component pid")
   #   |> send({:switch_mode, new_mode})
 
 

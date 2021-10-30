@@ -37,14 +37,19 @@ defmodule Flamelex.GUI.Structs.Frame do
   #   new(label, Coordinates.new(coords), Dimensions.new(dimensions))
   # end
 
-  def calculate_frame_position(opts) do
-    case opts |> Map.fetch(:show_menubar?) do
-      {:ok, true} ->
-        Coordinates.new(x: 0, y: Flamelex.GUI.Component.MenuBar.height())
-      _otherwise ->
-        Coordinates.new(x: 0, y: 0)
-    end
+  def calculate_frame_position(%{show_menubar?: true}) do
+    Coordinates.new(x: 0, y: Flamelex.GUI.Component.MenuBar.height())
   end
+  def calculate_frame_position(_otherwise) do
+    Coordinates.new(x: 0, y: 0)
+  end
+  #   case opts |> Map.fetch(:show_menubar?) do
+  #     {:ok, true} ->
+        
+  #     _otherwise ->
+        
+  #   end
+  # end
 
   #TODO lol whats going on here
   def calculate_frame_size(opts, layout_dimens) do
@@ -58,23 +63,28 @@ defmodule Flamelex.GUI.Structs.Frame do
 
 
 
-  def new(
-        %GUIState{
-          layout: %Layout{
-            arrangement: :maximized,
-            dimensions: %Dimensions{} = layout_dimens,
-            frames: [], #NOTE: No existing frames
-            opts: opts
-          }},
-        buf_tag) do
+  # def new(
+  #       %{
+  #         layout: %Layout{
+  #           arrangement: :maximized,
+  #           dimensions: %Dimensions{} = layout_dimens,
+  #           frames: [], #NOTE: No existing frames
+  #           opts: opts
+  #         }},
+  #       buf_tag) do
+  def new(gui_state, buf_tag) do
+  # def new(%GUIState{} = gui_state, buf_state) do
+    
 
-    coords = calculate_frame_position(opts)
-    dimens = calculate_frame_size(opts, layout_dimens)
+    coords = calculate_frame_position(gui_state)
+    # dimens = calculate_frame_size(opts, layout_dimens)
 
+    # coords = {50, 50}|> Coordinates.new()
+    # dimens = {400, 400}|> Dimensions.new()
     %__MODULE__{
       top_left:   coords,
-      dimensions: dimens,
-      label: "TODO change the label lol"
+      dimensions: gui_state.viewport,
+      label: "#{File.cwd!()}/example.txt"
     }
   end
 
@@ -135,7 +145,8 @@ def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when 
     y = frame.dimensions.height - h # go to the bottom & back up how high the bar will be
     c = Flamelex.GUI.Colors.menu_bar()
 
-    font_size = Flamelex.GUI.Fonts.size()
+    # font_size = Flamelex.GUI.Fonts.size()
+    font_size = 24 #TODO
     mode_textbox_width = 250
 
     stroke_width = 2
@@ -157,13 +168,15 @@ def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when 
     # draw the text showing the mode_string
     |> Scenic.Primitives.text(mode_string,
                 id: :mode_string,
-                font:       Flamelex.GUI.Fonts.primary(),
+                # font:       Flamelex.GUI.Fonts.primary(),
+                font:       :ibm_plex_mono,
                 translate:  {x+left_margin, y+font_size+stroke_width}, # text draws from bottom-left corner??
                 font_size:  font_size,
                 fill:       :black)
     # draw the text showing the frame_label
     |> Scenic.Primitives.text(frame_label,
-                font:       Flamelex.GUI.Fonts.primary(),
+                # ont:       Flamelex.GUI.Fonts.primary(),
+                font:       :ibm_plex_mono,
                 translate:  {x+mode_textbox_width+left_margin, y+font_size+stroke_width}, # text draws from bottom-left corner??
                 font_size:  font_size,
                 fill:       :black)
@@ -366,7 +379,6 @@ end
 
 #   # def handle_continue(:draw_frame, frame) do
 
-#   #   IO.inspect frame, label: "FFFFF"
 
 #   #   new_graph =
 #   #     frame.graph

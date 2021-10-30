@@ -12,7 +12,7 @@ defmodule Flamelex.Buffer.TopLevelSupervisor do
 
 
   def init(_params) do
-    IO.puts "#{__MODULE__} initializing..."
+    Logger.debug "#{__MODULE__} initializing..."
 
     children = [
       # {Registry, keys: :unique, name: Flamelex.Buffer.ProcessRegistry},

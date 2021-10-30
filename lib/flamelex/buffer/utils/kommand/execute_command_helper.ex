@@ -12,7 +12,6 @@ defmodule Flamelex.Buffer.Utils.KommandBuffer.ExecuteCommandHelper do
   #     "note" ->
   #       raise "can't do new notes@!"
   #     otherwise ->
-  #       IO.inspect otherwise
   #       IO.puts "Making new things all the time!! What a lovething #{inspect something}"
   #   end
   # end
@@ -39,7 +38,7 @@ defmodule Flamelex.Buffer.Utils.KommandBuffer.ExecuteCommandHelper do
 
 
   def execute_command(unrecognised_command) do
-    Logger.warn "Running KommandBuffer contents as Elixir code..."
+    Logger.info "--> KommandBuffer executing Elixir code: #{inspect unrecognised_command}"
     Code.eval_string(unrecognised_command)
   end
 
