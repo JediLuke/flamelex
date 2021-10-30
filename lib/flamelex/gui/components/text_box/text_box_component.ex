@@ -24,8 +24,7 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     draw_footer_if_reqd = fn(graph) ->
       if params.draw_footer? do
-        graph
-        |> Frame.draw_frame_footer(params)
+        graph |> Frame.draw_frame_footer(params)
       else
         graph
       end 
@@ -58,7 +57,6 @@ defmodule Flamelex.GUI.Component.TextBox do
     mode = if params.mode == :insert, do: :insert, else: :normal
 
     params |> Map.merge(%{
-      draw_footer?: true, #AHAHA the culprit! This isn't true by default any more, since we use this with KommandBuffer!!
       status_line: params[:status_line] || "",
       cursors: [
         #TODO acc coords here maybe??
@@ -93,7 +91,6 @@ defmodule Flamelex.GUI.Component.TextBox do
     vpcfg = Flamelex.GUI.ScenicInitialize.viewport_config()
     {:ok, dimensions} = Keyword.fetch(vpcfg, :size)
 
-    IO.inspect frame, label: "FRAME"
     Scenic.Graph.build()
     # |> Scenic.Primitives.add_specs_to_graph(Grid.simple({0, 0}, dimensions, [:top, :right, :bottom, :left, :center]), id: :root_grid)
     |> Draw.background(frame, background_color)
@@ -183,9 +180,12 @@ defmodule Flamelex.GUI.Component.TextBox do
         :kommand -> "COMMAND-MODE"
       end
 
+      
+
     new_graph =
       scene.assigns.graph
       |> Scenic.Graph.modify(:mode_string, &Scenic.Primitives.text(&1, mode_string))
+      |> Scenic.Graph.modify(:mode_string_box, &Scenic.Primitives.update_opts(&1, fill: Flamelex.GUI.Colors.mode(new_mode)))
       #TODO also we want to change the color of the box!
       # |> Frame.redraw()
 

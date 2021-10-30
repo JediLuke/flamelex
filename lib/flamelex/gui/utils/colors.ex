@@ -16,6 +16,7 @@ defmodule Flamelex.GUI.Colors do
 
   def mode(:normal), do: :beige
   def mode(:insert), do: :green
+  def mode(:kommand), do: :beige
 
   def menu_bar, do: :gray
 end
