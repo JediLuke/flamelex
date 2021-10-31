@@ -168,6 +168,7 @@ end
     color = :black
     border_box(graph, frame, {width, color})
   end
+
   def border_box(%Scenic.Graph{} = graph, %Frame{} = frame, {size, color} = stroke) when is_positive_integer(size) and is_atom(color) do
 
     #TODO-NOTE need + or - 1 here for some reason to do with Scenic quirks...
@@ -204,14 +205,14 @@ end
   #   |> Scenic.Primitives.rect(coords, opts)
   # end
 
-  #TODO remove this hideous function, right now it just works for rending fullscreen frames, but having card-coded coords like this is just wrong
-  def text(%Scenic.Graph{} = graph, t, translate \\ {20, 20}) do
-    graph
-    # |> Scenic.Primitives.text(t, font: @ibm_plex_mono,
-    |> Scenic.Primitives.text(t,
-               translate: translate, # text draws from bottom-left corner?? :( also, how high is it???
-               font_size: Flamelex.GUI.Fonts.size(), fill: :blue)
-  end
+  # #TODO remove this hideous function, right now it just works for rending fullscreen frames, but having card-coded coords like this is just wrong
+  # def text(%Scenic.Graph{} = graph, t, translate \\ {20, 20}) do
+  #   graph
+  #   # |> Scenic.Primitives.text(t, font: @ibm_plex_mono,
+  #   |> Scenic.Primitives.text(t,
+  #              translate: translate, # text draws from bottom-left corner?? :( also, how high is it???
+  #              font_size: Flamelex.GUI.Fonts.size(), fill: :blue)
+  # end
 
 
 
