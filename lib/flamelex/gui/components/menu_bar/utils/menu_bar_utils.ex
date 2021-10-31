@@ -1,16 +1,44 @@
 defmodule Flamelex.GUI.Component.MenuBar.Utils do
   alias Flamelex.GUI.Component.MenuBar
-  alias Flamelex.GUI.Utils.Draw
-  
+  use Flamelex.ProjectAliases
+  require Logger
 
-  # alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
+  # by default, nothing is highlighted
+  def render(%Scenic.Scene{assigns: %{state: :default, frame: %Frame{} = _f}} = scene) do
+    # render(f, params)
+    scene
+    |> Draw.clear_slate()         # overwrites scene.assigns.graph with a new %Scenic.Graph{}
+    |> Draw.background(:grey)     # looks at scene.assigns.frame, gets dimensions & draws a background
+    |> Draw.border()              # looks at the scene.assigns.frame & draws a border
+  end
+
+  # def render(frame, params) do
+  #   Logger.debug "rendering a MenuBar I guess..."
+  #   frame
+  #   |> Draw.background(:grey)
+  # end
+
+  # def render(%{assigns: %{frame: %Frame{} = _f}} = scene) do
+  #   # We can manually assign some stuff to a %Scenic.Graph{}, there's
+  #   # nothing fancy going on under-the-hood.
+  #   # https://github.com/boydm/scenic/blob/master/lib/scenic/scene.ex#L404
+
+  #   # 
+  #   menubar = render(scene)
+
+  #   new_graph = 
+  #     Scenic.Graph.build()
 
 
-  def inactive_menubar(frame) do
-    # Draw.blank_graph()
-    Scenic.Graph.build()
-    |> Draw.background(frame, :grey)
-    |> render_menu_buttons(frame, MenuBar.menu_buttons_mapping())
+  #   %{scene|assigns: scene.assigns |> Map.put(:graph, value)}
+  #   |> render()
+  # end
+
+
+  def inactive_menubar(%{assigns: %{graph: g, frame: f}} = scene) do
+    f
+    |> Draw.background(f, :grey)
+    |> render_menu_buttons(f, MenuBar.menu_buttons_mapping())
     # |> Draw.border(frame)
   end
 
