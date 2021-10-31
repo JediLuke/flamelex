@@ -215,8 +215,31 @@ defmodule Flamelex.GUI.ScenicEventsDefinitions do
 
 
       def key2string(x) do
-        IO.inspect x, label: "COULD NOT CONVERT"
-        raise "no"
+        #NOTE: I originally had this here for debugging, but it raises
+        #      an interesting question - maybe it's just one's personal
+        #      style, but, should we put this catchall here? I guess that
+        #      question becomes, do we want things to start crashing if
+        #      we can't convert a key to it's known string.
+        #
+        #      On the one hand, obviously we are not able to process the
+        #      original intent of the request - we have no direct way of
+        #      mapping this key to it's actually intended string representation -
+        #      and since we can't service the request, we should fail. 
+        #      Probably, an erlang purist would revert to the classic
+        #      'let it crash!' maxim - but to me it's an engineering/design
+        #      choice.
+        #
+        #      On the other hand, maybe that's not enough of a reason to
+        #      fail! After all, we could just map it to something stupid
+        #      like "X" or "?" or whatever (interestingly there's no
+        #      character glyff for "null" on a standard modern keyboard !?)
+        #
+        #      I think the most fundamental truth about what I have learned
+        #      from working with the BEAM is that it's important to understand
+        #      and know how your program *will* fail, so you can design
+        #      around that - which is the actual source of robust programs,
+        #      - good design.
+        raise "Unable to convert #{inspect x} to a valid string."
       end
 
     end

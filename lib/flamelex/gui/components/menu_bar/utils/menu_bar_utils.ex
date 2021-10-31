@@ -31,17 +31,12 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   # in this mode, we are highlighting the menu
   def render_menubar(%{assigns: %{state: {:hover, {:main_menubar, index}}}} = scene, menu_map) do
     Logger.debug "rendering the :main_menubar..."
-    # text = Enum.at(menu_map, index+1)
-    new_graph = scene.assigns.graph
-    |> Scenic.Primitives.text(
-        "Luke",
-        fill: :green,
-        font: :ibm_plex_mono,
-        #TODO get this height from good science not a guess
-        # translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
-        translate: {MenuBar.menu_item_width() * index + MenuBar.menu_item(:left_margin), 28})
+    scene
+    |> recursively_render_topmenu(Map.keys(menu_map), hover: index)
+  end
 
-    scene |> Draw.put_graph(new_graph)
+  def recursively_render_topmenu(scene, []) do
+    scene
   end
 
   def recursively_render_topmenu(scene, [], _opts) do
@@ -52,30 +47,88 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
     recursively_render_topmenu(scene, menu_items, offset: 0)
   end
 
-  def recursively_render_topmenu(scene, [label|rest], offset: ofst) do
+  def recursively_render_topmenu(scene, [label|rest], offset: offset) do
+    new_scene = scene
+    |> render_topmenu_item(label, offset: offset)
+
+    recursively_render_topmenu(new_scene, rest, offset: offset+1)
+  end
+
+  def recursively_render_topmenu(scene, [label|rest] = menu_items, hover: hover) do
+    recursively_render_topmenu(scene, menu_items, hover: hover, offset: 0)
+  end
+
+  def recursively_render_topmenu(scene, [label|rest], hover: hover, offset: offset) do
+    new_scene = scene
+    |> render_topmenu_item(label, hover: hover, offset: offset)
+
+    recursively_render_topmenu(new_scene, rest, offset: offset+1)
+  end
+
+  def render_topmenu_item(scene, label, offset: offset) do
     # the top_left_corner of this menu_item / button
     top_margin = 28 #TODO get this from somewhere real
     box_top_left_corner_coords =
-      {MenuBar.menu_item_width() * ofst, 0}
+      {MenuBar.menu_item_width() * offset, 0}
     text_top_left_corner_coords =
-      {MenuBar.menu_item(:left_margin)+MenuBar.menu_item_width()*ofst, top_margin}
+      {MenuBar.menu_item(:left_margin)+MenuBar.menu_item_width()*offset, top_margin}
+    tile = Frame.new(
+            top_left_corner: box_top_left_corner_coords,
+            dimensions: {MenuBar.menu_item_width(), MenuBar.height()})
 
-    new_graph = scene.assigns.graph
-    |> Scenic.Primitives.text(
-        label,
-        fill: :black,
-        font: :ibm_plex_mono,
-        translate: text_top_left_corner_coords)
-    |> Draw.border_box(Frame.new(
-        top_left_corner: box_top_left_corner_coords,
-        dimensions: {MenuBar.menu_item_width(), MenuBar.height()}))
+    new_graph =
+      scene.assigns.graph
+      |> Scenic.Primitives.text(
+          label,
+          # id: {:topmenu_item_text, index},
+          fill: :black,
+          font: :ibm_plex_mono,
+          translate: text_top_left_corner_coords)
+      |> Draw.border_box(tile)
 
     new_scene = scene
     |> Draw.put_graph(new_graph)
-
-    recursively_render_topmenu(new_scene, rest, offset: ofst+1)
   end
-    
+
+
+  def render_topmenu_item(scene, label, hover: index, offset: offset) do
+    # the top_left_corner of this menu_item / button
+    top_margin = 28 #TODO get this from somewhere real
+    box_top_left_corner_coords =
+      {MenuBar.menu_item_width() * offset, 0}
+    text_top_left_corner_coords =
+      {MenuBar.menu_item(:left_margin)+MenuBar.menu_item_width()*offset, top_margin}
+    tile = Frame.new(
+            top_left_corner: box_top_left_corner_coords,
+            dimensions: {MenuBar.menu_item_width(), MenuBar.height()})
+
+    new_graph =
+      if offset+1 == index do
+        scene.assigns.graph
+        |> Draw.background(tile, :red)
+        |> Scenic.Primitives.text(
+            label,
+            # id: {:topmenu_item_text, index},
+            fill: :black,
+            font: :ibm_plex_mono,
+            translate: text_top_left_corner_coords)
+        |> Draw.border_box(tile)
+      else
+        scene.assigns.graph
+        |> Scenic.Primitives.text(
+            label,
+            # id: {:topmenu_item_text, index},
+            fill: :black,
+            font: :ibm_plex_mono,
+            translate: text_top_left_corner_coords)
+        |> Draw.border_box(tile)
+      end
+
+    new_scene = scene
+    |> Draw.put_graph(new_graph)
+  end
+
+
       
     # menu_list,
     #                               :horizontal, %{
@@ -433,6 +486,29 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   # #NOTE: this last handle_action/2 catches actions that didn't match on one of the above
   # def handle_action({_graph, frame}, action) do
   #   :ignore_action
+  # end
+
+
+
+  # def highlight_topmenu(scene, index) do
+  #   scene
+  #   # new_scene = scene
+  #   # |> render_topmenu_item(label, index-1) # offsets start at zero :(
+
+
+  #   # new_graph = scene.assigns.graph
+    
+  #   # # now, draw highlighted top menu
+
+
+  #   # # text = Enum.at(menu_map, index+1)
+  #   # new_graph = scene.assigns.graph
+  #   # |> Scenic.Primitives.text(
+  #   #     "Luke",
+        
+  #   #     fill: :green,
+  #   #     font: :ibm_plex_mono,
+  #   #     translate: {MenuBar.menu_item_width() * index + MenuBar.menu_item(:left_margin), 28})
   # end
 
 

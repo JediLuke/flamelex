@@ -8,7 +8,8 @@ defmodule Flamelex.GUI.Utils.Draw do
   # @default_text_size Flamelex.GUI.Fonts.size()
   @default_text_size 24
 
-  def clean_slate(scene) do
+  @doc ~s(Updates a %Scenic.Scene{} with a new %Scenic.Graph{})
+  def clean_slate(%Scenic.Scene{} = scene) do
     scene |> put_graph(Scenic.Graph.build()) # assign a blank graph to the Scene
   end
 
@@ -80,7 +81,7 @@ defmodule Flamelex.GUI.Utils.Draw do
     |> border_box(frame, stroke)
 
     scene |> put_graph(new_graph)
-end
+  end
 
   # def border(graph, %Frame{top_left: {x, y}, dimensions: {w, h}} = frame) do
   #   Logger.debug "drawing a border..."
@@ -95,6 +96,19 @@ end
   def border(a) do
     raise "NO - #{inspect a}"
   end
+
+    # def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}, color) when is_atom(color) do
+  #   #TODO need width +1 here for some quirky reason of Scenic library
+  #   graph
+  #   |> Scenic.Primitives.rect({w + 1, h}, [fill: color, translate: {x, y}])
+  # end
+  # def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}) do
+  #   #TODO need width +1 here for some quirky reason of Scenic library
+  #   graph
+  #   |> Scenic.Primitives.rect({w + 1, h}, [translate: {x, y}]) #TODO only green for dev
+  # end
+# end
+
 
   def background(%Scenic.Scene{assigns: %{frame: %Frame{} = frame, graph: graph}} = scene, color) do
     width  = frame.dimensions.width + 1 #TODO need width +1 here for some quirky reason of Scenic library
@@ -164,6 +178,7 @@ end
       graph
       |> Scenic.Primitives.rect({width, height}, stroke: stroke, translate: {x_coord, y_coord})
   end
+end
 
 
 
@@ -199,17 +214,6 @@ end
 
 
 
-  # def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}, color) when is_atom(color) do
-  #   #TODO need width +1 here for some quirky reason of Scenic library
-  #   graph
-  #   |> Scenic.Primitives.rect({w + 1, h}, [fill: color, translate: {x, y}])
-  # end
-  # def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}) do
-  #   #TODO need width +1 here for some quirky reason of Scenic library
-  #   graph
-  #   |> Scenic.Primitives.rect({w + 1, h}, [translate: {x, y}]) #TODO only green for dev
-  # end
-end
 
 
 
