@@ -31,4 +31,5 @@
   "truetype_metrics": {:hex, :truetype_metrics, "0.5.2", "6f0b2e91df6e9eefc14f01a36f44fe60ac3e22bcc832e9f159927d8c011086c9", [:mix], [{:font_metrics, "~> 0.5", [hex: :font_metrics, repo: "hexpm", optional: false]}], "hexpm", "c6684dbe2d65f84e1628433f6c403b1a8d4fc6b3f73b160b496dab209940f5dc"},
   "tzdata": {:hex, :tzdata, "1.0.5", "69f1ee029a49afa04ad77801febaf69385f3d3e3d1e4b56b9469025677b89a28", [:mix], [{:hackney, "~> 1.0", [hex: :hackney, repo: "hexpm", optional: false]}], "hexpm", "55519aa2a99e5d2095c1e61cc74c9be69688f8ab75c27da724eb8279ff402a5a"},
   "unicode_util_compat": {:hex, :unicode_util_compat, "0.7.0", "bc84380c9ab48177092f43ac89e4dfa2c6d62b40b8bd132b1059ecc7232f9a78", [:rebar3], [], "hexpm", "25eee6d67df61960cf6a794239566599b09e17e668d3700247bc498638152521"},
+  "wormhole": {:hex, :wormhole, "2.3.0", "5539d538b87fd70fd2b9cd95b8ce8b272c38aa4adf18690cbe8d1736c56054b6", [:mix], [], "hexpm", "5a82445fe84193adafe64eb2c144d703b93d3ddac8aa7e1b0ab0ce3968b22440"},
 }

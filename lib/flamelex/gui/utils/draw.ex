@@ -8,12 +8,28 @@ defmodule Flamelex.GUI.Utils.Draw do
   # @default_text_size Flamelex.GUI.Fonts.size()
   @default_text_size 24
 
-  def clear_slate(scene) do
-    # function Scenic.Scene.get_and_update/3 is undefined (Scenic.Scene does not implement the Access behaviour)
-    # put_in(scene[:assigns][:graph], _new_graph = Scenic.Graph.build())
-    # %{scene|assigns: scene.assigns |> Map.put(:graph, Scenic.Graph.build())}
+  def clean_slate(scene) do
+    scene |> put_graph(Scenic.Graph.build()) # assign a blank graph to the Scene
+  end
 
-    scene |> overwrite_graph(Scenic.Graph.build()) # assign a blank graph to the Scene
+  # virtually ever single render function needs to update the graph...
+  def put_graph(%{assigns: assigns} = scene, %Scenic.Graph{} = new_graph) do
+    # We can manually assign some stuff to a %Scenic.Graph{}, there's
+    # nothing fancy going on under-the-hood.
+    # https://github.com/boydm/scenic/blob/master/lib/scenic/scene.ex#L404
+    #
+    #NOTE: I tried this implementation using `put_in`:
+    #
+    # ```
+    # put_in(scene[:assigns][:graph], _new_graph = Scenic.Graph.build())
+    # ```
+    #
+    # But I got the following error:
+    #
+    #     function Scenic.Scene.get_and_update/3 is undefined (Scenic.Scene does not implement the Access behaviour)
+    #
+    # Would be cool is a Scenic.Scene *did* implement this behaviour ;)
+    %{scene|assigns: assigns |> Map.put(:graph, new_graph)}
   end
 
   @doc """
@@ -52,7 +68,7 @@ defmodule Flamelex.GUI.Utils.Draw do
   #   stroke = {10, :white}
   #   new_graph =
   #     g |> Scenic.Primitives.rect({w, h}, stroke: stroke, translate: {x, y})
-  #   scene |> overwrite_graph(new_graph)
+  #   scene |> put_graph(new_graph)
   # end
 
 
@@ -62,7 +78,7 @@ defmodule Flamelex.GUI.Utils.Draw do
                                       graph: g}
                           } = scene) do
 
-    Logger.debug "drawing a border..."
+    #Logger.debug "drawing a border..."
     size = 3
     stroke = {size, :dark_violet}
 
@@ -77,7 +93,7 @@ defmodule Flamelex.GUI.Utils.Draw do
     # new_graph =
     #   g |> Scenic.Primitives.rect({w, h}, stroke: stroke, translate: {x, y})
 
-    scene |> overwrite_graph(new_graph)
+    scene |> put_graph(new_graph)
 end
 
   # def border(graph, %Frame{top_left: {x, y}, dimensions: {w, h}} = frame) do
@@ -87,7 +103,7 @@ end
   #     graph
   #     |> Scenic.Primitives.rect({w, h}, stroke: stroke, translate: {x, y})
 
-  #   scene |> overwrite_graph(new_graph)
+  #   scene |> put_graph(new_graph)
   # end
 
   def border(a) do
@@ -102,7 +118,7 @@ end
       graph
       |> Scenic.Primitives.rect({width, height}, fill: color, translate: {frame.top_left.x, frame.top_left.y})
 
-    scene |> overwrite_graph(new_graph)
+    scene |> put_graph(new_graph)
   end
 
   def background(%Scenic.Graph{} = graph, %Frame{} = frame, color) do
@@ -166,10 +182,7 @@ end
   end
 
 
-  # virtually ever single render function needs to update the graph...
-  defp overwrite_graph(%{assigns: assigns} = scene, graph) do
-    %{scene|assigns: assigns |> Map.put(:graph, graph)}
-  end
+
 
 
 

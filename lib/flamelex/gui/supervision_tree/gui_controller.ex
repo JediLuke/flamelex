@@ -48,6 +48,13 @@ defmodule Flamelex.GUI.Controller do
   end
 
   def handle_continue(:draw_default_gui, state) do
+    #TODO: I'm putting this sleep here because sometimes when I boot up
+    #      the app, the graph never renders, and I think that maybe the
+    #      GUI.Controller is sending the message out into the BEAmether,
+    #      but GUI.RootScene hasn't booted yet - we should enforce that
+    #      the process exists or something
+    :timer.sleep(500)
+
     new_graph = DefaultGUI.draw(state)
     GenServer.cast(Flamelex.GUI.RootScene, {:redraw, new_graph})
     {:noreply, %{state|graph: new_graph}}

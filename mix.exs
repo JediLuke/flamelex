@@ -35,6 +35,7 @@ defmodule Flamelex.MixProject do
       {:truetype_metrics, "~> 0.3"},
       {:font_metrics, "~> 0.3"},
       {:elixir_uuid, "~> 1.2"},
+      {:wormhole, "~> 2.3"},
       {:jason, "~> 1.1"},
       {:gproc, "~> 0.5.0"}, #TODO remove gproc, use Registry
       {:tzdata, "~> 1.0.4"},

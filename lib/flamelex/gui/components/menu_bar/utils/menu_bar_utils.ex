@@ -2,15 +2,209 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   alias Flamelex.GUI.Component.MenuBar
   use Flamelex.ProjectAliases
   require Logger
+  @moduledoc """
+  This module contains pure-functions to be used by MenuBar.
 
+  Because these are all pure-functions, we can run them with Wormhole,
+  and if they crash - nobody cares!
+  """
+
+  # don't render anything when there's no menu items to display
+  def render(%Scenic.Scene{assigns: %{menu_tree: m}} = scene) when m in [%{}, nil, []] do
+    scene |> Draw.clean_slate()      # overwrites scene.assigns.graph with a new %Scenic.Graph{}
+  end
+  
   # by default, nothing is highlighted
-  def render(%Scenic.Scene{assigns: %{state: :default, frame: %Frame{} = _f}} = scene) do
-    # render(f, params)
+  def render(%Scenic.Scene{assigns: %{state: state, frame: %Frame{} = _f, menu_tree: menu}} = scene) do
+    Logger.debug "re-rendering Flamelex.GUI.Component.MenuBar..."
     scene
-    |> Draw.clear_slate()         # overwrites scene.assigns.graph with a new %Scenic.Graph{}
+    |> Draw.clean_slate()         # overwrites scene.assigns.graph with a new %Scenic.Graph{}
     |> Draw.background(:grey)     # looks at scene.assigns.frame, gets dimensions & draws a background
+    |> render_menubar(menu)       # Use the menu_bar mappings to render the top-level menu
     |> Draw.border()              # looks at the scene.assigns.frame & draws a border
   end
+
+  def render_menubar(%{assigns: %{state: :not_hovering_over_menubar}} = scene, menu_map) do
+    Logger.debug "here we should be rendering the menubar (lol)"
+    scene
+    
+    menu_list = Map.keys(menu_map)
+    first_item = hd(menu_list)
+    offset = 0
+
+    # |> render_button(button_list)
+    new_graph = scene.assigns.graph
+    |> Scenic.Primitives.text(
+         "new menu",
+        fill: :black,
+        font: :ibm_plex_mono,
+        #TODO get this height from good science not a guess
+        # translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
+        translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
+    |> Draw.border_box(scene.assigns.frame)
+    
+    offset = 1
+
+    new_graph = new_graph
+    |> Scenic.Primitives.text(
+         "new menu",
+        fill: :black,
+        font: :ibm_plex_mono,
+        #TODO get this height from good science not a guess
+        # translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
+        translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
+    |> Draw.border_box(scene.assigns.frame)
+    # |> recursively_render_textlist(%{
+    #        item_list: menu_list,
+    #        item_dimensions: MenuBar.menu_item_width(),
+
+    # })
+      
+    # menu_list,
+    #                               :horizontal, %{
+    #                                 item_dimensions: Dimensions.new()
+    #                                 item_width: MenuBar.menu_item_width(), margin: 15}) #TODO get this from right place
+    # new_graph = scene.assigns.graph
+    # |> recursively_render_menubar_items(menu_map)
+
+    # new_graph = for item <- menu_map do
+      
+    # end
+
+    # new_graph =
+    # graph
+    # |> Scenic.Primitives.text(
+    #       button_text,
+    #         fill: :black,
+    #         font: :ibm_plex_mono,
+    #         #TODO get this height from good science not a guess
+    #         translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
+
+
+    # %{scene|assigns: scene.assigns |> Map.put(:graph, new_graph)}
+    scene
+    |> Draw.put_graph(new_graph)
+    # |> Draw.border()
+  end
+
+  # in this mode, we are highlighting the menu
+  def render_menubar(%{assigns: %{state: {:hover, {:main_menubar, index}}}} = scene, menu_map) do
+    Logger.debug "rendering the :main_menubar..."
+    # text = Enum.at(menu_map, index+1)
+    new_graph = scene.assigns.graph
+    |> Scenic.Primitives.text(
+        "Luke",
+        fill: :green,
+        font: :ibm_plex_mono,
+        #TODO get this height from good science not a guess
+        # translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
+        translate: {MenuBar.menu_item_width() * index + MenuBar.menu_item(:left_margin), 28})
+
+    scene |> Draw.put_graph(new_graph)
+  end
+
+  # def handle_input(%{assigns: %{state: {:hover, {:main_menubar, index}}}} = scene, {:cursor_pos, {x, y}}) do
+  #   if y <= MenuBar.height() do
+  #     Logger.debug "now hovering over the menubar..." 
+  #     index = (x |> floor() |> div(MenuBar.menu_item_width()))+1 # calc how wide a button is - indexes start at 1 !!
+  #     scene |> update_state({:hover, {:main_menubar, index}})
+  #   else
+  #     scene |> update_state(:not_hovering_over_menubar)
+  #   end
+  # end
+
+  def handle_input(scene, {:cursor_pos, {x, y}}) do
+    if y <= MenuBar.height() do
+      Logger.debug "now hovering over the menubar..."
+      index = (x |> floor() |> div(MenuBar.menu_item_width()))+1 # calc how wide a button is - indexes start at 1 !!
+      scene |> update_state({:hover, {:main_menubar, index}})
+    else
+      scene |> update_state(:not_hovering_over_menubar)
+    end
+  end
+
+
+
+  def handle_input(%{assigns: %{state: :not_hovering_over_menubar}} = scene, {:cursor_pos, {x, y}}) do
+    if y <= MenuBar.height() do
+      Logger.debug "now hovering over the menubar..." 
+      index = (x |> floor() |> div(MenuBar.menu_item_width()))+1 # calc how wide a button is - indexes start at 1 !!
+      scene |> update_state({:hover, {:main_menubar, index}})
+    else
+      Logger.debug "we're not hovering over the menubar..."
+      # index = (x |> floor() |> div(MenuBar.menu_item_width()))+1 # calc how wide a button is - indexes start at 1 !!
+      scene
+    end
+  end
+
+  def handle_input(scene, input) do
+    Logger.warn "ignoring some input... #{inspect input}"
+    scene
+  end
+  # def handle_input({:cursor_pos, {_x, _y} = coords} = 
+      
+  #   # case scene.assigns.graph |> Scenic.Graph.bounds(coords) do
+  #   #   true ->
+  #   #     Logger.debug "#{__MODULE__} yes we're within bounds."
+  #   #   false ->
+  #   #     Logger.debug "#{__MODULE__} no we're not within bounds."
+  #   # end
+
+  # case coords |> Utils.hovering_over_item?(scene.assigns.state) do
+  #   {:main_menubar, index} when index >= 1 ->
+  #       Logger.debug "you are hovering over the MenuBar !?"
+  #       new_scene =
+  #         scene 
+  #         |> assign(state: {:hover, {:main_menubar, index}})
+  #         |> render_push_graph()
+  #       {:noreply, new_scene}
+  #   {:sub_menu, index, sub_index} ->
+  #       # Flamelex.Fluxus.fire_action({:animate_menu, index, sub_index})
+  #       # MenuBar.action()
+  #       new_scene =
+  #         scene 
+  #         |> assign(state: {:hover, {:sub_menu, index, sub_index}})
+  #         |> render_push_graph()
+  #       {:noreply, scene}
+  #   :not_hovering_over_menubar ->
+  #       Logger.debug "you are NOT hovering over the MenuBar"
+  #       new_scene =
+  #         scene |> assign(state: :not_hovering_over_menubar)
+  #       {:noreply, new_scene}
+  # end
+
+
+
+
+  def hovering_over_item?({x, y} = _coords, :not_hovering_over_menubar) do
+    index = (x |> floor() |> div(MenuBar.menu_item_width()))+1 # calc how wide a button is - indexes start at 1 !!
+    if y <= MenuBar.height() do
+      Logger.debug "transitioning to :main_menubar mode ->"
+      {:main_menubar, index}
+    else
+      :not_hovering_over_menubar
+    end
+  end
+
+  def hovering_over_item?({x, y} = _coords, {:hover, {:main_menubar, index}}) do
+    if y <= MenuBar.height() do
+      Logger.debug "we're still hovering over the top menu bar..."
+      {:hover, {:main_menubar, index}}
+    else
+
+      ##TODO here, we need to calculate if we are hovering over a sub-menu!
+
+      # means we're transitioning from hovering over the bar, to either
+      # a sub-menu, away from the component
+      :not_hovering_over_menubar
+    end
+  end
+
+
+  # def recursively_render_textlist(graph, textlist, d, config) when d in [:horizontal, :vertical] do
+  # def recursively_render_textlist(graph, textlist, d, config) when d in [:horizontal, :vertical] do
+
+  # end
 
   # def render(frame, params) do
   #   Logger.debug "rendering a MenuBar I guess..."
@@ -35,12 +229,12 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   # end
 
 
-  def inactive_menubar(%{assigns: %{graph: g, frame: f}} = scene) do
-    f
-    |> Draw.background(f, :grey)
-    |> render_menu_buttons(f, MenuBar.menu_buttons_mapping())
-    # |> Draw.border(frame)
-  end
+  # def inactive_menubar(%{assigns: %{graph: g, frame: f}} = scene) do
+  #   f
+  #   |> Draw.background(f, :grey)
+  #   |> render_menu_buttons(f, MenuBar.menu_buttons_mapping())
+  #   # |> Draw.border(frame)
+  # end
 
   # def active_menubar(frame) do
   #   Draw.blank_graph()
@@ -49,120 +243,121 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   #   |> Draw.border(frame)
   # end
 
-  def draw_dropdown_menu(graph, frame, index, sub_index) do
+  # def draw_dropdown_menu(graph, frame, index, sub_index) do
 
-    #TODO remove all other dropdowns from the graph too
+  #   #TODO remove all other dropdowns from the graph too
 
-    details = {frame, MenuBar.menu_item_width(), MenuBar.menu_item(:left_margin)}
+  #   details = {frame, MenuBar.menu_item_width(), MenuBar.menu_item(:left_margin)}
 
-    # sub_menu = fetch_submenu(index)
+  #   # sub_menu = fetch_submenu(index)
 
-    # graph
+  #   # graph
 
-    # inactive_menubar(frame)
-    graph
-    |> draw_menu_highlight(details, index, sub_index, top_left: {0, 0})
-    # |> Draw.border(frame)
+  #   # inactive_menubar(frame)
+  #   graph
+  #   |> draw_menu_highlight(details, index, sub_index, top_left: {0, 0})
+  #   # |> Draw.border(frame)
+  # end
+
+  # def render_menu_buttons(graph, _frame, menu_map) do
+  #   button_list =
+  #     menu_map
+  #     |> Enum.reduce(_initial_acc = [], fn {key, _val}, acc ->
+  #                      acc ++ [key]
+  #                    end)
+
+  #   graph
+  #   |> render_button(button_list)
+  # end
+
+  # def draw_menu_highlight(graph, {_frame, item_width, left_margin}, index, sub_index, top_left: {x, y}) do
+  #   margin = x + item_width * index
+
+  #   # {:ok, {_key, sub_menu}} =
+  #   #   Flamelex.GUI.Component.MenuBar.menu_buttons_mapping()
+  #   #   |> Enum.fetch(index)
+
+  #   #TODO real text
+  #   # text = case sub_menu do
+  #   #   %{"paracelsize" => _dc} -> "paracelsize"
+  #   #   %{} -> "lame sauce"
+  #   # end
+  #   # draw_dropdown_menu
+  #   menu_map = MenuBar.menu_buttons_mapping()
+  #   {:ok, {_top_level, sub_menu}} = MenuBar.menu_buttons_mapping() |> Enum.fetch(index)
+
+  #   # sub_menu = ["liberty", "justice", "for_all", "farts", "popsdicle"]
+  #   # sub_menu = ["liberty"]
+  #   sub_menu = Map.keys(sub_menu)
+
+  #   graph
+  #   |> draw_sub_menu(sub_menu, {{item_width, left_margin}, {x, y}, margin}, sub_index)
+  #   |> highlight_top_menu_item(index, margin, item_width, y)
+
+  # end
+
+  # def highlight_top_menu_item(graph, index, margin, item_width, y) do
+  #   {:ok, {text, %{}}} = MenuBar.menu_buttons_mapping() |> Enum.fetch(index)
+
+  #   graph
+  #   |> Scenic.Primitives.rect({item_width, MenuBar.height()}, fill: :dark_blue, translate: {margin, 0})
+  #   |> Scenic.Primitives.text(text, font: :ibm_plex_mono, fill: :white, translate: {MenuBar.menu_item(:left_margin) + margin,  MenuBar.height() + 24}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
+  #   #TODO 28 is correct here but got it through trial & error...
+  #   |> Scenic.Primitives.text(text, font: :ibm_plex_mono, fill: :white, translate: {MenuBar.menu_item(:left_margin) + margin, y + 28}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
+  # end
+
+
+  # def draw_sub_menu(graph, menu_list, params, highlighted_sub_index) do
+  #   {{item_width, left_margin}, {_x, y}, margin} = params
+
+  #   height = MenuBar.height()
+
+  #   {new_graph, _index} =
+  #     Enum.reduce(menu_list, {graph, 0}, fn menu_item, {graph, sub_index} ->
+  #       color = unless sub_index == highlighted_sub_index, do: :grey, else: :red #TODO this is de way!! re-render buttons conditionally based on highlight
+
+  #       new_graph =
+  #         graph
+  #         |> Scenic.Primitives.rect({item_width, height}, fill: :white, translate: {margin, y + height + height*sub_index})
+  #         |> Scenic.Primitives.text(menu_item, font: :ibm_plex_mono, fill: color, translate: {left_margin + margin,  y + height + height*sub_index + 24}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
+
+  #       {new_graph, sub_index+1}
+  #     end)
+
+  #   new_graph
+  #   # graph
+  #   # |> (fn graph ->
+
+  #   # |> Scenic.Primitives.rect({item_width, 120}, fill: :white, translate: {margin, y + Flamelex.GUI.Component.MenuBar.height()})
+  #   # |> Scenic.Primitives.text(text, font: :ibm_plex_mono, fill: :blue, translate: {left_margin + margin, y + 2*Flamelex.GUI.Component.MenuBar.height()})
+  # end
+
+  # def render_button_list(graph, button_list, offset \\ 0)
+  # def render_button(graph, [], _offset), do: graph #NOTE: Base case - no buttons left to render...
+  # def render_button(graph, [button_text|rest], offset) do
+  # def render_button(graph, [button_text|rest], offset) do
+
+
+  # def render_button(graph, button_list, offset \\ 0)
+  # def render_button(graph, [], _offset), do: graph #NOTE: Base case - no buttons left to render...
+  # def render_button(graph, [button_text|rest], offset) do
+
+  #   new_graph =
+  #     graph
+  #     |> Scenic.Primitives.text(
+  #           button_text,
+  #             fill: :black,
+  #             font: :ibm_plex_mono,
+  #             #TODO get this height from good science not a guess
+  #             translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
+
+  #   render_button(new_graph, rest, offset+1)
+  # end
+
+  # shortcut to overwrite the state of a scene
+  defp update_state(%{assigns: assigns} = scene, new_state) do
+    %{scene|assigns: assigns |> Map.put(:state, new_state)}
   end
 
-  def render_menu_buttons(graph, _frame, menu_map) do
-    button_list =
-      menu_map
-      |> Enum.reduce(_initial_acc = [], fn {key, _val}, acc ->
-                       acc ++ [key]
-                     end)
 
-    graph
-    |> render_button(button_list)
-  end
-
-  def draw_menu_highlight(graph, {_frame, item_width, left_margin}, index, sub_index, top_left: {x, y}) do
-    margin = x + item_width * index
-
-    # {:ok, {_key, sub_menu}} =
-    #   Flamelex.GUI.Component.MenuBar.menu_buttons_mapping()
-    #   |> Enum.fetch(index)
-
-    #TODO real text
-    # text = case sub_menu do
-    #   %{"paracelsize" => _dc} -> "paracelsize"
-    #   %{} -> "lame sauce"
-    # end
-    # draw_dropdown_menu
-    menu_map = MenuBar.menu_buttons_mapping()
-    {:ok, {_top_level, sub_menu}} = MenuBar.menu_buttons_mapping() |> Enum.fetch(index)
-
-    # sub_menu = ["liberty", "justice", "for_all", "farts", "popsdicle"]
-    # sub_menu = ["liberty"]
-    sub_menu = Map.keys(sub_menu)
-
-    graph
-    |> draw_sub_menu(sub_menu, {{item_width, left_margin}, {x, y}, margin}, sub_index)
-    |> highlight_top_menu_item(index, margin, item_width, y)
-
-  end
-
-  def highlight_top_menu_item(graph, index, margin, item_width, y) do
-    {:ok, {text, %{}}} = MenuBar.menu_buttons_mapping() |> Enum.fetch(index)
-
-    graph
-    |> Scenic.Primitives.rect({item_width, MenuBar.height()}, fill: :dark_blue, translate: {margin, 0})
-    |> Scenic.Primitives.text(text, font: :ibm_plex_mono, fill: :white, translate: {MenuBar.menu_item(:left_margin) + margin,  MenuBar.height() + 24}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
-    #TODO 28 is correct here but got it through trial & error...
-    |> Scenic.Primitives.text(text, font: :ibm_plex_mono, fill: :white, translate: {MenuBar.menu_item(:left_margin) + margin, y + 28}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
-  end
-
-
-  def draw_sub_menu(graph, menu_list, params, highlighted_sub_index) do
-    {{item_width, left_margin}, {_x, y}, margin} = params
-
-    height = MenuBar.height()
-
-    {new_graph, _index} =
-      Enum.reduce(menu_list, {graph, 0}, fn menu_item, {graph, sub_index} ->
-        color = unless sub_index == highlighted_sub_index, do: :grey, else: :red #TODO this is de way!! re-render buttons conditionally based on highlight
-
-        new_graph =
-          graph
-          |> Scenic.Primitives.rect({item_width, height}, fill: :white, translate: {margin, y + height + height*sub_index})
-          |> Scenic.Primitives.text(menu_item, font: :ibm_plex_mono, fill: color, translate: {left_margin + margin,  y + height + height*sub_index + 24}) #TODO need the 40 cause of text drawing from the bottom... should get it from text but F THAT
-
-        {new_graph, sub_index+1}
-      end)
-
-    new_graph
-    # graph
-    # |> (fn graph ->
-
-    # |> Scenic.Primitives.rect({item_width, 120}, fill: :white, translate: {margin, y + Flamelex.GUI.Component.MenuBar.height()})
-    # |> Scenic.Primitives.text(text, font: :ibm_plex_mono, fill: :blue, translate: {left_margin + margin, y + 2*Flamelex.GUI.Component.MenuBar.height()})
-  end
-
-
-
-  def render_button(graph, button_list, offset \\ 0)
-  def render_button(graph, [], _offset), do: graph #NOTE: Base case - no buttons left to render...
-  def render_button(graph, [button_text|rest], offset) do
-
-    new_graph =
-      graph
-      |> Scenic.Primitives.text(
-            button_text,
-              fill: :black,
-              font: :ibm_plex_mono,
-              #TODO get this height from good science not a guess
-              translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
-
-    render_button(new_graph, rest, offset+1)
-  end
-
-  def hovering_over_item?({x, y} = _coords) do
-    index = (x |> floor() |> div(MenuBar.menu_item_width()))
-    if y <= MenuBar.height() do
-      {:main_menubar, index}
-    else
-      sub_index = (y |> floor() |> div(MenuBar.height())) - 1
-      {:sub_menu, index, sub_index}
-    end
-  end
 end
