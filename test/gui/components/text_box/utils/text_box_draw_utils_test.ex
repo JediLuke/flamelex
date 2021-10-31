@@ -1,7 +1,7 @@
 defmodule Flamelex.Test.GUI.Components.TextBox.Utils.TextBoxDrawUtilsTest do
   use ExUnit.Case
   alias Flamelex.GUI.Component.Utils.TextBox, as: TextBoxDrawUtils
-  alias Flamelex.GUI.Utilities.Draw
+  alias Flamelex.GUI.Utils.Draw
 
   @test_quote "Manufacturing is more than just putting parts together. Testing leads to failure, and failure leads to understanding."
 
