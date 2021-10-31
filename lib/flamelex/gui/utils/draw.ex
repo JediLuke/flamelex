@@ -72,26 +72,12 @@ defmodule Flamelex.GUI.Utils.Draw do
   # end
 
 
-  def border(%Scenic.Scene{assigns: %{frame: %{
-                                        top_left: %{x: x, y: y},
-                                        dimensions: %{width: w, height: h} } = frame,
-                                      graph: g}
-                          } = scene) do
-
+  def border(%Scenic.Scene{assigns: %{frame: frame, graph: graph}} = scene) do
     #Logger.debug "drawing a border..."
-    size = 3
-    stroke = {size, :dark_violet}
+    stroke = {3, :dark_violet}
 
-    #TODO-NOTE need + or - 1 here for some reason to do with Scenic quirks...
-    x_coord = frame.top_left.x + (size/2)
-    y_coord = frame.top_left.y + (size/2)
-    width   = frame.dimensions.width - (size/2)
-    height  = frame.dimensions.height - (size/2)
-
-    new_graph =
-      g |> Scenic.Primitives.rect({width, height}, stroke: stroke, translate: {x_coord, y_coord})
-    # new_graph =
-    #   g |> Scenic.Primitives.rect({w, h}, stroke: stroke, translate: {x, y})
+    new_graph = graph
+    |> border_box(frame, stroke)
 
     scene |> put_graph(new_graph)
 end
@@ -164,22 +150,19 @@ end
   end
 
   def border_box(%Scenic.Graph{} = graph, %Frame{} = frame) do
-    width = 2
-    color = :black
-    border_box(graph, frame, {width, color})
+    stroke = {2, :dark_grey}
+    border_box(graph, frame, stroke)
   end
 
-  def border_box(%Scenic.Graph{} = graph, %Frame{} = frame, {size, color} = stroke) when is_positive_integer(size) and is_atom(color) do
+  def border_box(%Scenic.Graph{} = graph, %Frame{} = frame, {size, color} = stroke)
+    when is_positive_integer(size) and is_atom(color) do
+      x_coord = frame.top_left.x + (size/2)
+      y_coord = frame.top_left.y + (size/2)
+      width   = frame.dimensions.width - (size/2)
+      height  = frame.dimensions.height - (size/2)
 
-    #TODO-NOTE need + or - 1 here for some reason to do with Scenic quirks...
-
-    x_coord = frame.top_left.x + size - 1
-    y_coord = frame.top_left.y
-    width   = frame.dimensions.width - 1
-    height  = frame.dimensions.height - MenuBar.height() - size + 1
-
-    graph
-    |> Scenic.Primitives.rect({width, height}, stroke: stroke, translate: {x_coord, y_coord})
+      graph
+      |> Scenic.Primitives.rect({width, height}, stroke: stroke, translate: {x_coord, y_coord})
   end
 
 

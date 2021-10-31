@@ -25,40 +25,57 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   end
 
   def render_menubar(%{assigns: %{state: :not_hovering_over_menubar}} = scene, menu_map) do
-    Logger.debug "here we should be rendering the menubar (lol)"
-    scene
-    
-    menu_list = Map.keys(menu_map)
-    first_item = hd(menu_list)
-    offset = 0
+    scene |> recursively_render_topmenu(Map.keys(menu_map))
+  end
 
-    # |> render_button(button_list)
+  # in this mode, we are highlighting the menu
+  def render_menubar(%{assigns: %{state: {:hover, {:main_menubar, index}}}} = scene, menu_map) do
+    Logger.debug "rendering the :main_menubar..."
+    # text = Enum.at(menu_map, index+1)
     new_graph = scene.assigns.graph
     |> Scenic.Primitives.text(
-         "new menu",
-        fill: :black,
+        "Luke",
+        fill: :green,
         font: :ibm_plex_mono,
         #TODO get this height from good science not a guess
         # translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
-        translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
-    |> Draw.border_box(scene.assigns.frame)
-    
-    offset = 1
+        translate: {MenuBar.menu_item_width() * index + MenuBar.menu_item(:left_margin), 28})
 
-    new_graph = new_graph
+    scene |> Draw.put_graph(new_graph)
+  end
+
+  def recursively_render_topmenu(scene, [], _opts) do
+    scene
+  end
+
+  def recursively_render_topmenu(scene, [_label|_rest] = menu_items) do
+    recursively_render_topmenu(scene, menu_items, offset: 0)
+  end
+
+  def recursively_render_topmenu(scene, [label|rest], offset: ofst) do
+    # the top_left_corner of this menu_item / button
+    top_margin = 28 #TODO get this from somewhere real
+    box_top_left_corner_coords =
+      {MenuBar.menu_item_width() * ofst, 0}
+    text_top_left_corner_coords =
+      {MenuBar.menu_item(:left_margin)+MenuBar.menu_item_width()*ofst, top_margin}
+
+    new_graph = scene.assigns.graph
     |> Scenic.Primitives.text(
-         "new menu",
+        label,
         fill: :black,
         font: :ibm_plex_mono,
-        #TODO get this height from good science not a guess
-        # translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
-        translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
-    |> Draw.border_box(scene.assigns.frame)
-    # |> recursively_render_textlist(%{
-    #        item_list: menu_list,
-    #        item_dimensions: MenuBar.menu_item_width(),
+        translate: text_top_left_corner_coords)
+    |> Draw.border_box(Frame.new(
+        top_left_corner: box_top_left_corner_coords,
+        dimensions: {MenuBar.menu_item_width(), MenuBar.height()}))
 
-    # })
+    new_scene = scene
+    |> Draw.put_graph(new_graph)
+
+    recursively_render_topmenu(new_scene, rest, offset: ofst+1)
+  end
+    
       
     # menu_list,
     #                               :horizontal, %{
@@ -82,26 +99,8 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
 
 
     # %{scene|assigns: scene.assigns |> Map.put(:graph, new_graph)}
-    scene
-    |> Draw.put_graph(new_graph)
-    # |> Draw.border()
-  end
+    
 
-  # in this mode, we are highlighting the menu
-  def render_menubar(%{assigns: %{state: {:hover, {:main_menubar, index}}}} = scene, menu_map) do
-    Logger.debug "rendering the :main_menubar..."
-    # text = Enum.at(menu_map, index+1)
-    new_graph = scene.assigns.graph
-    |> Scenic.Primitives.text(
-        "Luke",
-        fill: :green,
-        font: :ibm_plex_mono,
-        #TODO get this height from good science not a guess
-        # translate: {MenuBar.menu_item_width() * offset + MenuBar.menu_item(:left_margin), 28})
-        translate: {MenuBar.menu_item_width() * index + MenuBar.menu_item(:left_margin), 28})
-
-    scene |> Draw.put_graph(new_graph)
-  end
 
   # def handle_input(%{assigns: %{state: {:hover, {:main_menubar, index}}}} = scene, {:cursor_pos, {x, y}}) do
   #   if y <= MenuBar.height() do
@@ -201,8 +200,8 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   # end
 
 
-  # def recursively_render_textlist(graph, textlist, d, config) when d in [:horizontal, :vertical] do
-  # def recursively_render_textlist(graph, textlist, d, config) when d in [:horizontal, :vertical] do
+  # def recursively_render_topmenu(graph, textlist, d, config) when d in [:horizontal, :vertical] do
+  # def recursively_render_topmenu(graph, textlist, d, config) when d in [:horizontal, :vertical] do
 
   # end
 
