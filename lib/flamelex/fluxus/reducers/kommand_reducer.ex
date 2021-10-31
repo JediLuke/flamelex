@@ -58,7 +58,7 @@ defmodule Flamelex.Fluxus.Reducers.Kommand do
     #NOTE: If successful, the KommandBuffer will, in turn, call us (FluxusRadix)
     #      back, telling us to switch back to normal mode.
     #      Return the state unchanged.
-    radix_state
+    radix_state |> switch_mode(:normal)
   end
 
   defp reduce(_radix_state, {:action, {KommandBuffer, x}}) do
