@@ -1,7 +1,7 @@
 defmodule Flamelex.GUI.Utils.DefaultGUI.NEW do
   use Flamelex.ProjectAliases
   require Logger
-  alias Flamelex.GUI.Utilities.Draw
+  alias Flamelex.GUI.Utils.Draw
 
   # alias LayoutOMatic.Layouts.Components.Layout, as: AutoLayout
 

@@ -1,50 +1,108 @@
-defmodule Flamelex.GUI.Utilities.Draw do
+defmodule Flamelex.GUI.Utils.Draw do
   use Flamelex.{ProjectAliases, CustomGuards}
   alias Flamelex.GUI.Component.MenuBar
+  require Logger
 
 
   # @ibm_plex_mono Flamelex.GUI.Fonts.metrics_hash(:ibm_plex_mono) #NOTE: we use the metrics-hash here, not the font-hash
   # @default_text_size Flamelex.GUI.Fonts.size()
   @default_text_size 24
 
+  def clear_slate(scene) do
+    # function Scenic.Scene.get_and_update/3 is undefined (Scenic.Scene does not implement the Access behaviour)
+    # put_in(scene[:assigns][:graph], _new_graph = Scenic.Graph.build())
+    # %{scene|assigns: scene.assigns |> Map.put(:graph, Scenic.Graph.build())}
 
-  def blank_graph(text_size \\ @default_text_size) when is_integer(text_size) do
-    Scenic.Graph.build(font: @ibm_plex_mono, font_size: text_size)
+    scene |> overwrite_graph(Scenic.Graph.build()) # assign a blank graph to the Scene
   end
 
   @doc """
   Draw a test pattern.
   """
   def test_pattern(graph) do
-
+    rect_size = {80, 80}
     graph
     # 1st column
-    |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
-    |> Scenic.Primitives.rect({80, 80}, fill: :green,  translate: {100, 180})
-    |> Scenic.Primitives.rect({80, 80}, fill: :red,    translate: {100, 260})
+    |> Scenic.Primitives.rect(rect_size, fill: :white,  translate: {100, 100})
+    |> Scenic.Primitives.rect(rect_size, fill: :green,  translate: {100, 180})
+    |> Scenic.Primitives.rect(rect_size, fill: :red,    translate: {100, 260})
     # 2nd column
-    |> Scenic.Primitives.rect({80, 80}, fill: :blue,   translate: {180, 100})
-    |> Scenic.Primitives.rect({80, 80}, fill: :black,  translate: {180, 180})
-    |> Scenic.Primitives.rect({80, 80}, fill: :yellow, translate: {180, 260})
+    |> Scenic.Primitives.rect(rect_size, fill: :blue,   translate: {180, 100})
+    |> Scenic.Primitives.rect(rect_size, fill: :black,  translate: {180, 180})
+    |> Scenic.Primitives.rect(rect_size, fill: :yellow, translate: {180, 260})
     # 3rd column
-    |> Scenic.Primitives.rect({80, 80}, fill: :pink,   translate: {260, 100})
-    |> Scenic.Primitives.rect({80, 80}, fill: :purple, translate: {260, 180})
-    |> Scenic.Primitives.rect({80, 80}, fill: :brown,  translate: {260, 260})
+    |> Scenic.Primitives.rect(rect_size, fill: :pink,   translate: {260, 100})
+    |> Scenic.Primitives.rect(rect_size, fill: :purple, translate: {260, 180})
+    |> Scenic.Primitives.rect(rect_size, fill: :brown,  translate: {260, 260})
   end
 
-  @doc """
-  Return a simple frame, doesn't contain any buffer yet.
-  """
-  def empty_frame(%{id: id, top_left: top_left, size: size}) do
-    Frame.new(
-      id: id,
-      top_left_corner: top_left, #TODO make just top_left
-      dimensions: size
-    )
+  # @doc """
+  # Return a simple frame, doesn't contain any buffer yet.
+  # """
+  # def empty_frame(%{id: id, top_left: top_left, size: size}) do
+  #   Frame.new(
+  #     id: id,
+  #     top_left_corner: top_left, #TODO make just top_left
+  #     dimensions: size
+  #   )
+  # end
+
+  # def border(%Scenic.Scene{assigns: %{frame: %{top_left: {x, y}, dimensions: {w, h}}, graph: g}} = scene) do
+  #   Logger.debug "drawing a border..."
+  #   stroke = {10, :white}
+  #   new_graph =
+  #     g |> Scenic.Primitives.rect({w, h}, stroke: stroke, translate: {x, y})
+  #   scene |> overwrite_graph(new_graph)
+  # end
+
+
+  def border(%Scenic.Scene{assigns: %{frame: %{
+                                        top_left: %{x: x, y: y},
+                                        dimensions: %{width: w, height: h} } = frame,
+                                      graph: g}
+                          } = scene) do
+
+    Logger.debug "drawing a border..."
+    size = 3
+    stroke = {size, :dark_violet}
+
+    #TODO-NOTE need + or - 1 here for some reason to do with Scenic quirks...
+    x_coord = frame.top_left.x + (size/2)
+    y_coord = frame.top_left.y + (size/2)
+    width   = frame.dimensions.width - (size/2)
+    height  = frame.dimensions.height - (size/2)
+
+    new_graph =
+      g |> Scenic.Primitives.rect({width, height}, stroke: stroke, translate: {x_coord, y_coord})
+    # new_graph =
+    #   g |> Scenic.Primitives.rect({w, h}, stroke: stroke, translate: {x, y})
+
+    scene |> overwrite_graph(new_graph)
+end
+
+  # def border(graph, %Frame{top_left: {x, y}, dimensions: {w, h}} = frame) do
+  #   Logger.debug "drawing a border..."
+  #   stroke = {10, :white}
+  #   new_graph =
+  #     graph
+  #     |> Scenic.Primitives.rect({w, h}, stroke: stroke, translate: {x, y})
+
+  #   scene |> overwrite_graph(new_graph)
+  # end
+
+  def border(a) do
+    raise "NO - #{inspect a}"
   end
 
-  def border(graph, %Frame{} = frame) do
-    border_box(graph, frame, {1, :white})
+  def background(%Scenic.Scene{assigns: %{frame: %Frame{} = frame, graph: graph}} = scene, color) do
+    width  = frame.dimensions.width + 1 #TODO need width +1 here for some quirky reason of Scenic library
+    height = frame.dimensions.height
+
+    new_graph =
+      graph
+      |> Scenic.Primitives.rect({width, height}, fill: color, translate: {frame.top_left.x, frame.top_left.y})
+
+    scene |> overwrite_graph(new_graph)
   end
 
   def background(%Scenic.Graph{} = graph, %Frame{} = frame, color) do
@@ -108,6 +166,10 @@ defmodule Flamelex.GUI.Utilities.Draw do
   end
 
 
+  # virtually ever single render function needs to update the graph...
+  defp overwrite_graph(%{assigns: assigns} = scene, graph) do
+    %{scene|assigns: assigns |> Map.put(:graph, graph)}
+  end
 
 
 

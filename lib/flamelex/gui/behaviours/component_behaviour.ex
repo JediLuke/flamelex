@@ -3,16 +3,9 @@ defmodule Flamelex.GUI.ComponentBehaviour do
   GUI Components are defined here.
   """
 
-
   #TODO either deprecate this component or make it mandatory!!
 
-
-  #NOTE: Here's a little reminder...
-  # the __using__ macro allows us to `use ComponentBehaviour` and automatically
-  # run, not just the behaviour contract code, but a whole bunch of useful
-  # code we want automatically included in all ComponentBehaviours
   defmacro __using__(_params) do
-
     quote do
 
       #NOTE: Here's a little reminder...
@@ -21,24 +14,21 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       # `Flamelex.GUI.ComponentBehaviour`
       @behaviour Flamelex.GUI.ComponentBehaviour
       use Scenic.Component
+      use Flamelex.ProjectAliases
       require Logger
 
 
-      alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
-      alias Flamelex.GUI.Utilities.Draw
-      alias Flamelex.Utilities.ProcessRegistry
-
-
-      #NOTE:
-      # The following functions are common to all Flamelex.GUI.Components
-      # and they can share the same implementation, so we include them here.
-
+      # validate the incoming arguments when we mount a scene?
+      def validate(data) do
+        {:ok, data}
+      end
 
       @doc """
       Just like in Phoenix.LiveView, we mount our components onto an existing
       graph. In our case this is the same for all components though so we
       can abstract it out.
       """
+      #TODO deprecate, just use add_to_graph
       def mount(%Scenic.Graph{} = graph, %{ref: r} = params) do
         graph |> add_to_graph(params, id: r) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
       end
@@ -53,7 +43,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       # the same way. Also all components need a `ref`
       def verify(%{
         ref: _r,                # the `ref` refers back to the Buffer that this GUI.Component is for, e.g. {:buffer, {:file, "README.md"}}
-        frame: %Frame{} = _f    # the %Frame{} which defines this GUI.Component
+        frame: %Flamelex.GUI.Structs.Frame{} = _f    # the %Frame{} which defines this GUI.Component
       } = params) do
         {:ok, params}
       end
@@ -62,26 +52,26 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       def info(_data), do: ~s(Invalid data)
 
 
-      def init(%{frame: %Frame{} = frame} = params, _scenic_opts) do
-        {:rego_tag, _tag} = register_self(params)
+      # def init(%{frame: %Frame{} = frame} = params, _scenic_opts) do
+      #   {:rego_tag, _tag} = register_self(params)
 
-        #NOTE: This little trick is so that `custom_init_logic` is optional
-        params =
-          if function_exported?(__MODULE__, :custom_init_logic, 1) do
-            apply(__MODULE__, :custom_init_logic, [params])
-          else
-            params
-          end
+      #   #NOTE: This little trick is so that `custom_init_logic` is optional
+      #   params =
+      #     if function_exported?(__MODULE__, :custom_init_logic, 1) do
+      #       apply(__MODULE__, :custom_init_logic, [params])
+      #     else
+      #       params
+      #     end
 
-        Flamelex.Utils.PubSub.subscribe(topic: :gui_event_bus)
+      #   Flamelex.Utils.PubSub.subscribe(topic: :gui_event_bus)
 
-        graph =
-          #TODO change this to just render/1 eventually...
-          render(frame, params) #REMINDER: render/1 has to be implemented by the modules "using" this behaviour, and that is the function being called here
-          |> Frame.draw_frame_footer(params)
+      #   graph =
+      #     #TODO change this to just render/1 eventually...
+      #     render(frame, params) #REMINDER: render/1 has to be implemented by the modules "using" this behaviour, and that is the function being called here
+      #     |> Frame.draw_frame_footer(params)
 
-        {:ok, {graph, params}, push: graph}
-      end
+      #   {:ok, {graph, params}, push: graph}
+      # end
 
 
       #TODO maybe put __MODULE__ in here, so we can see what type of component it is in the registration?

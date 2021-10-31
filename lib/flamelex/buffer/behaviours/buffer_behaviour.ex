@@ -24,13 +24,13 @@ defmodule Flamelex.BufferBehaviour do
       def start_link(%{source: source} = params) do
         Logger.debug "#{__MODULE__} starting... params: #{inspect params}"
         tag  = {:buffer, source}
-        name = Flamelex.Utilities.ProcessRegistry.via_tuple_name(:gproc, tag)
+        name = Flamelex.Utils.ProcessRegistry.via_tuple_name(:gproc, tag)
         GenServer.start_link(__MODULE__, Map.merge(params, %{rego_tag: tag}), name: name)
       end
 
       def start_link(%{rego_tag: {:buffer, _b} = tag} = params) do #TODO should we enforce this tuple shape here?? dunno
         Logger.debug "#{__MODULE__} starting... params: #{inspect params}"
-        name = Flamelex.Utilities.ProcessRegistry.via_tuple_name(:gproc, tag)
+        name = Flamelex.Utils.ProcessRegistry.via_tuple_name(:gproc, tag)
         GenServer.start_link(__MODULE__, %{rego_tag: tag, params: params}, name: name)
       end
 

@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Utilities.Drawing.TextComponentDrawingLib do
+defmodule Flamelex.GUI.Utils.Drawing.TextComponentDrawingLib do
   use Flamelex.ProjectAliases
 
 

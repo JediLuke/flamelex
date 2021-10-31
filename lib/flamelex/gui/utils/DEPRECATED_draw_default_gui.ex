@@ -118,11 +118,12 @@ end
 
   defp mount_menubar(graph, vp) do
     graph
-    |> Flamelex.GUI.Component.MenuBar.mount(%{
+    |> Flamelex.GUI.Component.MenuBar.add_to_graph(%{
          ref: :menu_bar,
          frame: Frame.new(
             top_left: {0, 0},
-            size:     {vp.width, Flamelex.GUI.Component.MenuBar.height()})})
+            size:     {vp.width, Flamelex.GUI.Component.MenuBar.height()})
+       }, id: :menu_bar) #SCENIC options
   end
 
   defp mount_kommand_buffer(graph, vp) do

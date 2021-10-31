@@ -79,7 +79,7 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
     # Process.register(self(), __MODULE__)
     # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
 
-    Flamelex.Utilities.ProcessRegistry.register(rego_tag())
+    Flamelex.Utils.ProcessRegistry.register(rego_tag())
     #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
     #      the scene, so we just need to initialize it with *something*
     new_graph = 
@@ -167,6 +167,8 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
 
     graph
     |> Scenic.Primitives.circle(radius-170,
+                id: :inner_circle,
+                hidden: true,
                 stroke: {1, @primary_color},
                 translate: {center.x, center.y})
     |> Scenic.Primitives.circle(radius,

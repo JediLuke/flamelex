@@ -18,7 +18,7 @@ defmodule Flamelex.Buffer.MiddleManager do
 
     # create a unique name for the Task.Supervisor
     tag  = {:buffer, :task_supervisor, {:buffer, params.source}}
-    name = Flamelex.Utilities.ProcessRegistry.via_tuple_name(:gproc, tag)
+    name = Flamelex.Utils.ProcessRegistry.via_tuple_name(:gproc, tag)
 
     children = [
       {params.type, params}, #REMINDER: params.type is an atom, the module representing the type of Buffer this is

@@ -1,4 +1,4 @@
-defmodule Flamelex.Utilities.ProcessRegistry do #TODO Registrar
+defmodule Flamelex.Utils.ProcessRegistry do #TODO Registrar
   require Logger
   use Flamelex.ProjectAliases
 

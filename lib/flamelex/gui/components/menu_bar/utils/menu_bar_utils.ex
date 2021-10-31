@@ -1,7 +1,9 @@
-defmodule Flamelex.GUI.Utilities.Drawing.MenuBarHelper do
+defmodule Flamelex.GUI.Component.MenuBar.Utils do
   alias Flamelex.GUI.Component.MenuBar
+  alias Flamelex.GUI.Utils.Draw
+  
+
   # alias Flamelex.GUI.Structs.{Coordinates, Dimensions, Frame, Layout}
-  alias Flamelex.GUI.Utilities.Draw
 
 
   def inactive_menubar(frame) do

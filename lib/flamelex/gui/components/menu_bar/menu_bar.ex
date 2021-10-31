@@ -6,10 +6,8 @@ defmodule Flamelex.GUI.Component.MenuBar do
   them to be triggered via the GUI.
   """
   use Flamelex.GUI.ComponentBehaviour
-  alias Flamelex.GUI.Component.MenuBar
-
-  import Flamelex.GUI.Utilities.Drawing.MenuBarHelper
-  # use Scenic.Component
+  alias __MODULE__
+  import Flamelex.GUI.Component.MenuBar.Utils
 
   #TODO deprecate these, but also come up eith a better name!!
   @left_margin 15
@@ -19,55 +17,6 @@ defmodule Flamelex.GUI.Component.MenuBar do
   def menu_item(:left_margin), do: 15
   def menu_item_width, do: 190
 
-  def validate(data) do
-    {:ok, data}
-  end
-
-  # def mount(%Scenic.Graph{} = graph, %{ref: r} = params) do
-  #   graph |> add_to_graph(params, id: r) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
-  # end
-  # def mount(%Scenic.Graph{} = graph, params) do
-  #   graph |> add_to_graph(params) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
-  # end
-
-  def action(a) do
-    #TODO: We need some way of knowing that MenuBar has indeed been mounted
-    #      somewhere, or else the messages just go into the void (use call instead of cast?)
-
-    #REMINDER: `__MODULE__` will be the module which "uses" this macro
-    GenServer.cast(__MODULE__, {:action, a})
-  end
-
-  def init(scene, params, opts) do
-
-    Process.register(self(), __MODULE__)
-    # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
-
-    #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
-    #      the scene, so we just need to initialize it with *something*
-    new_graph = 
-      render(params.frame, %{})
-
-
-      # new_graph = 
-      # Scenic.Graph.build()
-      # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
-
-    new_scene =
-      scene
-      |> assign(graph: new_graph)
-      |> assign(frame: params.frame)
-      |> push_graph(new_graph)
-
-    capture_input(new_scene, [:cursor_pos])
-
-    {:ok, new_scene}
-  end
-
-  @impl Flamelex.GUI.ComponentBehaviour
-  def render(frame, _params) do
-    frame |> inactive_menubar()
-  end
 
   #TODO all of this is hacks... we need to move rego_tag into the behaviour, and this needs to be a behaviour
   # def rego_tag(%{ref: %BufRef{ref: ref}}) do
@@ -76,9 +25,8 @@ defmodule Flamelex.GUI.Component.MenuBar do
   # def rego_tag(%{ref: aa}) when is_atom(aa) do
   #   rego_tag(aa)
   # end
-  def rego_tag(x) do #TODO lol
-    {:gui_component, x}
-  end
+  def rego_tag(x), do: {:gui_component, :menu_bar}
+
 
   @doc """
   This function returns a map which describes all the menu items.
@@ -103,6 +51,32 @@ defmodule Flamelex.GUI.Component.MenuBar do
       "Help" => %{},
     }
   end
+
+
+
+  def init(scene, params, opts) do
+    Process.register(self(), __MODULE__)
+
+    new_graph = 
+      render(params.frame, %{})
+
+    new_scene =
+      scene
+      |> assign(graph: new_graph)
+      |> assign(frame: params.frame)
+      |> push_graph(new_graph)
+
+    capture_input(new_scene, [:cursor_pos, :cursor_button])
+
+    {:ok, new_scene}
+  end
+
+  @impl Flamelex.GUI.ComponentBehaviour
+  def render(frame, _params) do
+    frame |> inactive_menubar()
+  end
+
+
 
 
     # def handle_cast({:action, action}, {%Scenic.Graph{} = graph, state}) do
@@ -141,7 +115,8 @@ defmodule Flamelex.GUI.Component.MenuBar do
 
 
   @impl Scenic.Scene
-  def handle_input({:cursor_pos, {_x, _y} = coords}, _context, frame) do
+  def handle_input({:cursor_pos, {_x, _y} = coords} = input, _context, frame) do
+    Logger.debug "#{__MODULE__} received input: #{inspect input}"
     case coords |> hovering_over_item?() do
       {:main_menubar, index} ->
           # Flamelex.Fluxus.fire_action({:animate_menu, index})
@@ -230,4 +205,14 @@ defmodule Flamelex.GUI.Component.MenuBar do
   def handle_action({_graph, frame}, action) do
     :ignore_action
   end
+
+
+  # def action(a) do
+  #   #TODO: We need some way of knowing that MenuBar has indeed been mounted
+  #   #      somewhere, or else the messages just go into the void (use call instead of cast?)
+
+  #   #REMINDER: `__MODULE__` will be the module which "uses" this macro
+  #   GenServer.cast(__MODULE__, {:action, a})
+  # end
+
 end
