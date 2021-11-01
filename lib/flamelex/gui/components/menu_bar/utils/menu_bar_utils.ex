@@ -32,7 +32,7 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   def render_menubar(%{assigns: %{state: {:hover, {:main_menubar, index}}}} = scene, menu_map) do
     Logger.debug "rendering the :main_menubar..."
     scene
-    |> recursively_render_topmenu(Map.keys(menu_map), hover: index)
+    |> recursively_render_topmenu(Map.keys(menu_map))
   end
 
   def recursively_render_topmenu(scene, []) do
@@ -44,35 +44,88 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   end
 
   def recursively_render_topmenu(scene, [_label|_rest] = menu_items) do
-    recursively_render_topmenu(scene, menu_items, offset: 0)
+    recursively_render_topmenu(scene, menu_items, offset: 0) # offset keeps track of the number of menu items we've already rendered
   end
 
+  # def recursively_render_topmenu(%{assigs: %{state: :not_hovering_over_menubar}} = scene, [label|rest], offset: offset) do
+    
+  # end
+
+  # def recursively_render_topmenu(scene, [label|rest] = menu_items, hover: hover) do
+    
+  #   recursively_render_topmenu(scene, menu_items, hover: hover, offset: 0)
+  # end
+
+
+  # def recursively_render_topmenu(scene, [label|rest], hover: hover, offset: offset) do
+  #   when hover == offset+1 do
+  #     Logger.debug "you're hovering over the offset!"
+  # end
+  
+  # def recursively_render_topmenu(scene, [label|rest], hover: hover, offset: offset) do
+  #   new_scene = scene
+  #   |> render_topmenu_item(label, hover: hover, offset: offset)
+
+  #   recursively_render_topmenu(new_scene, rest, offset: offset+1)
+  # end
+
+  # def recursively_render_topmenu(%{assigs: %{state: {:hover, {:main_menubar, index}}}} = scene, [label|rest], offset: offset)
+  #   when index == offset+1 do
+  #     Logger.debug "rendering the box we're hovering over! index: #{inspect index}, offset: #{inspect offset}"
+  #     Logger.debug "rendering #{label}"
+  #     new_scene = scene
+  #     |> render_topmenu_item(label, offset: offset)
+
+  #     recursively_render_topmenu(new_scene, rest, offset: offset+1)
+  # end
+
   def recursively_render_topmenu(scene, [label|rest], offset: offset) do
+    Logger.debug "rendering a normal top_menu item #{inspect scene.assigns.state}, offset: #{inspect offset}"
     new_scene = scene
     |> render_topmenu_item(label, offset: offset)
 
     recursively_render_topmenu(new_scene, rest, offset: offset+1)
   end
 
-  def recursively_render_topmenu(scene, [label|rest] = menu_items, hover: hover) do
-    recursively_render_topmenu(scene, menu_items, hover: hover, offset: 0)
-  end
 
-  def recursively_render_topmenu(scene, [label|rest], hover: hover, offset: offset) do
-    new_scene = scene
-    |> render_topmenu_item(label, hover: hover, offset: offset)
+  def render_topmenu_item(%{assigns: %{state: {:hover, {:main_menubar, index}}}} = scene, label, offset: offset)
+    when index == offset+1 do
+      Logger.debug "rendering a top menu item, WITH hover"
+      # the top_left_corner of this menu_item / button
+      top_margin = 28 #TODO get this from somewhere real
+      box_top_left_corner_coords =
+        {MenuBar.menu_item_width() * offset, 0}
+      text_top_left_corner_coords =
+        {MenuBar.menu_item(:left_margin)+MenuBar.menu_item_width()*offset, top_margin}
+      frame = Frame.new(
+              top_left_corner: box_top_left_corner_coords,
+              dimensions: {MenuBar.menu_item_width(), MenuBar.height()})
 
-    recursively_render_topmenu(new_scene, rest, offset: offset+1)
+      new_graph =
+        scene.assigns.graph
+        |> Scenic.Primitives.text(
+            label,
+            # id: {:topmenu_item_text, index},
+            fill: :purple,
+            font: :ibm_plex_mono,
+            translate: text_top_left_corner_coords)
+        |> Draw.border_box(frame)
+
+      new_scene = scene
+      |> Draw.put_graph(new_graph)
   end
 
   def render_topmenu_item(scene, label, offset: offset) do
+    Logger.debug "rendering a top menu item, with no hover"
+    ic(offset)
+    ic(scene.assigns.state)
     # the top_left_corner of this menu_item / button
     top_margin = 28 #TODO get this from somewhere real
     box_top_left_corner_coords =
       {MenuBar.menu_item_width() * offset, 0}
     text_top_left_corner_coords =
       {MenuBar.menu_item(:left_margin)+MenuBar.menu_item_width()*offset, top_margin}
-    tile = Frame.new(
+    frame = Frame.new(
             top_left_corner: box_top_left_corner_coords,
             dimensions: {MenuBar.menu_item_width(), MenuBar.height()})
 
@@ -84,49 +137,57 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
           fill: :black,
           font: :ibm_plex_mono,
           translate: text_top_left_corner_coords)
-      |> Draw.border_box(tile)
+      |> Draw.border_box(frame)
 
     new_scene = scene
     |> Draw.put_graph(new_graph)
   end
 
 
-  def render_topmenu_item(scene, label, hover: index, offset: offset) do
-    # the top_left_corner of this menu_item / button
-    top_margin = 28 #TODO get this from somewhere real
-    box_top_left_corner_coords =
-      {MenuBar.menu_item_width() * offset, 0}
-    text_top_left_corner_coords =
-      {MenuBar.menu_item(:left_margin)+MenuBar.menu_item_width()*offset, top_margin}
-    tile = Frame.new(
-            top_left_corner: box_top_left_corner_coords,
-            dimensions: {MenuBar.menu_item_width(), MenuBar.height()})
 
-    new_graph =
-      if offset+1 == index do
-        scene.assigns.graph
-        |> Draw.background(tile, :red)
-        |> Scenic.Primitives.text(
-            label,
-            # id: {:topmenu_item_text, index},
-            fill: :black,
-            font: :ibm_plex_mono,
-            translate: text_top_left_corner_coords)
-        |> Draw.border_box(tile)
-      else
-        scene.assigns.graph
-        |> Scenic.Primitives.text(
-            label,
-            # id: {:topmenu_item_text, index},
-            fill: :black,
-            font: :ibm_plex_mono,
-            translate: text_top_left_corner_coords)
-        |> Draw.border_box(tile)
-      end
+  # def render_topmenu_item(scene, label, hover: index, offset: offset)
+  #   when index == offset+1 do # render the item currently being hovered over
+  #     Logger.debug "rendering the hover box - index: #{inspect index}, offset: #{inspect offset}"
+  #     scene
+  # end
 
-    new_scene = scene
-    |> Draw.put_graph(new_graph)
-  end
+  # def render_topmenu_item(scene, label, hover: index, offset: offset) do
+  #   Logger.debug "rendering a non-hovered menu item - index: #{inspect index}, offset: #{inspect offset}"
+  #   # the top_left_corner of this menu_item / button
+  #   top_margin = 28 #TODO get this from somewhere real
+  #   box_top_left_corner_coords =
+  #     {MenuBar.menu_item_width() * offset, 0}
+  #   text_top_left_corner_coords =
+  #     {MenuBar.menu_item(:left_margin)+MenuBar.menu_item_width()*offset, top_margin}
+  #   tile = Frame.new(
+  #           top_left_corner: box_top_left_corner_coords,
+  #           dimensions: {MenuBar.menu_item_width(), MenuBar.height()})
+
+  #   new_graph =
+  #     if offset+1 == index do
+  #       scene.assigns.graph
+  #       |> Draw.background(tile, :red)
+  #       |> Scenic.Primitives.text(
+  #           label,
+  #           # id: {:topmenu_item_text, index},
+  #           fill: :black,
+  #           font: :ibm_plex_mono,
+  #           translate: text_top_left_corner_coords)
+  #       |> Draw.border_box(tile)
+  #     else
+  #       scene.assigns.graph
+  #       |> Scenic.Primitives.text(
+  #           label,
+  #           # id: {:topmenu_item_text, index},
+  #           fill: :black,
+  #           font: :ibm_plex_mono,
+  #           translate: text_top_left_corner_coords)
+  #       |> Draw.border_box(tile)
+  #     end
+
+  #   new_scene = scene
+  #   |> Draw.put_graph(new_graph)
+  # end
 
 
       
@@ -167,7 +228,7 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
 
   def handle_input(scene, {:cursor_pos, {x, y}}) do
     if y <= MenuBar.height() do
-      Logger.debug "now hovering over the menubar..."
+      #Logger.debug "now hovering over the menubar..."
       index = (x |> floor() |> div(MenuBar.menu_item_width()))+1 # calc how wide a button is - indexes start at 1 !!
       scene |> update_state({:hover, {:main_menubar, index}})
     else
@@ -177,17 +238,17 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
 
 
 
-  def handle_input(%{assigns: %{state: :not_hovering_over_menubar}} = scene, {:cursor_pos, {x, y}}) do
-    if y <= MenuBar.height() do
-      Logger.debug "now hovering over the menubar..." 
-      index = (x |> floor() |> div(MenuBar.menu_item_width()))+1 # calc how wide a button is - indexes start at 1 !!
-      scene |> update_state({:hover, {:main_menubar, index}})
-    else
-      Logger.debug "we're not hovering over the menubar..."
-      # index = (x |> floor() |> div(MenuBar.menu_item_width()))+1 # calc how wide a button is - indexes start at 1 !!
-      scene
-    end
-  end
+  # def handle_input(%{assigns: %{state: :not_hovering_over_menubar}} = scene, {:cursor_pos, {x, y}}) do
+  #   if y <= MenuBar.height() do
+  #     #Logger.debug "now hovering over the menubar..." 
+  #     index = (x |> floor() |> div(MenuBar.menu_item_width()))+1 # calc how wide a button is - indexes start at 1 !!
+  #     scene |> update_state({:hover, {:main_menubar, index}})
+  #   else
+  #     Logger.debug "we're not hovering over the menubar..."
+  #     # index = (x |> floor() |> div(MenuBar.menu_item_width()))+1 # calc how wide a button is - indexes start at 1 !!
+  #     scene
+  #   end
+  # end
 
   def handle_input(scene, input) do
     Logger.warn "ignoring some input... #{inspect input}"

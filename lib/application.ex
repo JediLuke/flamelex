@@ -12,25 +12,10 @@ defmodule Flamelex.Application do
       Flamelex.Fluxus.TopLevelSupervisor,
       Flamelex.Buffer.TopLevelSupervisor,
       Flamelex.GUI.TopLevelSupervisor
-      # {Scenic, [viewport_config()]}
     ]
 
     opts = [strategy: :one_for_one, name: Flamelex.Trismegistus]
     Supervisor.start_link(children, opts)
   end
-
-  # def viewport_config do
-  #   [
-  #     name: :main_viewport,
-  #     size: {1000, 1000},
-  #     default_scene: {Flamelex.GUI.RootScene, nil},
-  #     drivers: [
-  #       [
-  #         module: Scenic.Driver.Local,
-  #         name: :local
-  #       ]
-  #     ]
-  #   ]
-  # end
 
 end

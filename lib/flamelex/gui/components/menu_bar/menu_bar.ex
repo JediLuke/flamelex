@@ -126,7 +126,8 @@ defmodule Flamelex.GUI.Component.MenuBar do
           #Logger.debug "no change in state... (current state: #{inspect init_state})"
           {:noreply, scene}
       {:ok, %Scenic.Scene{assigns: %{state: new_state}} = new_scene} ->
-          #Logger.debug "changed state! init_state: #{inspect init_state}, new_state: #{inspect new_state}"
+          #TODO revert to debug after Scenic meetup
+          Logger.info "#{__MODULE__} changed state! init_state: #{inspect init_state}, new_state: #{inspect new_state}"
           new_scene |> render_push_graph()
           {:noreply, new_scene}
       {:error, reason} ->
