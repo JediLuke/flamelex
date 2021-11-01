@@ -116,6 +116,7 @@ defmodule Flamelex.GUI.Controller do
     #
     #     For now I'm going to go with hax
 
+    # WOW - this actually works
     new_graph =
       state.graph
       |> Scenic.Graph.delete(buffer_tag) #TODO here we want to remove the open buffer TextBox component, when the buffer closes, so the GUI changes

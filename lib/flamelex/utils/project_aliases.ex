@@ -24,6 +24,9 @@ defmodule Flamelex.ProjectAliases do
 
       alias Flamelex.GUI.Utils.Draw
 
+      # https://github.com/joseph-lozano/ice_cream
+      use IceCream
+
     end
   end
 end
