@@ -56,6 +56,8 @@ defmodule Flamelex.BufferBehaviour do
 
       @impl GenServer
       def handle_continue(:register_with_buffer_manager, buf_state) do
+        # We call back to BufferManager, saying "hey, yep, we opened
+        # the file all good'n everythn'!", then xe updates the GUI.
         GenServer.cast(Flamelex.BufferManager, {:buffer_opened, buf_state})
         {:noreply, buf_state, {:continue, :send_callbacks}}
       end

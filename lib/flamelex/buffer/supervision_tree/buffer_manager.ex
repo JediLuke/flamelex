@@ -82,7 +82,8 @@ defmodule Flamelex.BufferManager do
     {:noreply, state}
   end
 
-  def handle_cast({:buffer_opened, buf_state}, state) do
+  def handle_cast({:buffer_opened, buf_state} = msg, state) do #TODO 'open' here should do it :P
+    Logger.debug "#{__MODULE__} received cast: #{inspect msg}"
     #TODO we can do better than this (though, this is still better I think, at least it's BuffERManager doing it)
     if Flamelex.Buffer.Utils.OpenBuffer.open_this_buffer_in_gui?(buf_state) do
       #TODO maybe replace this with GUI.Controller.fire_action({:show, buf}) - it' more consistent with the rest of flamelex, and then we dont need to keep adding new interface functions inside gui controller
@@ -94,6 +95,7 @@ defmodule Flamelex.BufferManager do
 
   # #TODO need to give each buffer a new number...
   def handle_cast({:close, buf}, state) do
+    Logger.debug "#{__MODULE__} attempting to close buffer: #{inspect buf}"
     # if state |> Enum.member?(buf) do
     #   #TODO this needs cleanup...
     #   case ProcessRegistry.find_buffer(buf) do
@@ -116,8 +118,10 @@ defmodule Flamelex.BufferManager do
 
     #TODO talk to the other process & say hey close plz
 
-    ProcessRegistry.find!(buf)
-    |> GenServer.cast(:close)
+    # ProcessRegistry.find!(buf)
+    # |> GenServer.cast(:close)
+
+    GenServer.cast(Flamelex.GUI.Controller, {:close, buf})
 
     {:noreply, state}
 

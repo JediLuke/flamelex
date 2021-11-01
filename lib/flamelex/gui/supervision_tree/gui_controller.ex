@@ -8,6 +8,7 @@ defmodule Flamelex.GUI.Controller do
   use Flamelex.ProjectAliases
   # alias Flamelex.GUI.Structs.GUIState
   alias Flamelex.GUI.Utils.DefaultGUI
+  alias Flamelex.GUI.Component.TextBox
   require Logger
 
   # just do it simple - a stack of frames. Frames are kind of analogous to layers, but they have restrictions on size
@@ -15,6 +16,19 @@ defmodule Flamelex.GUI.Controller do
   # can overlap
   # can be dragged/moved, can be toggled visible/inisible, can be moved around (re-ordered)
   # frames have layouts - can contain splits / hjave alignments / margins etc
+
+
+  ## OK I figured it OUT !!
+  #
+  #  The GUI.Controller keeps the highest level state of the GUI:
+  #    - Layers, which have layouts
+  #    - Frames inside those layers
+  #    - Inside frames, it renders Components
+  #    - GUI.State - this is a struct which holds GUI-specific state.
+  #      Note that state is NOT things like layouts - state is an
+  #      *internal* property of this process, so it keeps track of like,
+  #      where we hover etc.
+
 
   def start_link(_params) do
     initial_state = %{
@@ -93,14 +107,21 @@ defmodule Flamelex.GUI.Controller do
   #   {:noreply, gui_state}
   # end
 
-  def handle_cast({:close, buffer_tag}, gui_state) do
+  def handle_cast({:close, buffer_tag} = msg, state) do
+    Logger.debug "#{__MODULE__} received msg: #{inspect msg}"
+
+    #TODO ok so, if this was as good as MenuBar, then we would just -
+    #     update the `state` of GUIController, re-render it, & we're
+    #     done.
+    #
+    #     For now I'm going to go with hax
+
     new_graph =
-      gui_state.graph
-      |> Scenic.Graph.delete({:textbox, buffer_tag}) #TODO here we want to remove the open buffer TextBox component, when the buffer closes, so the GUI changes
+      state.graph
+      |> Scenic.Graph.delete(buffer_tag) #TODO here we want to remove the open buffer TextBox component, when the buffer closes, so the GUI changes
 
-    # Flamelex.GUI.redraw(new_graph)
-
-    {:noreply, %{gui_state|graph: new_graph}, push: new_graph}
+    GenServer.cast(Flamelex.GUI.RootScene, {:redraw, new_graph})
+    {:noreply, %{state|graph: new_graph}}
   end
 
 
@@ -179,23 +200,25 @@ defmodule Flamelex.GUI.Controller do
 
   def handle_cast({:show, buf_state}, gui_state) do #TODO this assumes it isn't hibernated or whatever
 
+    # frame = Frame.new(gui_state, buf_state, scale: :half_height)
     frame = Frame.new(gui_state, buf_state)
     # data  = Buffer.read(buf)
 
     gui_component_process_alive? = false #TODO
+    # sidebar: I think this was because `:show` could just mean, bring
+    #          up a buffer which is already open
     if gui_component_process_alive? do
       raise "well that's a surprise"
     else
       new_graph =
         gui_state.graph
-        |> Flamelex.GUI.Component.TextBox.mount(
-             buf_state
-             |> Map.merge(%{
+        |> TextBox.add_to_graph(
+             buf_state |> Map.merge(%{
                   ref: buf_state.rego_tag, #NOTE: this becomes the id of this Scenic primitive
                   frame: frame,
                   mode: :normal,
-                  draw_footer?: true
-             }))
+                  draw_footer?: true }),
+             id: buf_state.rego_tag)
 
       # Flamelex.GUI.RootScene.redraw(new_graph)
       GenServer.cast(Flamelex.GUI.RootScene, {:redraw, new_graph})

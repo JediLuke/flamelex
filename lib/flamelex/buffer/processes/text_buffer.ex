@@ -31,10 +31,10 @@ defmodule Flamelex.Buffer.Text do
     ProcessRegistry.find!({:buffer, :task_supervisor, rego_tag})
   end
 
-  #TODO right now, this only works for one cursor, i.e. cursor-1
-  def handle_call({:get_cursor_coords, 1}, _from, %{cursors: [c]} = state) do
-    {:reply, c, state}
-  end
+  # #TODO right now, this only works for one cursor, i.e. cursor-1
+  # def handle_call({:get_cursor_coords, 1}, _from, %{cursors: [c]} = state) do
+  #   {:reply, c, state}
+  # end
 
   def handle_call(:get_num_lines, _from, state) do
     {:reply, Enum.count(state.lines), state}
@@ -53,6 +53,7 @@ defmodule Flamelex.Buffer.Text do
   end
 
   def handle_cast(:close, %{unsaved_changes?: false} = state) do
+    Logger.debug "#{__MODULE__} received msg: :close - process will stop normally."
     # {:buffer, source} = state.rego_tag
     # Logger.warn "Closing a buffer... #{inspect source}"
     # ModifyHelper.cast_gui_component(source, :close)

@@ -30,11 +30,12 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       """
       #TODO deprecate, just use add_to_graph
       def mount(%Scenic.Graph{} = graph, %{ref: r} = params) do
+        Logger.warn "deprecate me"
         graph |> add_to_graph(params, id: r) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
       end
-      def mount(%Scenic.Graph{} = graph, params) do
-        graph |> add_to_graph(params) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
-      end
+      # def mount(%Scenic.Graph{} = graph, params) do
+      #   graph |> add_to_graph(params) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
+      # end
 
 
       #NOTE:

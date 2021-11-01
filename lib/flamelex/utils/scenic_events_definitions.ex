@@ -15,85 +15,94 @@ defmodule Flamelex.GUI.ScenicEventsDefinitions do
         :cursor_exit
       ]
 
-      @left_shift_press {:key, {:key_leftshift, 0, []}}
-      @escape_key {:key, {:key_esc, 0, []}}
-      @enter_key {:key, {:key_enter, 0, []}}
-      @backspace_key {:key, {:key_backspace, 0, []}}
+      # key-state numbers
+      # -----------------
+      # These are the numbers used by Scenic to represent the
+      # state of a key-press. I just prefer to use these names,
+      # so I bind them here.
+      @key_pressed 0
+      @key_released 1
+      @key_held 2
+      
+      @left_shift_press {:key, {:key_leftshift, @key_pressed, []}}
+      @escape_key {:key, {:key_esc, @key_pressed, []}}
+      @enter_key {:key, {:key_enter, @key_pressed, []}}
+      @backspace_key {:key, {:key_backspace, @key_pressed, []}}
       # @backspace_repeat {:key, {"backspace", :repeat, 0}}
       # @backspace_input [@backspace_key, @backspace_repeat]
-      @tab_key {:key, {:key_tab, 0, []}}
+      @tab_key {:key, {:key_tab, @key_pressed, []}}
 
-      @space_bar {:key, {:key_space, 0, []}}
+      @space_bar {:key, {:key_space, @key_pressed, []}}
 
-      @left_shift_and_space_bar {:key, {:key_space, 0, [:shift]}} # {:key, {" ", :press, 1}}
-      @left_shift_and_tab {:key, {:key_tab, 0, [:shift]}} # {:key, {"tab", :press, 1}}
+      @left_shift_and_space_bar {:key, {:key_space, @key_pressed, [:shift]}} # {:key, {" ", :press, 1}}
+      @left_shift_and_tab {:key, {:key_tab, @key_pressed, [:shift]}} # {:key, {"tab", :press, 1}}
 
       #NOTE: even though these are numbers, the last one in the tuple
       #      we send, is still always zero
-      @number_0 {:key, {:key_0, 0, []}}
-      @number_1 {:key, {:key_1, 0, []}}
-      @number_2 {:key, {:key_2, 0, []}}
-      @number_3 {:key, {:key_3, 0, []}}
-      @number_4 {:key, {:key_4, 0, []}}
-      @number_5 {:key, {:key_5, 0, []}}
-      @number_6 {:key, {:key_6, 0, []}}
-      @number_7 {:key, {:key_7, 0, []}}
-      @number_8 {:key, {:key_8, 0, []}}
-      @number_9 {:key, {:key_9, 0, []}}
+      @number_0 {:key, {:key_0, @key_pressed, []}}
+      @number_1 {:key, {:key_1, @key_pressed, []}}
+      @number_2 {:key, {:key_2, @key_pressed, []}}
+      @number_3 {:key, {:key_3, @key_pressed, []}}
+      @number_4 {:key, {:key_4, @key_pressed, []}}
+      @number_5 {:key, {:key_5, @key_pressed, []}}
+      @number_6 {:key, {:key_6, @key_pressed, []}}
+      @number_7 {:key, {:key_7, @key_pressed, []}}
+      @number_8 {:key, {:key_8, @key_pressed, []}}
+      @number_9 {:key, {:key_9, @key_pressed, []}}
 
-      @lowercase_a {:key, {:key_a, 0, []}}
-      @lowercase_b {:key, {:key_b, 0, []}}
-      @lowercase_c {:key, {:key_c, 0, []}}
-      @lowercase_d {:key, {:key_d, 0, []}}
-      @lowercase_e {:key, {:key_e, 0, []}}
-      @lowercase_f {:key, {:key_f, 0, []}}
-      @lowercase_g {:key, {:key_g, 0, []}}
-      @lowercase_h {:key, {:key_h, 0, []}}
-      @lowercase_i {:key, {:key_i, 0, []}}
-      @lowercase_j {:key, {:key_j, 0, []}}
-      @lowercase_k {:key, {:key_k, 0, []}}
-      @lowercase_l {:key, {:key_l, 0, []}}
-      @lowercase_m {:key, {:key_m, 0, []}}
-      @lowercase_n {:key, {:key_n, 0, []}}
-      @lowercase_o {:key, {:key_o, 0, []}}
-      @lowercase_p {:key, {:key_p, 0, []}}
-      @lowercase_q {:key, {:key_q, 0, []}}
-      @lowercase_r {:key, {:key_r, 0, []}}
-      @lowercase_s {:key, {:key_s, 0, []}}
-      @lowercase_t {:key, {:key_t, 0, []}}
-      @lowercase_u {:key, {:key_u, 0, []}}
-      @lowercase_v {:key, {:key_v, 0, []}}
-      @lowercase_w {:key, {:key_w, 0, []}}
-      @lowercase_x {:key, {:key_x, 0, []}}
-      @lowercase_y {:key, {:key_y, 0, []}}
-      @lowercase_z {:key, {:key_z, 0, []}}
+      @lowercase_a {:key, {:key_a, @key_pressed, []}}
+      @lowercase_b {:key, {:key_b, @key_pressed, []}}
+      @lowercase_c {:key, {:key_c, @key_pressed, []}}
+      @lowercase_d {:key, {:key_d, @key_pressed, []}}
+      @lowercase_e {:key, {:key_e, @key_pressed, []}}
+      @lowercase_f {:key, {:key_f, @key_pressed, []}}
+      @lowercase_g {:key, {:key_g, @key_pressed, []}}
+      @lowercase_h {:key, {:key_h, @key_pressed, []}}
+      @lowercase_i {:key, {:key_i, @key_pressed, []}}
+      @lowercase_j {:key, {:key_j, @key_pressed, []}}
+      @lowercase_k {:key, {:key_k, @key_pressed, []}}
+      @lowercase_l {:key, {:key_l, @key_pressed, []}}
+      @lowercase_m {:key, {:key_m, @key_pressed, []}}
+      @lowercase_n {:key, {:key_n, @key_pressed, []}}
+      @lowercase_o {:key, {:key_o, @key_pressed, []}}
+      @lowercase_p {:key, {:key_p, @key_pressed, []}}
+      @lowercase_q {:key, {:key_q, @key_pressed, []}}
+      @lowercase_r {:key, {:key_r, @key_pressed, []}}
+      @lowercase_s {:key, {:key_s, @key_pressed, []}}
+      @lowercase_t {:key, {:key_t, @key_pressed, []}}
+      @lowercase_u {:key, {:key_u, @key_pressed, []}}
+      @lowercase_v {:key, {:key_v, @key_pressed, []}}
+      @lowercase_w {:key, {:key_w, @key_pressed, []}}
+      @lowercase_x {:key, {:key_x, @key_pressed, []}}
+      @lowercase_y {:key, {:key_y, @key_pressed, []}}
+      @lowercase_z {:key, {:key_z, @key_pressed, []}}
 
-      @uppercase_A {:key, {:key_a, 0, [:shift]}}
-      @uppercase_B {:key, {:key_b, 0, [:shift]}}
-      @uppercase_C {:key, {:key_c, 0, [:shift]}}
-      @uppercase_D {:key, {:key_d, 0, [:shift]}}
-      @uppercase_E {:key, {:key_e, 0, [:shift]}}
-      @uppercase_F {:key, {:key_f, 0, [:shift]}}
-      @uppercase_G {:key, {:key_g, 0, [:shift]}}
-      @uppercase_H {:key, {:key_h, 0, [:shift]}}
-      @uppercase_I {:key, {:key_i, 0, [:shift]}}
-      @uppercase_J {:key, {:key_j, 0, [:shift]}}
-      @uppercase_K {:key, {:key_k, 0, [:shift]}}
-      @uppercase_L {:key, {:key_l, 0, [:shift]}}
-      @uppercase_M {:key, {:key_m, 0, [:shift]}}
-      @uppercase_N {:key, {:key_n, 0, [:shift]}}
-      @uppercase_O {:key, {:key_o, 0, [:shift]}}
-      @uppercase_P {:key, {:key_p, 0, [:shift]}}
-      @uppercase_Q {:key, {:key_q, 0, [:shift]}}
-      @uppercase_R {:key, {:key_r, 0, [:shift]}}
-      @uppercase_S {:key, {:key_s, 0, [:shift]}}
-      @uppercase_T {:key, {:key_t, 0, [:shift]}}
-      @uppercase_U {:key, {:key_u, 0, [:shift]}}
-      @uppercase_V {:key, {:key_v, 0, [:shift]}}
-      @uppercase_W {:key, {:key_w, 0, [:shift]}}
-      @uppercase_X {:key, {:key_x, 0, [:shift]}}
-      @uppercase_Y {:key, {:key_y, 0, [:shift]}}
-      @uppercase_Z {:key, {:key_z, 0, [:shift]}}
+      @uppercase_A {:key, {:key_a, @key_pressed, [:shift]}}
+      @uppercase_B {:key, {:key_b, @key_pressed, [:shift]}}
+      @uppercase_C {:key, {:key_c, @key_pressed, [:shift]}}
+      @uppercase_D {:key, {:key_d, @key_pressed, [:shift]}}
+      @uppercase_E {:key, {:key_e, @key_pressed, [:shift]}}
+      @uppercase_F {:key, {:key_f, @key_pressed, [:shift]}}
+      @uppercase_G {:key, {:key_g, @key_pressed, [:shift]}}
+      @uppercase_H {:key, {:key_h, @key_pressed, [:shift]}}
+      @uppercase_I {:key, {:key_i, @key_pressed, [:shift]}}
+      @uppercase_J {:key, {:key_j, @key_pressed, [:shift]}}
+      @uppercase_K {:key, {:key_k, @key_pressed, [:shift]}}
+      @uppercase_L {:key, {:key_l, @key_pressed, [:shift]}}
+      @uppercase_M {:key, {:key_m, @key_pressed, [:shift]}}
+      @uppercase_N {:key, {:key_n, @key_pressed, [:shift]}}
+      @uppercase_O {:key, {:key_o, @key_pressed, [:shift]}}
+      @uppercase_P {:key, {:key_p, @key_pressed, [:shift]}}
+      @uppercase_Q {:key, {:key_q, @key_pressed, [:shift]}}
+      @uppercase_R {:key, {:key_r, @key_pressed, [:shift]}}
+      @uppercase_S {:key, {:key_s, @key_pressed, [:shift]}}
+      @uppercase_T {:key, {:key_t, @key_pressed, [:shift]}}
+      @uppercase_U {:key, {:key_u, @key_pressed, [:shift]}}
+      @uppercase_V {:key, {:key_v, @key_pressed, [:shift]}}
+      @uppercase_W {:key, {:key_w, @key_pressed, [:shift]}}
+      @uppercase_X {:key, {:key_x, @key_pressed, [:shift]}}
+      @uppercase_Y {:key, {:key_y, @key_pressed, [:shift]}}
+      @uppercase_Z {:key, {:key_z, @key_pressed, [:shift]}}
 
       @lowercase_letters [
         @lowercase_a, @lowercase_b, @lowercase_c, @lowercase_d, @lowercase_e,
@@ -115,18 +124,18 @@ defmodule Flamelex.GUI.ScenicEventsDefinitions do
 
       @all_letters @lowercase_letters ++ @uppercase_letters
 
-      @period {:key, {:key_dot, 0, []}}
-      @bang {:key, {:key_1, 0, [:shift]}}
-      @question_mark {:key, {:key_slash, 0, [:shift]}}
-      @colon {:key, {:key_semicolon, 0, [:shift]}}
-      @comma {:key, {:key_comma, 0, []}}
-      @quote_character {:key, {:key_apostrophe, 0, [:shift]}}
-      @underscore {:key, {:key_minus, 1, [:shift]}}
-      @percent_sign {:key, {:key_5, 0, [:shift]}}
-      @left_parenthesis {:key, {:key_9, 1, [:shift]}}
-      @right_parenthesis {:key, {:key_0, 1, [:shift]}}
-      @left_brace {:key, {:key_leftbrace, 1, [:shift]}}
-      @right_brace {:key, {:key_rightbrace, 1, [:shift]}}
+      @period {:key, {:key_dot, @key_pressed, []}}
+      @bang {:key, {:key_1, @key_pressed, [:shift]}}
+      @question_mark {:key, {:key_slash, @key_pressed, [:shift]}}
+      @colon {:key, {:key_semicolon, @key_pressed, [:shift]}}
+      @comma {:key, {:key_comma, @key_pressed, []}}
+      @quote_character {:key, {:key_apostrophe, @key_pressed, [:shift]}}
+      @underscore {:key, {:key_minus, @key_pressed, [:shift]}}
+      @percent_sign {:key, {:key_5, @key_pressed, [:shift]}}
+      @left_parenthesis {:key, {:key_9, @key_pressed, [:shift]}}
+      @right_parenthesis {:key, {:key_0, @key_pressed, [:shift]}}
+      @left_brace {:key, {:key_leftbrace, @key_pressed, [:shift]}}
+      @right_brace {:key, {:key_rightbrace, @key_pressed, [:shift]}}
 
       @all_punctuation [@period, @bang, @question_mark, @colon, @comma,
         @quote_character, @percent_sign, @left_parenthesis, @right_parenthesis,

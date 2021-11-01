@@ -122,10 +122,25 @@ defmodule Flamelex.GUI.RootScene do
   #     {:noreply, scene}
   # end
 
-  def handle_input({:key, {_key, x, []}}, _context, scene) when x in [1, 2] do
-    Logger.debug "#{__MODULE__} ignoring either an upstroke, or depressed-key input."
+  def handle_input({:key, {key, @key_released, []}}, _context, scene) do
+    Logger.debug "#{__MODULE__} `key_released` for keypress: #{inspect key}"
     {:noreply, scene}
   end
+
+  # If this works, she's a pearla!
+  def handle_input({:key, {key, @key_held, []}} = input, context, scene) do
+    # test if the `same key, just with a normal `key_pressed` event, is valid input
+    equivalent_key_pressed_input = {:key, {key, @key_pressed, []}}
+    if Enum.member?(@valid_text_input_characters, equivalent_key_pressed_input) do
+      #NOTE: It's vitally important we remember to recursively call
+      #      ourselves with the *equivalent_key_pressed_input* here :P
+      handle_input(equivalent_key_pressed_input, context, scene)
+    else
+      Logger.warn "#{__MODULE__} the key: #{inspect key} is being held, however `key_pressed` not valid"
+      {:noreply, scene}
+    end
+  end
+
 
   # # handle all other (not-ignored) input...
   def handle_input(input, context, scene) do
@@ -161,6 +176,7 @@ defmodule Flamelex.GUI.RootScene do
   # @impl Scenic.Scene
   #NOTE: The only process which should be sending us these is GUI.Controller
   def handle_cast({:redraw, new_graph}, scene) do
+    Logger.debug "-- re-drawing the RootScene --"
     new_scene =
       scene
       |> assign(graph: new_graph)
