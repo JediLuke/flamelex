@@ -31,6 +31,12 @@ defmodule Flamelex do
     Application.start(:flamelex)
   end
 
+  def redraw_gui do
+    # shuts down scenc, starts it & gets GUI controller to attempt to re-draw
+    # from scratch
+    raise "not implemented"
+  end
+
 
   @doc """
   #TODO

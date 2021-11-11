@@ -23,6 +23,10 @@ defmodule Flamelex.GUI.ScenicEventsDefinitions do
       @key_pressed 0
       @key_released 1
       @key_held 2
+
+      # for mouse-related events, e.g. `{:cursor_button, {:btn_left, 1, [], _coords}}`
+      @click 1
+      @release_click 0
       
       @left_shift_press {:key, {:key_leftshift, @key_pressed, []}}
       @escape_key {:key, {:key_esc, @key_pressed, []}}

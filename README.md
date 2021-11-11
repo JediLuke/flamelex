@@ -465,6 +465,9 @@ to clone all of Wikipedia in Elixir - imagine being able to access all of
 Wikipedia, from the command line!! We are getting there, module by module,
 func-def by func-def...
 
+### Integrating your personal Memex with Flamelex
+
+You need to add it to mix.exs, then add the memelex config in your config.ex
 
 ### Personalizing your Memex environments
 

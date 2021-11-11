@@ -17,7 +17,7 @@ defmodule Flamelex.GUI.Utils.DefaultGUI do
 # ```
 
 
-def draw(%{viewport: vp}) do
+def draw(%{viewport: %Scenic.ViewPort{} = vp}) do
   Scenic.Graph.build()
   |> draw_transmutation_circle(vp)
   |> mount_menubar(vp)
@@ -97,11 +97,11 @@ end
   #      top of each other
 
 
-  def draw_transmutation_circle(graph, vp) do
+  def draw_transmutation_circle(graph, %Scenic.ViewPort{size: {w, h}}) do
 
     #NOTE: We need the Frame here, so here is where we need to calculate
     #      how to position the TransmutationCicle in the middle of the viewport
-    center_point = Dimensions.find_center(vp)
+    center_point = Dimensions.find_center(%{width: w, height: h})
     scale_factor = 600 # how big the square frame becomes
 
     top_left_x_for_centered_frame = center_point.x - scale_factor/2
@@ -116,23 +116,23 @@ end
   end
 
 
-  defp mount_menubar(graph, vp) do
+  defp mount_menubar(graph, %Scenic.ViewPort{size: {vp_width, vp_height}}) do
     graph
     |> Flamelex.GUI.Component.MenuBar.add_to_graph(%{
          ref: :menu_bar,
          frame: Frame.new(
             top_left: {0, 0},
-            size:     {vp.width, Flamelex.GUI.Component.MenuBar.height()})
+            size:     {vp_width, Flamelex.GUI.Component.MenuBar.height()})
        }, id: :menu_bar) #SCENIC options
   end
 
-  defp mount_kommand_buffer(graph, vp) do
+  defp mount_kommand_buffer(graph, %Scenic.ViewPort{size: {vp_width, vp_height}}) do
     graph
     |> Flamelex.GUI.Component.KommandBuffer.mount(%{
          ref: :kommand_buffer,
          frame: Frame.new(
-            top_left: {0, vp.height - Flamelex.GUI.Component.MenuBar.height()},
-            size:     {vp.width, Flamelex.GUI.Component.MenuBar.height()})
+            top_left: {0, vp_height - Flamelex.GUI.Component.MenuBar.height()},
+            size:     {vp_width, Flamelex.GUI.Component.MenuBar.height()})
        })
   end
 end

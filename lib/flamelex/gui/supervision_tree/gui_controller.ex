@@ -32,10 +32,15 @@ defmodule Flamelex.GUI.Controller do
 
   def start_link(_params) do
     initial_state = %{
-      viewport: Dimensions.new(:viewport_size),
+      # viewport: Dimensions.new(:viewport_size), #TODO call RootScene & get this - might improve sync on startup aswell!
       frames: [],
       graph: nil,
-      show_menubar?: true
+      show_menubar?: true,
+      memex_graph: nil,
+      mode: :homebase # ok maybe this mode/state thing is getting out of hand...
+                      # `:homebase` mode means we're rendering the usual
+                      # text editor kind of stuff, :memex mode means we're
+                      # rendering the memex
     }
 
     GenServer.start_link(__MODULE__, initial_state)
@@ -44,6 +49,10 @@ defmodule Flamelex.GUI.Controller do
   def toggle_layer(x) do
     # "This is what I can use to manually test the layers concept..."
     GenServer.cast(__MODULE__, {:toggle_layer, x})
+  end
+
+  def mode do
+    GenServer.call(__MODULE__, :get_mode)
   end
 
 
@@ -57,6 +66,8 @@ defmodule Flamelex.GUI.Controller do
   def init(state) do
     Logger.debug "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
+
+    # request_input(new_scene, [:cursor_pos, :cursor_button])
     Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
     {:ok, state, {:continue, :draw_default_gui}}
   end
@@ -69,11 +80,24 @@ defmodule Flamelex.GUI.Controller do
     #      the process exists or something
     :timer.sleep(500)
 
+    {:ok, vp} = GenServer.call(Flamelex.GUI.RootScene, :get_viewport)
+    IO.inspect vp, label: "REAL VIEWPORT BBY"
+
+    # state = state |> Map.merge(%{viewport: vp})
+
+    # size = vp |> Keyword.get(:size)
+    # vp_dimensions = Dimensions.new(vp.size)
+
+    state = state |> Map.merge(%{viewport: vp})
+
     new_graph = DefaultGUI.draw(state)
     GenServer.cast(Flamelex.GUI.RootScene, {:redraw, new_graph})
     {:noreply, %{state|graph: new_graph}}
   end
 
+  def handle_call(:get_mode, _from, state) do
+    {:reply, state.mode, state}
+  end
 
   # def handle_call(:get_frame_stack, _from, state) do
   #   {:reply, state.layout.frames, state}
@@ -125,10 +149,68 @@ defmodule Flamelex.GUI.Controller do
     {:noreply, %{state|graph: new_graph}}
   end
 
+  def handle_cast(:open_memex, %{mode: :homebase, memex_graph: nil} = state) do
+    Logger.debug "#{__MODULE__} recv'd msg: :open_memex"
+
+    # new_graph = render_memex()
+
+    new_graph =
+      Scenic.Graph.build()
+      |> Flamelex.GUI.Component.MemexScreen.add_to_graph(%{ #TODO wonder if `add_to_graph` could become mount/3 - of even mount/2, just pass everything in as a fkin map!! %{id: blah, data: blah}
+            frame: Frame.new(state.viewport)
+         }, id: :memex_screen)
+
+    GenServer.cast(Flamelex.GUI.RootScene, {:redraw, new_graph})
+
+    {:noreply, %{state|memex_graph: new_graph, mode: :memex}}
+  end
+
+  def handle_cast(:open_memex, %{mode: :homebase, memex_graph: %Scenic.Graph{} = memex_graph} = state) do
+    GenServer.cast(Flamelex.GUI.RootScene, {:redraw, memex_graph})
+    {:noreply, %{state|mode: :memex}}
+  end
+
+  # def handle_cast(:close_memex, %{memex_graph: true} = state) do
+  #   old_graph = state.assigns.graph
+  #   GenServer.cast(Flamelex.GUI.RootScene, {:redraw, old_graph})
+  #   {:noreply, %{state|mode: :homebase}}
+  # end
+
+  def handle_cast({:activate, :homebase}, %{mode: :memex} = state) do
+    old_graph = state.graph
+    GenServer.cast(Flamelex.GUI.RootScene, {:redraw, old_graph})
+    {:noreply, %{state|mode: :homebase}}
+  end
+
+  def render_memex() do
+    tidbit = Memex.My.Wiki.list |> Enum.random() #TODO My.Wiki.random()
+    # IO.inspect(tidbit, label: "TB")
+
+    Scenic.Graph.build()
+    |> Scenic.Primitives.text("HexDocs",
+          font: :ibm_plex_mono,
+          translate: {80, 200}, # text draws from bottom-left corner??
+          font_size: 36,
+          fill: :green )
+    |> Scenic.Primitives.text("Memex",
+          font: :ibm_plex_mono,
+          translate: {80, 400}, # text draws from bottom-left corner??
+          font_size: 36,
+          fill: :green )
+    |> Scenic.Components.button("Random", id: :sample_btn_id, t: {10, 10})
+    |> Flamelex.GUI.Component.HyperCard.add_to_graph(%{
+          tidbit: tidbit,
+          ref: "Luke's HyperCard" })
+  end
 
 
-
-
+  def filter_event(event, _from, state) do
+    IO.puts("Sample button was clicked! #{inspect event}")
+    new_graph = render_memex()
+    GenServer.cast(Flamelex.GUI.RootScene, {:redraw, new_graph})
+    {:noreply, %{state|memex_graph: new_graph, mode: :memex}}
+    # {:noreply, state}
+  end
 
 
   # def handle_cast(:show_in_gui, %BufRef{} = buffer}, state) do

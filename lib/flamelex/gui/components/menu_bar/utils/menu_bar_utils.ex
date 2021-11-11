@@ -1,6 +1,7 @@
 defmodule Flamelex.GUI.Component.MenuBar.Utils do
   alias Flamelex.GUI.Component.MenuBar
   use Flamelex.ProjectAliases
+  use Flamelex.GUI.ScenicEventsDefinitions
   require Logger
   @moduledoc """
   This module contains pure-functions to be used by MenuBar.
@@ -15,7 +16,10 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   end
   
   # by default, nothing is highlighted
-  def render(%Scenic.Scene{assigns: %{state: state, frame: %Frame{} = _f, menu_tree: menu}} = scene) do
+  def render(%Scenic.Scene{assigns: %{
+                state: _state,          # we don't need these, I'm just doing
+                frame: %Frame{} = _f,   # a little but of pattern-match type-checking ;)
+                menu_tree: menu }} = scene) do
     Logger.debug "re-rendering Flamelex.GUI.Component.MenuBar..."
     scene
     |> Draw.clean_slate()         # overwrites scene.assigns.graph with a new %Scenic.Graph{}
@@ -23,6 +27,12 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
     |> render_menubar(menu)       # Use the menu_bar mappings to render the top-level menu
     |> Draw.border()              # looks at the scene.assigns.frame & draws a border
   end
+
+
+  ##
+  ##  Helpers
+  ##
+
 
   def render_menubar(%{assigns: %{state: :not_hovering_over_menubar}} = scene, menu_map) do
     scene |> recursively_render_topmenu(Map.keys(menu_map))
@@ -33,6 +43,7 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
     Logger.debug "rendering the :main_menubar..."
     scene
     |> recursively_render_topmenu(Map.keys(menu_map))
+    |> render_submenu(menu_map, index)
   end
 
   def recursively_render_topmenu(scene, []) do
@@ -80,7 +91,7 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   # end
 
   def recursively_render_topmenu(scene, [label|rest], offset: offset) do
-    Logger.debug "rendering a normal top_menu item #{inspect scene.assigns.state}, offset: #{inspect offset}"
+    #Logger.debug "rendering a normal top_menu item #{inspect scene.assigns.state}, offset: #{inspect offset}"
     new_scene = scene
     |> render_topmenu_item(label, offset: offset)
 
@@ -90,7 +101,7 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
 
   def render_topmenu_item(%{assigns: %{state: {:hover, {:main_menubar, index}}}} = scene, label, offset: offset)
     when index == offset+1 do
-      Logger.debug "rendering a top menu item, WITH hover"
+      #Logger.debug "rendering a top menu item, WITH hover"
       # the top_left_corner of this menu_item / button
       top_margin = 28 #TODO get this from somewhere real
       box_top_left_corner_coords =
@@ -116,9 +127,7 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   end
 
   def render_topmenu_item(scene, label, offset: offset) do
-    Logger.debug "rendering a top menu item, with no hover"
-    ic(offset)
-    ic(scene.assigns.state)
+    #Logger.debug "rendering a top menu item, with no hover"
     # the top_left_corner of this menu_item / button
     top_margin = 28 #TODO get this from somewhere real
     box_top_left_corner_coords =
@@ -143,6 +152,10 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
     |> Draw.put_graph(new_graph)
   end
 
+  def render_submenu(scene, menu_map, index) do
+    Logger.debug "HERE we want to be rendering the sub_menu!"
+    scene
+  end
 
 
   # def render_topmenu_item(scene, label, hover: index, offset: offset)
@@ -236,9 +249,31 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
     end
   end
 
+  # def handle_input(scene, {:cursor_button, {:btn_left, @click, [], coords}}) do
+  # def handle_input(scene, {:cursor_button, {:btn_left, @click, [], coords}}) do
+  # def handle_input(scene, {:cursor_button, btn}) do
+  def handle_input(%{assigns: %{state: {:hover, {:main_menubar, index}}}} = scene, {:cursor_button, {:btn_left, @click, [], _coords}}) when index == 6 do
+    Logger.debug "\n\n We have clicked open memex !!\n\n"
+    {:hover, {:main_menubar, index}} = scene.assigns.state # fetch what we're hovering over
+    #NOTE - look up the menu, & do that!
+    # or, just open the Memex, cause I will dodge it up to do that ;)
+    # if index == 6, do: Flamelex.Fluxus.Action.fire(:open_memex) #TODO/note => ok, this is great. We want
+    Flamelex.Fluxus.Action.fire(:open_memex) #TODO/note => ok, this is great. We want
+                                    # to do something new - so we go ahead,
+                                    # and fire that action!! It will just get
+                                    # swallowed & ignored, cause we can't handle
+                                    # it yet, but now we're on our way to solving that!
+    scene
+  end
 
+  ## Catch-all!
 
-  # def handle_input(%{assigns: %{state: :not_hovering_over_menubar}} = scene, {:cursor_pos, {x, y}}) do
+  def handle_input(scene, input) do
+    Logger.warn "ignoring some input... #{inspect input}"
+    scene
+  end
+
+    # def handle_input(%{assigns: %{state: :not_hovering_over_menubar}} = scene, {:cursor_pos, {x, y}}) do
   #   if y <= MenuBar.height() do
   #     #Logger.debug "now hovering over the menubar..." 
   #     index = (x |> floor() |> div(MenuBar.menu_item_width()))+1 # calc how wide a button is - indexes start at 1 !!
@@ -250,10 +285,6 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   #   end
   # end
 
-  def handle_input(scene, input) do
-    Logger.warn "ignoring some input... #{inspect input}"
-    scene
-  end
   # def handle_input({:cursor_pos, {_x, _y} = coords} = 
       
   #   # case scene.assigns.graph |> Scenic.Graph.bounds(coords) do

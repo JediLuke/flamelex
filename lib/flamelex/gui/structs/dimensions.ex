@@ -15,10 +15,14 @@ defmodule Flamelex.GUI.Structs.Dimensions do
   def new(:viewport_size) do
     #TODO this is actually just getting us the *default* viewport,
     #     not necessarily the current one
-    dimensions = Flamelex.GUI.ScenicInitialize.viewport_config()
+    dimensions = Flamelex.GUI.ScenicInitialize.viewport_config() #TODO remove this!!
                  |> Keyword.get(:size)
     new(dimensions)
   end
+
+  # def new(width: width, height: height) do
+  #   %__MODULE__{width: width, height: height}
+  # end
 
   def new(width: width, height: height) do
     %__MODULE__{width: width, height: height}
@@ -42,7 +46,7 @@ defmodule Flamelex.GUI.Structs.Dimensions do
     %{struct|width: new_wid, height: new_hgt}
   end
 
-  def find_center(%__MODULE__{} = dimensions) do
+  def find_center(dimensions) do
     Coordinates.new(
         x: dimensions.width  / 2,
         y: dimensions.height / 2)

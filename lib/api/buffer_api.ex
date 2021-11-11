@@ -111,6 +111,14 @@ defmodule Flamelex.API.Buffer do
     }})
   end
 
+  # The process of adding functionality
+
+  ## 1) Create an API function e.g. Buffer.switch(b)
+  ## 2) Probably, it fires an action to FluxusRadix
+
+  def switch({:buffer, _details} = buf) do
+    GenServer.call(Flamelex.FluxusRadix, {:action, {:activate, buf}})
+  end
 
   @doc """
   Tell a buffer to save it's contents.

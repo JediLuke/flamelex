@@ -15,8 +15,7 @@ defmodule Flamelex.API.Kommander do
   Make the KommandBuffer visible, and put us in :kommand mode.
   """
   def show do
-
-    Flamelex.Fluxus.fire_action({KommandBuffer, :show})
+    Flamelex.Fluxus.Action.fire({KommandBuffer, :show})
   end
 
 

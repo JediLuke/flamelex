@@ -18,7 +18,7 @@ defmodule Flamelex.GUI.Structs.Frame do
         right: 0,
         bottom: 0,
         left: 0 },
-    scenic_opts:  [],             # Scenic options
+    # scenic_opts:  [],             # Scenic options
     label:        nil             # an optional label, usually used to render a footer bar
   ]
 
@@ -61,6 +61,15 @@ defmodule Flamelex.GUI.Structs.Frame do
     end
   end
 
+
+
+  def new(%Scenic.ViewPort{size: {w, h}}) do
+    Logger.debug "constructing a new %Frame{} the size of the ViewPort."
+    %Frame{
+      top_left: Coordinates.new(x: 0, y: 0),
+      dimensions: Dimensions.new(width: w, height: h)
+    }
+  end
 
 
   # def new(
@@ -114,13 +123,13 @@ defmodule Flamelex.GUI.Structs.Frame do
     }
   end
 
-def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when is_list(o) do
-    %Frame{
-      top_left:     c |> Coordinates.new(),
-      dimensions:   d |> Dimensions.new(),
-      scenic_opts:  o
-    }
-  end
+# def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when is_list(o) do
+#     %Frame{
+#       top_left:     c |> Coordinates.new(),
+#       dimensions:   d |> Dimensions.new(),
+#       scenic_opts:  o
+#     }
+#   end
 
   def set_margin(frame, %{top: t, left: l}) do
       %{frame|

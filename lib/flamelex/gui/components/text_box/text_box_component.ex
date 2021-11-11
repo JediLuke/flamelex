@@ -18,6 +18,8 @@ defmodule Flamelex.GUI.Component.TextBox do
 
   def init(scene, params, opts) do
 
+    #TODO this is where the Frame _SHOULD_ be specified!!
+
     params = custom_init_logic(params)
     # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
     ProcessRegistry.register(rego_tag(params))
@@ -173,14 +175,16 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     #     new_state = %{state| graph: new_graph, mode: m}
 
+    #TODO ok so this is a bit weird I guess - any time we switch mode,
+    #     we calc this mode-string, but maybe this should be done down
+    #     lower
     mode_string =
       case new_mode do
         :normal -> "NORMAL-MODE"
         :insert -> "INSERT-MODE"
         :kommand -> "COMMAND-MODE"
+        _unknown -> "UNKNOWN-MODE!?"
       end
-
-      
 
     new_graph =
       scene.assigns.graph

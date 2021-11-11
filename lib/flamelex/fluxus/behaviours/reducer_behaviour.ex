@@ -1,4 +1,4 @@
-defmodule Flamelex.Fluxux.ReducerBehaviour do
+defmodule Flamelex.Fluxus.ReducerBehaviour do
   @moduledoc """
   All Reducer modules use this behaviour - it contains common functionality
   & interfaces for working with Reducers.
@@ -30,7 +30,7 @@ defmodule Flamelex.Fluxux.ReducerBehaviour do
       #REMINDER: including this @behaviour in the __using__ macro here means
       #          that any module which calls `use This.Behaviour.Module`
       #          must implement all the callbacks defined in *this* module
-      @behaviour Flamelex.Fluxux.ReducerBehaviour
+      @behaviour Flamelex.Fluxus.ReducerBehaviour
 
     end
   end

@@ -12,6 +12,7 @@ defmodule Flamelex.Fluxus do
 
   https://medium.com/grandcentrix/state-management-with-phoenix-liveview-and-liveex-f53f8f1ec4d7
   """
+  require Logger
 
   @doc """
   This function enables us to fire actions off which enact changes, at
@@ -22,8 +23,15 @@ defmodule Flamelex.Fluxus do
   on this list, and eventually someone will call you back..."
   """
   def fire_action(a) do
+    Logger.warn """
+    This function to be deprecated in favor of:
+
+    ```
+    Fluxus.Action.fire(a)
+    ```
+    """
     # GenServer.cast(Flamelex.FluxusRadix, {:action, a})
-    #TODO this is kind of experimental, we have to call FluxuxRadix
+    #TODO this is kind of experimental, we have to call FluxusRadix
     # the idea is that it might solve a problem I have where I fire
     # actions too fast, & so they get executed "out of order" - or, rather,
     # n or more actions end up running in parallel on the same RadixState,

@@ -4,42 +4,68 @@ defmodule Flamelex.API.KeyMappings.VimClone do
 
   https://hea-www.harvard.edu/~fine/Tech/vi.html
   """
-  use Flamelex.Fluxux.KeyMappingBehaviour
+  # use Flamelex.Fluxus.KeyMappingBehaviour
   alias Flamelex.API.KeyMappings.VimClone.{NormalMode, KommandMode,
                                            InsertMode, LeaderBindings}
+  use Flamelex.ProjectAliases
+  use Flamelex.GUI.ScenicEventsDefinitions
+  alias Flamelex.Fluxus.Structs.RadixState
   require Logger
+
 
 
   # this is our vim leader
   def leader, do: @space_bar
 
+  def lookup(radix_state, input) do
+    try do
+      Logger.debug "#{__MODULE__} looking up input from the keymap"
+      keymap(radix_state, input)
+    rescue
+      e in FunctionClauseError ->
+              context = %{radix_state: radix_state, input: input}
+
+              error_msg = ~s(#{__MODULE__} failed to process some input due to a FunctionClauseError.
+
+              #{inspect e}
+
+              Most likely this KeyMapping module did not have a function
+              implemented which pattern-matched on this input.
+
+              context: #{inspect context})
+
+              Logger.warn error_msg
+              :ignore_input
+    end
+  end
 
   def keymap(%RadixState{mode: :normal} = state, input) do
     if last_keystroke_was_leader?(state) do
-      Logger.debug "doing a LeaderBindings lookup on: #{inspect input}"
+      #Logger.debug "doing a LeaderBindings lookup on: #{inspect input}"
       LeaderBindings.keymap(state, input)
     else
-      Logger.debug "doing a NormalMode lookup on #{inspect input}"
+      #Logger.debug "doing a NormalMode lookup on #{inspect input}"
       NormalMode.keymap(state, input)
     end
   end
 
 
+  #TODO move this up into the Root reducer - follow Memex
   def keymap(%RadixState{mode: :kommand} = state, input) do
     KommandMode.keymap(state, input)
   end
 
 
   def keymap(%RadixState{mode: :insert} = state, input) do
-    Logger.debug "#{__MODULE__} received input: #{inspect input}, routing it to InsertMode..."
+    #Logger.debug "#{__MODULE__} received input: #{inspect input}, routing it to InsertMode..."
     InsertMode.keymap(state, input)
   end
 
 
-  def keymap(state, input) do
-    context = %{state: state, input: input}
-    raise "failed to pattern-match on a known :mode in the RadixState. #{inspect context}"
-  end
+  # def keymap(state, input) do
+  #   context = %{state: state, input: input}
+  #   raise "failed to pattern-match on a known :mode in the RadixState. #{inspect context.state.mode}"
+  # end
 
 
   # returns true if the last key was pressed was the leader key

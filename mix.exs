@@ -39,6 +39,8 @@ defmodule Flamelex.MixProject do
       {:jason, "~> 1.1"},
       {:gproc, "~> 0.5.0"}, #TODO remove gproc, use Registry
       {:tzdata, "~> 1.0.4"},
+      {:event_bus, "~> 1.6.2"},
+      {:memex, path: "../memelex"}, #TODO change this to :memelex
       {:ex_doc, "~> 0.23", only: :dev, runtime: false},
       {:ice_cream, "~> 0.0.5", only: [:dev, :test]}
     ]

@@ -29,7 +29,7 @@ defmodule Flamelex.Fluxus.Reducers.Mode do
   #      this function!! Why?? Because if we call this directly, we haven't
   #      gone through the proper messaging channels - several (important!!)
   #      processes, will not have been updated correctly, e.g.
-  #      `Flamelex.Fluxux`, which holds the root stater. This will surely
+  #      `Flamelex.Fluxus`, which holds the root stater. This will surely
   #      cause additional problems/confusion, likely leading to needing
   #      some kind of restart, or lots of debugging.
   #

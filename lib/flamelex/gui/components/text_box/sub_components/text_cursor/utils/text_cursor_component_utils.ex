@@ -1,6 +1,7 @@
 defmodule Flamelex.GUI.Component.Utils.TextCursor do
   use Flamelex.ProjectAliases
-    alias Flamelex.GUI.Component.Utils.TextBox, as: TextBoxDrawUtils
+  alias Flamelex.GUI.Component.Utils.TextBox, as: TextBoxDrawUtils
+  require Logger
 
   def calc_starting_coordinates(frame) do
     # these are the original honme/base positions of the cursor - where we
@@ -116,6 +117,12 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
     w = 2
     h = cursor_box_height()
     {w, h}
+  end
+
+  def cursor_box_dimensions(_other) do
+    Logger.warn "This is bad, why should Text cursor need such specific knowledge of weird modes??"
+    # {10, 10} # junk data just to prevent crashes
+    # cursor_box_dimensions(:kommand)
   end
 
   def cursor_box_height do

@@ -48,9 +48,12 @@ defmodule Flamelex.GUI.RootScene do
     # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
     # |> Scenic.Primitives.rect({80, 80}, fill: :green,  translate: {140, 140})
 
-    scene = scene |> assign(graph: graph) |> push_graph(graph)
+    scene = scene
+    |> assign(graph: graph)
+    |> push_graph(graph)
     
     capture_input(scene, [:key])
+    request_input(scene, [:cursor_button, :cursor_scroll])
     #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
     #      the scene, so we just need to initialize it with *something*
     {:ok, scene}
@@ -85,12 +88,12 @@ defmodule Flamelex.GUI.RootScene do
   #   { :noreply, scene }
   # end
 
-  # handle all other (not-ignored) input...
-  def handle_event(input, _context, scene) do
-    IO.puts "SOME NON IGNORED INPUT #{inspect input}"
-    # Flamelex.Fluxus.handle_user_input(input)
-    {:noreply, scene}
-  end
+  # # handle all other (not-ignored) input...
+  # def handle_event(input, _context, scene) do
+  #   IO.puts "SOME NON IGNORED INPUT #{inspect input}"
+  #   # Flamelex.Fluxus.handle_user_input(input)
+  #   {:noreply, scene}
+  # end
 
 
 
@@ -145,9 +148,9 @@ defmodule Flamelex.GUI.RootScene do
   # # handle all other (not-ignored) input...
   def handle_input(input, context, scene) do
     # IO.puts "SOME NON IGNORED INPUT #{inspect input}"
+    Logger.debug "#{__MODULE__} recv'd some input: #{inspect input}"
 
     ##TODO it's simpler to route these different right now.
-
     # call Flamelex.Fluxus.UserInput.
 
     # This is an example of the "state-centered" approach - we keep
@@ -171,6 +174,10 @@ defmodule Flamelex.GUI.RootScene do
       input: input
     })
     {:noreply, scene}
+  end
+
+  def handle_call(:get_viewport, _from, scene) do
+    {:reply, {:ok, scene.viewport}, scene}
   end
 
   # @impl Scenic.Scene

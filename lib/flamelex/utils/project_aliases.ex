@@ -11,21 +11,22 @@ defmodule Flamelex.ProjectAliases do
         Buffer,
         Kommander,
         GUI,
-        Memex
+        # Memex
       }
 
-      alias Flamelex.Utils.ProcessRegistry
-      alias Flamelex.Utils.PubSub
-
+      alias Flamelex.Fluxus
+      
       alias Flamelex.GUI.Structs.Coordinates
       alias Flamelex.GUI.Structs.Dimensions
       alias Flamelex.GUI.Structs.Frame
       alias Flamelex.GUI.Structs.Layout
-
+      
       alias Flamelex.GUI.Utils.Draw
 
-      # https://github.com/joseph-lozano/ice_cream
-      use IceCream
+      alias Flamelex.Utils.ProcessRegistry
+      alias Flamelex.Utils.PubSub
+
+      use IceCream # https://github.com/joseph-lozano/ice_cream
 
     end
   end

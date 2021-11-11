@@ -1,5 +1,5 @@
 defmodule Flamelex.Fluxus.Reducers.Buffer do #TODO rename module
-  use Flamelex.Fluxux.ReducerBehaviour
+  use Flamelex.Fluxus.ReducerBehaviour
   require Logger
 
 
@@ -36,6 +36,20 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do #TODO rename module
 
     ProcessRegistry.find!(buffer)
     |> GenServer.cast({:move_cursor, details})
+  end
+
+  def async_reduce(%{action: {:activate, _buf} = action}) do
+    Logger.debug "#{__MODULE__} recv'd: #{inspect action}"
+    ## Find the buffer, set it to active
+    # ProcessRegistry.find!(buffer)
+
+    ## Update the GUI - note: this is what we DONT WANT (maybe??) - we want to calc a new state & pass it in to a "render" GUI function, not fire off side-effects like this!
+        # state + action -> state |> fn (RadixState) -> render_gui()
+        # the inherent problem with this is that state in ELixir is broken up into different processes!!
+    # :ok = GenServer.call(GUIController, action)
+    raise "unable to process action #{inspect action}"
+    
+    ## 
   end
 
   # modifying buffers...

@@ -43,9 +43,57 @@ defmodule Flamelex.Fluxus.RootReducer do
   what we want to do instead is, the reducer broadcasts the message to
   the "actions" channel - all the managers are able to react to this event.
   """
+
+  def async_reduce(%{mode: :memex} = radix_state, {:action, {:memex, :new_random}}) do
+    Logger.debug "received an action `{:memex, :new_random}` while in :memex mode..."
+    t = Memex.random()
+    GenServer.cast(:hypercard, {:new_tidbit, t})
+  end
+
+  def async_reduce(%{mode: :memex} = radix_state, {:action, {:switch_mode, :normal}} = action) do
+    # ModeReducer.handle(radix_state, action)
+    Logger.debug "this is where we will take us back to the other view!"
+    
+
+    Flamelex.Fluxus.Reducers.Mode.handle(radix_state, {:action, {:switch_mode, :normal}})
+    GenServer.cast(Flamelex.GUI.Controller, {:activate, :homebase})
+  end
+
   def async_reduce(radix_state, {:action, {:switch_mode, _m}} = action) do
     ModeReducer.handle(radix_state, action)
   end
+
+  def async_reduce(%{mode: :memex} = radix_state, action) do
+    Logger.debug "#{__MODULE__} recv'd an action in Memex :mode. #{inspect action}"
+
+    # ModeReducer.handle(radix_state, action)
+    
+
+    # Flamelex.Fluxus.Reducers.Mode.handle(radix_state, {:action, {:switch_mode, :normal}})
+    # GenServer.cast(Flamelex.GUI.Controller, {:activate, :homebase})
+  end
+
+  #TODO/note - ok so for implementing something, next step is, we need
+  #            to implement a fluxus-radix reduceR!
+  def async_reduce(radix_state, {:action, :open_memex} = action) do
+    Logger.debug "opening the MemexWrap..."
+    
+    Flamelex.Fluxus.Reducers.Mode.handle(radix_state, {:action, {:switch_mode, :memex}})
+    
+    #TODO update GUI state - :memex
+    GenServer.cast(Flamelex.GUI.Controller, :open_memex)
+    :ok
+  end
+
+  # def async_reduce(radix_state, {:action, :close_memex} = action) do
+  #   Logger.debug "opening the MemexWrap..."
+    
+  #   Flamelex.Fluxus.Reducers.Mode.handle(radix_state, {:action, {:switch_mode, :memex}})
+    
+  #   #TODO update GUI state - :memex
+  #   GenServer.cast(Flamelex.GUI.Controller, :open_memex)
+  #   :ok
+  # end
 
   def async_reduce(radix_state, {:action, {KommandBuffer, _details}} = action) do
     Logger.debug "RootReducer received an action related to the KommandBuffer - forwarding..."
@@ -56,7 +104,7 @@ defmodule Flamelex.Fluxus.RootReducer do
   # `root` action - we pubish it to the `:action_event_bus`, for each of
   # the managers to handle, if it's relevent to them
   def async_reduce(radix_state, {:action, action}) do
-    # Logger.debug "#{__MODULE__} did not match any action: #{inspect action} - broadcasting to :action_event_bus..."
+    Logger.debug "#{__MODULE__} did not match any action: #{inspect action} - broadcasting to :action_event_bus..."
     Flamelex.Utils.PubSub.broadcast([
         topic: :action_event_bus,
         msg: %{
