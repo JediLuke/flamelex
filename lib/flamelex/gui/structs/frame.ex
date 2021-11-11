@@ -81,6 +81,16 @@ defmodule Flamelex.GUI.Structs.Frame do
   #           opts: opts
   #         }},
   #       buf_tag) do
+  def new(
+    top_left:     %Coordinates{} = c,
+    dimensions:   %Dimensions{}  = d
+  ) do
+    %__MODULE__{
+      top_left:   c,
+      dimensions: d
+    }
+  end
+
   def new(gui_state, buf_tag) do
   # def new(%GUIState{} = gui_state, buf_state) do
     
@@ -113,6 +123,13 @@ defmodule Flamelex.GUI.Structs.Frame do
     %__MODULE__{
       top_left:   top_left |> Coordinates.new(),
       dimensions: size     |> Dimensions.new()
+    }
+  end
+
+  def new(top_left: {_x, _y} = c, dimensions: {_w, _h} = d) do
+    %__MODULE__{
+      top_left:   c |> Coordinates.new(),
+      dimensions: d |> Dimensions.new()
     }
   end
 

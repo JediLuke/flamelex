@@ -129,8 +129,11 @@ defmodule Flamelex.GUI.Utils.Draw do
   # end
 # end
 
+  def background(scene) do
+    background(scene, :grey) #TODO this needs some kind of color scheme system...
+  end
 
-  def background(%Scenic.Scene{assigns: %{frame: %Frame{} = frame, graph: graph}} = scene, color) do
+  def background(%Scenic.Scene{assigns: %{frame: %Frame{} = frame, graph: %Scenic.Graph{} = graph}} = scene, color) do
     width  = frame.dimensions.width + 1 #TODO need width +1 here for some quirky reason of Scenic library
     height = frame.dimensions.height
 
@@ -141,7 +144,12 @@ defmodule Flamelex.GUI.Utils.Draw do
     scene |> put_graph(new_graph)
   end
 
+  # def background(%Scenic.Scene{assigns: %{frame: %Frame{} = frame}} = scene, color) do
+
+  # end
+
   def background(%Scenic.Graph{} = graph, %Frame{} = frame, color) do
+    Logger.warn "Deprecate me.... 22"
     width  = frame.dimensions.width + 1 #TODO need width +1 here for some quirky reason of Scenic library
     height = frame.dimensions.height
 
