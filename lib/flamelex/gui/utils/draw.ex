@@ -36,22 +36,42 @@ defmodule Flamelex.GUI.Utils.Draw do
   @doc """
   Draw a test pattern.
   """
-  def test_pattern(graph) do
+  def test_pattern(%Scenic.Scene{assigns: %{graph: graph}} = scene) do
     rect_size = {80, 80}
-    graph
-    # 1st column
-    |> Scenic.Primitives.rect(rect_size, fill: :white,  translate: {100, 100})
-    |> Scenic.Primitives.rect(rect_size, fill: :green,  translate: {100, 180})
-    |> Scenic.Primitives.rect(rect_size, fill: :red,    translate: {100, 260})
-    # 2nd column
-    |> Scenic.Primitives.rect(rect_size, fill: :blue,   translate: {180, 100})
-    |> Scenic.Primitives.rect(rect_size, fill: :black,  translate: {180, 180})
-    |> Scenic.Primitives.rect(rect_size, fill: :yellow, translate: {180, 260})
-    # 3rd column
-    |> Scenic.Primitives.rect(rect_size, fill: :pink,   translate: {260, 100})
-    |> Scenic.Primitives.rect(rect_size, fill: :purple, translate: {260, 180})
-    |> Scenic.Primitives.rect(rect_size, fill: :brown,  translate: {260, 260})
+    new_graph =
+        graph
+        # 1st column
+        |> Scenic.Primitives.rect(rect_size, fill: :white,  translate: {100, 100})
+        |> Scenic.Primitives.rect(rect_size, fill: :green,  translate: {100, 180})
+        |> Scenic.Primitives.rect(rect_size, fill: :red,    translate: {100, 260})
+        # 2nd column
+        |> Scenic.Primitives.rect(rect_size, fill: :blue,   translate: {180, 100})
+        |> Scenic.Primitives.rect(rect_size, fill: :black,  translate: {180, 180})
+        |> Scenic.Primitives.rect(rect_size, fill: :yellow, translate: {180, 260})
+        # 3rd column
+        |> Scenic.Primitives.rect(rect_size, fill: :pink,   translate: {260, 100})
+        |> Scenic.Primitives.rect(rect_size, fill: :purple, translate: {260, 180})
+        |> Scenic.Primitives.rect(rect_size, fill: :brown,  translate: {260, 260})
+    
+    scene |> put_graph(new_graph)
   end
+
+  # def test_pattern(graph) do
+  #   rect_size = {80, 80}
+  #   graph
+  #   # 1st column
+  #   |> Scenic.Primitives.rect(rect_size, fill: :white,  translate: {100, 100})
+  #   |> Scenic.Primitives.rect(rect_size, fill: :green,  translate: {100, 180})
+  #   |> Scenic.Primitives.rect(rect_size, fill: :red,    translate: {100, 260})
+  #   # 2nd column
+  #   |> Scenic.Primitives.rect(rect_size, fill: :blue,   translate: {180, 100})
+  #   |> Scenic.Primitives.rect(rect_size, fill: :black,  translate: {180, 180})
+  #   |> Scenic.Primitives.rect(rect_size, fill: :yellow, translate: {180, 260})
+  #   # 3rd column
+  #   |> Scenic.Primitives.rect(rect_size, fill: :pink,   translate: {260, 100})
+  #   |> Scenic.Primitives.rect(rect_size, fill: :purple, translate: {260, 180})
+  #   |> Scenic.Primitives.rect(rect_size, fill: :brown,  translate: {260, 260})
+  # end
 
   # @doc """
   # Return a simple frame, doesn't contain any buffer yet.
