@@ -27,7 +27,7 @@ defmodule Flamelex.GUI.Component.KommandBuffer.Utils do
     Scenic.Graph.build()
     |> Scenic.Primitives.group(fn graph ->
          graph
-         |> Draw.background(frame, command_mode_background_color)
+        #  |> Draw.background(frame, command_mode_background_color) #TODO now KommandBuffer has no background...
          |> draw_command_prompt(frame)
          |> draw_textbox(frame)
         #  |> DrawingHelpers.draw_input_textbox(textbox_frame)
