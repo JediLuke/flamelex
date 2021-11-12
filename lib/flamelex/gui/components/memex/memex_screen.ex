@@ -93,7 +93,7 @@ defmodule Flamelex.GUI.Component.MemexScreen do
       |> add_collections_pane(%{frame: left_quadrant(scene.assigns.frame)})
       |> Draw.test_pattern()
       # |> add_story_river(%{frame: mid_section(scene.assigns.frame)})
-      # |> add_sidebar(%{frame: right_quadrant(scene.assigns.frame)})
+      |> add_sidebar(%{frame: right_quadrant(scene.assigns.frame)})
       |> assign(first_render?: false)
    end
 
@@ -108,7 +108,7 @@ defmodule Flamelex.GUI.Component.MemexScreen do
       # scene |> Draw.background()
       CollectionsPane.re_render(%{frame: left_quadrant(scene.assigns.frame)})
       # GenServer.call(StoryRiver, {:re_render, %{frame: mid_section(scene.assigns.frame)}})
-      # GenServer.call(SideBar, {:re_render, %{frame: right_quadrant(scene.assigns.frame)}})
+      GenServer.call(SideBar, {:re_render, %{frame: right_quadrant(scene.assigns.frame)}})
 
       scene
 

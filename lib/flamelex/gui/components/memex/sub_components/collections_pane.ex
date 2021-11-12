@@ -9,7 +9,6 @@ defmodule Flamelex.GUI.Component.Memex.CollectionsPane do
     end
 
     def validate(_data) do
-        IO.puts "VALIDDDDDDDDDDDDDDDD"
         # raise "here we should use proper Scenic validation, but - you forgot to use frames"
         {:error, "missing frame"}
     end
