@@ -1,7 +1,10 @@
-defmodule Flamelex.GUI.Component.Memex.HyperCard do
+defmodule Flamelex.GUI.Component.Memex.HyperCardTitle do
     use Scenic.Component
     use Flamelex.ProjectAliases
     require Logger
+
+    @component_id :hypercard_title
+    @background_color :yellow
 
     def validate(%{frame: %Frame{} = _f} = data) do
         Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
@@ -40,8 +43,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         new_graph =
             Scenic.Graph.build()
             |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                    id: :hypercard,
-                    fill: :rebecca_purple,
+                    id: @component_id,
+                    fill: @background_color,
                     translate: {
                         frame.top_left.x,
                         frame.top_left.y})
@@ -53,10 +56,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 
     def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame}} = scene) do
         new_graph = graph
-        |> Scenic.Graph.delete(:hypercard)
+        |> Scenic.Graph.delete(@component_id)
         |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                    id: :hypercard,
-                    fill: :rebecca_purple,
+                    id: @component_id,
+                    fill: @background_color,
                     translate: {
                         frame.top_left.x,
                         frame.top_left.y})
@@ -75,20 +78,4 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         {:reply, :ok, new_scene}
     end
 
-
-
-    #NOTE - you know, this is really the only thing that changes... all
-    #       the above is Boilerplate
-
-    # def render(scene) do
-    #     scene |> Draw.background(:rebecca_purple)
-    # end
-
-    # def handle_call({:re_render, %{frame: %Frame{} = f}}, _from, scene) do
-    #     new_scene = scene
-    #     |> assign(frame: f)
-    #     |> render_push_graph()
-        
-    #     {:reply, :ok, new_scene}
-    # end
 end

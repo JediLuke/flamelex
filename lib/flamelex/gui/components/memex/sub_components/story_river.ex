@@ -78,8 +78,8 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
 
     def hypercard_frame(%Frame{top_left: %Coordinates{x: x, y: y}, dimensions: %Dimensions{width: w, height: h}}) do
 
-        bm = _buffer_margin = 100 # px
-        Frame.new(top_left: {x+bm, y+bm}, dimensions: {w-(2*bm), 500}) #TODO just hard-code hypercards at 500 high for now
+        bm = _buffer_margin = 50 # px
+        Frame.new(top_left: {x+bm, y+bm}, dimensions: {w-(2*bm), 700}) #TODO just hard-code hypercards at 700 high for now
 
     end
         
