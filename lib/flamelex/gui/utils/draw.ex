@@ -14,7 +14,7 @@ defmodule Flamelex.GUI.Utils.Draw do
   end
 
   # virtually ever single render function needs to update the graph...
-  def put_graph(%{assigns: assigns} = scene, %Scenic.Graph{} = new_graph) do
+  def put_graph(%{assigns: old_assigns} = scene, %Scenic.Graph{} = new_graph) do
     # We can manually assign some stuff to a %Scenic.Graph{}, there's
     # nothing fancy going on under-the-hood.
     # https://github.com/boydm/scenic/blob/master/lib/scenic/scene.ex#L404
@@ -30,7 +30,7 @@ defmodule Flamelex.GUI.Utils.Draw do
     #     function Scenic.Scene.get_and_update/3 is undefined (Scenic.Scene does not implement the Access behaviour)
     #
     # Would be cool is a Scenic.Scene *did* implement this behaviour ;)
-    %{scene|assigns: assigns |> Map.put(:graph, new_graph)}
+    %{scene|assigns: old_assigns |> Map.put(:graph, new_graph)}
   end
 
   @doc """

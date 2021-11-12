@@ -27,17 +27,20 @@ defmodule Flamelex.GUI.Component.MemexScreen do
       # new_graph = 
       #    render(scene, params)
 
-      merged_scene =
-         %{scene|assigns: scene.assigns |> Map.merge(params)}
+      new_scene =
+         %{scene|assigns: scene.assigns |> Map.merge(params)} # just dump params straight into assigns
          |> assign(graph: Scenic.Graph.build())
+         |> assign(first_render?: true) # First time we have to "boot" the Components, after that we just update them
          |> render_push_graph()
+
+      request_input(new_scene, :viewport)
 
       # new_scene =
       #    scene
       #    |> assign(graph: new_graph)
       #    |> push_graph(new_graph)
 
-      {:ok, merged_scene}
+      {:ok, new_scene}
     end
 
    @skip_log true
@@ -54,6 +57,22 @@ defmodule Flamelex.GUI.Component.MemexScreen do
       end
    end
 
+   def handle_input({:viewport, {:reshape, {new_width, new_height} = new_dimensions}}, context, scene) do # e.g. of new_dimensions: {1025, 818}
+      Logger.debug "#{__MODULE__} received :viewport :reshape, dim: #{inspect new_dimensions}"
+
+      new_scene = scene
+      |> assign(frame: Frame.new(
+                         top_left: Coordinates.new(x: 0, y: 0), # this is a guess
+                         dimensions: Dimensions.new(width: new_width, height: new_height)))
+      |> render_push_graph()
+      {:noreply, scene}
+   end
+
+   def handle_input({:viewport, whatever}, context, scene) do # e.g. of new_dimensions: {1025, 818}
+      Logger.debug "ignoring some input from the :viewport - #{inspect whatever}"
+      {:noreply, scene}
+   end
+
    # def render_push_graph(scene) do
    #    scene
    #    |> assign(graph: Scenic.Graph.build())
@@ -64,13 +83,42 @@ defmodule Flamelex.GUI.Component.MemexScreen do
    ## render
 
 
-   #NOTE - render gets a scene, & must return a scene!
-   def render(scene) do
-
+   def render(%{assigns: %{first_render?: true}} = scene) do
+      Logger.debug "First render of the Memex Screen..."
       scene
-      |> Draw.background()
+      # |> Draw.background()
+      #IDEA: Instead of going top-down "I'm the screen, this is your frame"
+      #      we give each component just knowledge of their percentage of the viewport!!
+      #      Better to give these intructions & have component make it's own Frame
       |> add_collections_pane(%{frame: left_quadrant(scene.assigns.frame)})
       |> Draw.test_pattern()
+      # |> add_story_river(%{frame: mid_section(scene.assigns.frame)})
+      # |> add_sidebar(%{frame: right_quadrant(scene.assigns.frame)})
+      |> assign(first_render?: false)
+   end
+
+   #NOTE - render gets a scene, & must return a scene!
+   def render(scene) do
+      Logger.debug "Re-rendering the Memex Screen..."
+
+      #NOTE: This ONLY works for re-rendering updates. We need a more robust
+      #      and general way of "pushing down" to child components
+      #
+      #      eex templates may be the best answer for this
+      # scene |> Draw.background()
+      CollectionsPane.re_render(%{frame: left_quadrant(scene.assigns.frame)})
+      # GenServer.call(StoryRiver, {:re_render, %{frame: mid_section(scene.assigns.frame)}})
+      # GenServer.call(SideBar, {:re_render, %{frame: right_quadrant(scene.assigns.frame)}})
+
+      scene
+
+
+      # |> update_sub_components()
+      # |> update_collections_pane(%{frame: left_quadrant(scene.assigns.frame)})
+      # |> update_story_river(%{frame: mid_section(scene.assigns.frame)})
+      # |> update_sidebar(%{frame: right_quadrant(scene.assigns.frame)})
+      # ic scene
+
 
       # new_graph =
       # Scenic.Graph.build()
@@ -92,7 +140,30 @@ defmodule Flamelex.GUI.Component.MemexScreen do
       %{scene|assigns: scene.assigns |> Map.merge(%{graph: new_graph})}
    end
 
-   def left_quadrant(%{top_left: %Coordinates{x: x, y: y}, dimensions: %Dimensions{width: w, height: h}} = frame) do
-     Frame.new(top_left: {x, y}, dimensions: {w/4, h})
+   def add_sidebar(scene, data) do
+      new_graph = scene.assigns.graph
+      |> SideBar.add_to_graph(data)
+
+      %{scene|assigns: scene.assigns |> Map.merge(%{graph: new_graph})}
    end
+
+   def add_story_river(scene, data) do
+      new_graph = scene.assigns.graph
+      |> StoryRiver.add_to_graph(data)
+
+      %{scene|assigns: scene.assigns |> Map.merge(%{graph: new_graph})}
+   end
+
+   def left_quadrant(%{top_left: %Coordinates{x: x, y: y}, dimensions: %Dimensions{width: w, height: h}} = frame) do
+      Frame.new(top_left: {x, y}, dimensions: {w/4, h})
+   end
+
+   def right_quadrant(%{top_left: %Coordinates{x: x, y: y}, dimensions: %Dimensions{width: w, height: h}} = frame) do
+     Frame.new(top_left: {x+((3/4)*w), y}, dimensions: {w/4, h})
+   end
+
+   def mid_section(%{top_left: %Coordinates{x: x, y: y}, dimensions: %Dimensions{width: w, height: h}} = frame) do
+      one_quarter_page_width = w/4
+      Frame.new(top_left: {x+one_quarter_page_width, y}, dimensions: {w/2, h})
+    end
 end
