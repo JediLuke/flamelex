@@ -6,7 +6,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCardTitle do
     @component_id :hypercard_title
     @background_color :yellow
 
-    def validate(%{frame: %Frame{} = _f} = data) do
+    def validate(%{frame: %Frame{} = _f, text: t} = data) when is_bitstring(t) do
         Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
         {:ok, data}
     end
@@ -39,7 +39,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCardTitle do
     end
 
 
-    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame}} = scene) do
+    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, text: text}} = scene) do
+        buffer = 10
+        font_size = 28
         new_graph =
             Scenic.Graph.build()
             |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
@@ -48,15 +50,22 @@ defmodule Flamelex.GUI.Component.Memex.HyperCardTitle do
                     translate: {
                         frame.top_left.x,
                         frame.top_left.y})
+            |> Scenic.Primitives.text(text,
+                    id: :hypercard_title_text,
+                    font: :ibm_plex_mono,
+                    translate: {frame.top_left.x+buffer, frame.top_left.y+font_size+(2*buffer)}, # text draws from bottom-left corner??
+                    font_size: font_size,
+                    fill: :black)
 
         scene
         |> assign(graph: new_graph)
         |> assign(first_render?: false)
     end
 
-    def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame}} = scene) do
+    def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, text: text}} = scene) do
         new_graph = graph
         |> Scenic.Graph.delete(@component_id)
+        |> Scenic.Graph.delete(:hypercard_title_text)
         |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
                     id: @component_id,
                     fill: @background_color,
