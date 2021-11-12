@@ -1,8 +1,7 @@
-defmodule Flamelex.GUI.Component.Memex.StoryRiver do
+defmodule Flamelex.GUI.Component.Memex.HyperCard do
     use Scenic.Component
     use Flamelex.ProjectAliases
     require Logger
-    alias Flamelex.GUI.Component.Memex.HyperCard
 
     def validate(%{frame: %Frame{} = _f} = data) do
         Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
@@ -12,6 +11,7 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
     def validate(_data) do
         {:error, "This component must be passed a %Frame{}"}
     end
+
 
     def init(scene, params, opts) do
         Logger.debug "#{__MODULE__} initializing..."
@@ -40,15 +40,11 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         new_graph =
             Scenic.Graph.build()
             |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                    id: :story_river,
-                    fill: :beige,
+                    id: :hypercard,
+                    fill: :rebecca_purple,
                     translate: {
                         frame.top_left.x,
-                        frame.top_left.y })
-            |> HyperCard.add_to_graph(%{
-                    frame: hypercard_frame(scene.assigns.frame), # calculate hypercard based of story_river
-                    tidbit: "Luke" },
-                    id: :hypercard)
+                        frame.top_left.y})
 
         scene
         |> assign(graph: new_graph)
@@ -57,32 +53,19 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
 
     def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame}} = scene) do
         new_graph = graph
-        |> Scenic.Graph.delete(:story_river)
-        |> Scenic.Graph.delete(:hypercard) #TODO is this how it works with Components? Not sure...
+        |> Scenic.Graph.delete(:hypercard)
         |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                    id: :story_river,
-                    fill: :beige,
+                    id: :hypercard,
+                    fill: :rebecca_purple,
                     translate: {
                         frame.top_left.x,
                         frame.top_left.y})
-        |> HyperCard.add_to_graph(%{
-            frame: hypercard_frame(scene.assigns.frame), # calculate hypercard based of story_river
-            tidbit: "Luke" },
-            id: :hypercard)
-
-        # GenServer.call(HyperCard, {:re_render, %{frame: hypercard_frame(scene.assigns.frame)}})
 
         scene
         |> assign(graph: new_graph)
     end
 
-    def hypercard_frame(%Frame{top_left: %Coordinates{x: x, y: y}, dimensions: %Dimensions{width: w, height: h}}) do
 
-        bm = _buffer_margin = 100 # px
-        Frame.new(top_left: {x+bm, y+bm}, dimensions: {w-(2*bm), 500}) #TODO just hard-code hypercards at 500 high for now
-
-    end
-        
 
     def handle_call({:re_render, %{frame: %Frame{} = f}}, _from, scene) do
         new_scene = scene
@@ -94,32 +77,14 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
 
 
 
-
-
-
-
-
-    # #NOTE - you know, this is really the only thing that changes... all
-    # #       the above is Boilerplate
+    #NOTE - you know, this is really the only thing that changes... all
+    #       the above is Boilerplate
 
     # def render(scene) do
-    #     ##TODO next steps
-
-    #     # we have the hypercard component - we want to really robustify
-    #     # that component
-    #     #
-    #     # then we want to be able to get the sidebar happening with "recent",
-    #     # "open" etc.
-    #     #
-    #     # then we want to be able to edit TidBits
-    #     #
-    #     # Scrolling doesn't even have to come till like last, we can just
-    #     # flick through left/right
-    #     scene
+    #     scene |> Draw.background(:rebecca_purple)
     # end
 
     # def handle_call({:re_render, %{frame: %Frame{} = f}}, _from, scene) do
-    #     Logger.debug "#{__MODULE__} re-rendering..."
     #     new_scene = scene
     #     |> assign(frame: f)
     #     |> render_push_graph()
