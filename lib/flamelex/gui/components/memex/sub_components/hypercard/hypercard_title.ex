@@ -19,6 +19,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCardTitle do
     def init(scene, params, opts) do
         Logger.debug "#{__MODULE__} initializing..."
         Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
+        # Process.register(self(), :hypercard_title) #TODO this is something that the old use Component system had - inbuilt process registration
 
         init_scene =
          %{scene|assigns: scene.assigns |> Map.merge(params)} # bring in the params into the scene, just put them straight into assigns
@@ -63,6 +64,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCardTitle do
     end
 
     def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, text: text}} = scene) do
+        buffer = 10
+        font_size = 28
         new_graph = graph
         |> Scenic.Graph.delete(@component_id)
         |> Scenic.Graph.delete(:hypercard_title_text)
@@ -72,12 +75,26 @@ defmodule Flamelex.GUI.Component.Memex.HyperCardTitle do
                     translate: {
                         frame.top_left.x,
                         frame.top_left.y})
+        |> Scenic.Primitives.text(text,
+                        id: :hypercard_title_text,
+                        font: :ibm_plex_mono,
+                        translate: {frame.top_left.x+buffer, frame.top_left.y+font_size+(2*buffer)}, # text draws from bottom-left corner??
+                        font_size: font_size,
+                        fill: :black)
 
         scene
         |> assign(graph: new_graph)
     end
 
 
+    def handle_call({:update, %{tidbit: t}}, _from, scene) do
+        new_scene = scene
+        # |> assign(frame: f)
+        |> assign(text: t.title)
+        |> render_push_graph()
+        
+        {:reply, :ok, new_scene}
+    end
 
     def handle_call({:re_render, %{frame: %Frame{} = f}}, _from, scene) do
         new_scene = scene

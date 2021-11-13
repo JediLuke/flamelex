@@ -47,7 +47,15 @@ defmodule Flamelex.Fluxus.RootReducer do
   def async_reduce(%{mode: :memex} = radix_state, {:action, {:memex, :new_random}}) do
     Logger.debug "received an action `{:memex, :new_random}` while in :memex mode..."
     t = Memex.random()
-    GenServer.cast(:hypercard, {:new_tidbit, t})
+    # GenServer.cast(:hypercard, {:new_tidbit, t})
+    GenServer.cast(Flamelex.GUI.Component.Memex.HyperCard, {:new_tidbit, t})
+  end
+
+  def async_reduce(%{mode: :memex} = radix_state, {:action, {:memex, :open_random_tidbit}}) do
+    Logger.debug "received an action `{:memex, :open_random_tidbit}` while in :memex mode..."
+    t = Memex.random()
+    # GenServer.cast(:hypercard, {:new_tidbit, t})
+    GenServer.cast(Flamelex.GUI.Component.Memex.HyperCard, {:new_tidbit, t})
   end
 
   def async_reduce(%{mode: :memex} = radix_state, {:action, {:switch_mode, :normal}} = action) do

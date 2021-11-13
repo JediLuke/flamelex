@@ -79,11 +79,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.MoreFeatures do
         # ic btn
     #    bounds = Scenic.Graph.bounds(scene.assigns.graph) 
     #    ic bounds
-    ic scene.assigns.button_bounds
-    ic coords
        if coords |> inside?(scene.assigns.button_bounds) do
         IO.puts "CLICKED RANDO TIDBIT"
         # GenServer.cast(Flamelex.GUI.Component.Memex.SideBar, {:open_tab, scene.assigns.label})
+        Fluxus.Action.fire({:memex, :open_random_tidbit})
          {:noreply, scene}
        else
         IO.puts "OUTSIDE!??"

@@ -97,6 +97,9 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         {:reply, :ok, new_scene}
     end
 
+    def handle_cast({:replace_tidbit, tidbit}, _from, scene) do
+        {:noreply, scene}
+    end
 
 
 

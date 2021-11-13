@@ -1,4 +1,4 @@
-defmodule Flamelex.API.MemexWrap do
+defmodule Flamelex.API.MemexWrap do #TODO ah fuck I think I undid all this by accident - probably cause it was so stupid in the first place!
   @moduledoc """
   This is the Flamelex wrapper around Memelex - necessary for smooth
   integration with the UI.

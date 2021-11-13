@@ -90,6 +90,7 @@ defmodule Flamelex.GUI.Component.TextBox do
 
     # viewport_size = Application.get_env(:layout_demo, :viewport) |> Map.get(:size) #TODO
     # %{size: dimensions} = Flamelex.GUI.ScenicInitialize.viewport_config()
+    #TODO this is the only place that still uses ScniecInitialize...
     vpcfg = Flamelex.GUI.ScenicInitialize.viewport_config()
     {:ok, dimensions} = Keyword.fetch(vpcfg, :size)
 

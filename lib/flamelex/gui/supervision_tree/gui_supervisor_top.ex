@@ -23,14 +23,14 @@ defmodule Flamelex.GUI.TopLevelSupervisor do
 
 
   @macbook_pro {1440, 855}
-  # @window_size_macbook_pro_2 {1680, 1005}
-  # @window_size_monitor_32inch {2560, 1395}
+  @window_size_macbook_pro_2 {1680, 1005}
+  @window_size_monitor_32inch {2560, 1395}
   # @window_size_terminal_80col {800, 600}   # with size 24 font
 
   def viewport_config do
     [
       name: :main_viewport,
-      size: @macbook_pro,
+      size: @window_size_macbook_pro_2,
       default_scene: {Flamelex.GUI.RootScene, nil},
       drivers: [
         [

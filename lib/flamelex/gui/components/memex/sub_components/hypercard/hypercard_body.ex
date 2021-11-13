@@ -19,6 +19,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
     def init(scene, params, opts) do
         Logger.debug "#{__MODULE__} initializing..."
         Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
+        # Process.register(self(), :hypercard_body) #TODO this is something that the old use Component system had - inbuilt process registration
 
         init_scene =
          %{scene|assigns: scene.assigns |> Map.merge(params)} # bring in the params into the scene, just put them straight into assigns
@@ -62,8 +63,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
         |> assign(first_render?: false)
     end
 
-    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, contents: body}} = scene) do
-        Logger.warn "Ignoring the BODY #{inspect body} for this HyperCard..."
+    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, contents: body}} = scene) when is_bitstring(body) do
         text_buffer = 10
         new_graph =
             Scenic.Graph.build()
@@ -73,20 +73,47 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
                     translate: {
                         frame.top_left.x,
                         frame.top_left.y})
-            # |> Scenic.Primitives.text(body,
-            #         font: :ibm_plex_mono,
-            #         translate: {
-            #             frame.top_left.x+text_buffer,
-            #             frame.top_left.y+text_buffer },
-            #         font_size: 24,
-            #         fill: :black)
+            |> Scenic.Primitives.text(body,
+                    # id: :hypercard_body,
+                    font: :ibm_plex_mono,
+                    translate: {
+                        frame.top_left.x+text_buffer,
+                        frame.top_left.y+text_buffer },
+                    font_size: 24,
+                    fill: :black)
 
         scene
         |> assign(graph: new_graph)
         |> assign(first_render?: false)
     end
 
-    def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame}} = scene) do
+    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, contents: body}} = scene) do
+        # same as above but just ignore body for now
+        text_buffer = 10
+        new_graph =
+            Scenic.Graph.build()
+            |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+                    id: @component_id,
+                    fill: @background_color,
+                    translate: {
+                        frame.top_left.x,
+                        frame.top_left.y})
+            |> Scenic.Primitives.text("UNABLE TO RENDER BODY",
+                    # id: :hypercard_body,
+                    font: :ibm_plex_mono,
+                    translate: {
+                        frame.top_left.x+text_buffer,
+                        frame.top_left.y+text_buffer+24 },
+                    font_size: 24,
+                    fill: :black)
+
+        scene
+        |> assign(graph: new_graph)
+        |> assign(first_render?: false)
+    end
+
+    def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, contents: body}} = scene) when is_bitstring(body)  do
+        text_buffer = 10
         new_graph = graph
         |> Scenic.Graph.delete(@component_id)
         |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
@@ -95,11 +122,52 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
                     translate: {
                         frame.top_left.x,
                         frame.top_left.y})
+        |> Scenic.Primitives.text(body,
+                        # id: :hypercard_body,
+                        font: :ibm_plex_mono,
+                        translate: {
+                            frame.top_left.x+text_buffer,
+                            frame.top_left.y+text_buffer+24 },
+                        font_size: 24,
+                        fill: :black)
 
         scene
         |> assign(graph: new_graph)
     end
 
+    # not a text body
+    def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, contents: body}} = scene) do
+        text_buffer = 10
+        new_graph = graph
+        |> Scenic.Graph.delete(@component_id)
+        |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+                    id: @component_id,
+                    fill: @background_color,
+                    translate: {
+                        frame.top_left.x,
+                        frame.top_left.y})
+        |> Scenic.Primitives.text("UNABLE TO RENDER BODY",
+                        # id: :hypercard_body,
+                        font: :ibm_plex_mono,
+                        translate: {
+                            frame.top_left.x+text_buffer,
+                            frame.top_left.y+text_buffer+24 },
+                        font_size: 24,
+                        fill: :black)
+
+        scene
+        |> assign(graph: new_graph)
+    end
+
+
+    def handle_call({:update, %{tidbit: t}}, _from, scene) do
+        new_scene = scene
+        # |> assign(frame: f)
+        |> assign(contents: t.data)
+        |> render_push_graph()
+        
+        {:reply, :ok, new_scene}
+    end
 
 
     def handle_call({:re_render, %{frame: %Frame{} = f}}, _from, scene) do

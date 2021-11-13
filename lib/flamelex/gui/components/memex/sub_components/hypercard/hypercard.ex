@@ -6,7 +6,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                                         HyperCardDateline}
     alias Flamelex.GUI.Component.Memex.HyperCard.{TagsBox, ToolBox, Body}
 
-    def validate(%{frame: %Frame{} = _f} = data) do
+    def validate(%{frame: %Frame{} = _f, tidbit: %Memex.TidBit{} = _t} = data) do
         Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
         {:ok, data}
     end
@@ -76,44 +76,52 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     end
 
     def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, tidbit: t}} = scene) do
-        IO.inspect t, label: "TIDBIT"
-        ic t
-        new_graph = graph
-        |> Scenic.Graph.delete(:hypercard)
-        |> Scenic.Graph.delete(:hypercard_title)
-        |> Scenic.Graph.delete(:hypercard_dateline)
-        |> Scenic.Graph.delete(:hypercard_tagsbox)
-        |> Scenic.Graph.delete(:hypercard_toolbox)
-        |> Scenic.Graph.delete(:hypercard_line)
-        |> Scenic.Graph.delete(:hypercard_body)
-        |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                    id: :hypercard,
-                    fill: :rebecca_purple,
-                    translate: {
-                        frame.top_left.x,
-                        frame.top_left.y})
-        |> HyperCardTitle.add_to_graph(%{
-            frame: hypercard_title_frame(scene.assigns.frame), # calculate hypercard based of story_river
-            # text: "Luke" },
-            text: t.title },
-            id: :hypercard_title)
-        |> HyperCardDateline.add_to_graph(%{
-                frame: hypercard_dateline_frame(scene.assigns.frame) },
-                id: :hypercard_dateline)
-        |> TagsBox.add_to_graph(%{
-                    frame: hypercard_tagsbox_frame(scene.assigns.frame) },
-                    id: :hypercard_tagsbox)
-        |> ToolBox.add_to_graph(%{
-                frame: hypercard_toolbox_frame(scene.assigns.frame) },
-                id: :hypercard_toolbox)
-        |> Scenic.Primitives.line({{500, 300}, {1300, 300}}, id: :hypercard_line, stroke: {2, :black})
-        |> Body.add_to_graph(%{
-            frame: hypercard_body_frame(scene.assigns.frame),
-            contents: t.data },
-            id: :hypercard_body)
+
+
+
+      GenServer.call(HyperCardTitle, {:update, %{tidbit: t}})
+    #   GenServer.call(:hypercard_dateline, {:hypercard_dateline, %{tidbit: t}})
+    #   GenServer.call(:hypercard_tagsbox, {:hypercard_tagsbox, %{tidbit: t}})
+    #   GenServer.call(:hypercard_toolbox, {:hypercard_toolbox, %{tidbit: t}})
+    #   GenServer.call(:hypercard_title, {:update, %{tidbit: t}})
+      GenServer.call(Flamelex.GUI.Component.Memex.HyperCard.Body, {:update, %{tidbit: t}})
+        
+        # new_graph = graph
+        # |> Scenic.Graph.delete(:hypercard)
+        # |> Scenic.Graph.delete(:hypercard_title)
+        # |> Scenic.Graph.delete(:hypercard_dateline)
+        # |> Scenic.Graph.delete(:hypercard_tagsbox)
+        # |> Scenic.Graph.delete(:hypercard_toolbox)
+        # |> Scenic.Graph.delete(:hypercard_line)
+        # |> Scenic.Graph.delete(:hypercard_body)
+        # |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+        #             id: :hypercard,
+        #             fill: :rebecca_purple,
+        #             translate: {
+        #                 frame.top_left.x,
+        #                 frame.top_left.y})
+        # |> HyperCardTitle.add_to_graph(%{
+        #     frame: hypercard_title_frame(scene.assigns.frame), # calculate hypercard based of story_river
+        #     # text: "Luke" },
+        #     text: t.title },
+        #     id: :hypercard_title)
+        # |> HyperCardDateline.add_to_graph(%{
+        #         frame: hypercard_dateline_frame(scene.assigns.frame) },
+        #         id: :hypercard_dateline)
+        # |> TagsBox.add_to_graph(%{
+        #             frame: hypercard_tagsbox_frame(scene.assigns.frame) },
+        #             id: :hypercard_tagsbox)
+        # |> ToolBox.add_to_graph(%{
+        #         frame: hypercard_toolbox_frame(scene.assigns.frame) },
+        #         id: :hypercard_toolbox)
+        # |> Scenic.Primitives.line({{500, 300}, {1300, 300}}, id: :hypercard_line, stroke: {2, :black})
+        # |> Body.add_to_graph(%{
+        #     frame: hypercard_body_frame(scene.assigns.frame),
+        #     contents: t.data },
+        #     id: :hypercard_body)
 
         scene
-        |> assign(graph: new_graph)
+        # |> assign(graph: new_graph)
     end
 
     def hypercard_title_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
@@ -178,6 +186,15 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         {:reply, :ok, new_scene}
     end
 
+
+    def handle_cast({:new_tidbit, t}, scene) do
+
+        new_scene = scene
+        |> assign(tidbit: t)
+        |> render_push_graph()
+
+        {:noreply, new_scene}
+    end
 
 
     #NOTE - you know, this is really the only thing that changes... all
