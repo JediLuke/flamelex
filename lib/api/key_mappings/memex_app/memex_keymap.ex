@@ -9,7 +9,6 @@ defmodule Flamelex.API.KeyMappings.Memex do
   
     # this is the function which gets called externally
     def keymap(%RadixState{mode: :memex} = state, input) do
-      IO.inspect input
       # leader_binding_def(state, input)
       map(state)[input.input] #TODO YUCKKKKKK
     end

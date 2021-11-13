@@ -146,9 +146,8 @@ defmodule Flamelex.Fluxus.UserInputHandler do
 
 
   def lookup_action_for_input_async(%RadixState{mode: :memex} = radix_state, user_input) do
-    Logger.debug "#{__MODULE__} routing input received in Memex :mode."
+    #Logger.debug "#{__MODULE__} routing input received in Memex :mode."
     Flamelex.API.KeyMappings.Memex.keymap(radix_state, user_input)
-    |> IO.inspect(label: "MMX map")
     |> handle_lookup(radix_state)
   end
 

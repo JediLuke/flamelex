@@ -99,6 +99,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.OneTab do #TODO SingleTab
         GenServer.cast(Flamelex.GUI.Component.Memex.SideBar, {:open_tab, scene.assigns.label})
          {:noreply, scene}
        else
+         IO.puts "DID NOT CLICK ON A TAB"
          {:noreply, scene}
        end
     end
@@ -111,6 +112,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.OneTab do #TODO SingleTab
     # https://hexdocs.pm/scenic/0.11.0-beta.0/Scenic.Graph.html#bounds/1
     # def inside?({x, y}, {left, right, top, bottom} = _bounds) do
     def inside?({x, y}, {left, bottom, right, top} = _bounds) do #TODO update the docs in Scenic itself
+        # remember, if y > top, if top is 100 cursor might be 120 -> in the box ??
+        # top <= y and y <= bottom and left <= x and x <= right
         bottom <= y and y <= top and left <= x and x <= right
     end
 
