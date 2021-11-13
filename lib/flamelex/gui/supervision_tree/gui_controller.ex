@@ -183,6 +183,7 @@ defmodule Flamelex.GUI.Controller do
   end
 
   def render_memex() do
+    Logger.warn "DEPRECATE ME"
     tidbit = Memex.My.Wiki.list |> Enum.random() #TODO My.Wiki.random()
     # IO.inspect(tidbit, label: "TB")
 

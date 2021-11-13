@@ -148,7 +148,7 @@ defmodule Flamelex.GUI.RootScene do
   # # handle all other (not-ignored) input...
   def handle_input(input, context, scene) do
     # IO.puts "SOME NON IGNORED INPUT #{inspect input}"
-    Logger.debug "#{__MODULE__} recv'd some input: #{inspect input}"
+    #Logger.debug "#{__MODULE__} recv'd some input: #{inspect input}"
 
     ##TODO it's simpler to route these different right now.
     # call Flamelex.Fluxus.UserInput.

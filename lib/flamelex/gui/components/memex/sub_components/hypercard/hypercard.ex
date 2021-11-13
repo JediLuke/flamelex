@@ -20,6 +20,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         Logger.debug "#{__MODULE__} initializing..."
         Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
 
+        Logger.debug "HyperCard initializing for TidBit: #{inspect params.tidbit}"
+
         init_scene =
          %{scene|assigns: scene.assigns |> Map.merge(params)} # bring in the params into the scene, just put them straight into assigns
         |> assign(first_render?: true)
@@ -39,7 +41,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     end
 
 
-    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame}} = scene) do
+    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, tidbit: t}} = scene) do
         new_graph =
             Scenic.Graph.build()
             |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
@@ -50,7 +52,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                         frame.top_left.y})
             |> HyperCardTitle.add_to_graph(%{
                 frame: hypercard_title_frame(scene.assigns.frame), # calculate hypercard based of story_river
-                text: "Lorem Upsum - this is a test TidBit !!~" },
+                # text: "Luke" },
+                text: t.title },
                 id: :hypercard_title)
             |> HyperCardDateline.add_to_graph(%{
                     frame: hypercard_dateline_frame(scene.assigns.frame) },
@@ -63,7 +66,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                 id: :hypercard_toolbox)
             |> Scenic.Primitives.line(hypercard_line_spec(scene.assigns.frame), id: :hypercard_line, stroke: {2, :antique_white})
             |> Body.add_to_graph(%{
-                frame: hypercard_body_frame(scene.assigns.frame) },
+                frame: hypercard_body_frame(scene.assigns.frame),
+                contents: t.data },
                 id: :hypercard_body)
 
         scene
@@ -71,7 +75,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         |> assign(first_render?: false)
     end
 
-    def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame}} = scene) do
+    def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, tidbit: t}} = scene) do
+        IO.inspect t, label: "TIDBIT"
+        ic t
         new_graph = graph
         |> Scenic.Graph.delete(:hypercard)
         |> Scenic.Graph.delete(:hypercard_title)
@@ -88,7 +94,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                         frame.top_left.y})
         |> HyperCardTitle.add_to_graph(%{
             frame: hypercard_title_frame(scene.assigns.frame), # calculate hypercard based of story_river
-            text: "Lorem Upsum - this is a test TidBit !!~" },
+            # text: "Luke" },
+            text: t.title },
             id: :hypercard_title)
         |> HyperCardDateline.add_to_graph(%{
                 frame: hypercard_dateline_frame(scene.assigns.frame) },
@@ -101,7 +108,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                 id: :hypercard_toolbox)
         |> Scenic.Primitives.line({{500, 300}, {1300, 300}}, id: :hypercard_line, stroke: {2, :black})
         |> Body.add_to_graph(%{
-            frame: hypercard_body_frame(scene.assigns.frame) },
+            frame: hypercard_body_frame(scene.assigns.frame),
+            contents: t.data },
             id: :hypercard_body)
 
         scene
@@ -119,8 +127,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         buffer_margin = 20
         title_height = 60
         date_margin = 10
+        dateline_height = 40
         Frame.new(top_left: {x+buffer_margin, y+buffer_margin+title_height+date_margin},
-                dimensions: {0.4*(w-(2*buffer_margin)), 40})
+                dimensions: {0.4*(w-(2*buffer_margin)), dateline_height})
 
     end
 

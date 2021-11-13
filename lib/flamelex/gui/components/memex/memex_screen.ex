@@ -69,7 +69,7 @@ defmodule Flamelex.GUI.Component.MemexScreen do
    end
 
    def handle_input({:viewport, whatever}, context, scene) do # e.g. of new_dimensions: {1025, 818}
-      Logger.debug "ignoring some input from the :viewport - #{inspect whatever}"
+      #Logger.debug "ignoring some input from the :viewport - #{inspect whatever}"
       {:noreply, scene}
    end
 

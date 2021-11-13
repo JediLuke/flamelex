@@ -17,9 +17,14 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         Logger.debug "#{__MODULE__} initializing..."
         Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
 
+
+        # get a random one for now
+        tidbit = Memex.My.Wiki.list |> Enum.random()
+
         init_scene =
          %{scene|assigns: scene.assigns |> Map.merge(params)} # bring in the params into the scene, just put them straight into assigns
         |> assign(first_render?: true)
+        |> assign(tidbit: tidbit)
         |> render_push_graph()
     
 
@@ -36,7 +41,7 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
     end
 
 
-    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame}} = scene) do
+    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, tidbit: t}} = scene) do
         new_graph =
             Scenic.Graph.build()
             |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
@@ -47,7 +52,7 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
                         frame.top_left.y })
             |> HyperCard.add_to_graph(%{
                     frame: hypercard_frame(scene.assigns.frame), # calculate hypercard based of story_river
-                    tidbit: "Luke" },
+                    tidbit: t },
                     id: :hypercard)
 
         scene
@@ -55,7 +60,7 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         |> assign(first_render?: false)
     end
 
-    def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame}} = scene) do
+    def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, tidbit: t}} = scene) do
         new_graph = graph
         |> Scenic.Graph.delete(:story_river)
         |> Scenic.Graph.delete(:hypercard) #TODO is this how it works with Components? Not sure...
@@ -67,7 +72,7 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
                         frame.top_left.y})
         |> HyperCard.add_to_graph(%{
             frame: hypercard_frame(scene.assigns.frame), # calculate hypercard based of story_river
-            tidbit: "Luke" },
+            tidbit: t },
             id: :hypercard)
 
         # GenServer.call(HyperCard, {:re_render, %{frame: hypercard_frame(scene.assigns.frame)}})
