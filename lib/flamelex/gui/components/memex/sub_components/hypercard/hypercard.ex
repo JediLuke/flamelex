@@ -16,6 +16,21 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     end
 
 
+    #TODO
+    # - swap title & tabs sections
+    # - work on title component that actually works how we want
+    #       - scissored
+    #       - scrollable (I guess only up/down, not side-side) - also show ... if we overflow our area
+    #       - takes up 2 lines if necessary, just 1 if not
+    # - work on body component displaying how we actually want it to work
+    #       - wraps at correct width
+    #       - renders infinitely long
+    #       - only works for pure text, shows "NOT AVAILABLE" or whatever otherwise
+    # - work on render nice tags & datetime sections
+    # - work on taking us into edit more for a tidbit
+
+
+
     def init(scene, params, opts) do
         Logger.debug "#{__MODULE__} initializing..."
         Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
@@ -51,10 +66,11 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                         frame.top_left.x,
                         frame.top_left.y})
             |> HyperCardTitle.add_to_graph(%{
-                frame: hypercard_title_frame(scene.assigns.frame), # calculate hypercard based of story_river
+                frame: hypercard_title_frame(%{frame: scene.assigns.frame}), # calculate hypercard based of story_river
                 # text: "Luke" },
                 text: t.title },
                 id: :hypercard_title)
+                # scissor: hypercard_scissor(scene.assigns.frame))
             |> HyperCardDateline.add_to_graph(%{
                     frame: hypercard_dateline_frame(scene.assigns.frame) },
                     id: :hypercard_dateline)
@@ -124,11 +140,18 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         # |> assign(graph: new_graph)
     end
 
-    def hypercard_title_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-        buffer_margin = 20
-        title_height = 60
+    def hypercard_title_frame(
+            %{frame: %{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}},
+            buffer_margin \\ 20,
+            title_height \\ 60
+    ) do
         Frame.new(top_left: {x+buffer_margin, y+buffer_margin},
                 dimensions: {0.72*(w-(2*buffer_margin)), title_height})
+    end
+    def hypercard_scissor(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
+        buffer_margin = 20
+        title_height = 60
+        {0.72*(w-(2*buffer_margin)), title_height}
     end
 
     def hypercard_dateline_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do

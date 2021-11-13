@@ -44,68 +44,46 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
         text_buffer = 10
         new_graph =
             Scenic.Graph.build()
-            |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                    id: @component_id,
-                    fill: @background_color,
-                    translate: {
-                        frame.top_left.x,
-                        frame.top_left.y})
-            |> Scenic.Primitives.text(body,
-                    font: :ibm_plex_mono,
-                    translate: {
-                        frame.top_left.x+text_buffer,
-                        frame.top_left.y+text_buffer+24 }, # text renders from the bottom...
-                    font_size: 24,
-                    fill: :black)
+            |> Scenic.Primitives.group(fn graph ->
+                graph
+                |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+                            fill: @background_color,
+                            scissor: {frame.dimensions.width, frame.dimensions.height})
+                |> Scenic.Primitives.text(body,
+                            # id: :hypercard_body,
+                            font: :ibm_plex_mono,
+                            translate: {text_buffer, text_buffer+24},
+                            font_size: 24,
+                            fill: :black)
+           end,
+           id: @component_id,
+           translate: {frame.top_left.x, frame.top_left.y})
 
         scene
         |> assign(graph: new_graph)
         |> assign(first_render?: false)
     end
 
-    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, contents: body}} = scene) when is_bitstring(body) do
-        text_buffer = 10
-        new_graph =
-            Scenic.Graph.build()
-            |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                    id: @component_id,
-                    fill: @background_color,
-                    translate: {
-                        frame.top_left.x,
-                        frame.top_left.y})
-            |> Scenic.Primitives.text(body,
-                    # id: :hypercard_body,
-                    font: :ibm_plex_mono,
-                    translate: {
-                        frame.top_left.x+text_buffer,
-                        frame.top_left.y+text_buffer },
-                    font_size: 24,
-                    fill: :black)
-
-        scene
-        |> assign(graph: new_graph)
-        |> assign(first_render?: false)
-    end
 
     def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, contents: body}} = scene) do
         # same as above but just ignore body for now
         text_buffer = 10
         new_graph =
             Scenic.Graph.build()
-            |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                    id: @component_id,
-                    fill: @background_color,
-                    translate: {
-                        frame.top_left.x,
-                        frame.top_left.y})
-            |> Scenic.Primitives.text("UNABLE TO RENDER BODY",
-                    # id: :hypercard_body,
-                    font: :ibm_plex_mono,
-                    translate: {
-                        frame.top_left.x+text_buffer,
-                        frame.top_left.y+text_buffer+24 },
-                    font_size: 24,
-                    fill: :black)
+            |> Scenic.Primitives.group(fn graph ->
+                graph
+                |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+                            id: @component_id,
+                            fill: @background_color,
+                            scissor: {frame.dimensions.width, frame.dimensions.height})
+                |> Scenic.Primitives.text("UNABLE TO RENDER BODY",
+                                # id: :hypercard_body,
+                                font: :ibm_plex_mono,
+                                translate: {text_buffer, text_buffer+24},
+                                font_size: 24,
+                                fill: :black)
+           end,
+           translate: {frame.top_left.x, frame.top_left.y})
 
         scene
         |> assign(graph: new_graph)
@@ -113,23 +91,26 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
     end
 
     def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, contents: body}} = scene) when is_bitstring(body)  do
+        # test_string = """
+        # Alchemy (from Arabic: al-kīmiyā; from Ancient Greek: khumeía)[1] is an ancient branch of natural philosophy, a philosophical and protoscientific tradition that was historically practiced in China, India, the Muslim world, and Europe.[2] In its Western form, alchemy is first attested in a number of pseudepigraphical texts written in Greco-Roman Egypt during the first few centuries CE.
+        # """
         text_buffer = 10
         new_graph = graph
         |> Scenic.Graph.delete(@component_id)
-        |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                    id: @component_id,
-                    fill: @background_color,
-                    translate: {
-                        frame.top_left.x,
-                        frame.top_left.y})
-        |> Scenic.Primitives.text(body,
-                        # id: :hypercard_body,
-                        font: :ibm_plex_mono,
-                        translate: {
-                            frame.top_left.x+text_buffer,
-                            frame.top_left.y+text_buffer+24 },
-                        font_size: 24,
-                        fill: :black)
+        |> Scenic.Primitives.group(fn graph ->
+                graph
+                |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+                            fill: @background_color,
+                            scissor: {frame.dimensions.width, frame.dimensions.height})
+                |> Scenic.Primitives.text(body,
+                            # id: :hypercard_body,
+                            font: :ibm_plex_mono,
+                            translate: {text_buffer, text_buffer+24},
+                            font_size: 24,
+                            fill: :black)
+           end,
+           id: @component_id,
+           translate: {frame.top_left.x, frame.top_left.y})
 
         scene
         |> assign(graph: new_graph)
@@ -140,20 +121,20 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
         text_buffer = 10
         new_graph = graph
         |> Scenic.Graph.delete(@component_id)
-        |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                    id: @component_id,
-                    fill: @background_color,
-                    translate: {
-                        frame.top_left.x,
-                        frame.top_left.y})
-        |> Scenic.Primitives.text("UNABLE TO RENDER BODY",
-                        # id: :hypercard_body,
-                        font: :ibm_plex_mono,
-                        translate: {
-                            frame.top_left.x+text_buffer,
-                            frame.top_left.y+text_buffer+24 },
-                        font_size: 24,
-                        fill: :black)
+        |> Scenic.Primitives.group(fn graph ->
+                graph
+                |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+                            id: @component_id,
+                            fill: @background_color,
+                            scissor: {frame.dimensions.width, frame.dimensions.height})
+                |> Scenic.Primitives.text("UNABLE TO RENDER BODY",
+                                # id: :hypercard_body,
+                                font: :ibm_plex_mono,
+                                translate: {text_buffer, text_buffer+24},
+                                font_size: 24,
+                                fill: :black)
+           end,
+           translate: {frame.top_left.x, frame.top_left.y})
 
         scene
         |> assign(graph: new_graph)
@@ -162,7 +143,6 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
 
     def handle_call({:update, %{tidbit: t}}, _from, scene) do
         new_scene = scene
-        # |> assign(frame: f)
         |> assign(contents: t.data)
         |> render_push_graph()
         
