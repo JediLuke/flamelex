@@ -90,7 +90,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
     end
 
 
-    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, contents: body}} = scene) do
+    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, contents: %{"filepath" => _filepath}}} = scene) do
         # same as above but just ignore body for now
         text_buffer = 10
         new_graph =
@@ -144,39 +144,30 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
     end
 
     # not a text body
-    def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, contents: body}} = scene) do
+    def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, contents: %{"filepath" => _filepath}}} = scene) do
         text_buffer = 10
         font_size = 24
         text_left_margin = 15
 
-        {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
-        wrapped_text = FontMetrics.wrap(body, frame.dimensions.width-2*text_left_margin, font_size, metrics)
-
+        # IO.inspect filepath
+        # body = File.read!(filepath)
 
         new_graph = graph
         |> Scenic.Graph.delete(@component_id)
-        # |> Scenic.Primitives.group(fn graph ->
-        #         graph
-        #         |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-        #                     id: @component_id,
-        #                     fill: @background_color,
-        #                     scissor: {frame.dimensions.width, frame.dimensions.height})
-        #         |> Scenic.Primitives.text("UNABLE TO RENDER BODY",
-        #                         # id: :hypercard_body,
-        #                         font: :ibm_plex_mono,
-        #                         translate: {text_buffer, text_buffer+24},
-        #                         font_size: 24,
-        #                         fill: :black)
-        #    end,
-        #    translate: {frame.top_left.x, frame.top_left.y})
         |> Scenic.Primitives.group(fn graph ->
-            graph
-            |> Scenic.Primitives.rect({frame.top_left.x, frame.top_left.y},
-                  scissor: {frame.dimensions.width, frame.dimensions.height},
-                  fill: @background_color)
-            |> Scenic.Primitives.text(wrapped_text, font: :ibm_plex_mono, font_size: font_size, fill: :black, translate: {text_left_margin, 40})
-        end,
-        translate: {frame.top_left.x, frame.top_left.y})
+                graph
+                |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+                            id: @component_id,
+                            fill: @background_color,
+                            scissor: {frame.dimensions.width, frame.dimensions.height})
+                |> Scenic.Primitives.text("UNABLE TO RENDER BODY",
+                                # id: :hypercard_body,
+                                font: :ibm_plex_mono,
+                                translate: {text_buffer, text_buffer+24},
+                                font_size: 24,
+                                fill: :black)
+           end,
+           translate: {frame.top_left.x, frame.top_left.y})
 
         scene
         |> assign(graph: new_graph)

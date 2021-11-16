@@ -21,14 +21,42 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         # get a random one for now
         tidbit = Memex.My.Wiki.list |> Enum.random()
 
-        init_scene =
+        new_scene =
          %{scene|assigns: scene.assigns |> Map.merge(params)} # bring in the params into the scene, just put them straight into assigns
         |> assign(first_render?: true)
         |> assign(tidbit: tidbit)
         |> render_push_graph()
     
+        request_input(new_scene, [:cursor_scroll])
 
-        {:ok, init_scene}
+        {:ok, new_scene}
+    end
+
+    def handle_input({:cursor_scroll, {{_x_scroll, _y_scroll} = delta_scroll, coords}}, _context, scene) do
+        Logger.warn "#{__MODULE__} getting :scroll"
+        # Logger.debug "Handling right scrolling - "
+
+        # new_cumulative_scroll =
+        #     Scenic.Math.Vector2.add(scene.assigns.state.scroll, delta_scroll)
+
+        # new_graph = scene.assigns.graph
+        #     |> Scenic.Graph.modify(:textblock, &Scenic.Primitives.update_opts(&1, translate: new_cumulative_scroll))
+
+        # new_state = scene.assigns.state
+        #     |> Map.merge(%{scroll: new_cumulative_scroll})
+
+        # # new_graph = render(state, first_render?: true)
+        # new_scene = scene
+        # |> assign(graph: new_graph)
+        # |> assign(state: new_state)
+        # |> push_graph(new_graph)
+
+        {:noreply, scene}
+    end
+    
+    def handle_input(input, context, scene) do
+        Logger.debug "#{__MODULE__} ignoring some input: #{inspect input}"
+        {:noreply, scene}
     end
 
     def re_render(scene) do
@@ -44,16 +72,17 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
     def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, tidbit: t}} = scene) do
         new_graph =
             Scenic.Graph.build()
-            |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                    id: :story_river,
-                    fill: :beige,
-                    translate: {
-                        frame.top_left.x,
-                        frame.top_left.y })
-            |> HyperCard.add_to_graph(%{
-                    frame: hypercard_frame(scene.assigns.frame), # calculate hypercard based of story_river
-                    tidbit: t },
-                    id: :hypercard)
+            |> common_render(frame, t)
+            # |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+            #         id: :story_river,
+            #         fill: :beige,
+            #         translate: {
+            #             frame.top_left.x,
+            #             frame.top_left.y })
+            # |> HyperCard.add_to_graph(%{
+            #         frame: hypercard_frame(scene.assigns.frame), # calculate hypercard based of story_river
+            #         tidbit: t },
+            #         id: :hypercard)
 
         scene
         |> assign(graph: new_graph)
@@ -63,22 +92,37 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
     def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, tidbit: t}} = scene) do
         new_graph = graph
         |> Scenic.Graph.delete(:story_river)
-        |> Scenic.Graph.delete(:hypercard) #TODO is this how it works with Components? Not sure...
-        |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                    id: :story_river,
-                    fill: :beige,
-                    translate: {
-                        frame.top_left.x,
-                        frame.top_left.y})
-        |> HyperCard.add_to_graph(%{
-            frame: hypercard_frame(scene.assigns.frame), # calculate hypercard based of story_river
-            tidbit: t },
-            id: :hypercard)
+        # |> Scenic.Graph.delete(:hypercard) #TODO is this how it works with Components? Not sure...
+        |> common_render(frame, t)
+        # |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+        #             id: :story_river,
+        #             fill: :beige,
+        #             translate: {
+        #                 frame.top_left.x,
+        #                 frame.top_left.y})
+        # |> HyperCard.add_to_graph(%{
+        #     frame: hypercard_frame(scene.assigns.frame), # calculate hypercard based of story_river
+        #     tidbit: t },
+        #     id: :hypercard)
 
         # GenServer.call(HyperCard, {:re_render, %{frame: hypercard_frame(scene.assigns.frame)}})
 
         scene
         |> assign(graph: new_graph)
+    end
+
+    def common_render(graph, frame, t = tidbit) do
+        graph
+                    |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+                    id: :story_river,
+                    fill: :beige,
+                    translate: {
+                        frame.top_left.x,
+                        frame.top_left.y })
+            |> HyperCard.add_to_graph(%{
+                    frame: hypercard_frame(frame), # calculate hypercard based of story_river
+                    tidbit: t },
+                    id: :hypercard)
     end
 
     def hypercard_frame(%Frame{top_left: %Coordinates{x: x, y: y}, dimensions: %Dimensions{width: w, height: h}}) do
