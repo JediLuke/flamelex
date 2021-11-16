@@ -15,6 +15,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         {:error, "This component must be passed a %Frame{}"}
     end
 
+    @buffer_margin 4
+    @titlebar_width 0.85
+    @title_height 50
 
     #TODO
     # - swap title & tabs sections
@@ -142,61 +145,47 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 
     def hypercard_title_frame(
             %{frame: %{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}},
-            buffer_margin \\ 20,
-            title_height \\ 60
+            title_height \\ 50
     ) do
-        Frame.new(top_left: {x+buffer_margin, y+buffer_margin},
-                dimensions: {0.72*(w-(2*buffer_margin)), title_height})
+        Frame.new(top_left: {x+@buffer_margin, y+@buffer_margin},
+                dimensions: {0.82*(w-(2*@buffer_margin)), @title_height})
     end
     def hypercard_scissor(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-        buffer_margin = 20
-        title_height = 60
-        {0.72*(w-(2*buffer_margin)), title_height}
+        {@titlebar_width*(w-(2*@buffer_margin)), @title_height}
     end
 
     def hypercard_dateline_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-        buffer_margin = 20
-        title_height = 60
         date_margin = 10
         dateline_height = 40
-        Frame.new(top_left: {x+buffer_margin, y+buffer_margin+title_height+date_margin},
-                dimensions: {0.4*(w-(2*buffer_margin)), dateline_height})
+        Frame.new(top_left: {x+@buffer_margin, y+@buffer_margin+@title_height+date_margin},
+                dimensions: {0.4*(w-(2*@buffer_margin)), dateline_height})
 
     end
 
     def hypercard_tagsbox_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-        buffer_margin = 20
-        title_height = 60
         date_margin = 10
-        Frame.new(top_left: {x+buffer_margin, y+buffer_margin+title_height*2},
-                dimensions: {0.72*(w-(2*buffer_margin)), title_height}) # same width & height as the title
+        Frame.new(top_left: {x+@buffer_margin, y+@buffer_margin+@title_height*2},
+                dimensions: {@titlebar_width*(w-(2*@buffer_margin)), @title_height}) # same width & height as the title
 
     end
 
     def hypercard_toolbox_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-        buffer_margin = 20
-        title_height = 60
         date_margin = 10
-        title_width = 0.72*(w-(2*buffer_margin))
-        Frame.new(top_left: {x+(2*buffer_margin)+title_width, y+buffer_margin},
-                dimensions: {w-(0.72*(w-(2*buffer_margin)))-3*buffer_margin, 3*title_height}) # same width & height as the title
+        title_width = @titlebar_width*(w-(2*@buffer_margin))
+        Frame.new(top_left: {x+(2*@buffer_margin)+title_width, y+@buffer_margin},
+                dimensions: {w-(@titlebar_width*(w-(2*@buffer_margin)))-3*@buffer_margin, 3*@title_height}) # same width & height as the title
 
     end
     
     def hypercard_line_spec(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-        title_height = 60
-        buffer_margin = 20
-        line_y = 3*title_height + 2*buffer_margin
+        line_y = 3*@title_height + 2*@buffer_margin
         {{x, y+line_y}, {x+w, y+line_y}}
     end
     
     def hypercard_body_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-        title_height = 60
-        buffer_margin = 20
-        line_y = 3*title_height + 2*buffer_margin
-
-        Frame.new(top_left: {x+buffer_margin, y+line_y+buffer_margin},
-                dimensions: {w-(2*buffer_margin), h-(line_y+(2*buffer_margin))}) # same width & height as the title
+        line_y = 3*@title_height + 2*@buffer_margin
+        Frame.new(top_left: {x+@buffer_margin, y+line_y+@buffer_margin},
+                dimensions: {w-(2*@buffer_margin), h-(line_y+(2*@buffer_margin))}) # same width & height as the title
 
     end
 

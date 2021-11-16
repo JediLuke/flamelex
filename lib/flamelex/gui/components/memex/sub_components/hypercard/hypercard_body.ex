@@ -42,21 +42,46 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
 
     def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, contents: body}} = scene) when is_bitstring(body) do
         text_buffer = 10
+        font_size = 24
+        text_left_margin = 15
+        IO.puts "---------------RENDERING HYPERCARD BODY----------------"
+        # new_graph =
+        #     Scenic.Graph.build()
+        #     |> Scenic.Primitives.group(fn graph ->
+        #         graph
+        #         |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+        #                     fill: @background_color,
+        #                     scissor: {frame.dimensions.width, frame.dimensions.height})
+        #         |> Scenic.Primitives.text(body,
+        #                     # id: :hypercard_body,
+        #                     font: :ibm_plex_mono,
+        #                     translate: {text_buffer, text_buffer+24},
+        #                     font_size: font_size,
+        #                     fill: :black)
+        #    end,
+        #    id: @component_id,
+        #    translate: {frame.top_left.x, frame.top_left.y})
+
+           {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
+        #    text_width = FontMetrics.width(state.text, font_size, metrics) 
+        #    IO.inspect text_width, label: "WIdth222"
+   
+        IO.inspect body
+        IO.puts "~~~~~~~~~~~~~~~~~~~"
+           wrapped_text = FontMetrics.wrap(body, frame.dimensions.width-2*text_left_margin, font_size, metrics)
+           IO.inspect wrapped_text
+   
+        #    wrapped_body = 
+
         new_graph =
-            Scenic.Graph.build()
-            |> Scenic.Primitives.group(fn graph ->
-                graph
-                |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                            fill: @background_color,
-                            scissor: {frame.dimensions.width, frame.dimensions.height})
-                |> Scenic.Primitives.text(body,
-                            # id: :hypercard_body,
-                            font: :ibm_plex_mono,
-                            translate: {text_buffer, text_buffer+24},
-                            font_size: 24,
-                            fill: :black)
+           Scenic.Graph.build()
+           |> Scenic.Primitives.group(fn graph ->
+               graph
+               |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+                     scissor: {frame.dimensions.width, frame.dimensions.height},
+                     fill: @background_color)
+               |> Scenic.Primitives.text(wrapped_text, font: :ibm_plex_mono, font_size: font_size, fill: :black, translate: {text_left_margin, 40})
            end,
-           id: @component_id,
            translate: {frame.top_left.x, frame.top_left.y})
 
         scene
@@ -95,22 +120,24 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
         # Alchemy (from Arabic: al-kīmiyā; from Ancient Greek: khumeía)[1] is an ancient branch of natural philosophy, a philosophical and protoscientific tradition that was historically practiced in China, India, the Muslim world, and Europe.[2] In its Western form, alchemy is first attested in a number of pseudepigraphical texts written in Greco-Roman Egypt during the first few centuries CE.
         # """
         text_buffer = 10
+        {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
+        font_size = 24
+        text_left_margin = 15
+        wrapped_text = FontMetrics.wrap(body, frame.dimensions.width-2*text_left_margin, font_size, metrics)
+
+
+
+
         new_graph = graph
         |> Scenic.Graph.delete(@component_id)
         |> Scenic.Primitives.group(fn graph ->
-                graph
-                |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                            fill: @background_color,
-                            scissor: {frame.dimensions.width, frame.dimensions.height})
-                |> Scenic.Primitives.text(body,
-                            # id: :hypercard_body,
-                            font: :ibm_plex_mono,
-                            translate: {text_buffer, text_buffer+24},
-                            font_size: 24,
-                            fill: :black)
-           end,
-           id: @component_id,
-           translate: {frame.top_left.x, frame.top_left.y})
+            graph
+            |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+                    scissor: {frame.dimensions.width, frame.dimensions.height},
+                    fill: @background_color)
+            |> Scenic.Primitives.text(wrapped_text, font: :ibm_plex_mono, font_size: font_size, fill: :black, translate: {text_left_margin, 40})
+        end,
+        translate: {frame.top_left.x, frame.top_left.y})
 
         scene
         |> assign(graph: new_graph)
@@ -119,22 +146,37 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
     # not a text body
     def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, contents: body}} = scene) do
         text_buffer = 10
+        font_size = 24
+        text_left_margin = 15
+
+        {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
+        wrapped_text = FontMetrics.wrap(body, frame.dimensions.width-2*text_left_margin, font_size, metrics)
+
+
         new_graph = graph
         |> Scenic.Graph.delete(@component_id)
+        # |> Scenic.Primitives.group(fn graph ->
+        #         graph
+        #         |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+        #                     id: @component_id,
+        #                     fill: @background_color,
+        #                     scissor: {frame.dimensions.width, frame.dimensions.height})
+        #         |> Scenic.Primitives.text("UNABLE TO RENDER BODY",
+        #                         # id: :hypercard_body,
+        #                         font: :ibm_plex_mono,
+        #                         translate: {text_buffer, text_buffer+24},
+        #                         font_size: 24,
+        #                         fill: :black)
+        #    end,
+        #    translate: {frame.top_left.x, frame.top_left.y})
         |> Scenic.Primitives.group(fn graph ->
-                graph
-                |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                            id: @component_id,
-                            fill: @background_color,
-                            scissor: {frame.dimensions.width, frame.dimensions.height})
-                |> Scenic.Primitives.text("UNABLE TO RENDER BODY",
-                                # id: :hypercard_body,
-                                font: :ibm_plex_mono,
-                                translate: {text_buffer, text_buffer+24},
-                                font_size: 24,
-                                fill: :black)
-           end,
-           translate: {frame.top_left.x, frame.top_left.y})
+            graph
+            |> Scenic.Primitives.rect({frame.top_left.x, frame.top_left.y},
+                  scissor: {frame.dimensions.width, frame.dimensions.height},
+                  fill: @background_color)
+            |> Scenic.Primitives.text(wrapped_text, font: :ibm_plex_mono, font_size: font_size, fill: :black, translate: {text_left_margin, 40})
+        end,
+        translate: {frame.top_left.x, frame.top_left.y})
 
         scene
         |> assign(graph: new_graph)
