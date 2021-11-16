@@ -41,6 +41,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.MoreFeatures do
 
 
     def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame}} = scene) do
+        # base_graph = Scenic.Graph.build()
+
         {new_graph, button_bounds} =
             Scenic.Graph.build()
             |> Scenic.Primitives.rect({frame.dimensions.width-10, frame.dimensions.height-10},
@@ -50,6 +52,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.MoreFeatures do
                         frame.top_left.x+5,
                         frame.top_left.y+5})
             |> render_rando_tidbit_button(frame)
+            |> render_new_tidbit_button(frame)
 
         scene
         |> assign(graph: new_graph)
@@ -68,6 +71,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.MoreFeatures do
                         frame.top_left.x+5,
                         frame.top_left.y+5})
         |> render_rando_tidbit_button(frame)
+        |> render_new_tidbit_button(frame)
 
         scene
         |> assign(graph: new_graph)
@@ -79,13 +83,29 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.MoreFeatures do
         # ic btn
     #    bounds = Scenic.Graph.bounds(scene.assigns.graph) 
     #    ic bounds
-       if coords |> inside?(scene.assigns.button_bounds) do
+       [first_button|rest] = scene.assigns.button_bounds
+       if coords |> inside?(first_button) do
         IO.puts "CLICKED RANDO TIDBIT"
         # GenServer.cast(Flamelex.GUI.Component.Memex.SideBar, {:open_tab, scene.assigns.label})
         Fluxus.Action.fire({:memex, :open_random_tidbit})
          {:noreply, scene}
        else
         IO.puts "OUTSIDE!??"
+        if( not is_nil(new_btn = rest |> hd()) ) do
+            if coords |> inside?(new_btn) do
+
+                IO.puts "YOU CLICKED THE OTHER BUTTON"
+                Fluxus.Action.fire({:memex, :open_random_tidbit})
+                #WOW this might be some of the dirtiest hackery ever -
+                #    but it did give me the pattern of - computing the
+                #    bounding box as we go through & passing them all
+                #    back as a list.
+                {:noreply, scene}
+            else
+                "You did not click the other button"
+                {:noreply, scene}
+            end
+        end
          {:noreply, scene}
        end
     end
@@ -134,6 +154,38 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.MoreFeatures do
         right = frame.top_left.x+margin + button_width
         top = frame.top_left.y+margin
         {new_graph, {left, bottom, right, top}}
+    end
+
+    @roundedness 8
+    @text_margin 10
+    @text_size 18
+    @button_width 200
+    @button_height 40
+    @margin 10
+    def render_new_tidbit_button({old_graph, coords = {_left, _bottom, _right, _top}}, frame) do
+
+        lol_two_buttons = 70
+
+        new_graph = old_graph
+        |> Scenic.Primitives.rounded_rectangle({
+            @button_width,
+            @button_height,
+                @roundedness},
+                id: :rando_tidbit_button,
+                fill: :orange,
+                translate: {frame.top_left.x+@margin, frame.top_left.y+@margin+lol_two_buttons})
+        |> Scenic.Primitives.text("New TidBit",
+                font: :ibm_plex_mono,
+                translate: {frame.top_left.x+@margin+@text_margin, frame.top_left.y+@text_margin+@text_size+@margin+lol_two_buttons}, # text draws from bottom-left corner??
+                font_size: @text_size,
+                fill: :blue)
+
+        left = frame.top_left.x+@margin
+        bottom = frame.top_left.y+@margin+@button_height+lol_two_buttons
+        right = frame.top_left.x+@margin + @button_width
+        top = frame.top_left.y+@margin+lol_two_buttons
+
+        {new_graph, [coords, {left, bottom, right, top}]} # this is a HUGE hack lol its the box of the OG button
     end
 
 

@@ -19,12 +19,14 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
 
 
         # get a random one for now
-        tidbit = Memex.My.Wiki.list |> Enum.random()
+        # tidbit = Memex.My.Wiki.list |> Enum.random()
+        {:ok, open_tidbits} = GenServer.call(Flamelex.GUI.StageManager.Memex, :get_open_tidbits)
 
         new_scene =
          %{scene|assigns: scene.assigns |> Map.merge(params)} # bring in the params into the scene, just put them straight into assigns
         |> assign(first_render?: true)
-        |> assign(tidbit: tidbit)
+        |> assign(scroll: {0, 0})
+        |> assign(open_tidbits: open_tidbits)
         |> render_push_graph()
     
         request_input(new_scene, [:cursor_scroll])
@@ -36,22 +38,22 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         Logger.warn "#{__MODULE__} getting :scroll"
         # Logger.debug "Handling right scrolling - "
 
-        # new_cumulative_scroll =
-        #     Scenic.Math.Vector2.add(scene.assigns.state.scroll, delta_scroll)
+        new_cumulative_scroll =
+            Scenic.Math.Vector2.add(scene.assigns.scroll, delta_scroll)
 
-        # new_graph = scene.assigns.graph
-        #     |> Scenic.Graph.modify(:textblock, &Scenic.Primitives.update_opts(&1, translate: new_cumulative_scroll))
+        new_graph = scene.assigns.graph
+            |> Scenic.Graph.modify(:hypercard, &Scenic.Primitives.update_opts(&1, translate: new_cumulative_scroll))
 
-        # new_state = scene.assigns.state
+        # new_state = scene.assigns
         #     |> Map.merge(%{scroll: new_cumulative_scroll})
 
         # # new_graph = render(state, first_render?: true)
-        # new_scene = scene
-        # |> assign(graph: new_graph)
+        new_scene = scene
+        |> assign(graph: new_graph)
         # |> assign(state: new_state)
-        # |> push_graph(new_graph)
+        |> push_graph(new_graph)
 
-        {:noreply, scene}
+        {:noreply, scene |> assign(scroll: new_cumulative_scroll)}
     end
     
     def handle_input(input, context, scene) do
@@ -69,10 +71,10 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
     end
 
 
-    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, tidbit: t}} = scene) do
+    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, open_tidbits: [t]}} = scene) do
         new_graph =
             Scenic.Graph.build()
-            |> common_render(frame, t)
+            |> common_render(frame, t, scene.assigns.scroll)
             # |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
             #         id: :story_river,
             #         fill: :beige,
@@ -89,11 +91,11 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         |> assign(first_render?: false)
     end
 
-    def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, tidbit: t}} = scene) do
+    def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, open_tidbits: [t]}} = scene) do
         new_graph = graph
         |> Scenic.Graph.delete(:story_river)
         # |> Scenic.Graph.delete(:hypercard) #TODO is this how it works with Components? Not sure...
-        |> common_render(frame, t)
+        |> common_render(frame, t, scene.assigns.scroll)
         # |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
         #             id: :story_river,
         #             fill: :beige,
@@ -111,7 +113,7 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         |> assign(graph: new_graph)
     end
 
-    def common_render(graph, frame, t = tidbit) do
+    def common_render(graph, frame, t = tidbit, scroll) do
         graph
                     |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
                     id: :story_river,
@@ -122,7 +124,8 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
             |> HyperCard.add_to_graph(%{
                     frame: hypercard_frame(frame), # calculate hypercard based of story_river
                     tidbit: t },
-                    id: :hypercard)
+                    id: :hypercard,
+                    t: scroll)
     end
 
     def hypercard_frame(%Frame{top_left: %Coordinates{x: x, y: y}, dimensions: %Dimensions{width: w, height: h}}) do

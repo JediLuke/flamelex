@@ -15,7 +15,8 @@ defmodule Flamelex.GUI.TopLevelSupervisor do
     children = [
       {Scenic, [viewport_config()]},
       Flamelex.GUI.Controller,
-      Flamelex.GUI.VimSupervisor
+      Flamelex.GUI.VimSupervisor,
+      Flamelex.GUI.StageManager.Memex,
     ]
 
     Supervisor.init(children, strategy: :one_for_all)
