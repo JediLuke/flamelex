@@ -161,6 +161,10 @@ defmodule Flamelex.GUI.Controller do
          }, id: :memex_screen)
 
     GenServer.cast(Flamelex.GUI.RootScene, {:redraw, new_graph})
+    #TODO I guess it could be better to just hand *everything*
+    #     down to StageManager - have that process update the
+    #     root scene etc :thinking_face:
+    GenServer.cast(Flamelex.GUI.StageManager.Memex, :memex_open)
 
     {:noreply, %{state|memex_graph: new_graph, mode: :memex}}
   end

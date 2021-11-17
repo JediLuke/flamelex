@@ -18,7 +18,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.ToolBox do
 
     def init(scene, params, opts) do
         Logger.debug "#{__MODULE__} initializing..."
-        Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
+        # Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
 
         init_scene =
          %{scene|assigns: scene.assigns |> Map.merge(params)} # bring in the params into the scene, just put them straight into assigns

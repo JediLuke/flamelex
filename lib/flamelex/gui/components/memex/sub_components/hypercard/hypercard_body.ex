@@ -18,7 +18,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
 
     def init(scene, params, opts) do
         Logger.debug "#{__MODULE__} initializing..."
-        Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
+        # Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
         # Process.register(self(), :hypercard_body) #TODO this is something that the old use Component system had - inbuilt process registration
 
         init_scene =

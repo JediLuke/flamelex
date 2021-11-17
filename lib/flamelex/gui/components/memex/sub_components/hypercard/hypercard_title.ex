@@ -20,7 +20,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCardTitle do
 
     def init(scene, params, opts) do
         Logger.debug "#{__MODULE__} initializing..."
-        Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
+        # Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
         # Process.register(self(), :hypercard_title) #TODO this is something that the old use Component system had - inbuilt process registration
 
         {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
