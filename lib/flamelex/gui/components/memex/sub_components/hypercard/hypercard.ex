@@ -46,8 +46,19 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         |> render_push_graph()
     
 
-        {:ok, init_scene}
+        {:ok, init_scene, {:continue, :update_story_river_with_our_height}}
     end
+
+    def handle_continue(:update_story_river_with_our_height, state) do
+        g = state.assigns.graph
+        bounds = Scenic.Graph.bounds(g)
+        IO.inspect bounds, label: "HOW HIGH"
+
+        Flamelex.GUI.Component.Memex.StoryRiver
+        |> GenServer.cast({:component_height, state.assigns.tidbit.title, bounds})
+
+        {:noreply, state}
+      end
 
     def re_render(scene) do
         GenServer.call(__MODULE__, {:re_render, scene})
