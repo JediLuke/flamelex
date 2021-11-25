@@ -66,10 +66,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Body do
         #    text_width = FontMetrics.width(state.text, font_size, metrics) 
         #    IO.inspect text_width, label: "WIdth222"
    
-        IO.inspect body
-        IO.puts "~~~~~~~~~~~~~~~~~~~"
-           wrapped_text = FontMetrics.wrap(body, frame.dimensions.width-2*text_left_margin, font_size, metrics)
-           IO.inspect wrapped_text
+        wrapped_text = FontMetrics.wrap(body, frame.dimensions.width-2*text_left_margin, font_size, metrics)
    
         #    wrapped_body = 
 

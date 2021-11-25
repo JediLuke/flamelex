@@ -6,7 +6,14 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                                         HyperCardDateline}
     alias Flamelex.GUI.Component.Memex.HyperCard.{TagsBox, ToolBox, Body}
 
+    @default_height 300
+
     def validate(%{frame: %Frame{} = _f, tidbit: %Memex.TidBit{} = _t} = data) do
+        Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
+        {:ok, data}
+    end
+
+    def validate(%{top_left: _tl, width: _w, tidbit: %Memex.TidBit{} = _t} = data) do
         Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
         {:ok, data}
     end
@@ -32,7 +39,128 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     # - work on render nice tags & datetime sections
     # - work on taking us into edit more for a tidbit
 
+    def init(scene, %{top_left: coords, width: w, tidbit: %{data: %{"filepath" => fp}} = t}, opts) do
+            # def init(scene, %{frame: %Frame{top_left: _coords, dimensions: {_x, :flex}}}, opts) do #TODO make Frame accept :flex as params
 
+        #NOTE: We need to find the body text here, so we can calculate
+        #      the height of the body, so we know how big to make the background
+        #      (a colored rectangle)
+
+        # orig_text = File.read!(fp) |> IO.inspect(label: "ORIG")
+
+        text_left_margin = 15
+        font_size = 24
+        textbox_width = w-2*text_left_margin
+
+        {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
+        # wrapped_text = FontMetrics.wrap(orig_text, textbox_width, font_size, metrics)
+
+        wrapped_text = "CANt RENDER BOFY"
+
+        new_graph =
+        Scenic.Graph.build()
+        |> Scenic.Primitives.group(fn graph ->
+                graph
+                |> Scenic.Primitives.rect({w, @default_height},
+                        id: :hypercard,
+                        fill: :antique_white)
+                |> Scenic.Primitives.text(wrapped_text,
+                        font: :ibm_plex_mono,
+                        font_size: font_size,
+                        fill: :black,
+                        translate: {text_left_margin, text_left_margin+font_size}) #TODO this should actually be, one line height
+            end, [
+                #NOTE: We will scroll this pane around later on, and need to
+                #      add new TidBits to it with Modify
+                id: :hypercard_itself, # Scenic required we register groups/components with a name
+                translate: coords
+            ])
+
+        new_scene = scene
+        |> assign(graph: new_graph)
+        |> push_graph(new_graph)
+        
+        {:ok, new_scene}
+    end
+
+    def init(scene, %{top_left: coords, width: w, tidbit: %{data: ""}}, opts) do
+        Logger.debug "~~~~ Rendering a HyperCard with no body inside it !!!"
+
+        new_graph = Scenic.Graph.build()
+        |> Scenic.Primitives.rect({w, 300},
+                    id: :hypercard,
+                    fill: :chocolate,
+                    translate: coords)
+
+        new_scene = scene
+        |> assign(graph: new_graph)
+        |> push_graph(new_graph)
+        
+        {:ok, new_scene}
+    end
+
+
+    def init(scene, %{top_left: coords, width: w, tidbit: %{data: data} = t}, opts) when is_bitstring(data) do
+    # def init(scene, %{frame: %Frame{top_left: _coords, dimensions: {_x, :flex}}}, opts) do #TODO make Frame accept :flex as params
+
+        #NOTE: We need to find the body text here, so we can calculate
+        #      the height of the body, so we know how big to make the background
+        #      (a colored rectangle)
+        font_size = 24
+        text_left_margin = 15
+        textbox_width = w-2*text_left_margin
+        {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
+        wrapped_text = FontMetrics.wrap(t.data, textbox_width, font_size, metrics)
+        |> IO.inspect(label: "TEXT")
+
+        body_text_graph = Scenic.Graph.build()
+        |> Scenic.Primitives.text(wrapped_text, font: :ibm_plex_mono, font_size: font_size)
+        
+        #NOTE: This tells us, how long the body will be...
+        {one, two, three, four} = text_bounds = Scenic.Graph.bounds(body_text_graph)
+        # |> IO.inspect(label: "FINAL BOUNDS")
+
+        body_height = four-two+(2*text_left_margin) # just is
+
+        # new_graph = Scenic.Graph.build()
+        # |> Scenic.Primitives.rect({w, 300},
+        #             id: :hypercard,
+        #             fill: :rebecca_purple,
+        #             translate: coords)
+
+            # |> Scenic.Primitives.text(wrapped_text, , fill: :black, translate: {text_left_margin, 40})
+
+        new_graph =
+        Scenic.Graph.build()
+        |> Scenic.Primitives.group(fn graph ->
+                graph
+                |> Scenic.Primitives.rect({w, body_height},
+                        id: :hypercard,
+                        fill: :rebecca_purple)
+                        # translate: coords)
+                |> Scenic.Primitives.text(wrapped_text,
+                        font: :ibm_plex_mono,
+                        font_size: font_size,
+                        fill: :black,
+                        translate: {text_left_margin, text_left_margin+font_size}) #TODO this should actually be, one line height
+            end, [
+                #NOTE: We will scroll this pane around later on, and need to
+                #      add new TidBits to it with Modify
+                id: :hypercard_itself, # Scenic required we register groups/components with a name
+                translate: coords
+            ])
+
+        new_scene = scene
+        |> assign(graph: new_graph)
+        |> push_graph(new_graph)
+
+        full_bounds = text_bounds = Scenic.Graph.bounds(new_graph)
+
+        Flamelex.GUI.Component.LayoutList
+        |> GenServer.cast({:component_height, t.title, full_bounds})
+        
+        {:ok, new_scene}
+    end
 
     def init(scene, params, opts) do
         Logger.debug "#{__MODULE__} initializing..."
@@ -54,7 +182,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         bounds = Scenic.Graph.bounds(g)
         IO.inspect bounds, label: "HOW HIGH"
 
-        Flamelex.GUI.Component.Memex.StoryRiver
+        Flamelex.GUI.Component.LayoutList
         |> GenServer.cast({:component_height, state.assigns.tidbit.title, bounds})
 
         {:noreply, state}
