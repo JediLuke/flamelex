@@ -25,7 +25,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     @inner_margin 15    # How much margin we put in between the border of the card, and text we want to render
     @font_size 24       # How big the standard font is (headers get scaled to this)
 
-    @header_height 200
+    @header_height 190
 
     @buffer_margin 50
     @titlebar_width 0.85
@@ -123,8 +123,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                             hypercard_frame: frame })
                     |> render_tagsbox(%{
                             hypercard_frame: frame })
-                    # |> render_toolbox(%{
-                    #     hypercard_frame: frame })
+                    |> render_toolbox(%{
+                        hypercard_frame: frame })
                     |> render_body(%{
                             width: width,
                             header_height: @header_height,
@@ -160,7 +160,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     end
 
     def render_title(graph, %{hypercard_frame: hyper_frame, title: title}) when is_bitstring(title) do
-        title_area = {0.82*(hyper_frame.dimensions.width-(2*@buffer_margin)), @title_height} #TODO dont use hard-coded title_height
+        title_width = 0.82*(hyper_frame.dimensions.width-(2*@buffer_margin))
+        title_area = {title_width, @title_height} #TODO dont use hard-coded title_height
         title_font_size = 2*@font_size
 
         graph
@@ -205,6 +206,19 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                     @margin.top+@title_height+@date_margin+@dateline_height+@date_margin})
     end
 
+    def render_toolbox(graph, %{hypercard_frame: hyper_frame}) do
+        title_width = 0.82*(hyper_frame.dimensions.width-(2*@buffer_margin))
+        toolbox_width = hyper_frame.dimensions.width-(@margin.left+title_width+@margin.left)-@margin.right
+        toolbox_height = @title_height+@date_margin+@dateline_height+@date_margin+@title_height
+
+        graph
+        |> Scenic.Primitives.rect({toolbox_width, toolbox_height},
+                fill: :sky_blue,
+                translate: {
+                    @margin.left+title_width+@margin.left,
+                    @margin.top})
+    end
+
     # def hypercard_toolbox_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
     #     date_margin = 10
     #     title_width = @titlebar_width*(w-(2*@buffer_margin))
@@ -213,17 +227,6 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 
     # end
     
-    # def hypercard_line_spec(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-    #     line_y = 3*@title_height + 2*@buffer_margin
-    #     {{x, y+line_y}, {x+w, y+line_y}}
-    # end
-    
-    # def hypercard_body_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-    #     line_y = 3*@title_height + 2*@buffer_margin
-    #     Frame.new(top_left: {x+@buffer_margin, y+line_y+@buffer_margin},
-    #             dimensions: {w-(2*@buffer_margin), h-(line_y+(2*@buffer_margin))}) # same width & height as the title
-    # end
-
     @doc """
     Calculates the render height of a bunch of text (after wrapping) for
     a given frame (including margins!)
