@@ -104,9 +104,6 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 
         full_hypercard_height = @header_height+body_height
 
-        # %{x: x, y: y} = frame.top_left
-
-
         base_graph =
             Scenic.Graph.build()
             |> Scenic.Primitives.group(fn graph ->
@@ -138,10 +135,6 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                     id: :hypercard_itself, # Scenic required we register groups/components with a name
                     translate: {frame.top_left.x+@buffer_margin, frame.top_left.y+@buffer_margin}
                 ])
-        
-        # Scenic.Graph.add_to(:hypercard_itself, fn graph ->
-            
-        # end)
     end
 
     def render_body(graph, %{header_height: header_height, data: text, width: width}) when is_bitstring(text) do
@@ -212,306 +205,23 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                     @margin.top+@title_height+@date_margin+@dateline_height+@date_margin})
     end
 
-    #     def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, tidbit: t}} = scene) do
-    #     new_graph =
-    #         Scenic.Graph.build()
-    #         |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-    #                 id: :hypercard,
-    #                 fill: :rebecca_purple,
-    #                 translate: {
-    #                     frame.top_left.x,
-    #                     frame.top_left.y})
-    #         |> HyperCardTitle.add_to_graph(%{
-    #             frame: hypercard_title_frame(%{frame: scene.assigns.frame}), # calculate hypercard based of story_river
-    #             # text: "Luke" },
-    #             text: t.title },
-    #             id: :hypercard_title)
-    #             # scissor: hypercard_scissor(scene.assigns.frame))
-    #         |> HyperCardDateline.add_to_graph(%{
-    #                 frame: hypercard_dateline_frame(scene.assigns.frame) },
-    #                 id: :hypercard_dateline)
-    #         |> TagsBox.add_to_graph(%{
-    #                 frame: hypercard_tagsbox_frame(scene.assigns.frame) },
-    #                 id: :hypercard_tagsbox)
-    #         |> ToolBox.add_to_graph(%{
-    #             frame: hypercard_toolbox_frame(scene.assigns.frame) },
-    #             id: :hypercard_toolbox)
-    #         |> Scenic.Primitives.line(hypercard_line_spec(scene.assigns.frame), id: :hypercard_line, stroke: {2, :antique_white})
-    #         |> Body.add_to_graph(%{
-    #             frame: hypercard_body_frame(scene.assigns.frame),
-    #             contents: t.data },
-    #             id: :hypercard_body)
+    # def hypercard_toolbox_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
+    #     date_margin = 10
+    #     title_width = @titlebar_width*(w-(2*@buffer_margin))
+    #     Frame.new(top_left: {x+(2*@buffer_margin)+title_width, y+@buffer_margin},
+    #             dimensions: {w-(@titlebar_width*(w-(2*@buffer_margin)))-3*@buffer_margin, 3*@title_height}) # same width & height as the title
 
-    #     scene
-    #     |> assign(graph: new_graph)
-    #     |> assign(first_render?: false)
     # end
-
-
-
-    # def render(%{width: hypercard_width, text: pre_wrapped_text, scroll: scroll_coords}) do
-    #     Scenic.Graph.build()
-    #     |> Scenic.Primitives.group(fn graph ->
-    #             graph
-    #             |> Scenic.Primitives.rect({hypercard_width, @default_height},
-    #                     id: :hypercard,
-    #                     fill: :antique_white)
-    #             |> Scenic.Primitives.text(pre_wrapped_text,
-    #                     font: :ibm_plex_mono,
-    #                     font_size: @font_size,
-    #                     fill: :black,
-    #                     translate: {@left_margin, @left_margin+@font_size}) #TODO this should actually be, one line height
-    #         end, [
-    #             #NOTE: We will scroll this pane around later on, and need to
-    #             #      add new TidBits to it with Modify
-    #             id: :hypercard_itself, #TODO Scenic required we register groups/components with a name
-    #             translate: scroll_coords # We scroll just by moving the underlying Scenic.Group around
-    #         ])
-    # end
-
-    #SIMPLOFY STEP 1 - only 1 init function
-
-    # def init(scene, %{top_left: coords, width: w, tidbit: %{data: %{"filepath" => fp}} = t}, opts) do
-    #         # def init(scene, %{frame: %Frame{top_left: _coords, dimensions: {_x, :flex}}}, opts) do #TODO make Frame accept :flex as params
-
-    #     #NOTE: We need to find the body text here, so we can calculate
-    #     #      the height of the body, so we know how big to make the background
-    #     #      (a colored rectangle)
-
-    #     # orig_text = File.read!(fp) |> IO.inspect(label: "ORIG")
-
-    #     font_size = 24
-    #     textbox_width = w-2*@left_margin
-
-    #     {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
-    #     # wrapped_text = FontMetrics.wrap(orig_text, textbox_width, font_size, metrics)
-
-    #     wrapped_text = "CANt RENDER BOFY"
-
-    #     # new_graph =
-    #     # Scenic.Graph.build()
-    #     # |> Scenic.Primitives.group(fn graph ->
-    #     #         graph
-    #     #         |> Scenic.Primitives.rect({w, @default_height},
-    #     #                 id: :hypercard,
-    #     #                 fill: :antique_white)
-    #     #         |> Scenic.Primitives.text(wrapped_text,
-    #     #                 font: :ibm_plex_mono,
-    #     #                 font_size: font_size,
-    #     #                 fill: :black,
-    #     #                 translate: {@left_margin, @left_margin+font_size}) #TODO this should actually be, one line height
-    #     #     end, [
-    #     #         #NOTE: We will scroll this pane around later on, and need to
-    #     #         #      add new TidBits to it with Modify
-    #     #         id: :hypercard_itself, # Scenic required we register groups/components with a name
-    #     #         translate: coords
-    #     #     ])
-
-    #     new_scene = scene
-    #     # |> assign(graph: new_graph)
-    #     # |> push_graph(new_graph)
-        
-    #     {:ok, new_scene}
-    # end
-
-    # def init(scene, %{top_left: coords, width: w, tidbit: %{data: ""}}, opts) do
-    #     Logger.debug "~~~~ Rendering a HyperCard with no body inside it !!!"
-
-    #     # new_graph = Scenic.Graph.build()
-    #     # |> Scenic.Primitives.rect({w, 300},
-    #     #             id: :hypercard,
-    #     #             fill: :chocolate,
-    #     #             translate: coords)
-
-    #     new_scene = scene
-    #     # |> assign(graph: new_graph)
-    #     # |> push_graph(new_graph)
-        
-    #     {:ok, new_scene}
-    # end
-
-    # def init(scene, %{top_left: coords, width: w, tidbit: %{data: data} = t}, opts) when is_bitstring(data) do
-    # # def init(scene, %{frame: %Frame{top_left: _coords, dimensions: {_x, :flex}}}, opts) do #TODO make Frame accept :flex as params
-
-
-    #     # new_graph = Scenic.Graph.build()
-    #     # |> Scenic.Primitives.rect({w, 300},
-    #     #             id: :hypercard,
-    #     #             fill: :rebecca_purple,
-    #     #             translate: coords)
-
-    #         # |> Scenic.Primitives.text(wrapped_text, , fill: :black, translate: {@left_margin, 40})
-
-    #     # new_graph =
-    #     # Scenic.Graph.build()
-    #     # |> Scenic.Primitives.group(fn graph ->
-    #     #         graph
-    #     #         |> Scenic.Primitives.rect({w, body_height},
-    #     #                 id: :hypercard,
-    #     #                 fill: :rebecca_purple)
-    #     #                 # translate: coords)
-    #     #         |> Scenic.Primitives.text(wrapped_text,
-    #     #                 font: :ibm_plex_mono,
-    #     #                 font_size: @font_size,
-    #     #                 fill: :black,
-    #     #                 translate: {@left_margin, @left_margin+@font_size}) #TODO this should actually be, one line height
-    #     #     end, [
-    #     #         #NOTE: We will scroll this pane around later on, and need to
-    #     #         #      add new TidBits to it with Modify
-    #     #         id: :hypercard_itself, # Scenic required we register groups/components with a name
-    #     #         translate: coords
-    #     #     ])
-
-    #     new_scene = scene
-    #     |> assign(graph: new_graph)
-    #     |> push_graph(new_graph)
-
-    #     full_bounds = text_bounds = Scenic.Graph.bounds(new_graph)
-
-    #     Flamelex.GUI.Component.LayoutList
-    #     |> GenServer.cast({:component_height, t.title, full_bounds})
-        
-    #     {:ok, new_scene}
-    # end
-
-
-
-
-
-
-
-
-
-    # next - this continue will be a better continue, with proper rendering support
-
-    # def handle_continue(:update_story_river_with_our_height, state) do
-    #     g = state.assigns.graph
-    #     bounds = Scenic.Graph.bounds(g)
-    #     IO.inspect bounds, label: "HOW HIGH"
-
-    #     Flamelex.GUI.Component.LayoutList
-    #     |> GenServer.cast({:component_height, state.assigns.tidbit.title, bounds})
-
-    #     {:noreply, state}
-    #   end
-
-    # def re_render(scene) do
-    #     GenServer.call(__MODULE__, {:re_render, scene})
-    # end
-
-    # def render_push_graph(scene) do
-    #   new_scene = render(scene) # updates the graph
-    #   new_scene |> push_graph(new_scene.assigns.graph) # pushes the changes
-    # end
-
-
-
-    # def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, tidbit: t}} = scene) do
-
-
-
-    #   GenServer.call(HyperCardTitle, {:update, %{tidbit: t}})
-    # #   GenServer.call(:hypercard_dateline, {:hypercard_dateline, %{tidbit: t}})
-    # #   GenServer.call(:hypercard_tagsbox, {:hypercard_tagsbox, %{tidbit: t}})
-    # #   GenServer.call(:hypercard_toolbox, {:hypercard_toolbox, %{tidbit: t}})
-    # #   GenServer.call(:hypercard_title, {:update, %{tidbit: t}})
-    #   GenServer.call(Flamelex.GUI.Component.Memex.HyperCard.Body, {:update, %{tidbit: t}})
-        
-    #     # new_graph = graph
-    #     # |> Scenic.Graph.delete(:hypercard)
-    #     # |> Scenic.Graph.delete(:hypercard_title)
-    #     # |> Scenic.Graph.delete(:hypercard_dateline)
-    #     # |> Scenic.Graph.delete(:hypercard_tagsbox)
-    #     # |> Scenic.Graph.delete(:hypercard_toolbox)
-    #     # |> Scenic.Graph.delete(:hypercard_line)
-    #     # |> Scenic.Graph.delete(:hypercard_body)
-    #     # |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-    #     #             id: :hypercard,
-    #     #             fill: :rebecca_purple,
-    #     #             translate: {
-    #     #                 frame.top_left.x,
-    #     #                 frame.top_left.y})
-    #     # |> HyperCardTitle.add_to_graph(%{
-    #     #     frame: hypercard_title_frame(scene.assigns.frame), # calculate hypercard based of story_river
-    #     #     # text: "Luke" },
-    #     #     text: t.title },
-    #     #     id: :hypercard_title)
-    #     # |> HyperCardDateline.add_to_graph(%{
-    #     #         frame: hypercard_dateline_frame(scene.assigns.frame) },
-    #     #         id: :hypercard_dateline)
-    #     # |> TagsBox.add_to_graph(%{
-    #     #             frame: hypercard_tagsbox_frame(scene.assigns.frame) },
-    #     #             id: :hypercard_tagsbox)
-    #     # |> ToolBox.add_to_graph(%{
-    #     #         frame: hypercard_toolbox_frame(scene.assigns.frame) },
-    #     #         id: :hypercard_toolbox)
-    #     # |> Scenic.Primitives.line({{500, 300}, {1300, 300}}, id: :hypercard_line, stroke: {2, :black})
-    #     # |> Body.add_to_graph(%{
-    #     #     frame: hypercard_body_frame(scene.assigns.frame),
-    #     #     contents: t.data },
-    #     #     id: :hypercard_body)
-
-    #     scene
-    #     # |> assign(graph: new_graph)
-    # end
-
-
-
-
-
-    def hypercard_toolbox_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-        date_margin = 10
-        title_width = @titlebar_width*(w-(2*@buffer_margin))
-        Frame.new(top_left: {x+(2*@buffer_margin)+title_width, y+@buffer_margin},
-                dimensions: {w-(@titlebar_width*(w-(2*@buffer_margin)))-3*@buffer_margin, 3*@title_height}) # same width & height as the title
-
-    end
     
-    def hypercard_line_spec(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-        line_y = 3*@title_height + 2*@buffer_margin
-        {{x, y+line_y}, {x+w, y+line_y}}
-    end
+    # def hypercard_line_spec(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
+    #     line_y = 3*@title_height + 2*@buffer_margin
+    #     {{x, y+line_y}, {x+w, y+line_y}}
+    # end
     
-    def hypercard_body_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-        line_y = 3*@title_height + 2*@buffer_margin
-        Frame.new(top_left: {x+@buffer_margin, y+line_y+@buffer_margin},
-                dimensions: {w-(2*@buffer_margin), h-(line_y+(2*@buffer_margin))}) # same width & height as the title
-
-    end
-
-
-    # def handle_call({:re_render, %{frame: %Frame{} = f}}, _from, scene) do
-    #     new_scene = scene
-    #     |> assign(frame: f)
-    #     |> render_push_graph()
-        
-    #     {:reply, :ok, new_scene}
-    # end
-
-
-    # def handle_cast({:new_tidbit, t}, scene) do
-
-    #     new_scene = scene
-    #     |> assign(tidbit: t)
-    #     |> render_push_graph()
-
-    #     {:noreply, new_scene}
-    # end
-
-
-    #NOTE - you know, this is really the only thing that changes... all
-    #       the above is Boilerplate
-
-    # def render(scene) do
-    #     scene |> Draw.background(:rebecca_purple)
-    # end
-
-    # def handle_call({:re_render, %{frame: %Frame{} = f}}, _from, scene) do
-    #     new_scene = scene
-    #     |> assign(frame: f)
-    #     |> render_push_graph()
-        
-    #     {:reply, :ok, new_scene}
+    # def hypercard_body_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
+    #     line_y = 3*@title_height + 2*@buffer_margin
+    #     Frame.new(top_left: {x+@buffer_margin, y+line_y+@buffer_margin},
+    #             dimensions: {w-(2*@buffer_margin), h-(line_y+(2*@buffer_margin))}) # same width & height as the title
     # end
 
     @doc """
