@@ -15,6 +15,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     @titlebar_width 0.85
     @title_height 50
 
+    @min_body_height 150    # Smallest height for any body, even 1 line of text
+
     @margins %{
         left: 15,
         top: 15,
@@ -81,7 +83,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     # - work on render nice tags & datetime sections
     # - work on taking us into edit more for a tidbit
 
-    def render(%{frame: %{dimensions: %{width: width, height: :flex}} = frame, tidbit: %Memex.TidBit{data: data}}) do
+    def render(%{frame: %{dimensions: %{width: width, height: :flex}} = frame, tidbit: %Memex.TidBit{data: data} = tidbit}) do
 
         #TODO good idea: render each sub-component as a seperate graph,
         #                calculate their heights, then use Scenic.Graph.add_to
@@ -112,7 +114,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                     |> Scenic.Primitives.rect({width, header_height},
                             id: :hypercard,
                             fill: :deep_sky_blue)
-                    #Hypercard title
+                    |> render_title(%{
+                            title: tidbit.title,
+                            hypercard_frame: frame })
                     #Hypercard Dateline
                     #TagsBox
                     #ToolBox
@@ -152,6 +156,30 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
             font_size: @font_size,
             fill: :black,
             translate: {@margins.left, @margins.top+header_height+@font_size}) #TODO this should actually be, one line height
+    end
+
+    def render_title(graph, %{hypercard_frame: hyper_frame, title: title}) when is_bitstring(title) do
+        title_area = {0.82*(hyper_frame.dimensions.width-(2*@buffer_margin)), @title_height} #TODO dont use hard-coded title_height
+        title_font_size = 2*@font_size
+
+        graph
+        |> Scenic.Primitives.group(fn graph ->
+            graph
+            |> Scenic.Primitives.rect(title_area,
+                     fill: :yellow,
+                     scissor: title_area)
+            |> Scenic.Primitives.text(title,
+                     id: :hypercard_title_text,
+                     font: :ibm_plex_mono,
+                     # scissor: {frame.dimensions.width, frame.dimensions.height},
+                     # translate: {frame.top_left.x+buffer, frame.top_left.y+font_size+(2*buffer)}, # text draws from bottom-left corner??
+                    #  translate: {@inner_margin, title_font_size+@inner_margin}, # text draws from bottom-left corner??
+                     translate: {0, title_font_size}, # text draws from bottom-left corner??
+                     font_size: title_font_size,
+                     fill: :black)
+         end,
+         id: {:hypercard, :title, title}, #TODO how do we register components/primitives
+         translate: {@inner_margin, @inner_margin})
     end
 
     #     def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, tidbit: t}} = scene) do
@@ -397,13 +425,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     #     # |> assign(graph: new_graph)
     # end
 
-    def hypercard_title_frame(
-            %{frame: %{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}},
-            title_height \\ 50
-    ) do
-        Frame.new(top_left: {x+@buffer_margin, y+@buffer_margin},
-                dimensions: {0.82*(w-(2*@buffer_margin)), @title_height})
-    end
+
 
     def hypercard_scissor(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
         {@titlebar_width*(w-(2*@buffer_margin)), @title_height}
@@ -502,14 +524,14 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         
         body_height = (bottom-top)+@margins.top+@margins.bottom
 
-        if body_height <= 150 do
-            150
+        if body_height <= @min_body_height do
+            @min_body_height
         else
             body_height
         end
     end
 
     def calc_wrapped_text_height(_otherwise) do
-        150 #TODO this is complete guess lol
+        @min_body_height
     end
 end
