@@ -197,6 +197,12 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         {:noreply, scene}
     end
 
+    def handle_cast({:clicked_edit_tidbit, title}, scene) do
+        IO.puts "EDITING #{inspect title}" 
+        GenServer.cast(title |> String.to_atom, :edit_mode)
+        {:noreply, scene}
+    end
+
 
 
 

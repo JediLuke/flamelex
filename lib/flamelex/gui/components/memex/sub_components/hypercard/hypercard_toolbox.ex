@@ -99,6 +99,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.ToolBox do
         # GenServer.cast(Flamelex.GUI.Component.Memex.SideBar, {:open_tab, scene.assigns.label})
         # Fluxus.Action.fire({:memex, :open_random_tidbit})
         IO.puts "CLICKED EDIT TIDBIT"
+
+        Flamelex.GUI.Component.Memex.StoryRiver
+        |> GenServer.cast({:clicked_edit_tidbit, scene.assigns.title})
+
          {:noreply, scene}
        else
          {:noreply, scene}
