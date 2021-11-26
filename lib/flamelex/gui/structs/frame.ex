@@ -11,7 +11,9 @@ defmodule Flamelex.GUI.Structs.Frame do
   # to actually build one and cant just use a default struct cause it spits chips
 
   defstruct [
+    #TODO change top_left to `pin` (this would then be awesome to add an 'orientation' flag, which would default to scenic default, :top_left)
     top_left:     nil,            # a %Coordinates{} struct, pointing to the top-left corner of the frame, referenced from top-left corner of the viewport
+    #TODO change dimensions to 'size' (or something better) - I dont think `dimens` is good
     dimensions:   nil,            # a %Dimensions{} struct, specifying the height and width of the frame
     margin: %{
         top: 0,
@@ -67,6 +69,20 @@ defmodule Flamelex.GUI.Structs.Frame do
     Logger.debug "constructing a new %Frame{} the size of the ViewPort."
     %Frame{
       top_left: Coordinates.new(x: 0, y: 0),
+      dimensions: Dimensions.new(width: w, height: h)
+    }
+  end
+
+  def new([pin: {x, y}, size: {w, h}]) do
+    %Frame{
+      top_left: Coordinates.new(x: x, y: y),
+      dimensions: Dimensions.new(width: w, height: h)
+    }
+  end
+
+  def new([pin: %{x: x, y: y}, size: {w, h}]) do
+    %Frame{
+      top_left: Coordinates.new(x: x, y: y),
       dimensions: Dimensions.new(width: w, height: h)
     }
   end

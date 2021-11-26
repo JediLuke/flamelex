@@ -23,6 +23,8 @@ defmodule Flamelex.GUI.Component.LayoutList do
   # def render(list of components)
   # def add / remove
 
+  @spacing_buffer 25 # how much gap to put between each item in the layout
+
 
   def validate(%{
         id: _id,
@@ -178,6 +180,8 @@ defmodule Flamelex.GUI.Component.LayoutList do
     new_scene = scene
     |> assign(state: new_state)
 
+    # Logger.warn "IN THE LAYOUT LIST YES"
+
     GenServer.cast(self(), :render_next_component)
     
     {:reply, :ok, new_scene}
@@ -200,20 +204,25 @@ defmodule Flamelex.GUI.Component.LayoutList do
                      acc_height: acc_height,
                      render_queue: [c|rest]}}}) do
     Logger.debug "Attempting to render an additional component in the LayoutList..."
+    # Logger.warn "IN THE RENDER LIST YES"
 
-    margin_buf = 50 # this is how much margin we render around each HyperCard
+    margin_buf = 2*@spacing_buffer # this is how much margin we render around each HyperCard
     {HyperCard, tidbit, opts} = c #TODO lol
 
     frame = scene.assigns.frame
     state = scene.assigns.state
     new_state = %{state | render_queue: rest}
 
+    #NOTE - margin ought to be managed by the component itself - dont
+    #       adjust the frame & pass it in, pass in margin as a prop
+
     new_graph = scene.assigns.graph
     |> Scenic.Graph.add_to(:river_pane, fn graph ->
           args = %{
             tidbit: tidbit,
-            top_left: {frame.top_left.x+margin_buf, frame.top_left.y+margin_buf+acc_height},
-            width: frame.dimensions.width-(2*margin_buf) # got to take off the margun_buf from each side...
+            frame: Frame.new(pin: {frame.top_left.x, frame.top_left.y+acc_height}, size: {frame.dimensions.width-(2*margin_buf), :flex})
+            # top_left: {frame.top_left.x+margin_buf, frame.top_left.y+margin_buf+acc_height},
+            # width: frame.dimensions.width-(2*margin_buf) # got to take off the margun_buf from each side...
           }
           Kernel.apply(HyperCard, :add_to_graph, [graph, args, opts])
           # |> HyperCard.add_to_graph(%{
@@ -315,11 +324,10 @@ defmodule Flamelex.GUI.Component.LayoutList do
 
       {left, top, right, bottom} = bounds # top is less than bottom, because the axis starts in top-left corner
       component_height = bottom - top
-      between_tidbits_buffer = 25
 
       new_state = %{state|
-                      active_components: state.active_components ++ [{id, bounds}],
-                      acc_height: state.acc_height+component_height+between_tidbits_buffer
+                      active_components: state.active_components ++ [{HyperCard, id, bounds}],
+                      acc_height: state.acc_height+(component_height+@spacing_buffer)
                     }
 
       IO.puts "HEIGHT: #{inspect bounds}"

@@ -11,24 +11,59 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     @inner_margin 15    # How much margin we put in between the border of the card, and text we want to render
     @font_size 24       # How big the standard font is (headers get scaled to this)
 
-    @buffer_margin 4
+    @buffer_margin 50
     @titlebar_width 0.85
     @title_height 50
 
+    @margins %{
+        left: 15,
+        top: 15,
+        right: 15,
+        bottom: 15
+    }
+
     @left_margin 15     # How much left margin we leave in the HyperCard
+
 
     def validate(%{frame: %Frame{} = _f, tidbit: %Memex.TidBit{} = _t} = data) do
         Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
         {:ok, data}
     end
 
-    def validate(%{top_left: _tl, width: _w, tidbit: %Memex.TidBit{} = _t} = data) do
-        Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
-        {:ok, data}
-    end
-
     def validate(_data) do
         {:error, "This component must be passed a %Frame{}"}
+    end
+
+
+
+    def init(scene, %{frame: frame, tidbit: tidbit} = params, opts) do
+        Logger.debug "#{__MODULE__} initializing... title: #{inspect tidbit.title}"
+        # Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
+
+        new_scene = scene
+        |> assign(frame: frame)
+        |> assign(tidbit: tidbit)
+        # |> assign(config: %{
+        #      margin_buf: params.margin_buf
+        # })
+
+        {:ok, new_scene, {:continue, :render_hypercard}}
+    end
+
+    def handle_continue(:render_hypercard, scene) do
+
+        new_graph = render(scene.assigns)
+
+        new_scene = scene
+        |> assign(graph: new_graph)
+        |> push_graph(new_graph)
+
+        bounds = Scenic.Graph.bounds(new_graph)
+
+        Flamelex.GUI.Component.LayoutList
+        |> GenServer.cast({:component_height, scene.assigns.tidbit.title, bounds})
+        
+        {:noreply, new_scene}
     end
 
 
@@ -46,219 +81,253 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     # - work on render nice tags & datetime sections
     # - work on taking us into edit more for a tidbit
 
-    def render(%{width: hypercard_width, text: pre_wrapped_text, scroll: scroll_coords}) do
-        Scenic.Graph.build()
-        |> Scenic.Primitives.group(fn graph ->
-                graph
-                |> Scenic.Primitives.rect({hypercard_width, @default_height},
-                        id: :hypercard,
-                        fill: :antique_white)
-                |> Scenic.Primitives.text(pre_wrapped_text,
-                        font: :ibm_plex_mono,
-                        font_size: @font_size,
-                        fill: :black,
-                        translate: {@left_margin, @left_margin+@font_size}) #TODO this should actually be, one line height
-            end, [
-                #NOTE: We will scroll this pane around later on, and need to
-                #      add new TidBits to it with Modify
-                id: :hypercard_itself, #TODO Scenic required we register groups/components with a name
-                translate: scroll_coords # We scroll just by moving the underlying Scenic.Group around
-            ])
+    def render(%{frame: %{dimensions: %{width: width, height: :flex}} = frame, tidbit: %Memex.TidBit{data: body}}) do
+
+        #TODO good idea: render each sub-component as a seperate graph,
+        #                calculate their heights, then use Scenic.Graph.add_to
+        #                to put them into the `:hypercard_itself` group
+        #                -> Unfortunately, this doesn't work because Scenic
+        #                doesn't seem to support "merging" 2 graphs, or
+        #                if I return a graph (each component), no way to
+        #                simply add that to another graph, as a sub-component
+
+
+        coords = {0,0}
+
+        # header_height = calc_header_height()
+        header_height = 250 #TODO lets just make this assumption for now
+        body_height = calc_wrapped_text_height(%{frame: frame, text: body})
+
+        full_hypercard_height = header_height+body_height
+
+        # %{x: x, y: y} = frame.top_left
+
+        base_graph =
+            Scenic.Graph.build()
+            |> Scenic.Primitives.group(fn graph ->
+                    graph
+                    # render the background rectangle first, as our base layer, now that we know how high it needs to be
+                    |> Scenic.Primitives.rect({width, full_hypercard_height},
+                            id: :hypercard,
+                            fill: :rebecca_purple)
+
+
+                    #Hypercard title
+                    #Hypercard Dateline
+                    #TagsBox
+                    #ToolBox
+                    #BODY
+                    # |> Scenic.Primitives.text(wrapped_text,
+                    #         font: :ibm_plex_mono,
+                    #         font_size: @font_size,
+                    #         fill: :black,
+                    #         translate: {@left_margin, @left_margin+@font_size}) #TODO this should actually be, one line height
+                end, [
+                    #NOTE: We will scroll this pane around later on, and need to
+                    #      add new TidBits to it with Modify
+                    id: :hypercard_itself, # Scenic required we register groups/components with a name
+                    translate: {frame.top_left.x+@buffer_margin, frame.top_left.y+@buffer_margin}
+                ])
+        
+        # Scenic.Graph.add_to(:hypercard_itself, fn graph ->
+            
+        # end)
     end
+
+
+    #     def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, tidbit: t}} = scene) do
+    #     new_graph =
+    #         Scenic.Graph.build()
+    #         |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
+    #                 id: :hypercard,
+    #                 fill: :rebecca_purple,
+    #                 translate: {
+    #                     frame.top_left.x,
+    #                     frame.top_left.y})
+    #         |> HyperCardTitle.add_to_graph(%{
+    #             frame: hypercard_title_frame(%{frame: scene.assigns.frame}), # calculate hypercard based of story_river
+    #             # text: "Luke" },
+    #             text: t.title },
+    #             id: :hypercard_title)
+    #             # scissor: hypercard_scissor(scene.assigns.frame))
+    #         |> HyperCardDateline.add_to_graph(%{
+    #                 frame: hypercard_dateline_frame(scene.assigns.frame) },
+    #                 id: :hypercard_dateline)
+    #         |> TagsBox.add_to_graph(%{
+    #                 frame: hypercard_tagsbox_frame(scene.assigns.frame) },
+    #                 id: :hypercard_tagsbox)
+    #         |> ToolBox.add_to_graph(%{
+    #             frame: hypercard_toolbox_frame(scene.assigns.frame) },
+    #             id: :hypercard_toolbox)
+    #         |> Scenic.Primitives.line(hypercard_line_spec(scene.assigns.frame), id: :hypercard_line, stroke: {2, :antique_white})
+    #         |> Body.add_to_graph(%{
+    #             frame: hypercard_body_frame(scene.assigns.frame),
+    #             contents: t.data },
+    #             id: :hypercard_body)
+
+    #     scene
+    #     |> assign(graph: new_graph)
+    #     |> assign(first_render?: false)
+    # end
+
+
+
+    # def render(%{width: hypercard_width, text: pre_wrapped_text, scroll: scroll_coords}) do
+    #     Scenic.Graph.build()
+    #     |> Scenic.Primitives.group(fn graph ->
+    #             graph
+    #             |> Scenic.Primitives.rect({hypercard_width, @default_height},
+    #                     id: :hypercard,
+    #                     fill: :antique_white)
+    #             |> Scenic.Primitives.text(pre_wrapped_text,
+    #                     font: :ibm_plex_mono,
+    #                     font_size: @font_size,
+    #                     fill: :black,
+    #                     translate: {@left_margin, @left_margin+@font_size}) #TODO this should actually be, one line height
+    #         end, [
+    #             #NOTE: We will scroll this pane around later on, and need to
+    #             #      add new TidBits to it with Modify
+    #             id: :hypercard_itself, #TODO Scenic required we register groups/components with a name
+    #             translate: scroll_coords # We scroll just by moving the underlying Scenic.Group around
+    #         ])
+    # end
 
     #SIMPLOFY STEP 1 - only 1 init function
 
-    def init(scene, %{top_left: coords, width: w, tidbit: %{data: %{"filepath" => fp}} = t}, opts) do
-            # def init(scene, %{frame: %Frame{top_left: _coords, dimensions: {_x, :flex}}}, opts) do #TODO make Frame accept :flex as params
+    # def init(scene, %{top_left: coords, width: w, tidbit: %{data: %{"filepath" => fp}} = t}, opts) do
+    #         # def init(scene, %{frame: %Frame{top_left: _coords, dimensions: {_x, :flex}}}, opts) do #TODO make Frame accept :flex as params
 
-        #NOTE: We need to find the body text here, so we can calculate
-        #      the height of the body, so we know how big to make the background
-        #      (a colored rectangle)
+    #     #NOTE: We need to find the body text here, so we can calculate
+    #     #      the height of the body, so we know how big to make the background
+    #     #      (a colored rectangle)
 
-        # orig_text = File.read!(fp) |> IO.inspect(label: "ORIG")
+    #     # orig_text = File.read!(fp) |> IO.inspect(label: "ORIG")
 
-        font_size = 24
-        textbox_width = w-2*@left_margin
+    #     font_size = 24
+    #     textbox_width = w-2*@left_margin
 
-        {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
-        # wrapped_text = FontMetrics.wrap(orig_text, textbox_width, font_size, metrics)
+    #     {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
+    #     # wrapped_text = FontMetrics.wrap(orig_text, textbox_width, font_size, metrics)
 
-        wrapped_text = "CANt RENDER BOFY"
+    #     wrapped_text = "CANt RENDER BOFY"
 
-        # new_graph =
-        # Scenic.Graph.build()
-        # |> Scenic.Primitives.group(fn graph ->
-        #         graph
-        #         |> Scenic.Primitives.rect({w, @default_height},
-        #                 id: :hypercard,
-        #                 fill: :antique_white)
-        #         |> Scenic.Primitives.text(wrapped_text,
-        #                 font: :ibm_plex_mono,
-        #                 font_size: font_size,
-        #                 fill: :black,
-        #                 translate: {@left_margin, @left_margin+font_size}) #TODO this should actually be, one line height
-        #     end, [
-        #         #NOTE: We will scroll this pane around later on, and need to
-        #         #      add new TidBits to it with Modify
-        #         id: :hypercard_itself, # Scenic required we register groups/components with a name
-        #         translate: coords
-        #     ])
+    #     # new_graph =
+    #     # Scenic.Graph.build()
+    #     # |> Scenic.Primitives.group(fn graph ->
+    #     #         graph
+    #     #         |> Scenic.Primitives.rect({w, @default_height},
+    #     #                 id: :hypercard,
+    #     #                 fill: :antique_white)
+    #     #         |> Scenic.Primitives.text(wrapped_text,
+    #     #                 font: :ibm_plex_mono,
+    #     #                 font_size: font_size,
+    #     #                 fill: :black,
+    #     #                 translate: {@left_margin, @left_margin+font_size}) #TODO this should actually be, one line height
+    #     #     end, [
+    #     #         #NOTE: We will scroll this pane around later on, and need to
+    #     #         #      add new TidBits to it with Modify
+    #     #         id: :hypercard_itself, # Scenic required we register groups/components with a name
+    #     #         translate: coords
+    #     #     ])
 
-        new_scene = scene
-        # |> assign(graph: new_graph)
-        # |> push_graph(new_graph)
+    #     new_scene = scene
+    #     # |> assign(graph: new_graph)
+    #     # |> push_graph(new_graph)
         
-        {:ok, new_scene}
-    end
+    #     {:ok, new_scene}
+    # end
 
-    def init(scene, %{top_left: coords, width: w, tidbit: %{data: ""}}, opts) do
-        Logger.debug "~~~~ Rendering a HyperCard with no body inside it !!!"
+    # def init(scene, %{top_left: coords, width: w, tidbit: %{data: ""}}, opts) do
+    #     Logger.debug "~~~~ Rendering a HyperCard with no body inside it !!!"
 
-        # new_graph = Scenic.Graph.build()
-        # |> Scenic.Primitives.rect({w, 300},
-        #             id: :hypercard,
-        #             fill: :chocolate,
-        #             translate: coords)
+    #     # new_graph = Scenic.Graph.build()
+    #     # |> Scenic.Primitives.rect({w, 300},
+    #     #             id: :hypercard,
+    #     #             fill: :chocolate,
+    #     #             translate: coords)
 
-        new_scene = scene
-        # |> assign(graph: new_graph)
-        # |> push_graph(new_graph)
+    #     new_scene = scene
+    #     # |> assign(graph: new_graph)
+    #     # |> push_graph(new_graph)
         
-        {:ok, new_scene}
-    end
+    #     {:ok, new_scene}
+    # end
 
-    def init(scene, %{top_left: coords, width: w, tidbit: %{data: data} = t}, opts) when is_bitstring(data) do
-    # def init(scene, %{frame: %Frame{top_left: _coords, dimensions: {_x, :flex}}}, opts) do #TODO make Frame accept :flex as params
+    # def init(scene, %{top_left: coords, width: w, tidbit: %{data: data} = t}, opts) when is_bitstring(data) do
+    # # def init(scene, %{frame: %Frame{top_left: _coords, dimensions: {_x, :flex}}}, opts) do #TODO make Frame accept :flex as params
 
-        #NOTE: We need to find the body text here, so we can calculate
-        #      the height of the body, so we know how big to make the background
-        #      (a colored rectangle)
-        textbox_width = w-2*@left_margin
-        {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
-        wrapped_text = FontMetrics.wrap(t.data, textbox_width, @font_size, metrics)
-        # |> IO.inspect(label: "TEXT")
 
-        body_text_graph = Scenic.Graph.build()
-        |> Scenic.Primitives.text(wrapped_text, font: :ibm_plex_mono, font_size: @font_size)
+    #     # new_graph = Scenic.Graph.build()
+    #     # |> Scenic.Primitives.rect({w, 300},
+    #     #             id: :hypercard,
+    #     #             fill: :rebecca_purple,
+    #     #             translate: coords)
+
+    #         # |> Scenic.Primitives.text(wrapped_text, , fill: :black, translate: {@left_margin, 40})
+
+    #     # new_graph =
+    #     # Scenic.Graph.build()
+    #     # |> Scenic.Primitives.group(fn graph ->
+    #     #         graph
+    #     #         |> Scenic.Primitives.rect({w, body_height},
+    #     #                 id: :hypercard,
+    #     #                 fill: :rebecca_purple)
+    #     #                 # translate: coords)
+    #     #         |> Scenic.Primitives.text(wrapped_text,
+    #     #                 font: :ibm_plex_mono,
+    #     #                 font_size: @font_size,
+    #     #                 fill: :black,
+    #     #                 translate: {@left_margin, @left_margin+@font_size}) #TODO this should actually be, one line height
+    #     #     end, [
+    #     #         #NOTE: We will scroll this pane around later on, and need to
+    #     #         #      add new TidBits to it with Modify
+    #     #         id: :hypercard_itself, # Scenic required we register groups/components with a name
+    #     #         translate: coords
+    #     #     ])
+
+    #     new_scene = scene
+    #     |> assign(graph: new_graph)
+    #     |> push_graph(new_graph)
+
+    #     full_bounds = text_bounds = Scenic.Graph.bounds(new_graph)
+
+    #     Flamelex.GUI.Component.LayoutList
+    #     |> GenServer.cast({:component_height, t.title, full_bounds})
         
-        #NOTE: This tells us, how long the body will be...
-        {one, two, three, four} = text_bounds = Scenic.Graph.bounds(body_text_graph)
-        # |> IO.inspect(label: "FINAL BOUNDS")
+    #     {:ok, new_scene}
+    # end
 
-        body_height = four-two+(2*@left_margin) # just is
 
-        # new_graph = Scenic.Graph.build()
-        # |> Scenic.Primitives.rect({w, 300},
-        #             id: :hypercard,
-        #             fill: :rebecca_purple,
-        #             translate: coords)
 
-            # |> Scenic.Primitives.text(wrapped_text, , fill: :black, translate: {@left_margin, 40})
 
-        new_graph =
-        Scenic.Graph.build()
-        |> Scenic.Primitives.group(fn graph ->
-                graph
-                |> Scenic.Primitives.rect({w, body_height},
-                        id: :hypercard,
-                        fill: :rebecca_purple)
-                        # translate: coords)
-                |> Scenic.Primitives.text(wrapped_text,
-                        font: :ibm_plex_mono,
-                        font_size: @font_size,
-                        fill: :black,
-                        translate: {@left_margin, @left_margin+@font_size}) #TODO this should actually be, one line height
-            end, [
-                #NOTE: We will scroll this pane around later on, and need to
-                #      add new TidBits to it with Modify
-                id: :hypercard_itself, # Scenic required we register groups/components with a name
-                translate: coords
-            ])
 
-        new_scene = scene
-        |> assign(graph: new_graph)
-        |> push_graph(new_graph)
 
-        full_bounds = text_bounds = Scenic.Graph.bounds(new_graph)
 
-        Flamelex.GUI.Component.LayoutList
-        |> GenServer.cast({:component_height, t.title, full_bounds})
-        
-        {:ok, new_scene}
-    end
 
-    def init(scene, params, opts) do
-        Logger.debug "#{__MODULE__} initializing..."
-        # Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
-
-        Logger.debug "HyperCard initializing for TidBit: #{inspect params.tidbit}"
-
-        init_scene =
-         %{scene|assigns: scene.assigns |> Map.merge(params)} # bring in the params into the scene, just put them straight into assigns
-        |> assign(first_render?: true)
-        |> render_push_graph()
-    
-
-        {:ok, init_scene, {:continue, :update_story_river_with_our_height}}
-    end
 
     # next - this continue will be a better continue, with proper rendering support
 
-    def handle_continue(:update_story_river_with_our_height, state) do
-        g = state.assigns.graph
-        bounds = Scenic.Graph.bounds(g)
-        IO.inspect bounds, label: "HOW HIGH"
+    # def handle_continue(:update_story_river_with_our_height, state) do
+    #     g = state.assigns.graph
+    #     bounds = Scenic.Graph.bounds(g)
+    #     IO.inspect bounds, label: "HOW HIGH"
 
-        Flamelex.GUI.Component.LayoutList
-        |> GenServer.cast({:component_height, state.assigns.tidbit.title, bounds})
+    #     Flamelex.GUI.Component.LayoutList
+    #     |> GenServer.cast({:component_height, state.assigns.tidbit.title, bounds})
 
-        {:noreply, state}
-      end
+    #     {:noreply, state}
+    #   end
 
     # def re_render(scene) do
     #     GenServer.call(__MODULE__, {:re_render, scene})
     # end
 
-    def render_push_graph(scene) do
-      new_scene = render(scene) # updates the graph
-      new_scene |> push_graph(new_scene.assigns.graph) # pushes the changes
-    end
+    # def render_push_graph(scene) do
+    #   new_scene = render(scene) # updates the graph
+    #   new_scene |> push_graph(new_scene.assigns.graph) # pushes the changes
+    # end
 
 
-    def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, tidbit: t}} = scene) do
-        new_graph =
-            Scenic.Graph.build()
-            |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-                    id: :hypercard,
-                    fill: :rebecca_purple,
-                    translate: {
-                        frame.top_left.x,
-                        frame.top_left.y})
-            |> HyperCardTitle.add_to_graph(%{
-                frame: hypercard_title_frame(%{frame: scene.assigns.frame}), # calculate hypercard based of story_river
-                # text: "Luke" },
-                text: t.title },
-                id: :hypercard_title)
-                # scissor: hypercard_scissor(scene.assigns.frame))
-            |> HyperCardDateline.add_to_graph(%{
-                    frame: hypercard_dateline_frame(scene.assigns.frame) },
-                    id: :hypercard_dateline)
-            |> TagsBox.add_to_graph(%{
-                    frame: hypercard_tagsbox_frame(scene.assigns.frame) },
-                    id: :hypercard_tagsbox)
-            |> ToolBox.add_to_graph(%{
-                frame: hypercard_toolbox_frame(scene.assigns.frame) },
-                id: :hypercard_toolbox)
-            |> Scenic.Primitives.line(hypercard_line_spec(scene.assigns.frame), id: :hypercard_line, stroke: {2, :antique_white})
-            |> Body.add_to_graph(%{
-                frame: hypercard_body_frame(scene.assigns.frame),
-                contents: t.data },
-                id: :hypercard_body)
-
-        scene
-        |> assign(graph: new_graph)
-        |> assign(first_render?: false)
-    end
 
     # def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, tidbit: t}} = scene) do
 
@@ -357,23 +426,23 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     end
 
 
-    def handle_call({:re_render, %{frame: %Frame{} = f}}, _from, scene) do
-        new_scene = scene
-        |> assign(frame: f)
-        |> render_push_graph()
+    # def handle_call({:re_render, %{frame: %Frame{} = f}}, _from, scene) do
+    #     new_scene = scene
+    #     |> assign(frame: f)
+    #     |> render_push_graph()
         
-        {:reply, :ok, new_scene}
-    end
+    #     {:reply, :ok, new_scene}
+    # end
 
 
-    def handle_cast({:new_tidbit, t}, scene) do
+    # def handle_cast({:new_tidbit, t}, scene) do
 
-        new_scene = scene
-        |> assign(tidbit: t)
-        |> render_push_graph()
+    #     new_scene = scene
+    #     |> assign(tidbit: t)
+    #     |> render_push_graph()
 
-        {:noreply, new_scene}
-    end
+    #     {:noreply, new_scene}
+    # end
 
 
     #NOTE - you know, this is really the only thing that changes... all
@@ -390,4 +459,32 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         
     #     {:reply, :ok, new_scene}
     # end
+
+    @doc """
+    Calculates the render height of a bunch of text (after wrapping) for
+    a given frame (including margins!)
+    """
+    def calc_wrapped_text_height(%{frame: frame, text: unwrapped_text}) when is_bitstring(unwrapped_text) do
+
+        width = frame.dimensions.width
+        textbox_width = width-@margins.left-@margins.right
+
+        {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
+        wrapped_text = FontMetrics.wrap(unwrapped_text, textbox_width, @font_size, metrics)
+
+        #NOTE: This tells us, how long the body will be - because in Scenic
+        #      we take the top-left corner as the origin, the bottom of
+        #      a bounding box is greater than the top. The total height
+        #      is the bottom minus the top.
+        {_left, top, _right, bottom} =
+            Scenic.Graph.build()
+            |> Scenic.Primitives.text(wrapped_text, font: :ibm_plex_mono, font_size: @font_size)
+            |> Scenic.Graph.bounds()
+        
+        body_height = (bottom-top)+@margins.top+@margins.bottom
+    end
+
+    def calc_wrapped_text_height(_otherwise) do
+        150 #TODO this is complete guess lol
+    end
 end
