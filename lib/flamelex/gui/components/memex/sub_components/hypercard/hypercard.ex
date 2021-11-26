@@ -81,7 +81,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     # - work on render nice tags & datetime sections
     # - work on taking us into edit more for a tidbit
 
-    def render(%{frame: %{dimensions: %{width: width, height: :flex}} = frame, tidbit: %Memex.TidBit{data: body}}) do
+    def render(%{frame: %{dimensions: %{width: width, height: :flex}} = frame, tidbit: %Memex.TidBit{data: data}}) do
 
         #TODO good idea: render each sub-component as a seperate graph,
         #                calculate their heights, then use Scenic.Graph.add_to
@@ -92,15 +92,14 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         #                simply add that to another graph, as a sub-component
 
 
-        coords = {0,0}
-
         # header_height = calc_header_height()
         header_height = 250 #TODO lets just make this assumption for now
-        body_height = calc_wrapped_text_height(%{frame: frame, text: body})
+        body_height = calc_wrapped_text_height(%{frame: frame, text: data})
 
         full_hypercard_height = header_height+body_height
 
         # %{x: x, y: y} = frame.top_left
+
 
         base_graph =
             Scenic.Graph.build()
@@ -110,18 +109,17 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                     |> Scenic.Primitives.rect({width, full_hypercard_height},
                             id: :hypercard,
                             fill: :rebecca_purple)
-
-
+                    |> Scenic.Primitives.rect({width, header_height},
+                            id: :hypercard,
+                            fill: :deep_sky_blue)
                     #Hypercard title
                     #Hypercard Dateline
                     #TagsBox
                     #ToolBox
-                    #BODY
-                    # |> Scenic.Primitives.text(wrapped_text,
-                    #         font: :ibm_plex_mono,
-                    #         font_size: @font_size,
-                    #         fill: :black,
-                    #         translate: {@left_margin, @left_margin+@font_size}) #TODO this should actually be, one line height
+                    |> render_body(%{
+                            width: width,
+                            header_height: header_height,
+                            data: data })
                 end, [
                     #NOTE: We will scroll this pane around later on, and need to
                     #      add new TidBits to it with Modify
@@ -134,6 +132,27 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         # end)
     end
 
+    def render_body(graph, %{header_height: header_height, data: text, width: width}) when is_bitstring(text) do
+        textbox_width = width-@margins.left-@margins.right
+        {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf") #TODO put this in the %Scene{} maybe?
+        wrapped_text = FontMetrics.wrap(text, textbox_width, @font_size, metrics)
+
+        graph
+        |> Scenic.Primitives.text(wrapped_text,
+            font: :ibm_plex_mono,
+            font_size: @font_size,
+            fill: :black,
+            translate: {@margins.left, @margins.top+header_height+@font_size}) #TODO this should actually be, one line height
+    end
+
+    def render_body(graph, %{header_height: header_height, data: _data, width: width}) do
+        graph
+        |> Scenic.Primitives.text("UNABLE TO RENDER BODY",
+            font: :ibm_plex_mono,
+            font_size: @font_size,
+            fill: :black,
+            translate: {@margins.left, @margins.top+header_height+@font_size}) #TODO this should actually be, one line height
+    end
 
     #     def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, tidbit: t}} = scene) do
     #     new_graph =
@@ -482,6 +501,12 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
             |> Scenic.Graph.bounds()
         
         body_height = (bottom-top)+@margins.top+@margins.bottom
+
+        if body_height <= 150 do
+            150
+        else
+            body_height
+        end
     end
 
     def calc_wrapped_text_height(_otherwise) do
