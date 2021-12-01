@@ -85,7 +85,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         bounds = Scenic.Graph.bounds(new_graph)
 
         Flamelex.GUI.Component.LayoutList
-        |> GenServer.cast({:component_height, scene.assigns.tidbit.title, bounds})
+        |> GenServer.cast({:component_height, scene.assigns.tidbit, bounds})
         
         {:noreply, new_scene}
     end

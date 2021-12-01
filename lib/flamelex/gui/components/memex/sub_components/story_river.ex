@@ -203,6 +203,13 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         {:noreply, scene}
     end
 
+    def handle_cast({:clicked_exxxxit_tidbit, title}, scene) do
+        IO.puts "Leaving.... #{inspect title}" 
+        # GenServer.cast(title |> String.to_atom, :edit_mode)
+        GenServer.cast(Flamelex.GUI.Component.LayoutList, {:close_tidbit, title})
+        {:noreply, scene}
+    end
+
 
 
 

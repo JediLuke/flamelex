@@ -53,8 +53,7 @@ defmodule Flamelex.GUI.Component.LayoutList do
       # first_render?: true, #NOTE: We can do everything for the "first render" in the init/3 function
       active_components: [], # we haven't rendered any yet, so none are active
       render_queue: [] = params.components, # we will go through this list very soon & render them...
-      scroll: {0, 0},
-      acc_height: 0,
+      scroll: {0, 0}
     }
 
     Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
@@ -201,7 +200,6 @@ defmodule Flamelex.GUI.Component.LayoutList do
 
   def handle_cast(:render_next_component, scene = %{assigns: %{state: %{
                     #  active_components: [],
-                     acc_height: acc_height,
                      render_queue: [c|rest]}}}) do
     Logger.debug "Attempting to render an additional component in the LayoutList..."
     # Logger.warn "IN THE RENDER LIST YES"
@@ -213,8 +211,17 @@ defmodule Flamelex.GUI.Component.LayoutList do
     state = scene.assigns.state
     new_state = %{state | render_queue: rest}
 
+    acc_height = calc_acc_height(scene) #TODO loop through active components, calc height, including all spaced offsets!
+
     #NOTE - margin ought to be managed by the component itself - dont
     #       adjust the frame & pass it in, pass in margin as a prop
+
+    #TODO get current scroll for the river_pane, so we can use it again
+    #     as an option when we add the new HyperCard to the graph - I feel
+    #     like Scenic should have respected my initial options, but anyway...
+
+    #NOTE this is supposed to get the existing scroll but we need to cann it for now
+    # [%{transforms: %{translate: scroll_coords}}] = Scenic.Graph.get(scene.assigns.graph, :river_pane)
 
     new_graph = scene.assigns.graph
     |> Scenic.Graph.add_to(:river_pane, fn graph ->
@@ -224,7 +231,8 @@ defmodule Flamelex.GUI.Component.LayoutList do
             # top_left: {frame.top_left.x+margin_buf, frame.top_left.y+margin_buf+acc_height},
             # width: frame.dimensions.width-(2*margin_buf) # got to take off the margun_buf from each side...
           }
-          Kernel.apply(HyperCard, :add_to_graph, [graph, args, opts])
+          # Kernel.apply(HyperCard, :add_to_graph, [graph, args, [translate: scroll_coords]]) #TODO I dont think this actually worked
+          Kernel.apply(HyperCard, :add_to_graph, [graph, args, opts]) #TODO this always resets us back moving the story river to default! Very annoying!!
           # |> HyperCard.add_to_graph(%{
           #     top_left: {},
           #     width: {},
@@ -234,6 +242,8 @@ defmodule Flamelex.GUI.Component.LayoutList do
           #     # frame: hypercard_frame(frame), # calculate hypercard based of story_river
           #     tidbit: tidbit })
     end)
+    #NOTE this seems to have basically no effect on counter-acting the scroll reset when we open a new tidbit problem...
+    # |> Scenic.Graph.modify(:river_pane, &Scenic.Primitives.update_opts(&1, translate: scroll_coords))
 
     # then, riht at the end, call itself again until there's no render queue components (!?!?)
     # GenServer.cast(self(), :render_next_component)
@@ -308,7 +318,59 @@ defmodule Flamelex.GUI.Component.LayoutList do
   #   {:noreply, scene}
   # end
 
-  def handle_cast({:component_height, id, bounds}, %{assigns: %{state: state}} = scene) do
+  def handle_cast({:close_tidbit, title}, scene) do
+    #TODO here - we need to take the tidbit out of our list of active_components,
+    #            re-compute the graph from this new list & swap in the new graph
+    #            to update the display
+
+
+    #TODO so for now, cause I'm lazy, I'm just gonna take out the tidbit we
+    #     just closed & re-render everything from scratch
+    state = scene.assigns.state
+
+    new_active_components =
+      # state.active_components |> Enum.reject(& &1.title == title)
+      state.active_components
+      |> Enum.reject(fn {HyperCard, tidbit, _bounds} -> tidbit.title == title end)
+      # |> Enum.map(fn {HyperCard, tidbit, _bounds} -> tidbit end) # extract back out the main input, the TidBit, so we can just call re-render lmao
+
+      #lmao so I need to do this cause active_components have bounds, and actuall add_tidbit wants options
+      |> Enum.map(fn {HyperCard, tidbit, _bounds} -> {HyperCard, tidbit, []} end) # extract back out the main input, the TidBit, so we can just call re-render lmao
+
+    IO.inspect new_active_components, label: "WHATS LEFT"
+
+    new_state = %{state|active_components: [], render_queue: new_active_components}
+
+    new_graph = 
+      Scenic.Graph.build()
+      |> Scenic.Primitives.group(fn graph ->
+          graph
+        end, [
+            #NOTE: We will scroll this pane around later on, and need to
+            #      add new TidBits to it with Modify
+            id: :river_pane, # Scenic required we register groups/components with a name
+            translate: state.scroll
+        ])
+
+    new_scene = scene
+    |> assign(graph: new_graph)
+    |> assign(state: new_state)
+    |> push_graph(new_graph)
+
+    #NOTE: My original idea was to send all these re-render messages at once,
+    #      the problem with that is that then they all render before any
+    #      of them have called back with their height!! The solution is
+    #      to only render one, let it go through it's cycle (calling back
+    #      with it's own bounds) and then if we still have things in the
+    #      render_queue, re-drawing those too
+    #Enum.each(new_active_components, fn _x -> GenServer.cast(self(), :render_next_component) end)
+    GenServer.cast(self(), :render_next_component)
+
+    {:noreply, new_scene}
+  end
+
+  #TODO this should be called - register_component_bounds/size or something
+  def handle_cast({:component_height, full_tidbit, bounds}, %{assigns: %{state: state}} = scene) do
       # this callback is received when a component boots successfully -
       # it register itself to this component (parent-child relationship,
       # which ought to be able to handle props aswell!) including it's
@@ -316,21 +378,13 @@ defmodule Flamelex.GUI.Component.LayoutList do
       # size, and only wrap/clip in the most extreme circumstancses and/or
       # boundary conditions)
       # Logger.emergency "WERE GETTING CALLBACK"
-      IO.puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ callback"
-
-      IO.inspect id, label: "ID"
-      IO.inspect bounds, label: "BOUNDS"
-
-
-      {left, top, right, bottom} = bounds # top is less than bottom, because the axis starts in top-left corner
-      component_height = bottom - top
 
       new_state = %{state|
-                      active_components: state.active_components ++ [{HyperCard, id, bounds}],
-                      acc_height: state.acc_height+(component_height+@spacing_buffer)
+                      active_components: state.active_components ++ [{HyperCard, full_tidbit, bounds}],
+                      # acc_height: state.acc_height+(component_height+@spacing_buffer)
                     }
 
-      IO.puts "HEIGHT: #{inspect bounds}"
+      # IO.puts "HEIGHT: #{inspect bounds}"
       # ic scene
       # new_scene = scene
       # |> assign(open_tidbits: [{id, bounds}])
@@ -338,6 +392,32 @@ defmodule Flamelex.GUI.Component.LayoutList do
       # now, this scene will be able to use this data to render the
       # next TidBit in place!
 
+      # if scene.assigns.state.render_queue == [] do
+      #   # nothing
+      #   :ok
+      # else
+        # Since one component just called back, we are ready to render
+        # the next one if there are any which need it
+        GenServer.cast(self(), :render_next_component)
+      # end
+
       {:noreply, scene |> assign(state: new_state)}
   end
+
+
+  def calc_acc_height(%{assigns: %{state: %{active_components: components}}}) do
+
+    do_calc_acc_height(0, components)
+  end
+
+  def do_calc_acc_height(acc, []), do: acc
+
+  def do_calc_acc_height(acc, [{HyperCard, _id, bounds} = c|rest]) do
+    {_left, top, _right, bottom} = bounds # top is less than bottom, because the axis starts in top-left corner
+    component_height = bottom - top
+
+    new_acc = acc+component_height+@spacing_buffer
+    do_calc_acc_height(new_acc, rest)
+  end
+
 end

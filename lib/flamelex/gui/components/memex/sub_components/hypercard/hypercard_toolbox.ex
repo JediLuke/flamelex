@@ -53,16 +53,22 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.ToolBox do
                     translate: {
                         frame.top_left.x,
                         frame.top_left.y})
-            |> Scenic.Primitives.rounded_rectangle({
-                50,
-                50,
-                    roundedness},
+            |> Scenic.Primitives.rounded_rectangle({50, 50, roundedness},
                     id: :edit_tidbit_button,
                     fill: :orange,
                     translate: {frame.top_left.x+margin, frame.top_left.y+margin})
             |> Scenic.Primitives.text("E",
                     font: :ibm_plex_mono,
                     translate: {frame.top_left.x+margin+text_margin, frame.top_left.y+text_margin+text_size+margin}, # text draws from bottom-left corner??
+                    font_size: text_size,
+                    fill: :blue)
+            |> Scenic.Primitives.rounded_rectangle({50, 50, roundedness},
+                    id: :edit_tidbit_button,
+                    fill: :pink,
+                    translate: {frame.top_left.x+margin, frame.top_left.y+margin+50+margin})
+            |> Scenic.Primitives.text("X",
+                    font: :ibm_plex_mono,
+                    translate: {frame.top_left.x+margin+text_margin, frame.top_left.y+text_margin+text_size+margin+50+margin}, # text draws from bottom-left corner??
                     font_size: text_size,
                     fill: :blue)
 
@@ -105,7 +111,21 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.ToolBox do
 
          {:noreply, scene}
        else
-         {:noreply, scene}
+
+          exit_button_bounds = {frame.top_left.x+margin, frame.top_left.y+margin+50+margin+50, frame.top_left.x+margin+50, frame.top_left.y+margin+50+margin}
+
+            if coords |> inside?(exit_button_bounds) do
+                IO.puts "CLICKED EXXXXXIT TIDBIT"
+                Flamelex.GUI.Component.Memex.StoryRiver
+                |> GenServer.cast({:clicked_exxxxit_tidbit, scene.assigns.title})
+        
+                 {:noreply, scene}
+               else
+                {:noreply, scene}
+            end
+
+
+         
        end
     end
 
