@@ -109,7 +109,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
     end
 
     def handle_event({:value_changed, :search_field, value}, _context, scene) do
-        IO.puts "OT AN EVENT #{inspect event}"
+        # IO.puts "OT AN EVENT #{inspect event}"
         {:noreply, scene}
     end
 
