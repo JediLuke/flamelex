@@ -51,12 +51,16 @@ defmodule Flamelex.GUI.Component.Memex.SideBar do
                     translate: {
                         frame.top_left.x,
                         frame.top_left.y})
-            |> Scenic.Primitives.line(sidebar_line_spec(scene.assigns.frame),
-                    id: :sidebar_line,
-                    stroke: {2, :antique_white})
-            |> Scenic.Primitives.line(sidebar_line_two_spec(scene.assigns.frame),
-                id: :sidebar_line_two,
-                stroke: {2, :antique_white})
+            # |> Scenic.Primitives.line(sidebar_line_spec(scene.assigns.frame),
+            #         id: :sidebar_line,
+            #         stroke: {2, :antique_white})
+            # |> Scenic.Primitives.line(sidebar_line_two_spec(scene.assigns.frame),
+            #     id: :sidebar_line_two,
+            #     stroke: {2, :antique_white})
+            |> Sidebar.SearchBox.add_to_graph(%{
+                    mode: :inactive,
+                    frame: search_box_frame(scene.assigns.frame)},
+                    id: :search_box)
             |> Sidebar.Tabs.add_to_graph(%{
                     tabs: @tabs,
                     frame: sidebar_tabs_frame(scene.assigns.frame)},
@@ -124,6 +128,21 @@ defmodule Flamelex.GUI.Component.Memex.SideBar do
         {{x, y+line_y+external_margin+dateline_height}, {x+w, y+line_y+external_margin+dateline_height}} # extra 50 is the external margin
     end
 
+    def search_box_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
+
+        title_height = 60
+        buffer_margin = 20
+        dateline_height = 40 # from elsewhere in the app (lol)
+        external_margin = 0
+        line_y = 3*title_height + 2*buffer_margin
+
+        dateline_height = 40 # from elsewhere in the app (lol)
+
+        Frame.new(
+            top_left: {x, y+line_y+external_margin},
+            dimensions: {w, dateline_height})
+    end
+
     def sidebar_tabs_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
         title_height = 60
         buffer_margin = 20
@@ -185,6 +204,11 @@ defmodule Flamelex.GUI.Component.Memex.SideBar do
         |> push_graph(new_graph)
 
         {:noreply, new_scene}
+    end
+
+    def handle_cast({:switch_mode, :search}, scene) do
+        IO.puts "GOING INTO SEARCH MODE"
+         {:noreply, scene}
     end
 
     def handle_call({:re_render, %{frame: %Frame{} = f}}, _from, scene) do

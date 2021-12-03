@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Component.LayoutList do
+defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
   use Scenic.Component
   use Flamelex.ProjectAliases
   require Logger

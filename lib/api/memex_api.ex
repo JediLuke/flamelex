@@ -18,4 +18,11 @@ defmodule Flamelex.API.MemexWrap do #TODO ah fuck I think I undid all this by ac
 
   #TODO maybe we can do something cool, like, route other functions from
   # Memex, to Memelex
+
+  #NOTE I think the best answer may be to simply give the module name `Memex`
+  #     to Flamelex, and rename the app that backs up the Memex to have
+  #     module names starting with `Memelex` - avoiding the clash, keeping
+  #     them seperate, making them both available while at the same time
+  #     hopefully making a nice interface (thought I just realised they'll
+  ##    collide :(  well we'll figure it out eventually
 end

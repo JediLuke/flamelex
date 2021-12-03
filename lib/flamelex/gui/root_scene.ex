@@ -52,7 +52,7 @@ defmodule Flamelex.GUI.RootScene do
     |> assign(graph: graph)
     |> push_graph(graph)
     
-    capture_input(scene, [:key])
+    # capture_input(scene, [:key])
     request_input(scene, [:cursor_button, :cursor_scroll])
     #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
     #      the scene, so we just need to initialize it with *something*

@@ -8,6 +8,9 @@ defmodule Flamelex.Application do
 
     Logger.debug "#{__MODULE__} initializing..."
 
+    #TODO - eventually, we want to move to a centralized event-bus architecture
+    # EventBus.register_topic(:general)
+
     children = [
       Flamelex.Fluxus.TopLevelSupervisor,
       Flamelex.Buffer.TopLevelSupervisor,

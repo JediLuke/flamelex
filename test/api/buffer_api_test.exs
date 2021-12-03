@@ -53,7 +53,7 @@ defmodule Flamelex.Test.Buffers.BufferTest do
 
     assert Flamelex.BufferManager.count_open_buffers == 1
 
-    # Buffer.modify(Buffer.active_buffer(), {:insert, Memex.random_quote().text, {:cursor, 1}})
+    # Buffer.modify(Buffer.active_buffer(), {:insert, MemexWrap.random_quote().text, {:cursor, 1}})
 
     Buffer.close b
 

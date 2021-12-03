@@ -26,7 +26,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.Tabs do
         |> assign(first_render?: true)
         |> assign(active_tab: "Open")
         |> render_push_graph()
-    
+
+        request_input(init_scene, [:cursor_button])
 
         {:ok, init_scene}
     end
@@ -104,12 +105,12 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.Tabs do
         {:reply, :ok, new_scene}
     end
 
-    def handle_input(input, _context, scene) do
-        # pass all input up to the parent scene
-        IO.puts "TABS BAR GOT THE INPUT: #{inspect input}"
-        ic input
-        {:cont, input, scene}
-    end
+    # def handle_input(input, _context, scene) do
+    #     # pass all input up to the parent scene
+    #     IO.puts "TABS BAR GOT THE INPUT: #{inspect input}"
+    #     ic input
+    #     {:cont, input, scene}
+    # end
 
     def handle_event(event, _context, scene) do
         IO.puts "SOME  IGNORED event #{inspect event}"

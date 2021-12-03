@@ -28,19 +28,32 @@ defmodule Flamelex.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:scenic, "~> 0.11.0-beta.0"},
-      {:scenic_driver_local, "~> 0.11.0-beta.0"},
+
+      ## NOTE - these deps are all ones I have local copies of, so if you
+      #         happn to be reading this (hello Vacarsu) you'll need to
+      #         either clone them locally or switch back to the mix managed versions
+      #
+      #         I think you can just comment out memex for now, but, it might
+      #         also break stuff
+
+      # {:scenic, "~> 0.11.0-beta.0"},
+      {:scenic, path: "../scenic", override: true},
+      # {:scenic_driver_local, "~> 0.11.0-beta.0"},
+      {:scenic_driver_local, path: "../scenic_driver_local", override: true},
+      {:memex, path: "../memelex"}, #TODO change this to :memelex
       # {:scenic_layout_o_matic, "~> 0.4.0"},
+
+
+      # these deps should all be fine
       {:ecto_sql, "~> 3.0"},
-      {:truetype_metrics, "~> 0.3"},
-      {:font_metrics, "~> 0.3"},
+      {:truetype_metrics, "~> 0.5"},
+      {:font_metrics, "~> 0.5"},
       {:elixir_uuid, "~> 1.2"},
       {:wormhole, "~> 2.3"},
       {:jason, "~> 1.1"},
       {:gproc, "~> 0.5.0"}, #TODO remove gproc, use Registry
       {:tzdata, "~> 1.0.4"},
       {:event_bus, "~> 1.6.2"},
-      {:memex, path: "../memelex"}, #TODO change this to :memelex
       {:ex_doc, "~> 0.23", only: :dev, runtime: false},
       {:ice_cream, "~> 0.0.5", only: [:dev, :test]}
     ]
