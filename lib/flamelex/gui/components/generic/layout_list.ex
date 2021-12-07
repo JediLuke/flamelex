@@ -24,7 +24,7 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
   # def add / remove
 
   @spacing_buffer 25 # how much gap to put between each item in the layout
-  @min_position_cap 0
+  @min_position_cap {0, 0}
 
 
   def validate(%{
@@ -270,6 +270,8 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
       new_cumulative_scroll =
           cap_position(scene, Scenic.Math.Vector2.add(scene.assigns.state.scroll, fast_scroll))
 
+      Logger.debug(inspect new_cumulative_scroll)
+
       new_graph = scene.assigns.graph
           |> Scenic.Graph.modify(:river_pane, &Scenic.Primitives.update_opts(&1, translate: new_cumulative_scroll))
 
@@ -405,16 +407,16 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
       {:noreply, scene |> assign(state: new_state)}
   end
 
-  def cap_position(scene, coord) do
+  def cap_position(%{assigns: %{frame: frame}} = scene, coord) do
     height = calc_acc_height(scene)
-    if height > scene.assigns.frame.dimensions.height do
+    if height > frame.dimensions.height do
       coord
-      |> floor(@min_position_cap)
-      |> ceil(height)
+      |> floor({0, -height + frame.dimensions.height / 2})
+      |> ceil({0, 0})
     else
       coord
       |> floor(@min_position_cap)
-      |> ceil(0)
+      |> ceil(@min_position_cap)
     end
   end
 
@@ -432,8 +434,8 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
     do_calc_acc_height(new_acc, rest)
   end
 
-  defp floor({x, y}, min), do: {x, max(y, min)}
+  defp floor({x, y}, {min_x, min_y}), do: {max(x, min_x), max(y, min_y)}
 
-  defp ceil({x, y}, max), do: {x, min(y, max)}
+  defp ceil({x, y}, {max_x, max_y}), do: {min(x, max_x), min(y, max_y)}
 
 end
