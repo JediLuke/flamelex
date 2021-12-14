@@ -24,6 +24,7 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
   # def add / remove
 
   @spacing_buffer 25 # how much gap to put between each item in the layout
+  @min_position_cap {0, 0}
 
 
   def validate(%{
@@ -33,11 +34,11 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
         layout: l, #NOTE: Eventually, we want to have this available as "offset" aswell, for e.g. ManuBars - and plz blog this out one day!
         scroll: true,
       } = data) when l in [:flex_grow] and is_list(compnts) do
-        
+
     # Enum.each(compnts, fn %{module: mod, params: p, opts: o} = p ->
     #   Logger.debug "valid component: #{inspect p}"
     # end)
-        
+
     Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
     {:ok, data}
   end
@@ -92,7 +93,7 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
     #     # [{_id, {left, bottom, right, top} = bounds}] = ot
     #     [{_id, {left, top, right, bottom} = bounds}] = ot
 
-    #     new_graph = 
+    #     new_graph =
     #     scene.assigns.graph
     #     # |> Scenic.Graph.modify(:river_pane, fn group ->
     #     #         IO.inspect group, label: "FETCHED RIVER PANE"
@@ -108,7 +109,7 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
     #                 tidbit: tidbit })
 
     #     end)
-        
+
     #     # raise "this needs to be converted over to the new system"
     #     # frame = scene.assigns.frame
 
@@ -140,7 +141,7 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
     #     # #             tidbit: tidbit })
     #     # #             # id: :hypercard,
     #     # #             # t: scroll)
-        
+
     #     # # end)
     #     # #     |> Scenic.Primitives.group(fn graph ->
     #     # #     graph
@@ -155,7 +156,7 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
     #     # #     id: :river_pane, # Scenic required we register groups/components with a name
     #     # #     translate: scroll
     #     # # ])
-        
+
     #     # # &text(&1, "Updated Text 3") )
 
     #     new_scene = scene
@@ -182,7 +183,7 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
     # Logger.warn "IN THE LAYOUT LIST YES"
 
     GenServer.cast(self(), :render_next_component)
-    
+
     {:reply, :ok, new_scene}
   end
 
@@ -267,7 +268,9 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
 
       fast_scroll = {0, 3*y_scroll}
       new_cumulative_scroll =
-          Scenic.Math.Vector2.add(scene.assigns.state.scroll, fast_scroll)
+          cap_position(scene, Scenic.Math.Vector2.add(scene.assigns.state.scroll, fast_scroll))
+
+      Logger.debug(inspect new_cumulative_scroll)
 
       new_graph = scene.assigns.graph
           |> Scenic.Graph.modify(:river_pane, &Scenic.Primitives.update_opts(&1, translate: new_cumulative_scroll))
@@ -306,7 +309,7 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
 
   #   #TODO
   #   # new_graph = scene.assigns.graph
-  #   # |> 
+  #   # |>
 
   #   new_scene = scene
   #   |> assign(state: new_state)
@@ -341,7 +344,7 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
 
     new_state = %{state|active_components: [], render_queue: new_active_components}
 
-    new_graph = 
+    new_graph =
       Scenic.Graph.build()
       |> Scenic.Primitives.group(fn graph ->
           graph
@@ -404,9 +407,20 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
       {:noreply, scene |> assign(state: new_state)}
   end
 
+  def cap_position(%{assigns: %{frame: frame}} = scene, coord) do
+    height = calc_acc_height(scene)
+    if height > frame.dimensions.height do
+      coord
+      |> floor({0, -height + frame.dimensions.height / 2})
+      |> ceil({0, 0})
+    else
+      coord
+      |> floor(@min_position_cap)
+      |> ceil(@min_position_cap)
+    end
+  end
 
   def calc_acc_height(%{assigns: %{state: %{active_components: components}}}) do
-
     do_calc_acc_height(0, components)
   end
 
@@ -419,5 +433,9 @@ defmodule Flamelex.GUI.Component.LayoutList do #TODO this will be LinearLayout
     new_acc = acc+component_height+@spacing_buffer
     do_calc_acc_height(new_acc, rest)
   end
+
+  defp floor({x, y}, {min_x, min_y}), do: {max(x, min_x), max(y, min_y)}
+
+  defp ceil({x, y}, {max_x, max_y}), do: {min(x, max_x), min(y, max_y)}
 
 end
