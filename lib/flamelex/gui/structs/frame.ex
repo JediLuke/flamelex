@@ -3,7 +3,7 @@ defmodule Flamelex.GUI.Structs.Frame do
   Struct which holds relevant data for rendering a buffer frame status bar.
   """
   require Logger
-  use Flamelex.ProjectAliases
+  use Flamelex.ProjectAliases #NOTE: Can't use this, because this is aliased inside it!?
   alias Flamelex.Structs.BufRef
   alias Flamelex.GUI.Structs.GUIState
 
@@ -11,17 +11,18 @@ defmodule Flamelex.GUI.Structs.Frame do
   # to actually build one and cant just use a default struct cause it spits chips
 
   defstruct [
-    #TODO change top_left to `pin` (this would then be awesome to add an 'orientation' flag, which would default to scenic default, :top_left)
+    pin:          nil,            #TODO deprecate top_left
+    orientation:  :top_left,      # This means that the pin is located at the top-left corner of the Frame #TODO add checking for all current operations against being top_left orientation
     top_left:     nil,            # a %Coordinates{} struct, pointing to the top-left corner of the frame, referenced from top-left corner of the viewport
-    #TODO change dimensions to 'size' (or something better) - I dont think `dimens` is good
     dimensions:   nil,            # a %Dimensions{} struct, specifying the height and width of the frame
+    size:         nil,            #TODO deprecate dimensions in favor of size
     margin: %{
         top: 0,
         right: 0,
         bottom: 0,
         left: 0 },
-    # scenic_opts:  [],             # Scenic options
-    label:        nil             # an optional label, usually used to render a footer bar
+    label:        nil,            # an optional label, usually used to render a footer bar
+    opts:         %{}             # A map to hold options, e.g. %{render_footer?: true}
   ]
 
   # def test do
@@ -66,22 +67,28 @@ defmodule Flamelex.GUI.Structs.Frame do
 
 
   def new(%Scenic.ViewPort{size: {w, h}}) do
-    Logger.debug "constructing a new %Frame{} the size of the ViewPort."
-    %Frame{
+    Logger.debug "constructing a new %__MODULE__{} the size of the ViewPort."
+    %__MODULE__{
+      pin: {0, 0},
+      size: {w, h},
       top_left: Coordinates.new(x: 0, y: 0),
       dimensions: Dimensions.new(width: w, height: h)
     }
   end
 
   def new([pin: {x, y}, size: {w, h}]) do
-    %Frame{
+    %__MODULE__{
+      pin: {x, y},
+      size: {w, h},
       top_left: Coordinates.new(x: x, y: y),
       dimensions: Dimensions.new(width: w, height: h)
     }
   end
 
   def new([pin: %{x: x, y: y}, size: {w, h}]) do
-    %Frame{
+    %__MODULE__{
+      pin: {x, y},
+      size: {w, h},
       top_left: Coordinates.new(x: x, y: y),
       dimensions: Dimensions.new(width: w, height: h)
     }
@@ -142,22 +149,26 @@ defmodule Flamelex.GUI.Structs.Frame do
     }
   end
 
-  def new(top_left: {_x, _y} = c, dimensions: {_w, _h} = d) do
+  def new(top_left: {x, y} = c, dimensions: {w, h} = d) do
     %__MODULE__{
+      pin: {x, y},
+      size: {w, h},
       top_left:   c |> Coordinates.new(),
       dimensions: d |> Dimensions.new()
     }
   end
 
-  def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d) do
+  def new(top_left_corner: {x, y} = c, dimensions: {w, h} = d) do
     %__MODULE__{
+      pin: {x, y},
+      size: {w, h},
       top_left:   c |> Coordinates.new(),
       dimensions: d |> Dimensions.new()
     }
   end
 
 # def new(top_left_corner: {_x, _y} = c, dimensions: {_w, _h} = d, opts: o)  when is_list(o) do
-#     %Frame{
+#     %__MODULE__{
 #       top_left:     c |> Coordinates.new(),
 #       dimensions:   d |> Dimensions.new(),
 #       scenic_opts:  o
@@ -177,7 +188,7 @@ defmodule Flamelex.GUI.Structs.Frame do
 
   def draw_frame_footer(
         %Scenic.Graph{} = graph,
-        %{ frame: %Frame{} = frame,
+        %{ frame: %__MODULE__{} = frame,
            draw_footer?: true })
   do
 
@@ -232,7 +243,7 @@ defmodule Flamelex.GUI.Structs.Frame do
     graph
   end
 
-  def decorate_graph(%Scenic.Graph{} = graph, %{frame: %Frame{} = frame} = params) do
+  def decorate_graph(%Scenic.Graph{} = graph, %{frame: %__MODULE__{} = frame} = params) do
     Logger.debug "#{__MODULE__} framing up... frame: #{inspect frame}, params: #{inspect params}"
     Logger.warn "Not rly framing anything yet..."
     graph
@@ -264,19 +275,19 @@ defmodule Flamelex.GUI.Structs.Frame do
     %{frame|dimensions: new_dimensions}
   end
 
-  # def draw(%Scenic.Graph{} = graph, %Frame{} = frame) do
+  # def draw(%Scenic.Graph{} = graph, %__MODULE__{} = frame) do
   #   graph
   #   |> Draw.border_box(frame)
   #   |> draw_frame_footer(frame)
   # end
 
-  # def draw(%Scenic.Graph{} = graph, %Frame{} = frame, opts) when is_map(opts) do
+  # def draw(%Scenic.Graph{} = graph, %__MODULE__{} = frame, opts) when is_map(opts) do
   #   graph
   #   |> draw_frame_footer(frame, opts)
   #   |> Draw.border_box(frame)
   # end
 
-  # def draw(%Scenic.Graph{} = graph, %Frame{} = frame, %Flamelex.Fluxus.Structs.RadixState{} = radix_state) do
+  # def draw(%Scenic.Graph{} = graph, %__MODULE__{} = frame, %Flamelex.Fluxus.Structs.RadixState{} = radix_state) do
   #   graph
   #   |> draw_frame_footer(frame, radix_state)
   #   |> Draw.border_box(frame)
@@ -383,7 +394,7 @@ end
 
 
 #   @impl Scenic.Component
-#   def verify(%Frame{} = frame), do: {:ok, frame}
+#   def verify(%__MODULE__{} = frame), do: {:ok, frame}
 #   def verify(_else), do: :invalid_data
 
 #   @impl Scenic.Component
@@ -395,7 +406,7 @@ end
 
 
 #   @impl Scenic.Scene
-#   def init(%Frame{} = frame, _opts) do
+#   def init(%__MODULE__{} = frame, _opts) do
 #     # IO.puts "Initializing #{__MODULE__}..."
 #     {:ok, frame, push: GUI.GraphConstructors.Frame.convert(frame)}
 #   end
@@ -448,11 +459,11 @@ end
 #   #   Process.register(self(), __MODULE__) #TODO this should be gproc
 #   # end
 
-#   # def initialize(%Frame{} = frame) do
+#   # def initialize(%__MODULE__{} = frame) do
 #   #   # the textbox is internal to the command buffer, but we need the
 #   #   # coordinates of it in a few places, so we pre-calculate it here
 #   #   textbox_frame =
-#   #     %Frame{} = DrawingHelpers.calc_textbox_frame(frame)
+#   #     %__MODULE__{} = DrawingHelpers.calc_textbox_frame(frame)
 
 #   #   Draw.blank_graph()
 #   #   |> Scenic.Primitives.group(fn graph ->

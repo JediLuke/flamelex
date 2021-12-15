@@ -3,7 +3,7 @@ defmodule Flamelex.GUI.Component.MemexScreen do
    use Flamelex.ProjectAliases
    require Logger
    alias Flamelex.GUI.Component.Memex.{CollectionsPane,
-                                       StoryRiver, SideBar}
+                                       StoryRiver, SideBar, SecondSideBar}
 
    def validate(%{frame: %Frame{} = _f} = data) do
       Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
@@ -62,6 +62,10 @@ defmodule Flamelex.GUI.Component.MemexScreen do
 
       new_scene = scene
       |> assign(frame: Frame.new(
+                         pin: {0, 0},
+                         orientation: :top_left,
+                         size: {new_width, new_height},
+                         #TODO deprecate below args
                          top_left: Coordinates.new(x: 0, y: 0), # this is a guess
                          dimensions: Dimensions.new(width: new_width, height: new_height)))
       |> render_push_graph()
@@ -140,9 +144,11 @@ defmodule Flamelex.GUI.Component.MemexScreen do
       %{scene|assigns: scene.assigns |> Map.merge(%{graph: new_graph})}
    end
 
-   def add_sidebar(scene, data) do
+   def add_sidebar(scene, %{frame: frame}) do
+      #TODO here, we can experiment - we want to switch out old sidebar, for TidBar
       new_graph = scene.assigns.graph
-      |> SideBar.add_to_graph(data)
+      # |> SideBar.add_to_graph(data)
+      |> SecondSideBar.mount(%{ref: :second_sidebar, frame: frame, state: %{}})
 
       %{scene|assigns: scene.assigns |> Map.merge(%{graph: new_graph})}
    end

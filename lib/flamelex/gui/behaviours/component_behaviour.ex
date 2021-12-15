@@ -15,25 +15,27 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
       use Scenic.Component
       use Flamelex.ProjectAliases
       require Logger
-
+      
+      #NOTE: We must use the full component module names here, aliases
+      #      won't work because this is a macro.
 
       # validate the incoming arguments when we mount a scene
       def validate(%{
-            ref: _ref,                  # Each component needs a ref. This will be used for addressing (sending the component messages)
-            frame: %Frame{} = _f,       # Flamelex GUI components all have a defined %Frame{}
-            state: _x} = data)          # `state` is the holder for whatever data it is which defines the internal state of the component (usually a map)
+            ref: _ref,                                  # Each component needs a ref. This will be used for addressing (sending the component messages)
+            frame: %Flamelex.GUI.Structs.Frame{} = _f,  # Flamelex GUI components all have a defined %Flamelex.GUI.Structs.Frame{}
+            state: _x} = data)                          # `state` is the holder for whatever data it is which defines the internal state of the component (usually a map)
         do
           {:ok, data}
       end
 
       #I think veryfiy got deprecated??
       #NOTE:
-      # In our case, we always want a Component to be passed in a %Frame{}
+      # In our case, we always want a Component to be passed in a %Flamelex.GUI.Structs.Frame{}
       # so we don't need specific ones, each Component implements them
       # the same way. Also all components need a `ref`
       # def verify(%{
       #   ref: _r,                # the `ref` refers back to the Buffer that this GUI.Component is for, e.g. {:buffer, {:file, "README.md"}}
-      #   frame: %Flamelex.GUI.Structs.Frame{} = _f    # the %Frame{} which defines this GUI.Component
+      #   frame: %Flamelex.GUI.Structs.Frame{} = _f    # the %Flamelex.GUI.Structs.Frame{} which defines this GUI.Component
       # } = params) do
       #   {:ok, params}
       # end
@@ -117,20 +119,20 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
 
         #TODO search for if the process is already registered, if it is, engage recovery procedure
         #Process.monitor(Process.whereis(KommandBuffer))
-        ProcessRegistry.register(tag)
+        Flamelex.Utils.ProcessRegistry.register(tag)
         {:rego_tag, tag}
       end
 
       def update(ref, new_state) do
         #TODO here we might need rego_tag/1
-        ProcessRegistry.find(ref) |> GenServer.cast({:update, new_state})
+        Flamelex.Utils.ProcessRegistry.find(ref) |> GenServer.cast({:update, new_state})
       end
 
       def handle_cast({:update, new_state}, scene) do
         new_scene_first_stage = scene
         |> assign(state: new_state)
 
-        new_graph = new_graph(new_scene.assigns)
+        new_graph = new_graph(new_scene_first_stage.assigns)
         
         new_scene = new_scene_first_stage
         |> assign(graph: new_graph)
@@ -153,7 +155,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
   
   @doc """
   Each Component is represented internally at the highest level by the
-  %Frame{} datastructure. This function takes in that Component definition
+  %Flamelex.GUI.Structs.Frame{} datastructure. This function takes in that Component definition
   and returns a %Scenic.Graph{} which can be drawn by Scenic.
   """
   @callback render(%Scenic.Graph{}, map()) :: %Scenic.Graph{}
