@@ -93,6 +93,10 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
         |> assign(graph: new_graph)
         |> push_graph(new_graph)
 
+        if function_exported?(__MODULE__, :request_input, 1) do
+          apply(__MODULE__, :request_input, [init_scene])
+        end
+
         {:ok, init_scene}
       end
 
@@ -109,6 +113,10 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
           end,
         id: ref, #TODO do we need rego tag here?
         translate: {frame.top_left.x, frame.top_left.y})
+      end
+
+      def register_self(%{ref: :unregistered}) do
+        :did_not_register
       end
 
       def register_self(%{ref: ref} = params) do

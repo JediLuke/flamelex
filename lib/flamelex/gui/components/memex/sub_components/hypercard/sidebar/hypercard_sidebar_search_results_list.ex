@@ -76,7 +76,12 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchResultsList do
                     results_list
                     |> Enum.reduce({init_graph, _initial_carry = 35}, fn title, {graph, carry} ->
                             this_graph_updated = graph
-                            |> Scenic.Primitives.text(title, t: {10, carry})
+                            |> Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SingleResult.mount(%{
+                                 ref: :unregistered,
+                                 frame: Frame.new(pin: {10, carry}, size: {frame.dimensions.width, 35}),
+                                 state: %{text: title}
+                            })
+                            # |> Scenic.Primitives.text(title, t: {10, carry})
 
                             {this_graph_updated, carry+40}
                     end)
