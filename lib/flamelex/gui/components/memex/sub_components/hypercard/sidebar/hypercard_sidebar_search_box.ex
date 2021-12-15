@@ -57,7 +57,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
                 |> render_magnifying_glass_icon(frame)
                 |> Scenic.Components.text_field("Search...", id: :search_field, translate: {x+42,y+5})
 
-             end, [])
+             end, [id: :search_box])
 
         scene
         |> assign(graph: new_graph)
@@ -88,16 +88,22 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
     #     |> assign(graph: new_graph)
     # end
     
+    #NOTE: So apparently, clicking in the search box doesnt send an event here...
+    #      for this reason I'm just going to use `:value_changed` event,
+    #      but eventually would be better to just have click
     def handle_input({:cursor_button, {:btn_left, 0, [], coords}}, _context, %{assigns: %{mode: :inactive}} = scene) do
         Logger.debug "#{__MODULE__} recv'd :btn_left"
        bounds = Scenic.Graph.bounds(scene.assigns.graph) 
        IO.inspect bounds
        IO.inspect coords
        if coords |> inside?(bounds) do
-        #  GenServer.cast(Flamelex.GUI.Component.Memex.SideBar, {:switch_mode, :search})
+        IO.puts "INSIDE"
+        # p "inside"
+         GenServer.cast(Flamelex.GUI.Component.Memex.SideBar, {:switch_mode, :search})
           
          {:noreply, scene |> assign(mode: :search)}
        else
+        IO.puts "OUTSIDE"
          {:noreply, scene}
        end
     end
@@ -109,9 +115,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
     end
 
     def handle_event({:value_changed, :search_field, value}, _context, scene) do
-        # IO.puts "OT AN EVENT #{inspect event}"
+        GenServer.cast(Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchResults, {:search, value})
         {:noreply, scene}
     end
+
 
 
     # def inside?({x, y}, {left, bottom, right, top} = _bounds) do #TODO update the docs in Scenic itself 

@@ -5,7 +5,10 @@ defmodule Flamelex.GUI.Component.TextCursor do
   b) what mode we're in (by either blinking as a block, or being a straight line)
   """
   use Flamelex.ProjectAliases
-  use Flamelex.GUI.ComponentBehaviour
+  # use Flamelex.GUI.ComponentBehaviour
+  use Scenic.Component
+  use Flamelex.ProjectAliases
+      require Logger
   alias Flamelex.GUI.Component.Utils.TextCursor, as: CursorUtils
 
 

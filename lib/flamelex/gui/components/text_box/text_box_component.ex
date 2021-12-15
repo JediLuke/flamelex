@@ -2,7 +2,10 @@ defmodule Flamelex.GUI.Component.TextBox do
   @moduledoc """
   This module is just an example. Copy & modify it.
   """
-  use Flamelex.GUI.ComponentBehaviour
+  # use Flamelex.GUI.ComponentBehaviour
+  use Scenic.Component
+  use Flamelex.ProjectAliases
+      require Logger
   alias Flamelex.GUI.Component.Utils.TextBox, as: TextBoxDrawUtils
   alias Flamelex.GUI.Component.MenuBar
   alias Flamelex.GUI.Component.TextCursor
@@ -19,6 +22,7 @@ defmodule Flamelex.GUI.Component.TextBox do
   def init(scene, params, opts) do
 
     #TODO this is where the Frame _SHOULD_ be specified!!
+    # IO.inspect params
 
     params = custom_init_logic(params)
     # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()

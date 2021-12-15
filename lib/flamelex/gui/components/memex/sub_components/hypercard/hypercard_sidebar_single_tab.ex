@@ -99,7 +99,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.OneTab do #TODO SingleTab
         GenServer.cast(Flamelex.GUI.Component.Memex.SideBar, {:open_tab, scene.assigns.label})
          {:noreply, scene}
        else
-         IO.puts "DID NOT CLICK ON A TAB"
+        #  IO.puts "DID NOT CLICK ON A TAB"
          {:noreply, scene}
        end
     end

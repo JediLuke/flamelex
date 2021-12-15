@@ -149,7 +149,7 @@ defmodule Flamelex.GUI.Utils.Draw do
   # end
 
   def background(%Scenic.Graph{} = graph, %Frame{} = frame, color) do
-    Logger.warn "Deprecate me.... 22"
+    Logger.warn "Deprecate me.... 22 #{inspect frame}"
     width  = frame.dimensions.width + 1 #TODO need width +1 here for some quirky reason of Scenic library
     height = frame.dimensions.height
 

@@ -5,7 +5,10 @@ defmodule Flamelex.GUI.Component.MenuBar do
   The Menubar displays a tree-like structure of specific functions, enabling
   them to be triggered via the GUI.
   """
-  use Flamelex.GUI.ComponentBehaviour
+  # use Flamelex.GUI.ComponentBehaviour
+  use Scenic.Component
+  use Flamelex.ProjectAliases
+      require Logger
   alias Flamelex.GUI.Component.MenuBar.Utils
 
   #TODO deprecate these, but also come up eith a better name!!
@@ -27,6 +30,14 @@ defmodule Flamelex.GUI.Component.MenuBar do
   # end
   def rego_tag(x), do: {:gui_component, :menu_bar}
 
+  # def validate(%{
+  #   ref: _ref,                  # Each component needs a ref. This will be used for addressing (sending the component messages)
+  #   frame: %Frame{} = _f,       # Flamelex GUI components all have a defined %Frame{}
+  #   state: _x} = data)          # `state` is the holder for whatever data it is which defines the internal state of the component (usually a map)
+  def validate(data)
+do
+  {:ok, data}
+end
 
   @doc """
   This function returns a map which describes all the menu items.

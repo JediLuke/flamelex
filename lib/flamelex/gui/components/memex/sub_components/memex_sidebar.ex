@@ -7,6 +7,8 @@ defmodule Flamelex.GUI.Component.Memex.SideBar do
     # @tabs ["Open", "Recent", "EXPERIMENTAL!?","More"]
     @tabs ["Open", "Recent", "More"]
 
+    # use Flamelex.GUI.ComponentBehaviour
+
     def validate(%{frame: %Frame{} = _f} = data) do
         Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
         {:ok, data}
@@ -25,6 +27,7 @@ defmodule Flamelex.GUI.Component.Memex.SideBar do
          %{scene|assigns: scene.assigns |> Map.merge(params)} # bring in the params into the scene, just put them straight into assigns
         |> assign(first_render?: true)
         |> assign(active_tab: "Open")
+        |> assign(mode: :normal)
         |> render_push_graph()
     
 
@@ -70,6 +73,12 @@ defmodule Flamelex.GUI.Component.Memex.SideBar do
                 frame: sidebar_open_tidbits_frame(scene.assigns.frame)},
                 # id: {:sidebar, :low_pane, "Open"})
                 id: :sidebar_lowpane) # they all use this save id, so we can just delete this every time
+            |> Sidebar.SearchResults.add_to_graph(%{
+                results: [],
+                frame: sidebar_search_results_frame(scene.assigns.frame)},
+                # id: {:sidebar, :low_pane, "Open"})
+                id: :sidebar_search_results,
+                hidden: true)
                 
 
         scene
@@ -106,6 +115,12 @@ defmodule Flamelex.GUI.Component.Memex.SideBar do
             frame: sidebar_open_tidbits_frame(scene.assigns.frame)},
             # id: {:sidebar, :low_pane, "Open"})
             id: :sidebar_lowpane) # they all use this save id, so we can just delete this every time
+        |> Sidebar.SearchResults.add_to_graph(%{
+                results: [],
+                frame: sidebar_search_results_frame(scene.assigns.frame)},
+                # id: {:sidebar, :low_pane, "Open"})
+                id: :sidebar_search_results,
+                hidden: true)
 
         scene
         |> assign(graph: new_graph)
@@ -169,6 +184,19 @@ defmodule Flamelex.GUI.Component.Memex.SideBar do
             dimensions: {w, h-height_of_top_section-tab_bar_height})
     end
 
+    def sidebar_search_results_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
+        title_height = 60
+        buffer_margin = 20
+        tab_bar_height = dateline_height = 40 # from elsewhere in the app (lol)
+        external_margin = 0
+        line_y = 3*title_height + 2*buffer_margin
+        height_of_top_section = y+line_y+external_margin+dateline_height
+
+        Frame.new(
+            top_left: {x, y+height_of_top_section},
+            dimensions: {w, h-height_of_top_section})
+    end
+
     def handle_input(input, _context, scene) do
         ic input
         {:noreply, scene}
@@ -208,7 +236,42 @@ defmodule Flamelex.GUI.Component.Memex.SideBar do
 
     def handle_cast({:switch_mode, :search}, scene) do
         IO.puts "GOING INTO SEARCH MODE"
-         {:noreply, scene}
+        new_graph = scene.assigns.graph
+        # |> Scenic.Graph.delete(:sidebar_tabs)
+        # |> Scenic.Graph.delete(:sidebar_lowpane)
+        # |> Sidebar.OpenTidBits.add_to_graph(%{
+        #     open_tidbits: ["Luke", "Leah"],
+        #     frame: sidebar_open_tidbits_frame(scene.assigns.frame)},
+        #     # id: {:sidebar, :low_pane, "Open"})
+        #     id: :sidebar_lowpane) # they all use this save id, so we can just delete this every time
+
+        |> Scenic.Graph.modify(:sidebar_search_results, &Scenic.Primitives.update_opts(&1, hidden: false))
+
+        new_scene = scene
+        |> assign(graph: new_graph)
+        |> push_graph(new_graph)
+
+         {:noreply, new_scene}
+    end
+
+    def handle_cast({:switch_mode, :normal}, scene) do
+        IO.puts "GOING INTO NORMAL MODE"
+        new_graph = scene.assigns.graph
+        # |> Scenic.Graph.delete(:sidebar_tabs)
+        # |> Scenic.Graph.delete(:sidebar_lowpane)
+        # |> Sidebar.OpenTidBits.add_to_graph(%{
+        #     open_tidbits: ["Luke", "Leah"],
+        #     frame: sidebar_open_tidbits_frame(scene.assigns.frame)},
+        #     # id: {:sidebar, :low_pane, "Open"})
+        #     id: :sidebar_lowpane) # they all use this save id, so we can just delete this every time
+
+        |> Scenic.Graph.modify(:sidebar_search_results, &Scenic.Primitives.update_opts(&1, hidden: true))
+
+        new_scene = scene
+        |> assign(graph: new_graph)
+        |> push_graph(new_graph)
+
+         {:noreply, new_scene}
     end
 
     def handle_call({:re_render, %{frame: %Frame{} = f}}, _from, scene) do
