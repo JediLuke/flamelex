@@ -1,9 +1,8 @@
-defmodule Flamelex.GUI.ComponentBehaviour do
+defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple groups unfortunately, cant contain other components, because a pure render function cant handle the side-effects of processes being alive / holding state. Our only/best option would be kill each process & reboot it, but then we get timing issues cause processes dont die quick enough
   @moduledoc """
   GUI Components are defined here.
   """
 
-  #TODO either deprecate this component or make it mandatory!!
 
   defmacro __using__(_params) do
     quote do
@@ -18,106 +17,175 @@ defmodule Flamelex.GUI.ComponentBehaviour do
       require Logger
 
 
-      # validate the incoming arguments when we mount a scene?
-      def validate(data) do
-        {:ok, data}
+      # validate the incoming arguments when we mount a scene
+      def validate(%{
+            ref: _ref,                  # Each component needs a ref. This will be used for addressing (sending the component messages)
+            frame: %Frame{} = _f,       # Flamelex GUI components all have a defined %Frame{}
+            state: _x} = data)          # `state` is the holder for whatever data it is which defines the internal state of the component (usually a map)
+        do
+          {:ok, data}
       end
+
+      #I think veryfiy got deprecated??
+      #NOTE:
+      # In our case, we always want a Component to be passed in a %Frame{}
+      # so we don't need specific ones, each Component implements them
+      # the same way. Also all components need a `ref`
+      # def verify(%{
+      #   ref: _r,                # the `ref` refers back to the Buffer that this GUI.Component is for, e.g. {:buffer, {:file, "README.md"}}
+      #   frame: %Flamelex.GUI.Structs.Frame{} = _f    # the %Frame{} which defines this GUI.Component
+      # } = params) do
+      #   {:ok, params}
+      # end
+      # def verify(_else), do: :invalid_data
+      # @impl Scenic.Component
+      # def info(_data), do: ~s(Invalid data)
+
+
 
       @doc """
       Just like in Phoenix.LiveView, we mount our components onto an existing
       graph. In our case this is the same for all components though so we
       can abstract it out.
       """
-      #TODO deprecate, just use add_to_graph
-      def mount(%Scenic.Graph{} = graph, %{ref: r} = params) do
-        Logger.warn "deprecate me"
-        graph |> add_to_graph(params, id: r) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
+      #TODO here, we need to pull out which are args, and which are opts
+      #     I don't like sending a map AND a list, so I just accept a map :shrug:
+      def mount(%Scenic.Graph{} = graph, %{ref: r} = args) do
+        opts = [
+          id: r     # we need to register the component with a name in Scenic, by passing it in as an option
+        ]
+
+        #REMINDER: `args` will in turn be passed into `validate/1, and if
+        #          that succeeds, on to init/3 (as this is the way Scenic works)
+        graph |> add_to_graph(args, opts) #REMINDER: Under the hood, this is calling Scenic.Component.add_to_graph/3
       end
-      # def mount(%Scenic.Graph{} = graph, params) do
-      #   graph |> add_to_graph(params) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
-      # end
 
 
-      #NOTE:
-      # In our case, we always want a Component to be passed in a %Frame{}
-      # so we don't need specific ones, each Component implements them
-      # the same way. Also all components need a `ref`
-      def verify(%{
-        ref: _r,                # the `ref` refers back to the Buffer that this GUI.Component is for, e.g. {:buffer, {:file, "README.md"}}
-        frame: %Flamelex.GUI.Structs.Frame{} = _f    # the %Frame{} which defines this GUI.Component
-      } = params) do
-        {:ok, params}
+
+      def init(scene, params, opts) do
+        Logger.debug "#{__MODULE__} initializing... #{inspect params}"
+
+        params =
+          #NOTE: This little trick is so that `custom_init_logic` is optional
+          if function_exported?(__MODULE__, :custom_init_logic, 1) do
+            apply(__MODULE__, :custom_init_logic, [params])
+          else
+            params
+          end
+
+        register_self(params)
+
+        #TODO this could also subscribe to the channel for this id
+        Flamelex.Utils.PubSub.subscribe(topic: :gui_event_bus)
+        
+        init_scene_first_stage = scene
+        |> assign(ref: params.ref)
+        |> assign(state: params.state)
+        |> assign(frame: params.frame)
+        
+        new_graph = new_graph(init_scene_first_stage.assigns)
+
+        init_scene = init_scene_first_stage
+        |> assign(graph: new_graph)
+        |> push_graph(new_graph)
+
+        {:ok, init_scene}
       end
-      def verify(_else), do: :invalid_data
-      @impl Scenic.Component
-      def info(_data), do: ~s(Invalid data)
 
+      # This function builds our graph - render accepts this graph & adds
+      # the group of primitives
+        #TODO implement dev mode !! Each can be toggled with/without background!!
+        #TODO also implement the optional frame footer rendering, or anything else
+        # graph = render(params) 
+        # |> Frame.draw_frame_footer(params)
+      def new_graph(%{ref: ref, frame: frame, state: state} = args) do
+        Scenic.Graph.build()
+          |> Scenic.Primitives.group(fn init_graph ->
+               init_graph |> render(args) #REMINDER: render/1 has to be implemented by the modules "using" this behaviour, and that is the function being called here
+          end,
+        id: ref, #TODO do we need rego tag here?
+        translate: {frame.top_left.x, frame.top_left.y})
+      end
 
-      # def init(%{frame: %Frame{} = frame} = params, _scenic_opts) do
-      #   {:rego_tag, _tag} = register_self(params)
-
-      #   #NOTE: This little trick is so that `custom_init_logic` is optional
-      #   params =
-      #     if function_exported?(__MODULE__, :custom_init_logic, 1) do
-      #       apply(__MODULE__, :custom_init_logic, [params])
-      #     else
-      #       params
-      #     end
-
-      #   Flamelex.Utils.PubSub.subscribe(topic: :gui_event_bus)
-
-      #   graph =
-      #     #TODO change this to just render/1 eventually...
-      #     render(frame, params) #REMINDER: render/1 has to be implemented by the modules "using" this behaviour, and that is the function being called here
-      #     |> Frame.draw_frame_footer(params)
-
-      #   {:ok, {graph, params}, push: graph}
-      # end
-
-
-      #TODO maybe put __MODULE__ in here, so we can see what type of component it is in the registration?
       def register_self(%{ref: ref} = params) do
-        tag =
+        tag = {:gui_component, _mod, _ref} =
           if function_exported?(__MODULE__, :rego_tag, 1) do
             apply(__MODULE__, :rego_tag, [params])
           else
-            {:gui_component, ref} #TODO {__MODULE__, ref}
+            {:gui_component, __MODULE__, ref}
           end
 
         #TODO search for if the process is already registered, if it is, engage recovery procedure
-        #TODO this should be {:gui_component, frame.id}, or maybe other way around. It could also subscribe to the channel for this id
+        #Process.monitor(Process.whereis(KommandBuffer))
         ProcessRegistry.register(tag)
         {:rego_tag, tag}
       end
-    end
-  end
 
+      def update(ref, new_state) do
+        #TODO here we might need rego_tag/1
+        ProcessRegistry.find(ref) |> GenServer.cast({:update, new_state})
+      end
 
-  # @doc """
-  # This is called when the scene first renders. It appends the Scene (which
-  # is represented by Scenic as a reference to a `Scenic.Component` process,
-  # see: #TODO-[fetch link] for more info)
+      def handle_cast({:update, new_state}, scene) do
+        new_scene_first_stage = scene
+        |> assign(state: new_state)
 
-  # We have actually implemented this in the __using__ macro, but my heart
-  # tells me to leave this here anyway... maybe it'll save us some pain later.
-  # """
-  # @callback mount(%Scenic.Graph{}, map()) :: %Scenic.Graph{}
+        new_graph = new_graph(new_scene.assigns)
+        
+        new_scene = new_scene_first_stage
+        |> assign(graph: new_graph)
+        |> push_graph(new_graph)
+  
+        {:noreply, new_scene}
+      end
 
-  @doc """
-  We have a nice little method for initializing all components, but
-  sometimes there is some special logic which needs to be done during
-  a components init/2 function.
+      def handle_cast({:change_frame, new_frame}, scene) do
+        raise "can't do this yet but shouldn't be too hard"
+      end
 
-  This is an optional callback. #TODO
-  """
-  @callback custom_init_logic(map()) :: map()
+    
+    end # do quote 
+  end # do defmacro
 
+  
+  #---------------------------------------------------------------------
+
+  
   @doc """
   Each Component is represented internally at the highest level by the
   %Frame{} datastructure. This function takes in that Component definition
   and returns a %Scenic.Graph{} which can be drawn by Scenic.
   """
-  #TODO just make this a map & pass both in the map...
-  @callback render(%Flamelex.GUI.Structs.Frame{}, map()) :: %Scenic.Graph{}
+  @callback render(%Scenic.Graph{}, map()) :: %Scenic.Graph{}
 
+  @doc """
+  This behaviour gives a nice centralized & consistent method for
+  initializing all components, but sometimes there is some special logic
+  which needs to be done during a components init/2 function. In these
+  cases, implement `custom_init_logic/1` - the args are whatever the args
+  which were passed in during the call to `mount/1`, this function can
+  then transform those args however it likes, before they are actually
+  passed in to the start of the component initialization chain.
+
+  One common example of where to use custom_init_logic/1 is when defining
+  the initial state of a component.
+
+  DON'T try to register components inside custom_init_logic!! If you want
+  to customize how your component is registered, implement `rego_tag/1`
+  and you can use the same params you would get here to define how you
+  want the component to be registered (or if you want it to only have
+  one consistent global name)
+
+  This is an optional callback.
+  """
+  @callback custom_init_logic(map()) :: map()
+
+  @doc """
+  This function (which implemented) takes in a map of args and returns
+  the rego tag for this component. This is useful when trying to find
+  a component's pid.
+  """
+  @callback rego_tag(any()) :: any()
+
+  @optional_callbacks custom_init_logic: 1, rego_tag: 1
 end
