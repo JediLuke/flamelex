@@ -24,6 +24,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
         init_scene =
          %{scene|assigns: scene.assigns |> Map.merge(params)} # bring in the params into the scene, just put them straight into assigns
          |> assign(mode: :inactive)
+         |> assign(string: "Search...")
         |> render_push_graph()
     
         request_input(init_scene, [:cursor_button])
@@ -55,7 +56,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
                     frame.top_left.x,
                     frame.top_left.y })
                 |> render_magnifying_glass_icon(frame)
-                |> Scenic.Components.text_field("Search...", id: :search_field, translate: {x+42,y+5})
+                |> Scenic.Components.text_field(scene.assigns.string, id: :search_field, translate: {x+42,y+5})
 
              end, [id: :search_box])
 
@@ -96,14 +97,23 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
        bounds = Scenic.Graph.bounds(scene.assigns.graph) 
        IO.inspect bounds
        IO.inspect coords
+    #    if Scenic.Scene.global_to_local(scene, coords) |> inside?(bounds) do
        if coords |> inside?(bounds) do
         IO.puts "INSIDE"
         # p "inside"
-         GenServer.cast(Flamelex.GUI.Component.Memex.SideBar, {:switch_mode, :search})
+        #  GenServer.cast(Flamelex.GUI.Component.Memex.SideBar, {:switch_mode, :search})
           
-         {:noreply, scene |> assign(mode: :search)}
+         ProcessRegistry.find!({:gui_component, Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane, :lower_pane})
+         |> GenServer.cast({:search, scene.assigns.string})
+
+        #  {:noreply, scene |> assign(mode: :search)}
+         {:noreply, scene }
        else
         IO.puts "OUTSIDE"
+        ic bounds
+        ic coords
+        ic Scenic.Scene.global_to_local(scene, coords)
+        ic Scenic.Scene.local_to_global(scene, coords)
          {:noreply, scene}
        end
     end
@@ -124,6 +134,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
     # def inside?({x, y}, {left, bottom, right, top} = _bounds) do #TODO update the docs in Scenic itself 
     def inside?({x, y}, {left, top, right, bottom} = _bounds) do #TODO update the docs in Scenic itself 
         # remember, if y > top, if top is 100 cursor might be 120 -> in the box
-        top <= y and y <= bottom and left <= x and x <= right
+        # top <= y and y <= bottom and left <= x and x <= right
+        x >= left and y >= top and x <= right and y <= bottom
     end
 end

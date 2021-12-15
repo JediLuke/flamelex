@@ -69,12 +69,14 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
 
         params =
           #NOTE: This little trick is so that `custom_init_logic` is optional
-          if function_exported?(__MODULE__, :custom_init_logic, 1) do
-            apply(__MODULE__, :custom_init_logic, [params])
+          if function_exported?(__MODULE__, :custom_init_logic, 2) do
+            apply(__MODULE__, :custom_init_logic, [scene, params])
           else
             params
           end
 
+        #NOTE: To find a process later... e.g.
+        #      ProcessRegistry.find!({:gui_component, Flamelex.GUI.Component.Memex.SecondSideBar, :second_sidebar})
         register_self(params)
 
         #TODO this could also subscribe to the channel for this id
@@ -103,7 +105,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
       def new_graph(%{ref: ref, frame: frame, state: state} = args) do
         Scenic.Graph.build()
           |> Scenic.Primitives.group(fn init_graph ->
-               init_graph |> render(args) #REMINDER: render/1 has to be implemented by the modules "using" this behaviour, and that is the function being called here
+               init_graph |> render(args |> Map.merge(%{first_render?: true})) #REMINDER: render/1 has to be implemented by the modules "using" this behaviour, and that is the function being called here
           end,
         id: ref, #TODO do we need rego tag here?
         translate: {frame.top_left.x, frame.top_left.y})

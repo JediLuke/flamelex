@@ -27,7 +27,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.Tabs do
         |> assign(active_tab: "Open")
         |> render_push_graph()
 
-        request_input(init_scene, [:cursor_button])
+        # request_input(init_scene, [:cursor_button])
 
         {:ok, init_scene}
     end

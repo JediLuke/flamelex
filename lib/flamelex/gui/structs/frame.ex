@@ -7,8 +7,6 @@ defmodule Flamelex.GUI.Structs.Frame do
   alias Flamelex.Structs.BufRef
   alias Flamelex.GUI.Structs.GUIState
 
-  #TODO each "new/x" function should be making a new Scenic.Graph, we need
-  # to actually build one and cant just use a default struct cause it spits chips
 
   defstruct [
     orientation:  :top_left,      # This means that the pin is located at the top-left corner of the Frame #TODO add checking for all current operations against being top_left orientation
@@ -26,46 +24,6 @@ defmodule Flamelex.GUI.Structs.Frame do
     opts:         %{}             # A map to hold options, e.g. %{render_footer?: true}
   ]
 
-  # def test do
-  #   new("tester", {100, 100}, {100, 100})
-  # end
-
-  # def new(label, %Coordinates{} = c, %Dimensions{}  = d) do
-  #   new(
-  #     id:              label,
-  #     top_left_corner: %Coordinates{} = c,
-  #     dimensions:      %Dimensions{}  = d
-  #   )
-  # end
-  # def new(label, coords, dimensions) do
-  #   new(label, Coordinates.new(coords), Dimensions.new(dimensions))
-  # end
-
-  def calculate_frame_position(%{show_menubar?: true}) do
-    Coordinates.new(x: 0, y: Flamelex.GUI.Component.MenuBar.height())
-  end
-  def calculate_frame_position(_otherwise) do
-    Coordinates.new(x: 0, y: 0)
-  end
-  #   case opts |> Map.fetch(:show_menubar?) do
-  #     {:ok, true} ->
-        
-  #     _otherwise ->
-        
-  #   end
-  # end
-
-  #TODO lol whats going on here
-  def calculate_frame_size(opts, layout_dimens) do
-    case opts |> Map.fetch(:show_menubar?) do
-      {:ok, true} ->
-        Dimensions.new(width: layout_dimens.width, height: layout_dimens.height)
-      _otherwise ->
-        Dimensions.new(width: layout_dimens.width, height: layout_dimens.height)
-    end
-  end
-
-
 
   def new(%Scenic.ViewPort{size: {w, h}}) do
     Logger.debug "constructing a new %__MODULE__{} the size of the ViewPort."
@@ -77,6 +35,15 @@ defmodule Flamelex.GUI.Structs.Frame do
     }
   end
 
+  # def new(pin: {x, y}, size: {w, h}) do
+  #   %__MODULE__{
+  #     pin: {x, y},
+  #     size: {w, h},
+  #     top_left: Coordinates.new(x: x, y: y),
+  #     dimensions: Dimensions.new(width: w, height: h)
+  #   }
+  # end
+
   def new([pin: {x, y}, size: {w, h}]) do
     %__MODULE__{
       pin: {x, y},
@@ -86,15 +53,14 @@ defmodule Flamelex.GUI.Structs.Frame do
     }
   end
 
-  def new([pin: %{x: x, y: y}, size: {w, h}]) do
-    %__MODULE__{
-      pin: {x, y},
-      size: {w, h},
-      top_left: Coordinates.new(x: x, y: y),
-      dimensions: Dimensions.new(width: w, height: h)
-    }
-  end
-
+  # def new([pin: %{x: x, y: y}, size: {w, h}]) do
+  #   %__MODULE__{
+  #     pin: {x, y},
+  #     size: {w, h},
+  #     top_left: Coordinates.new(x: x, y: y),
+  #     dimensions: Dimensions.new(width: w, height: h)
+  #   }
+  # end
 
   # def new(
   #       %{
@@ -105,6 +71,7 @@ defmodule Flamelex.GUI.Structs.Frame do
   #           opts: opts
   #         }},
   #       buf_tag) do
+
   def new(
     top_left:     %Coordinates{} = c,
     dimensions:   %Dimensions{}  = d
@@ -274,6 +241,46 @@ defmodule Flamelex.GUI.Structs.Frame do
                       height: new_height )
 
     %{frame|dimensions: new_dimensions}
+  end
+
+
+  # def test do
+  #   new("tester", {100, 100}, {100, 100})
+  # end
+
+  # def new(label, %Coordinates{} = c, %Dimensions{}  = d) do
+  #   new(
+  #     id:              label,
+  #     top_left_corner: %Coordinates{} = c,
+  #     dimensions:      %Dimensions{}  = d
+  #   )
+  # end
+  # def new(label, coords, dimensions) do
+  #   new(label, Coordinates.new(coords), Dimensions.new(dimensions))
+  # end
+
+  def calculate_frame_position(%{show_menubar?: true}) do
+    Coordinates.new(x: 0, y: Flamelex.GUI.Component.MenuBar.height())
+  end
+  def calculate_frame_position(_otherwise) do
+    Coordinates.new(x: 0, y: 0)
+  end
+  #   case opts |> Map.fetch(:show_menubar?) do
+  #     {:ok, true} ->
+        
+  #     _otherwise ->
+        
+  #   end
+  # end
+
+  #TODO lol whats going on here
+  def calculate_frame_size(opts, layout_dimens) do
+    case opts |> Map.fetch(:show_menubar?) do
+      {:ok, true} ->
+        Dimensions.new(width: layout_dimens.width, height: layout_dimens.height)
+      _otherwise ->
+        Dimensions.new(width: layout_dimens.width, height: layout_dimens.height)
+    end
   end
 
   # def draw(%Scenic.Graph{} = graph, %__MODULE__{} = frame) do

@@ -89,14 +89,17 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.OneTab do #TODO SingleTab
     end
 
     def handle_input({:cursor_button, {:btn_left, 0, [], coords}}, _context, scene) do
-        #Logger.debug "#{__MODULE__} recv'd :btn_left"
        bounds = Scenic.Graph.bounds(scene.assigns.graph) 
        if coords |> inside?(bounds) do
          Logger.debug "You clicked inside the tab: #{scene.assigns.label}"
          #TODO here we need to throw the event "up" into SideBar to handle
          #TODO is this still supported? If not, Scenic docs need updating...
         #  {:cont, {:tab_click, scene.assigns.label}, scene}
-        GenServer.cast(Flamelex.GUI.Component.Memex.SideBar, {:open_tab, scene.assigns.label})
+        # GenServer.cast(Flamelex.GUI.Component.Memex.SideBar, {:open_tab, scene.assigns.label})
+        {:gui_component, Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane, :lower_pane}
+        |> ProcessRegistry.find!()
+        |> GenServer.cast({:open_tab, scene.assigns.label})
+
          {:noreply, scene}
        else
         #  IO.puts "DID NOT CLICK ON A TAB"
