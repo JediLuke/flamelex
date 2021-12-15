@@ -11,11 +11,12 @@ defmodule Flamelex.GUI.Structs.Frame do
   # to actually build one and cant just use a default struct cause it spits chips
 
   defstruct [
-    pin:          nil,            #TODO deprecate top_left
     orientation:  :top_left,      # This means that the pin is located at the top-left corner of the Frame #TODO add checking for all current operations against being top_left orientation
+    pin:          {0, 0},         #TODO deprecate top_left
+    size:         nil,            #TODO deprecate dimensions in favor of size
+    #TODO deprecate next 2
     top_left:     nil,            # a %Coordinates{} struct, pointing to the top-left corner of the frame, referenced from top-left corner of the viewport
     dimensions:   nil,            # a %Dimensions{} struct, specifying the height and width of the frame
-    size:         nil,            #TODO deprecate dimensions in favor of size
     margin: %{
         top: 0,
         right: 0,
