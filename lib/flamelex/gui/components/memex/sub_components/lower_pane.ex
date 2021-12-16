@@ -39,6 +39,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane do
         |> Scenic.Graph.delete(:sidebar_memex_control)
         |> Scenic.Graph.delete(:sidebar_open_tidbits)
         |> Scenic.Graph.delete(:sidebar_search_results)
+        |> Sidebar.Tabs.add_to_graph(%{
+            tabs: ["Open", "Recent", "More"],
+            frame: Frame.new(pin: {0, 0}, size: {w, @tabs_menu_height}),
+            id: :sidebar_tabs}, id: :sidebar_tabs, t: frame.pin)
         |> Sidebar.MoreFeatures.add_to_graph(%{
             # open_tidbits: ["Luke", "Leah"],
             frame: Frame.new(pin: {0, @tabs_menu_height}, size: {w, h-@tabs_menu_height}),

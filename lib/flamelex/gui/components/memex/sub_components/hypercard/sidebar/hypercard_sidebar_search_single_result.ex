@@ -38,8 +38,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SingleResult do
         bounds = Scenic.Graph.bounds(scene.assigns.graph)
 
         if coords |> inside?(bounds) do
-            IO.puts "WE CLICKED THE BUTTON #{inspect scene.assigns.state}"
-            # Flamelex.API.MemexWrap.open(scene.assigns.state)
+            #TODO - so ideally, we should treat buttons clicks as the same
+            #       as user input - it should get routed to the RadixFluxus,
+            #       parsed in the context of the global & local state, etc...
+            Flamelex.API.MemexWrap.open(scene.assigns.state)
 
             {:gui_component, Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane, :lower_pane}
             |> ProcessRegistry.find!()

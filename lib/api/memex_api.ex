@@ -11,9 +11,19 @@ defmodule Flamelex.API.MemexWrap do #TODO ah fuck I think I undid all this by ac
     Flamelex.Fluxus.Action.fire(:open_memex)
   end
 
+  def open(%Memex.TidBit{uuid: uuid} = t) when is_bitstring(uuid) do
+    Logger.debug "#{__MODULE__} opening the Memex..."
+    Flamelex.Fluxus.Action.fire({:open_tidbit, t})
+  end
+
   def close do
     Logger.debug "#{__MODULE__} closing the Memex..."
     Flamelex.Fluxus.Action.fire(:close_memex) # this is, really, at the end of the day - pushing all state through a syncronized point
+  end
+
+  def tiggle_search do
+    Logger.debug "#{__MODULE__} closing the Memex..."
+    Flamelex.Fluxus.Action.fire(:tiggle_search)
   end
 
   #TODO maybe we can do something cool, like, route other functions from
