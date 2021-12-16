@@ -43,6 +43,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SingleResult do
             #       parsed in the context of the global & local state, etc...
             Flamelex.API.MemexWrap.open(scene.assigns.state)
 
+            Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox
+            # |> ProcessRegistry.find!()
+            |> GenServer.cast(:deactivate)
+
             {:gui_component, Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane, :lower_pane}
             |> ProcessRegistry.find!()
             |> GenServer.cast({:open_tab, "unknown"})

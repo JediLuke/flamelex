@@ -19,7 +19,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
 
     def init(scene, params, opts) do
         Logger.debug "#{__MODULE__} initializing..."
-        # Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
+        Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
 
         init_scene =
          %{scene|assigns: scene.assigns |> Map.merge(params)} # bring in the params into the scene, just put them straight into assigns
@@ -106,8 +106,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
          ProcessRegistry.find!({:gui_component, Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane, :lower_pane})
          |> GenServer.cast({:search, scene.assigns.string})
 
-        #  {:noreply, scene |> assign(mode: :search)}
-         {:noreply, scene }
+         {:noreply, scene |> assign(mode: :search)}
+        #  {:noreply, scene }
        else
         IO.puts "OUTSIDE"
         ic bounds
@@ -122,6 +122,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
     def handle_input(input, _context, scene) do
         #IO.puts "TABS GOT INPUT #{inspect input}, context: #{inspect context}"
         {:noreply, scene}
+    end
+
+    def handle_cast(:deactivate, scene) do
+        {:noreply, scene |> assign(mode: :inactive)}
     end
 
     def handle_event({:value_changed, :search_field, value}, _context, scene) do

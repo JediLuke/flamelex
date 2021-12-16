@@ -49,7 +49,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane do
             # id: {:sidebar, :low_pane, "Open"})
             id: :sidebar_memex_control}, id: :sidebar_memex_control, t: frame.pin) # they all use this save id, so we can just delete this every time
 
+        new_state = scene.assigns.state |> Map.merge(%{mode: :normal})
+
         new_scene = scene
+        |> assign(state: new_state)
         |> assign(graph: new_graph)
         |> push_graph(new_graph)
 
@@ -74,7 +77,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane do
             # id: {:sidebar, :low_pane, "Open"})
             id: :sidebar_open_tidbits, t: frame.pin) # they all use this save id, so we can just delete this every time
 
+        new_state = scene.assigns.state |> Map.merge(%{mode: :normal})
+
         new_scene = scene
+        |> assign(state: new_state)
         |> assign(graph: new_graph)
         |> push_graph(new_graph)
 
@@ -109,13 +115,23 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane do
      #TODO note that fkin text input box fucks everything up... it captures keystrokes!!
 
      def handle_cast({:search, search_term}, %{assigns: %{state: %{mode: :search}}} = scene) do
-        {:ok, [sidebar_search_results: pid]} = Scenic.Scene.children(scene)
-        GenServer.cast(pid, {:search, search_term})
+        # {:ok, [sidebar_search_results: pid]} = Scenic.Scene.children(scene)
+        {:ok, children} = Scenic.Scene.children(scene)
+        children |> Enum.map(fn {:sidebar_search_results, pid} ->
+                                    GenServer.cast(pid, {:search, search_term})
+                                _else ->
+                                    :ok
+                            end)
+        
         {:noreply, scene}
      end
 
      def handle_input(@escape_key, _context, %{assigns: %{state: %{mode: :search}, frame: frame}} = scene) do
         full_frame = {w, h} = {frame.dimensions.width, frame.dimensions.height}
+
+        {:gui_component, Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox, :search_box}
+        |> ProcessRegistry.find!()
+        |> GenServer.cast(:deactivate)
 
         IO.puts "YEYERYERY"
         new_graph = scene.assigns.graph

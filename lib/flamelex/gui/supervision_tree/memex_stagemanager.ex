@@ -33,6 +33,13 @@ defmodule Flamelex.GUI.StageManager.Memex do
     {:noreply, new_state}
   end
 
+  def handle_cast({:open_tidbit, t}, state) do
+    Logger.debug "#{__MODULE__} recv'd msg: {:open_random, #{t.title}}"
+    new_state = %{state|open: state.open ++ [t]}
+    GenServer.cast(Flamelex.GUI.Component.Memex.StoryRiver, {:add_tidbit, t})
+    {:noreply, new_state}
+  end
+
   def handle_call(:get_open_tidbits, _from, %{open: []} = state) do
     Logger.warn "Dont wanna open empty Memex yet lol, just render a rando..."
     #TODO fix the bug vacarsu found here
