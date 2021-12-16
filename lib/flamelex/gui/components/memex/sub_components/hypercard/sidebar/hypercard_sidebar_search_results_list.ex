@@ -74,12 +74,12 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchResultsList do
                 #TODO tage tidbit results, turn them into a new component "SingleResult" or someting which "uses" LinearLayoutItem
                 {final_graph, _final_offset} =
                     results_list
-                    |> Enum.reduce({init_graph, _initial_carry = 35}, fn title, {graph, carry} ->
+                    |> Enum.reduce({init_graph, _initial_carry = 35}, fn tidbit, {graph, carry} ->
                             this_graph_updated = graph
                             |> Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SingleResult.mount(%{
                                  ref: :unregistered,
                                  frame: Frame.new(pin: {10, carry}, size: {frame.dimensions.width, 35}),
-                                 state: %{text: title}
+                                 state: tidbit
                             })
                             # |> Scenic.Primitives.text(title, t: {10, carry})
 

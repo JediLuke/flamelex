@@ -101,7 +101,6 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchResults do
         IO.puts "Searching #{search_term} "
         r = Memex.My.Wiki.list(search_term)
             |> Enum.sort(& String.jaro_distance(search_term, &1.title) >= String.jaro_distance(search_term, &2.title))
-            |> Enum.map(& &1.title)
         GenServer.cast(Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchResultsList, {:update_results, r})
         {:noreply, scene}
     end

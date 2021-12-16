@@ -28,19 +28,22 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane do
             frame: Frame.new(pin: {0, @tabs_menu_height}, size: {w, h-@tabs_menu_height})},
             # frame: sidebar_open_tidbits_frame(frame)},
             # id: {:sidebar, :low_pane, "Open"})
-            id: :sidebar_lowpane) # they all use this save id, so we can just delete this every time
+            id: :sidebar_open_tidbits) # they all use this save id, so we can just delete this every time
     end
 
 
     def handle_cast({:open_tab, "More"}, %{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame}} = scene) do
         full_frame = {w, h} = {frame.dimensions.width, frame.dimensions.height}
         new_graph = graph
-        |> Scenic.Graph.delete(:sidebar_lowpane)
+        |> Scenic.Graph.delete(:sidebar_tabs)
+        |> Scenic.Graph.delete(:sidebar_memex_control)
+        |> Scenic.Graph.delete(:sidebar_open_tidbits)
+        |> Scenic.Graph.delete(:sidebar_search_results)
         |> Sidebar.MoreFeatures.add_to_graph(%{
-            open_tidbits: ["Luke", "Leah"],
+            # open_tidbits: ["Luke", "Leah"],
             frame: Frame.new(pin: {0, @tabs_menu_height}, size: {w, h-@tabs_menu_height}),
             # id: {:sidebar, :low_pane, "Open"})
-            id: :sidebar_lowpane}, id: :sidebar_lowpane, t: frame.pin) # they all use this save id, so we can just delete this every time
+            id: :sidebar_memex_control}, id: :sidebar_memex_control, t: frame.pin) # they all use this save id, so we can just delete this every time
 
         new_scene = scene
         |> assign(graph: new_graph)
@@ -52,13 +55,20 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane do
     def handle_cast({:open_tab, _else}, %{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame}} = scene) do
         full_frame = {w, h} = {frame.dimensions.width, frame.dimensions.height}
         new_graph = graph
-        |> Scenic.Graph.delete(:sidebar_lowpane)
+        |> Scenic.Graph.delete(:sidebar_tabs)
+        |> Scenic.Graph.delete(:sidebar_memex_control)
+        |> Scenic.Graph.delete(:sidebar_open_tidbits)
+        |> Scenic.Graph.delete(:sidebar_search_results)
+        |> Sidebar.Tabs.add_to_graph(%{
+            tabs: ["Open", "Recent", "More"],
+            frame: Frame.new(pin: {0, 0}, size: {w, @tabs_menu_height}),
+            id: :sidebar_tabs}, id: :sidebar_tabs, t: frame.pin)
         |> Sidebar.OpenTidBits.add_to_graph(%{
             open_tidbits: ["Luke", "Leah"],
             frame: Frame.new(pin: {0, @tabs_menu_height}, size: {w, h-@tabs_menu_height})},
             # frame: sidebar_open_tidbits_frame(frame)},
             # id: {:sidebar, :low_pane, "Open"})
-            id: :sidebar_lowpane, t: frame.pin) # they all use this save id, so we can just delete this every time
+            id: :sidebar_open_tidbits, t: frame.pin) # they all use this save id, so we can just delete this every time
 
         new_scene = scene
         |> assign(graph: new_graph)
@@ -74,7 +84,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane do
 
         new_graph = scene.assigns.graph
         |> Scenic.Graph.delete(:sidebar_tabs)
-        |> Scenic.Graph.delete(:sidebar_lowpane)
+        |> Scenic.Graph.delete(:sidebar_memex_control)
+        |> Scenic.Graph.delete(:sidebar_open_tidbits)
+        |> Scenic.Graph.delete(:sidebar_search_results)
         |> Sidebar.SearchResults.add_to_graph(%{
             results: [],
             frame: Frame.new(pin: {0, 0}, size: {w, h})},
@@ -103,6 +115,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane do
 
         IO.puts "YEYERYERY"
         new_graph = scene.assigns.graph
+        |> Scenic.Graph.delete(:sidebar_tabs)
+        |> Scenic.Graph.delete(:sidebar_memex_control)
+        |> Scenic.Graph.delete(:sidebar_open_tidbits)
         |> Scenic.Graph.delete(:sidebar_search_results)
         |> Sidebar.Tabs.add_to_graph(%{
             tabs: ["Open", "Recent", "More"],
@@ -113,7 +128,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane do
             frame: Frame.new(pin: {0, @tabs_menu_height}, size: {w, h-@tabs_menu_height})},
             # frame: sidebar_open_tidbits_frame(frame)},
             # id: {:sidebar, :low_pane, "Open"})
-            id: :sidebar_lowpane, t: frame.pin) # they all use this save id, so we can just delete this every time
+            id: :sidebar_open_tidbits, t: frame.pin) # they all use this save id, so we can just delete this every time
 
         new_state = scene.assigns.state |> Map.merge(%{mode: :normal})
 

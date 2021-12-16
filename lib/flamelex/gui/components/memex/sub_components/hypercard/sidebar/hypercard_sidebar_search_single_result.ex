@@ -6,10 +6,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SingleResult do
     #TODO use LayoutItem??
 
     def request_input(scene) do
-        request_input(scene, [:cursor_pos])
+        request_input(scene, [:cursor_pos, :cursor_button])
     end
 
-    def render(graph, %{state: %{text: text}, frame: frame}) do
+    def render(graph, %{state: %{title: text}, frame: frame}) do
         graph
         |> Scenic.Primitives.rect(frame.size, fill: :blue, t: {10, -32}, id: :background)
         |> Scenic.Primitives.text(text, t: {10, 0})
@@ -32,6 +32,25 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SingleResult do
         |> push_graph(new_graph)
 
         {:noreply, new_scene}
+    end
+
+    def handle_input({:cursor_button, {:btn_left, 0, [], coords}}, _context, scene) do
+        bounds = Scenic.Graph.bounds(scene.assigns.graph)
+
+        if coords |> inside?(bounds) do
+            IO.puts "WE CLICKED THE BUTTON #{inspect scene.assigns.state}"
+            # Flamelex.API.MemexWrap.open(scene.assigns.state)
+
+            {:gui_component, Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane, :lower_pane}
+            |> ProcessRegistry.find!()
+            |> GenServer.cast({:open_tab, "unknown"})
+        end
+
+        {:noreply, scene}
+    end
+
+    def handle_input({:cursor_button, _otherwise}, _context, scene) do
+        {:noreply, scene}
     end
 
         # def inside?({x, y}, {left, bottom, right, top} = _bounds) do #TODO update the docs in Scenic itself 
