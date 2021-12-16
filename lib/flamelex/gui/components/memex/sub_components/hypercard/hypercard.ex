@@ -4,7 +4,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     require Logger
     alias Flamelex.GUI.Component.Memex.{HyperCardTitle,
                                         HyperCardDateline}
-    alias Flamelex.GUI.Component.Memex.HyperCard.{TagsBox, ToolBox, Body}
+    alias Flamelex.GUI.Component.Memex.HyperCard.{TagsBox, ToolBox, EditorsToolBox, Body}
 
     
     #TODO
@@ -92,9 +92,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 
     def handle_cast(:edit_mode, scene) do
         Logger.debug "*********** EDIT MODE ***********"
-
         body_height = calc_wrapped_text_height(%{frame: scene.assigns.frame, text: scene.assigns.tidbit.data})
         full_hypercard_height = @header_height+body_height
+
 
         new_graph = scene.assigns.graph
         |> Scenic.Graph.delete(String.to_atom("hypercard_" <> scene.assigns.tidbit.title))
@@ -115,13 +115,62 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
             #         hypercard_frame: frame })
             # |> render_tagsbox(%{
             #         hypercard_frame: frame })
-            # |> render_toolbox(%{
-            #     hypercard_frame: frame,
-            #     title: tidbit.title })
+            |> render_editors_toolbox(%{
+                frame: scene.assigns.frame,
+                tidbit: scene.assigns.tidbit })
             # |> render_body(%{
             #         width: width,
             #         header_height: @header_height,
             #         data: data })
+        end, [
+            #NOTE: We will scroll this pane around later on, and need to
+            #      add new TidBits to it with Modify
+            # id: :hypercard_itself, # Scenic required we register groups/components with a name
+            id: String.to_atom("hypercard_" <> scene.assigns.tidbit.title),
+            translate: {scene.assigns.frame.top_left.x+@buffer_margin, scene.assigns.frame.top_left.y+@buffer_margin}
+        ])
+
+        new_scene = scene
+        |> assign(graph: new_graph)
+        |> push_graph(new_graph)
+
+        {:noreply, new_scene}
+    end
+
+    def handle_cast(:exit_edit_mode, scene) do
+
+        frame = scene.assigns.frame
+        tidbit = scene.assigns.tidbit
+
+        body_height = calc_wrapped_text_height(%{frame: frame, text: tidbit.data})
+        full_hypercard_height = @header_height+body_height
+
+        new_graph = scene.assigns.graph
+        |> Scenic.Graph.delete(String.to_atom("hypercard_" <> scene.assigns.tidbit.title))
+        |> Scenic.Primitives.group(fn graph ->
+                    graph
+                    # render the background rectangle first, as our base layer, now that we know how high it needs to be
+                    |> Scenic.Primitives.rect({frame.dimensions.width, full_hypercard_height},
+                            id: :hypercard,
+                            fill: :rebecca_purple)
+                    # render just the background for the header section
+                    |> Scenic.Primitives.rect({frame.dimensions.width, @header_height},
+                            id: :hypercard,
+                            fill: :deep_sky_blue)
+                    |> render_title(%{
+                            title: tidbit.title,
+                            hypercard_frame: frame })
+                    |> render_dateline(%{
+                            hypercard_frame: frame })
+                    |> render_tagsbox(%{
+                            hypercard_frame: frame })
+                    |> render_toolbox(%{
+                        hypercard_frame: frame,
+                        title: tidbit.title })
+                    |> render_body(%{
+                            width: frame.dimensions.width,
+                            header_height: @header_height,
+                            data: tidbit.data })
         end, [
             #NOTE: We will scroll this pane around later on, and need to
             #      add new TidBits to it with Modify
@@ -275,6 +324,25 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         #             @margin.left+title_width+@margin.left,
         #             @margin.top})
         |> ToolBox.add_to_graph(%{frame: toolbox_frame, title: title})
+    end
+
+    def render_editors_toolbox(graph, %{frame: hyper_frame, tidbit: tidbit}) do
+        title_width = @title_width_factor*(hyper_frame.dimensions.width-(2*@buffer_margin))
+
+        toolbox_width = hyper_frame.dimensions.width-(@margin.left+title_width+@margin.left)-@margin.right
+        toolbox_height = @title_height+@date_margin+@dateline_height+@date_margin+@title_height
+
+        toolbox_top_left = {@margin.left+title_width+@margin.left, @margin.top}
+
+        toolbox_frame = Frame.new(pin: toolbox_top_left, size: {toolbox_width, toolbox_height})
+
+        graph
+        # |> Scenic.Primitives.rect({toolbox_width, toolbox_height},
+        #         fill: :sky_blue,
+        #         translate: {
+        #             @margin.left+title_width+@margin.left,
+        #             @margin.top})
+        |> EditorsToolBox.add_to_graph(%{frame: toolbox_frame, tidbit: tidbit})
     end
 
     # def hypercard_toolbox_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
