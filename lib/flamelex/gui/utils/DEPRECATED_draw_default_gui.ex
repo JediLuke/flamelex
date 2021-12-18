@@ -21,7 +21,7 @@ def draw(%{viewport: %Scenic.ViewPort{} = vp}) do
   Scenic.Graph.build()
   |> draw_transmutation_circle(vp)
   |> mount_menubar(vp)
-  |> mount_kommand_buffer(vp)
+  # |> mount_kommand_buffer(vp)
   # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
   # |> Scenic.Primitives.rect({80, 80}, fill: :green,  translate: {140, 140})
 end
