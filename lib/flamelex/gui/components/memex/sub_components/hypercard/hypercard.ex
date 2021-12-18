@@ -5,6 +5,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     alias Flamelex.GUI.Component.Memex.{HyperCardTitle,
                                         HyperCardDateline}
     alias Flamelex.GUI.Component.Memex.HyperCard.{TagsBox, ToolBox, EditorsToolBox, Body}
+    alias Flamelex.GUI.Component.Generic.NeoTextBox
 
     
     #TODO
@@ -118,10 +119,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
             |> render_editors_toolbox(%{
                 frame: scene.assigns.frame,
                 tidbit: scene.assigns.tidbit })
-            # |> render_body(%{
-            #         width: width,
-            #         header_height: @header_height,
-            #         data: data })
+            |> render_editors_body(%{
+                    width: scene.assigns.frame.dimensions.width,
+                    header_height: @header_height,
+                    tidbit: scene.assigns.tidbit })
         end, [
             #NOTE: We will scroll this pane around later on, and need to
             #      add new TidBits to it with Modify
@@ -236,6 +237,35 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
                     id: String.to_atom("hypercard_" <> tidbit.title),
                     translate: {frame.top_left.x+@buffer_margin, frame.top_left.y+@buffer_margin}
                 ])
+    end
+
+    def render_editors_body(graph, %{tidbit: %{data: text} = tidbit, width: width} = args) when is_bitstring(text) do
+        # textbox_width = width-@margin.left-@margin.right
+        # {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf") #TODO put this in the %Scene{} maybe?
+        # wrapped_text = FontMetrics.wrap(text, textbox_width, @font_size, metrics)
+
+        #TODO this now needs to be a textbox!!
+
+        # graph
+        # |> Scenic.Primitives.text(wrapped_text,
+        #     font: :ibm_plex_mono,
+        #     font_size: @font_size,
+        #     fill: :black,
+        #     translate: {@margin.left, @margin.top+header_height+@font_size}) #TODO this should actually be, one line height
+        pin = {@margin.left, @margin.top+@header_height+@font_size}#TODO this should actually be, one line height
+
+        state = args |> Map.merge(%{
+            margin: @margin,
+            header_height: @header_height,
+            font_size: @font_size,
+        })
+
+        graph
+        |> NeoTextBox.mount(%{
+                ref: :neo_text_box,
+                frame: Frame.new(pin: pin, size: {width, :flex}),
+                state: state
+            })
     end
 
     def render_body(graph, %{header_height: header_height, data: text, width: width}) when is_bitstring(text) do

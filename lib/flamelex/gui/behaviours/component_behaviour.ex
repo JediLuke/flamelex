@@ -52,7 +52,11 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
       """
       #TODO here, we need to pull out which are args, and which are opts
       #     I don't like sending a map AND a list, so I just accept a map :shrug:
-      def mount(%Scenic.Graph{} = graph, %{ref: r} = args) do
+      def mount(%Scenic.Graph{} = graph, %{
+            ref: r,
+            frame: %Flamelex.GUI.Structs.Frame{} = _f,
+            state: _state
+      } = args) do
         opts = [
           id: r     # we need to register the component with a name in Scenic, by passing it in as an option
         ]
