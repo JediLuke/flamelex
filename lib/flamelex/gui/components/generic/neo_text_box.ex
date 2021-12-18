@@ -3,31 +3,62 @@ defmodule Flamelex.GUI.Component.Generic.NeoTextBox do
     alias Flamelex.GUI.Component.Memex.HyperCard.Sidebar
     use Flamelex.GUI.ScenicEventsDefinitions
 
-    def validate(%{state: %{margin: margin, header_height: header_height, width: width, data: text, font_size: font_size}} = data) do
+    def validate(%{state: %{
+            margin: margin,
+            header_height: header_height,
+            width: width,
+            data: text,
+            font_size: font_size
+    }} = data) do
         {:ok, data}
     end
 
-    def custom_init_logic(scene, args) do
-        request_input(scene, [:key])
+    def custom_init_logic(_scene, args) do
+        # request_input(scene, [:key])
         args
     end
 
-    def render(graph, %{state: %{margin: margin, header_height: header_height, width: width, tidbit: tidbit, font_size: font_size}} = args) do
+    # STEP 1 - a border
+    # Step 2 - a cursor
+    # step 3 - working test editing
+    # step 4 - use this for header aswell
+
+    def render(graph, %{state: %{
+            margin: margin,
+            header_height: header_height,
+            width: width,
+            tidbit: tidbit,
+            font_size: font_size
+    }, frame: frame} = args) do
 
         textbox_width = width-margin.left-margin.right
         {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf") #TODO put this in the %Scene{} maybe?
         wrapped_text = FontMetrics.wrap(tidbit.data, textbox_width, font_size, metrics)
 
-        #TODO this now needs to be a textbox!!
-        IO.puts "22222"
+        # bottom - top / descent - ascent
+        ascent = FontMetrics.ascent(font_size, metrics)
+        d = FontMetrics.descent(font_size, metrics)
 
+        text_height = ascent+(d*-1)
+        ic text_height
+
+        num_lines = String.split(wrapped_text, "\n", trim: true) |> Enum.count()
+
+        ic num_lines
+
+        text_box_height = num_lines * text_height
+
+        dimens = %{height: text_box_height, width: textbox_width}
         graph
         # |> Scenic.Primitives.rect({250, 250}, t: {500, 500}, fill: :yellow)
+        |> Draw.border_box(%{x: 0, y: 0-ascent} |> Map.merge(dimens), {1, :black})
         |> Scenic.Primitives.text(wrapped_text,
             font: :ibm_plex_mono,
             font_size: font_size,
-            fill: :black,
-        )
+            fill: :black)
+            #TODO - how to draw a flexibly high border, which depends on how
+            #       high the above text is - obviously I need to calculate
+            #       how high this text is, that's not obviously easy to me how to do...
             # translate: {margin.left, margin.top+font_size}) #TODO this should actually be, one line height
             # translate: {margin.left, margin.top+font_size}) #TODO this should actually be, one line height
     end

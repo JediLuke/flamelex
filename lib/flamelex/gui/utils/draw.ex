@@ -191,6 +191,22 @@ defmodule Flamelex.GUI.Utils.Draw do
     |> Scenic.Primitives.rect({width, height}, fill: :white, translate: {x, y})
   end
 
+  def box(%Scenic.Graph{} = graph, %{x: x, y: y, width: width, height: height}) do
+    graph
+    |> Scenic.Primitives.rect({width, height}, fill: :white, translate: {x, y})
+  end
+
+  def border_box(%Scenic.Graph{} = graph, %{x: x, y: y, width: width, height: height}, {size, color} = stroke)
+  when is_positive_integer(size) and is_atom(color) do
+    x_coord = x + (size/2)
+    y_coord = y + (size/2)
+    width   = width - (size/2)
+    height  = height - (size/2)
+
+    graph
+    |> Scenic.Primitives.rect({width, height}, stroke: stroke, translate: {x_coord, y_coord})
+end
+
   def border_box(%Scenic.Graph{} = graph, %Frame{} = frame) do
     stroke = {2, :dark_grey}
     border_box(graph, frame, stroke)
