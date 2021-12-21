@@ -8,7 +8,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
   # use Flamelex.GUI.ComponentBehaviour
   use Scenic.Component
   use Flamelex.ProjectAliases
-      require Logger
+  require Logger
   alias Flamelex.GUI.Component.MenuBar.Utils
 
   #TODO deprecate these, but also come up eith a better name!!
@@ -42,6 +42,8 @@ end
   @doc """
   This function returns a map which describes all the menu items.
   """
+  # def custom_menu_map
+  #TODO this should be a list, not a map, then the order is enforced
   def menu_buttons_mapping do
     # top-level buttons
     %{
@@ -61,6 +63,33 @@ end
       "DevTools" => %{},
       "Help" => %{},
     }
+  end
+
+  def menubar_schematic do
+    # Can be either:
+    #   a) just a string (maybe a button, no drop-down)
+    #   b) a tuple with a label & the drop-down
+
+    [
+      {"Flamelex", [
+        {"temet nosce", {Flamelex, :temet_nosce, []}},
+        {"show cmder", {Flamelex.API.CommandBuffer, :show, []}}
+      ]},
+      {"Memex", [
+        # {"temet nosce", {Flamelex, :temet_nosce, []}}
+        # {"show cmder", {Flamelex.API.CommandBuffer, :show, []}
+      ]},
+    ]
+
+    ++ memex_custom_modulez() ++ [
+      "Help"
+    ]
+  end
+
+  def memex_custom_modulez do
+    {"My Customz", [
+      {Memelex.Journal, :now, []}
+    ]}
   end
 
 
@@ -84,7 +113,7 @@ end
     #                then (for now) just broadcast it to both components which need it
     #
 
-    request_input(new_scene, [:cursor_pos, :cursor_button])
+    request_input(new_scene, [:cursor_pos, :cursor_button, :key])
 
     {:ok, new_scene}
   end
@@ -136,9 +165,10 @@ end
   and push_graph() has side-effects. For that reason,  I think it *has*
   to be a def/defp within this module.
   """
+  #TODO this is what we want inside EACH GUI.component - handling input is wrapped in Wormhole
   def process_input(%{assigns: %{state: init_state}} = scene, input) do
-    case Wormhole.capture(Utils, :handle_input, [scene, input], skip_log: @skip_log) do
-      {:ok, %{assigns: %{state: ^init_state}}} ->
+    case Wormhole.capture(Utils, :handle_input, [scene, input], skip_log: @skip_log) do #TODO each component should automatically also have a reducer to handle input
+      {:ok, %Scenic.Scene{assigns: %{state: ^init_state}}} ->
           # no change in state, nothing to re-draw
           #Logger.debug "no change in state... (current state: #{inspect init_state})"
           {:noreply, scene}
@@ -166,6 +196,7 @@ end
     #NOTE: On the flip side, we are (potentially? Maybe Scenic optimizes?)
     #      re-drawing the entire graph for every mouse-movement...
     case Wormhole.capture(Utils, :render, [scene], skip_log: @skip_log) do
+      #TODO chek for state changes here
       {:ok, new_scene} ->
         new_scene |> push_graph(new_scene.assigns.graph)
       {:error, reason} ->

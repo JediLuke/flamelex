@@ -154,7 +154,21 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
 
   def render_submenu(scene, menu_map, index) do
     Logger.debug "HERE we want to be rendering the sub_menu!"
-    scene
+
+    sub_menu = menu_map |> Enum.into([]) |> Enum.at(index-1)
+
+    new_graph = scene.assigns.graph
+    |> Flamelex.GUI.Component.MenuBar.SubMenu.mount(%{
+          state: sub_menu,
+          ref: {:sub_menu, index},
+          frame: Frame.new(
+            pin: {MenuBar.menu_item_width()*(index-1),MenuBar.height()},
+            # pin: {MenuBar.height(), MenuBar.menu_item_width()*index},
+            size: {MenuBar.menu_item_width(),:flex})})
+
+    # scene |> assign(graph: new_graph)
+    new_scene = scene
+    |> Draw.put_graph(new_graph) #TODO nowadays, I don't love this, but I guess it was a progression
   end
 
 
@@ -238,6 +252,20 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   #     scene |> update_state(:not_hovering_over_menubar)
   #   end
   # end
+
+  def handle_input(%{assigns: %{state: {:hover, {:main_menubar, _index}}}} = scene, {:cursor_pos, {x, y}}) do
+    if y <= MenuBar.height() do
+      #Logger.debug "now hovering over the menubar..."
+      index = (x |> floor() |> div(MenuBar.menu_item_width()))+1 # calc how wide a button is - indexes start at 1 !!
+      scene |> update_state({:hover, {:main_menubar, index}})
+    else
+      scene #NOTE: This is a HACK, we have to press escape or click something to exit the menu lol
+    end
+  end
+
+  def handle_input(%{assigns: %{state: {:hover, {:main_menubar, index}}}} = scene, @escape_key) do
+    scene |> update_state(:not_hovering_over_menubar)
+  end
 
   def handle_input(scene, {:cursor_pos, {x, y}}) do
     if y <= MenuBar.height() do
