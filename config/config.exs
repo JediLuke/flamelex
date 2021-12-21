@@ -1,6 +1,5 @@
 import Config
 
-
 config :elixir,
   # https://hexdocs.pm/elixir/DateTime.html#module-time-zone-database
   :time_zone_database, Tzdata.TimeZoneDatabase
@@ -11,19 +10,13 @@ config :scenic,
 config :flamelex,
   :key_mapping, Flamelex.API.KeyMappings.VimClone
 
-# config :memex,
-#   environment: %{
-#     name: "Nicholas",
-#     memex_directory: "/Users/luke/memex/Nicholas",
-#     backups_directory: "/Users/luke/memex/backups/Nicholas"
-#   }
-
 config :memelex,
-  environment: %{
-    name: "JediLuke",
-    memex_directory: "/Users/luke/memex/JediLuke_copy",
-    # backups_directory: "/Users/luke/memex/backups/JediLuke"
-  }
+  active?: false
+  # environment: %{
+  #   name: "Beauregard",
+  #   memex_directory: "/Users/luke/memex/Beauregard",
+  #   backups_directory: "/Users/luke/memex/backups/Beauregard"
+  # }
 
 # remove superfluous newline characters from logs
 # see: https://elixirforum.com/t/why-does-logger-output-in-iex-have-to-have-an-empty-line-after-every-line-logged/21822/4
