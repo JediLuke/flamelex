@@ -56,32 +56,9 @@ defmodule Flamelex.GUI.Utils.Draw do
     scene |> put_graph(new_graph)
   end
 
-  # def test_pattern(graph) do
-  #   rect_size = {80, 80}
+  # def test_pattern(%Scenic.Graph{} = graph, %{frame: %Frame{pin: pin, size: size}}) do
   #   graph
-  #   # 1st column
-  #   |> Scenic.Primitives.rect(rect_size, fill: :white,  translate: {100, 100})
-  #   |> Scenic.Primitives.rect(rect_size, fill: :green,  translate: {100, 180})
-  #   |> Scenic.Primitives.rect(rect_size, fill: :red,    translate: {100, 260})
-  #   # 2nd column
-  #   |> Scenic.Primitives.rect(rect_size, fill: :blue,   translate: {180, 100})
-  #   |> Scenic.Primitives.rect(rect_size, fill: :black,  translate: {180, 180})
-  #   |> Scenic.Primitives.rect(rect_size, fill: :yellow, translate: {180, 260})
-  #   # 3rd column
-  #   |> Scenic.Primitives.rect(rect_size, fill: :pink,   translate: {260, 100})
-  #   |> Scenic.Primitives.rect(rect_size, fill: :purple, translate: {260, 180})
-  #   |> Scenic.Primitives.rect(rect_size, fill: :brown,  translate: {260, 260})
-  # end
-
-  # @doc """
-  # Return a simple frame, doesn't contain any buffer yet.
-  # """
-  # def empty_frame(%{id: id, top_left: top_left, size: size}) do
-  #   Frame.new(
-  #     id: id,
-  #     top_left_corner: top_left, #TODO make just top_left
-  #     dimensions: size
-  #   )
+  #   |> Scenic.Primitives.rect(size, translate: pin, fill: :green)
   # end
 
   # def border(%Scenic.Scene{assigns: %{frame: %{top_left: {x, y}, dimensions: {w, h}}, graph: g}} = scene) do
@@ -91,7 +68,6 @@ defmodule Flamelex.GUI.Utils.Draw do
   #     g |> Scenic.Primitives.rect({w, h}, stroke: stroke, translate: {x, y})
   #   scene |> put_graph(new_graph)
   # end
-
 
   def border(%Scenic.Scene{assigns: %{frame: frame, graph: graph}} = scene) do
     #Logger.debug "drawing a border..."

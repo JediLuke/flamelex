@@ -46,7 +46,8 @@ end
   #TODO this should be a list, not a map, then the order is enforced
   def menu_buttons_mapping do
     # top-level buttons
-    %{
+
+    default_map = %{
       "Flamelex" => %{
         "temet nosce" => {Flamelex, :temet_nosce, []},
         "show cmder" => {Flamelex.API.CommandBuffer, :show, []}
@@ -57,12 +58,29 @@ end
       },
       "GUI" => %{}, #TODO auto-generate it from the GUI file
       "Buffer" => %{
-        "open README" => {Flamelex.Buffer, :open!, []},
-        "close" => {Flamelex.Buffer, :close, ["/Users/luke/workbench/elixir/flamelex/README.md"]},
+        "open README" => {Flamelex.API.Buffer, :open!, ["/Users/luke/workbench/elixir/flamelex/README.md"]},
+        "close" => {Flamelex.API.Buffer, :close, ["/Users/luke/workbench/elixir/flamelex/README.md"]},
       },
       "DevTools" => %{},
-      "Help" => %{},
+      "Help" => %{
+        "Getting Started" => nil,
+        "About" => nil
+      },
     }
+
+    
+    case Memex.Env.ExecutiveManager |> Process.whereis() do
+      pid when is_pid(pid) ->
+        {:ok, name} = GenServer.call(Memex.Env.ExecutiveManager, :who_am_i?)
+        case GenServer.call(Memex.Env.ExecutiveManager, :fetch_custom_menu) do
+          {:ok, custom_menu} ->
+            default_map |> Map.merge(Map.new([{name, custom_menu}]))
+          {:error, _reason} ->
+            default_map
+        end
+      _otherwise ->
+        default_map
+    end
   end
 
   def menubar_schematic do

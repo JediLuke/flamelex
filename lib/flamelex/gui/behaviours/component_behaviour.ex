@@ -131,6 +131,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
             {:gui_component, __MODULE__, ref}
           end
 
+        Logger.debug "#{__MODULE__} registering as: #{inspect tag}"
         #TODO search for if the process is already registered, if it is, engage recovery procedure
         #Process.monitor(Process.whereis(KommandBuffer))
         Flamelex.Utils.ProcessRegistry.register(tag)

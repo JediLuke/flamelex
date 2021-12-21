@@ -21,12 +21,13 @@ defmodule Flamelex.GUI.Component.MenuBar.SubMenu do
         |> Scenic.Primitives.group(fn init_graph ->
             {final_graph, _final_offset} =
                 sub_menu
-                |> Enum.reduce({init_graph, _init_carry = 28}, fn {title, action}, {graph, carry} ->
+                |> Enum.reduce({init_graph, _init_carry = 0}, fn {title, action}, {graph, carry} ->
                             this_graph_updated = graph
                             #TODO this nees to be its own component, like a search result, so we can detect hover events
-                            |> Scenic.Primitives.text(title, t: {10,carry})
+                            # |> Scenic.Primitives.text(title, t: {10,carry})
+                            |> Scenic.Components.button(title, t: {0, carry}, id: {title, action})
 
-                            {this_graph_updated, carry+26}
+                            {this_graph_updated, carry+41}
                 end)
 
             final_graph
@@ -37,6 +38,11 @@ defmodule Flamelex.GUI.Component.MenuBar.SubMenu do
 
         # |> Draw.test_pattern(new_args)
         # |> Scenic.Primitives.rect({width, height}, fill: :green)
+    end
+
+    def handle_event({:click, {_title, {mod, func, args}}}, _context, scene) do
+        Kernel.apply(mod, func, args)
+        {:noreply, scene}
     end
 
 
