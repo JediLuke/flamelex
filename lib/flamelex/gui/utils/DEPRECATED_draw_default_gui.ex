@@ -21,7 +21,7 @@ def draw(%{viewport: %Scenic.ViewPort{} = vp}) do
   Scenic.Graph.build()
   |> draw_transmutation_circle(vp)
   |> mount_menubar(vp)
-  # |> mount_kommand_buffer(vp)
+  |> mount_kommand_buffer(vp)
   # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
   # |> Scenic.Primitives.rect({80, 80}, fill: :green,  translate: {140, 140})
 end
@@ -128,7 +128,13 @@ end
 
   defp mount_kommand_buffer(graph, %Scenic.ViewPort{size: {vp_width, vp_height}}) do
     graph
-    |> Flamelex.GUI.Component.KommandBuffer.mount(%{
+    # |> Flamelex.GUI.Component.KommandBuffer.mount(%{
+    #      ref: :kommand_buffer,
+    #      frame: Frame.new(
+    #         top_left: {0, vp_height - Flamelex.GUI.Component.MenuBar.height()},
+    #         size:     {vp_width, Flamelex.GUI.Component.MenuBar.height()})
+    #    })
+    |> Flamelex.GUI.Component.KommandBuffer.add_to_graph(%{
          ref: :kommand_buffer,
          frame: Frame.new(
             top_left: {0, vp_height - Flamelex.GUI.Component.MenuBar.height()},

@@ -153,7 +153,7 @@ defmodule Flamelex.Fluxus.UserInputHandler do
 
   #NOTE: this function is defined here, but it is run in it's own process...
   def lookup_action_for_input_async(%RadixState{mode: m} = radix_state, user_input)
-    when m in [:normal, :insert] do
+    when m in [:normal, :insert, :kommand] do
     Logger.debug "Async Process: lookup_action_for_input_async - #{inspect user_input}"
 
     #TODO just hard-code it for now, much easier...

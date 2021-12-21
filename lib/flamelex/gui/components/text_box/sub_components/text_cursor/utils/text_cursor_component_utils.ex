@@ -99,7 +99,7 @@ defmodule Flamelex.GUI.Component.Utils.TextCursor do
 
   def reset_position({graph, state}) do
     new_state =
-      %{state|current_coords: state.assigns.starting_coords, override?: :visible} # the visual effect is better if you dont blink the cursor when moving it
+      %{state|current_coords: state.original_coordinates, override?: :visible} # the visual effect is better if you dont blink the cursor when moving it
 
     new_graph =
       graph |> modify_cursor_position(new_state)
