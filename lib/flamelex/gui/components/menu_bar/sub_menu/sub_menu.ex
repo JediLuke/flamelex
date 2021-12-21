@@ -14,11 +14,30 @@ defmodule Flamelex.GUI.Component.MenuBar.SubMenu do
         {_top_levl, sub_menu} = args.state
 
         sub_menu = sub_menu |> Enum.into([])
-        ic sub_menu
+        num_options = Enum.count(sub_menu)
 
 
         graph
+        |> Scenic.Primitives.group(fn init_graph ->
+            {final_graph, _final_offset} =
+                sub_menu
+                |> Enum.reduce({init_graph, _init_carry = 28}, fn {title, action}, {graph, carry} ->
+                            this_graph_updated = graph
+                            #TODO this nees to be its own component, like a search result, so we can detect hover events
+                            |> Scenic.Primitives.text(title, t: {10,carry})
+
+                            {this_graph_updated, carry+26}
+                end)
+
+            final_graph
+        end,
+        id: :sub_menu_actual,
+        # translate: {frame.top_left.x, frame.top_left.y})
+        )
+
         # |> Draw.test_pattern(new_args)
-        |> Scenic.Primitives.rect({width, height}, fill: :green)
+        # |> Scenic.Primitives.rect({width, height}, fill: :green)
     end
+
+
 end

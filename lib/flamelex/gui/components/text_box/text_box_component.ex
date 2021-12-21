@@ -5,7 +5,7 @@ defmodule Flamelex.GUI.Component.TextBox do
   # use Flamelex.GUI.ComponentBehaviour
   use Scenic.Component
   use Flamelex.ProjectAliases
-      require Logger
+  require Logger
   alias Flamelex.GUI.Component.Utils.TextBox, as: TextBoxDrawUtils
   alias Flamelex.GUI.Component.MenuBar
   alias Flamelex.GUI.Component.TextCursor
