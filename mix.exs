@@ -21,6 +21,7 @@ defmodule Flamelex.MixProject do
     ]
   end
 
+  #TODO use mix environments to figure out which memex to connect to?
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
@@ -36,15 +37,16 @@ defmodule Flamelex.MixProject do
       #         I think you can just comment out memex for now, but, it might
       #         also break stuff
 
-      # {:scenic, "~> 0.11.0-beta.0"},
-      {:scenic, path: "../scenic", override: true},
-      # {:scenic_driver_local, "~> 0.11.0-beta.0"},
-      {:scenic_driver_local, path: "../scenic_driver_local", override: true},
-      {:memex, path: "../memelex"}, #TODO change this to :memelex
-      # {:scenic_layout_o_matic, "~> 0.4.0"},
-
-
+      #NOTE: These are the public declarations (pulled from github)
+      {:scenic, "~> 0.11.0-beta.0"},
+      {:scenic_driver_local, "~> 0.11.0-beta.0"},
+      {:memelex, git: "https://github.com/JediLuke/memelex"},
+      #      These are the imports for local dev
+      # {:scenic, path: "../scenic", override: true},
+      # {:scenic_driver_local, path: "../scenic_driver_local", override: true},
+      # {:memelex, path: "../memelex"}, #TODO change this to :memelex
       # these deps should all be fine
+      # {:scenic_layout_o_matic, "~> 0.4.0"},
       {:ecto_sql, "~> 3.0"},
       {:truetype_metrics, "~> 0.5"},
       {:font_metrics, "~> 0.5"},
