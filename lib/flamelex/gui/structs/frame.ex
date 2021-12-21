@@ -93,7 +93,7 @@ defmodule Flamelex.GUI.Structs.Frame do
     # dimens = {400, 400}|> Dimensions.new()
     %__MODULE__{
       top_left:   coords,
-      dimensions: gui_state.viewport,
+      dimensions: Dimensions.new(gui_state.viewport.size),
       label: "#{File.cwd!()}/example.txt"
     }
   end

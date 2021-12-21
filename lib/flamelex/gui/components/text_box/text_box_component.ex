@@ -95,8 +95,8 @@ defmodule Flamelex.GUI.Component.TextBox do
     # viewport_size = Application.get_env(:layout_demo, :viewport) |> Map.get(:size) #TODO
     # %{size: dimensions} = Flamelex.GUI.ScenicInitialize.viewport_config()
     #TODO this is the only place that still uses ScniecInitialize...
-    vpcfg = Flamelex.GUI.ScenicInitialize.viewport_config()
-    {:ok, dimensions} = Keyword.fetch(vpcfg, :size)
+    # vpcfg = Flamelex.GUI.ScenicInitialize.viewport_config()
+    # {:ok, dimensions} = Keyword.fetch(vpcfg, :size)
 
     Scenic.Graph.build()
     # |> Scenic.Primitives.add_specs_to_graph(Grid.simple({0, 0}, dimensions, [:top, :right, :bottom, :left, :center]), id: :root_grid)
@@ -111,7 +111,7 @@ defmodule Flamelex.GUI.Component.TextBox do
     when is_list(cursors) and length(cursors) >= 1
   do
     Enum.reduce(cursors, _init_acc={graph, _first_cursor_num=1}, fn c, {graph, n} ->
-      graph |> TextCursor.mount(c |> Map.merge(%{ref: rego_tag(params), frame: frame, num: n}))
+      graph |> TextCursor.add_to_graph(c |> Map.merge(%{ref: rego_tag(params), frame: frame, num: n}))
     end)
   end
 

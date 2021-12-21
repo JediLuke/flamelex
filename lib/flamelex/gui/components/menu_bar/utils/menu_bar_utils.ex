@@ -297,7 +297,7 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
   ## Catch-all!
 
   def handle_input(scene, input) do
-    Logger.warn "ignoring some input... #{inspect input}"
+    # Logger.warn "ignoring some input... #{inspect input}"
     scene
   end
 

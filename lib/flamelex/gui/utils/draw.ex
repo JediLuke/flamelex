@@ -93,17 +93,16 @@ defmodule Flamelex.GUI.Utils.Draw do
     raise "NO - #{inspect a}"
   end
 
-    # def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}, color) when is_atom(color) do
-  #   #TODO need width +1 here for some quirky reason of Scenic library
-  #   graph
-  #   |> Scenic.Primitives.rect({w + 1, h}, [fill: color, translate: {x, y}])
-  # end
-  # def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}) do
-  #   #TODO need width +1 here for some quirky reason of Scenic library
-  #   graph
-  #   |> Scenic.Primitives.rect({w + 1, h}, [translate: {x, y}]) #TODO only green for dev
-  # end
-# end
+  def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}, color) when is_atom(color) do
+    #TODO need width +1 here for some quirky reason of Scenic library
+    graph
+    |> Scenic.Primitives.rect({w + 1, h}, [fill: color, translate: {x, y}])
+  end
+  def background(%Scenic.Graph{} = graph, %{top_left_corner: {x, y}, dimensions: {w, h}}) do
+    #TODO need width +1 here for some quirky reason of Scenic library
+    graph
+    |> Scenic.Primitives.rect({w + 1, h}, [translate: {x, y}]) #TODO only green for dev
+  end
 
   def background(scene) do
     background(scene, :grey) #TODO this needs some kind of color scheme system...
