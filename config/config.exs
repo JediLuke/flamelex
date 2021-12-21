@@ -18,7 +18,7 @@ config :flamelex,
 #     backups_directory: "/Users/luke/memex/backups/Nicholas"
 #   }
 
-config :memex,
+config :memelex,
   environment: %{
     name: "JediLuke",
     memex_directory: "/Users/luke/memex/JediLuke_copy",
