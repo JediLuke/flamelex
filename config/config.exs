@@ -11,11 +11,11 @@ config :flamelex,
   :key_mapping, Flamelex.API.KeyMappings.VimClone
 
 config :memelex,
-  # active?: false,
+  active?: false, # by default, don't start with the memex on...
   environment: %{
-    name: "Beauregard",
-    memex_directory: "/Users/luke/memex/Beauregard",
-    backups_directory: "/Users/luke/memex/backups/Beauregard"
+    name: "YourMemexNameHere",
+    memex_directory: "/an/absolute/path/to/an/empty/directory",
+    backups_directory: "/an/absolute/path/to/an/empty/backups/directory"
   }
 
 # remove superfluous newline characters from logs
