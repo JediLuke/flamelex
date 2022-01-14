@@ -1,7 +1,7 @@
 defmodule Flamelex.GUI.RootScene do
   @moduledoc false
   use Scenic.Scene
-  use Flamelex.GUI.ScenicEventsDefinitions
+  use ScenicWidgets.ScenicEventsDefinitions
 
   import Scenic.Primitives
   import Scenic.Components

@@ -1,6 +1,6 @@
 defmodule Flamelex.API.KeyMappings.VimClone.InsertMode do
   alias Flamelex.Fluxus.Structs.RadixState
-  use Flamelex.GUI.ScenicEventsDefinitions
+  use ScenicWidgets.ScenicEventsDefinitions
 
 
   # this is the function which gets called externally

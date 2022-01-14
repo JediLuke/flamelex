@@ -1,7 +1,7 @@
 defmodule Flamelex.GUI.Component.Generic.NeoTextBox do
     use Flamelex.GUI.ComponentBehaviour
     alias Flamelex.GUI.Component.Memex.HyperCard.Sidebar
-    use Flamelex.GUI.ScenicEventsDefinitions
+    use ScenicWidgets.ScenicEventsDefinitions
 
     def validate(%{state: %{
             margin: margin,
@@ -40,15 +40,19 @@ defmodule Flamelex.GUI.Component.Generic.NeoTextBox do
         d = FontMetrics.descent(font_size, metrics)
 
         text_height = ascent+(d*-1)
-        ic text_height
 
         num_lines = String.split(wrapped_text, "\n", trim: true) |> Enum.count()
-
         ic num_lines
 
         text_box_height = num_lines * text_height
 
         dimens = %{height: text_box_height, width: textbox_width}
+        ic dimens
+
+        {x_position, line_num} = FontMetrics.position_at(wrapped_text, String.length(wrapped_text), font_size, metrics)
+        ic x_position
+        ic line_num
+
         graph
         # |> Scenic.Primitives.rect({250, 250}, t: {500, 500}, fill: :yellow)
         |> Draw.border_box(%{x: 0, y: 0-ascent} |> Map.merge(dimens), {1, :black})
@@ -61,6 +65,7 @@ defmodule Flamelex.GUI.Component.Generic.NeoTextBox do
             #       how high this text is, that's not obviously easy to me how to do...
             # translate: {margin.left, margin.top+font_size}) #TODO this should actually be, one line height
             # translate: {margin.left, margin.top+font_size}) #TODO this should actually be, one line height
+        |> Scenic.Primitives.rect({5,30}, fill: :white, t: {x_position,(line_num-1)*text_height})
     end
  
     # def render(graph, %{first_render?: true, frame: frame, state: %{mode: :normal}}) do

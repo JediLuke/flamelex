@@ -8,7 +8,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
   alias Flamelex.API.KeyMappings.VimClone.{NormalMode, KommandMode,
                                            InsertMode, LeaderBindings}
   use Flamelex.ProjectAliases
-  use Flamelex.GUI.ScenicEventsDefinitions
+  use ScenicWidgets.ScenicEventsDefinitions
   alias Flamelex.Fluxus.Structs.RadixState
   require Logger
 

@@ -38,13 +38,14 @@ defmodule Flamelex.MixProject do
       #         also break stuff
 
       #NOTE: These are the public declarations (pulled from github)
-      {:scenic, "~> 0.11.0-beta.0"},
-      {:scenic_driver_local, "~> 0.11.0-beta.0"},
-      {:memelex, git: "https://github.com/JediLuke/memelex"},
+      # {:scenic, "~> 0.11.0-beta.0"},
+      # {:scenic_driver_local, "~> 0.11.0-beta.0"},
+      # {:memelex, git: "https://github.com/JediLuke/memelex"},
       #      These are the imports for local dev
-      # {:scenic, path: "../scenic", override: true},
-      # {:scenic_driver_local, path: "../scenic_driver_local", override: true},
-      # {:memelex, path: "../memelex"}, #TODO change this to :memelex
+      {:scenic, path: "../scenic", override: true},
+      {:scenic_driver_local, path: "../scenic_driver_local", override: true},
+      {:scenic_widget_contrib, path: "../scenic-widget-contrib", override: true},
+      {:memelex, path: "../memelex"},
       # these deps should all be fine
       # {:scenic_layout_o_matic, "~> 0.4.0"},
       {:ecto_sql, "~> 3.0"},

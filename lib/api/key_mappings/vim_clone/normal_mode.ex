@@ -1,6 +1,6 @@
 defmodule Flamelex.API.KeyMappings.VimClone.NormalMode do
   alias Flamelex.Fluxus.Structs.RadixState
-  use Flamelex.GUI.ScenicEventsDefinitions
+  use ScenicWidgets.ScenicEventsDefinitions
   require Logger
 
 

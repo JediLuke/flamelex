@@ -1,7 +1,7 @@
 defmodule Flamelex.GUI.Component.MenuBar.Utils do
   alias Flamelex.GUI.Component.MenuBar
   use Flamelex.ProjectAliases
-  use Flamelex.GUI.ScenicEventsDefinitions
+  use ScenicWidgets.ScenicEventsDefinitions
   require Logger
   @moduledoc """
   This module contains pure-functions to be used by MenuBar.

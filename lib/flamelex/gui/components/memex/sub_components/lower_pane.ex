@@ -1,7 +1,7 @@
 defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.LowerPane do
     use Flamelex.GUI.ComponentBehaviour
     alias Flamelex.GUI.Component.Memex.HyperCard.Sidebar
-    use Flamelex.GUI.ScenicEventsDefinitions
+    use ScenicWidgets.ScenicEventsDefinitions
 
     @tabs_menu_height 40
 

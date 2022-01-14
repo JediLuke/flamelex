@@ -1,6 +1,6 @@
 defmodule Flamelex.API.KeyMappings.Memex do
     alias Flamelex.Fluxus.Structs.RadixState
-    use Flamelex.GUI.ScenicEventsDefinitions
+    use ScenicWidgets.ScenicEventsDefinitions
 
     # def keymap(%RadixState{mode: :memex} = state, %{input: {:cursor_button, {:btn_left, 1, [], _coords}}} = input) do
     def keymap(%RadixState{mode: :memex} = state, {:cursor_button, {:btn_left, 1, [], _coords}} = input) do

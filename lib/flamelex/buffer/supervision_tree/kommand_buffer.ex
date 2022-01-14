@@ -15,7 +15,7 @@ defmodule Flamelex.Buffer.KommandBuffer do
   alias Flamelex.Buffer.Utils.TextBuffer.ModifyHelper
   alias Flamelex.Utils.TextManipulationTools, as: TextTools
   require Logger
-  use Flamelex.GUI.ScenicEventsDefinitions
+  use ScenicWidgets.ScenicEventsDefinitions
 
   @impl Flamelex.BufferBehaviour
   def boot_sequence(params) do
