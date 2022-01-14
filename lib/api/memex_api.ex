@@ -1,4 +1,4 @@
-defmodule Flamelex.API.MemexWrap do #TODO ah fuck I think I undid all this by accident - probably cause it was so stupid in the first place!
+defmodule Flamelex.API.Memex do
   @moduledoc """
   This is the Flamelex wrapper around Memelex - necessary for smooth
   integration with the UI.
@@ -11,7 +11,7 @@ defmodule Flamelex.API.MemexWrap do #TODO ah fuck I think I undid all this by ac
     Flamelex.Fluxus.Action.fire(:open_memex)
   end
 
-  def open(%Memex.TidBit{uuid: uuid} = t) when is_bitstring(uuid) do
+  def open(%Memelex.TidBit{uuid: uuid} = t) when is_bitstring(uuid) do
     Logger.debug "#{__MODULE__} opening the Memex..."
     Flamelex.Fluxus.Action.fire({:open_tidbit, t})
   end

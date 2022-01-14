@@ -23,7 +23,7 @@ defmodule Flamelex.Agent.Reminders do
   end
 
   # changes tag from "reminder" to "ackd_reminder"
-  def ack_reminder(r = %Memex.TidBit{}) do
+  def ack_reminder(r = %Memelex.TidBit{}) do
     GenServer.cast(__MODULE__, {:ack_reminder, r})
   end
 

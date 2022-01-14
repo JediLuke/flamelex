@@ -11,7 +11,7 @@ defmodule Flamelex.ProjectAliases do
         Buffer,
         Kommander,
         GUI,
-        # Memex
+        Memex
       }
 
       alias Flamelex.Fluxus

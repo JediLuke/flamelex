@@ -48,7 +48,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     @left_margin 15     # How much left margin we leave in the HyperCard
 
 
-    def validate(%{frame: %Frame{} = _f, tidbit: %Memex.TidBit{} = _t} = data) do
+    def validate(%{frame: %Frame{} = _f, tidbit: %Memelex.TidBit{} = _t} = data) do
         Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
         {:ok, data}
     end
@@ -188,7 +188,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     end
 
 
-    def render(%{frame: %{dimensions: %{width: width, height: :flex}} = frame, tidbit: %Memex.TidBit{data: data} = tidbit}) do
+    def render(%{frame: %{dimensions: %{width: width, height: :flex}} = frame, tidbit: %Memelex.TidBit{data: data} = tidbit}) do
 
         #TODO good idea: render each sub-component as a seperate graph,
         #                calculate their heights, then use Scenic.Graph.add_to

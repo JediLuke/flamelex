@@ -84,7 +84,7 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
     #     |> assign(graph: new_graph)
     # end
 
-    # def common_render(graph, frame, %Memex.TidBit{} = t, scroll) do
+    # def common_render(graph, frame, %Memelex.TidBit{} = t, scroll) do
     #     # this_frame = second_hypercard_frame(frame)
 
 

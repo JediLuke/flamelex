@@ -6,7 +6,7 @@
 #   defmacro __using__(_params) do
 #     quote do
 #       use Flamelex.ProjectAliases
-#       use Flamelex.GUI.ScenicEventsDefinitions
+#       use ScenicWidgets.ScenicEventsDefinitions
 #       alias Flamelex.Fluxus.Structs.RadixState
 #       require Logger
 

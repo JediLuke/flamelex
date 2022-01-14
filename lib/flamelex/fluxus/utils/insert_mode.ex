@@ -3,7 +3,7 @@
 # defmodule Flamelex.GUI.InputHandler.InsertMode do
 #   @moduledoc false
 #   use Flamelex.ProjectAliases
-#   use Flamelex.GUI.ScenicEventsDefinitions
+#   use ScenicWidgets.ScenicEventsDefinitions
 #   alias Flamelex.Fluxus.Structs.RadixState
 #   alias Flamelex.GUI.Control.Input.KeyMapping
 

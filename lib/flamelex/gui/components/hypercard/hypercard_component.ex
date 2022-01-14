@@ -54,8 +54,8 @@
 #     {:noreply, new_scene}
 #   end
 
-#   def render(scene, %Memex.TidBit{type: ["text"]} = t) do
-#     Logger.debug "Now we're rendering an actual %Memex.TidBit{} !!"
+#   def render(scene, %Memelex.TidBit{type: ["text"]} = t) do
+#     Logger.debug "Now we're rendering an actual %Memelex.TidBit{} !!"
 #     IO.inspect t, label: "TTT"
 
 #     #NOTE - this could really, really use the concept of, I don't know,
