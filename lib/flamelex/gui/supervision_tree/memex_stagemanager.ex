@@ -43,8 +43,14 @@ defmodule Flamelex.GUI.StageManager.Memex do
   def handle_call(:get_open_tidbits, _from, %{open: []} = state) do
     Logger.warn "Dont wanna open empty Memex yet lol, just render a rando..."
     #TODO fix the bug vacarsu found here
-    rando = Memex.My.Wiki.list |> Enum.random()
-    {:reply, {:ok, [rando]}, %{open: [rando]}}
+    case Memex.My.Wiki.list() do
+      [] ->
+        Logger.warn "WE SHOULD just always make at least one thing in the Meme..."
+        {:reply, {:ok, []}, state}
+      [_t|_rest] ->
+        rando = Memex.My.Wiki.list |> Enum.random()
+        {:reply, {:ok, [rando]}, %{state|open: [rando]}}
+    end
   end
 
 end
