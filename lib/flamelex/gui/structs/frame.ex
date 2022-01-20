@@ -7,6 +7,13 @@ defmodule Flamelex.GUI.Structs.Frame do
   alias Flamelex.Structs.BufRef
   alias Flamelex.GUI.Structs.GUIState
 
+  defmodule Coordinates do
+    defstruct [x: 0, y: 0]
+
+    def new(x: x, y: y), do: %__MODULE__{x: x, y: y}
+    def new({x, y}), do: %__MODULE__{x: x, y: y}
+  end
+
 
   defstruct [
     orientation:  :top_left,      # This means that the pin is located at the top-left corner of the Frame #TODO add checking for all current operations against being top_left orientation
