@@ -11,11 +11,11 @@ config :flamelex,
   :key_mapping, Flamelex.API.KeyMappings.VimClone
 
 config :memelex,
-  active?: false, # by default, don't start with the memex on...
+  active?: false,
   environment: %{
-    name: "YourMemexNameHere",
-    memex_directory: "/an/absolute/path/to/an/empty/directory",
-    backups_directory: "/an/absolute/path/to/an/empty/backups/directory"
+    name: "Beauregard",
+    memex_directory: "/Users/luke/memex/Beauregard",
+    backups_directory: "/Users/luke/memex/backups/Beauregard"
   }
 
 # remove superfluous newline characters from logs
@@ -25,14 +25,7 @@ config :logger,
 
 # https://github.com/otobus/event_bus/wiki/Creating-(Registering)-Topics
 config :event_bus,
-  topics: [
-    # :checkout_completed, 
-    # :email_sent,
-    # :payment_failed, 
-    # :user_created, 
-    # :user_activated,  
-    # more topics...
-  ]
+  topics: [:general]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -9,6 +9,18 @@ defmodule Flamelex.Buffer.Text do
   # require Logger
 
 
+  def boot_sequence(%{source: :none, data: file_contents} = params) do
+    init_state =
+      params |> Map.merge(%{
+        unsaved_changes?: false,  # a flag to say if we have unsaved changes
+        # time_opened #TODO
+        cursors: [%{line: 1, col: 1}],
+        lines: file_contents |> TextBufferUtils.parse_raw_text_into_lines()
+      })
+
+    {:ok, init_state}
+  end
+
   @impl Flamelex.BufferBehaviour
   def boot_sequence(%{source: {:file, filepath}} = params) do
     # Logger.info "#{__MODULE__} booting up... #{inspect params, pretty: true}"

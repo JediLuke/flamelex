@@ -5,6 +5,30 @@ defmodule Flamelex.API.Buffer do
   use Flamelex.ProjectAliases
   alias Flamelex.BufferManager
 
+  def new do
+    new("")
+  end
+
+  def new(data) when is_bitstring(data) do
+    GenServer.call(Flamelex.FluxusRadix, {:action, {
+      :open_buffer, %{
+          type: Flamelex.Buffer.Text,
+          source: :none,
+          data: data,
+          label: "Unsaved file",
+          open_in_gui?: true, #TODO set active buffer
+          callback_list: [self()]
+    }}})
+
+    receive do
+      {:ok_open_buffer, tag} ->
+        tag
+    after
+      :timer.seconds(1) ->
+        raise "Buffer failed to open. reason: TimedOut."
+    end
+
+  end
 
   @doc """
   List all the open buffers.

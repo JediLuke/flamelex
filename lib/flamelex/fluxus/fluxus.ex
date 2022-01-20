@@ -13,6 +13,39 @@ defmodule Flamelex.Fluxus do
   https://medium.com/grandcentrix/state-management-with-phoenix-liveview-and-liveex-f53f8f1ec4d7
   """
   require Logger
+  
+  # called to fire off an action
+  def action(a) do
+    EventBus.notify(%EventBus.Model.Event{
+      id: UUID.uuid4(),
+      topic: :general,
+      data: {:action, a}
+    })
+  end
+
+  # called to register user-input with the Fluxus system - Scenic MUST
+  # forward input to Fluxus if it wants to be processed that way (input
+  # might be captured & processed "locally" by a component, which could
+  # then trigger an action... however if Scenic passes input through to
+  # Fluxus, then it opens up the possibility of having things like Vim
+  # keymaps that exist at a higher level than just a Scenic component)
+  def input(ii) do
+    EventBus.notify(%EventBus.Model.Event{
+      id: UUID.uuid4(),
+      topic: :general,
+      data: {:input, ii}
+    })
+  end
+
+
+
+
+
+
+
+## Deprecate below
+
+
 
   @doc """
   This function enables us to fire actions off which enact changes, at

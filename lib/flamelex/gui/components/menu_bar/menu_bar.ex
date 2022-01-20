@@ -53,13 +53,15 @@ end
         "show cmder" => {Flamelex.API.CommandBuffer, :show, []}
       },
       "Memex" => %{
+        "open" => {Flamelex.API.MemexWrap, :open, []},
         "random quote" => {Flamelex.Memex, :random_quote, []},
         "journal" => {Flamelex.MemexWrap.Journal, :now, []}
       },
       "GUI" => %{}, #TODO auto-generate it from the GUI file
       "Buffer" => %{
         "open README" => {Flamelex.API.Buffer, :open!, ["/Users/luke/workbench/elixir/flamelex/README.md"]},
-        "close" => {Flamelex.API.Buffer, :close, ["/Users/luke/workbench/elixir/flamelex/README.md"]},
+        # "close" => {Flamelex.API.Buffer, :close, ["/Users/luke/workbench/elixir/flamelex/README.md"]},
+        "close" => fn -> Buffer.active_buffer() |> Buffer.close() end
       },
       "DevTools" => %{},
       "Help" => %{

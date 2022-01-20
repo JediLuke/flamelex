@@ -285,8 +285,8 @@ defmodule Flamelex.GUI.Component.MenuBar.Utils do
     {:hover, {:main_menubar, index}} = scene.assigns.state # fetch what we're hovering over
     #NOTE - look up the menu, & do that!
     # or, just open the Memex, cause I will dodge it up to do that ;)
-    # if index == 6, do: Flamelex.Fluxus.Action.fire(:open_memex) #TODO/note => ok, this is great. We want
-    Flamelex.Fluxus.Action.fire(:open_memex) #TODO/note => ok, this is great. We want
+    # if index == 6, do: Flamelex.Fluxus.action(:open_memex) #TODO/note => ok, this is great. We want
+    Flamelex.Fluxus.action(:open_memex) #TODO/note => ok, this is great. We want
                                     # to do something new - so we go ahead,
                                     # and fire that action!! It will just get
                                     # swallowed & ignored, cause we can't handle

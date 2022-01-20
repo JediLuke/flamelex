@@ -4,7 +4,7 @@ defmodule Flamelex.API.KeyMappings.Memex do
 
     # def keymap(%RadixState{mode: :memex} = state, %{input: {:cursor_button, {:btn_left, 1, [], _coords}}} = input) do
     def keymap(%RadixState{mode: :memex} = state, {:cursor_button, {:btn_left, 1, [], _coords}} = input) do
-      {:execute_function, fn -> Flamelex.Fluxus.Action.fire({:memex, :new_random}) end}
+      {:execute_function, fn -> Flamelex.Fluxus.action({:memex, :new_random}) end}
     end
   
     # this is the function which gets called externally
@@ -25,8 +25,8 @@ defmodule Flamelex.API.KeyMappings.Memex do
 
     def map(_state) do
       %{
-        # @escape_key => fn -> Flamelex.Fluxus.Action.fire({:switch_mode, :normal}) end #TODO lmao I think this is firing, not returning as a function!!
-        @escape_key => {:execute_function, fn -> Flamelex.Fluxus.Action.fire({:switch_mode, :normal}) end} #TODO lmao I think this is firing, not returning as a function!!
+        # @escape_key => fn -> Flamelex.Fluxus.action({:switch_mode, :normal}) end #TODO lmao I think this is firing, not returning as a function!!
+        @escape_key => {:execute_function, fn -> Flamelex.Fluxus.action({:switch_mode, :normal}) end} #TODO lmao I think this is firing, not returning as a function!!
       }
     end
   

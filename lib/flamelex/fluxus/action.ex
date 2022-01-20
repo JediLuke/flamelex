@@ -1,11 +1,16 @@
 defmodule Flamelex.Fluxus.Action do
 
-    ## this module will eventually give me a nicer interface than Flamelex.Fluxus
 
-    # the problem with that module is that it's recursive - inputs, end up
-    # calling itself again to handle actions - which gets confusing
-    # nicer to just have each input, go through & fire an action
   def fire(a) do
+    IO.puts "DEPRECATE_MEEEE", ansi_color: :red
     :ok = GenServer.call(Flamelex.FluxusRadix, {:action, a})
+
+    #NOTE: Ok, think about this for a sec...
+    # EventBus.notify(%EventBus.Model.Event{
+    #   id: UUID.uuid4(),
+    #   topic: :general,
+    #   data: {:action, a}
+    # })
+
   end
 end

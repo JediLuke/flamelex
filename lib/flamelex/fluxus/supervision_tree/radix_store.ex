@@ -67,7 +67,10 @@ defmodule Flamelex.FluxusRadix do
 
 
   def handle_cast({:user_input, ii}, radix_state) do
-    Flamelex.Fluxus.UserInputHandler.handle(radix_state, {:user_input, ii})
+    #TODO for now, cancel running user input through radix store (or maybe
+    #we do?? Just to record it?? But then again, we should be recording
+    # events in the event bus, so maybe we dont even need to record them in hre any more)
+    # Flamelex.Fluxus.UserInputHandler.handle(radix_state, {:user_input, ii})
     {:noreply, radix_state |> RadixState.record(keystroke: ii)}
   end
 
