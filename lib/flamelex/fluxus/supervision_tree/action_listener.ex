@@ -21,8 +21,9 @@ defmodule Flamelex.Fluxus.ActionListener do
         if not an_action?(event) do
             :ignore
         else
+            %EventBus.Model.Event{id: _id, topic: :general, data: {:action, action}} = event
             radix_state = Flamelex.Fluxus.Stash.get()
-            case Flamelex.Fluxus.NeoRootReducer.process(radix_state, action) do
+            case Flamelex.Fluxus.RootReducer.process(radix_state, action) do
                 :ignore ->
                     EventBus.mark_as_completed({__MODULE__, event_shadow})
                     Logger.debug "#{__MODULE__} ignoring... #{inspect(%{radix_state: radix_state, action: action})}"
