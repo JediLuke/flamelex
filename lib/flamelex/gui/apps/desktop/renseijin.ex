@@ -55,7 +55,7 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
   # use Flamelex.GUI.ComponentBehaviour
   use Scenic.Component
   alias Flamelex.GUI.GeometryLib.Trigonometry
-  alias Flamelex.GUI.Structs.Frame
+  alias ScenicWidgets.Core.Structs.Frame
   require Logger
 
   @primary_color :dark_violet

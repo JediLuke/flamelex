@@ -22,7 +22,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
       # validate the incoming arguments when we mount a scene
       def validate(%{
             ref: _ref,                                  # Each component needs a ref. This will be used for addressing (sending the component messages)
-            frame: %Flamelex.GUI.Structs.Frame{} = _f,  # Flamelex GUI components all have a defined %Flamelex.GUI.Structs.Frame{}
+            frame: %ScenicWidgets.Core.Structs.Frame{} = _f,  # Flamelex GUI components all have a defined %ScenicWidgets.Core.Structs.Frame{}
             state: _x} = data)                          # `state` is the holder for whatever data it is which defines the internal state of the component (usually a map)
         do
           {:ok, data}
@@ -30,12 +30,12 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
 
       #I think veryfiy got deprecated??
       #NOTE:
-      # In our case, we always want a Component to be passed in a %Flamelex.GUI.Structs.Frame{}
+      # In our case, we always want a Component to be passed in a %ScenicWidgets.Core.Structs.Frame{}
       # so we don't need specific ones, each Component implements them
       # the same way. Also all components need a `ref`
       # def verify(%{
       #   ref: _r,                # the `ref` refers back to the Buffer that this GUI.Component is for, e.g. {:buffer, {:file, "README.md"}}
-      #   frame: %Flamelex.GUI.Structs.Frame{} = _f    # the %Flamelex.GUI.Structs.Frame{} which defines this GUI.Component
+      #   frame: %ScenicWidgets.Core.Structs.Frame{} = _f    # the %ScenicWidgets.Core.Structs.Frame{} which defines this GUI.Component
       # } = params) do
       #   {:ok, params}
       # end
@@ -54,7 +54,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
       #     I don't like sending a map AND a list, so I just accept a map :shrug:
       def mount(%Scenic.Graph{} = graph, %{
             ref: r,
-            frame: %Flamelex.GUI.Structs.Frame{} = _f,
+            frame: %ScenicWidgets.Core.Structs.Frame{} = _f,
             state: _state
       } = args) do
         opts = [
@@ -170,7 +170,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
   
   @doc """
   Each Component is represented internally at the highest level by the
-  %Flamelex.GUI.Structs.Frame{} datastructure. This function takes in that Component definition
+  %ScenicWidgets.Core.Structs.Frame{} datastructure. This function takes in that Component definition
   and returns a %Scenic.Graph{} which can be drawn by Scenic.
   """
   @callback render(%Scenic.Graph{}, map()) :: %Scenic.Graph{}

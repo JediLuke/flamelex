@@ -1,6 +1,6 @@
 defmodule Flamelex.GUI.Component.Utils.TextBox do
   # alias Flamelex.GUI.Structs.{Coordinates, LineOfText}
-  # alias Flamelex.GUI.Structs.Frame
+  # alias ScenicWidgets.Core.Structs.Frame
 
   alias Flamelex.Buffer.Utils.TextBufferUtils #TODO this is prob stupid
 

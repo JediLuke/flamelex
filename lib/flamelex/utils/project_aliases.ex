@@ -18,8 +18,8 @@ defmodule Flamelex.ProjectAliases do
       
       alias Flamelex.GUI.Structs.Coordinates
       alias Flamelex.GUI.Structs.Dimensions
-      alias Flamelex.GUI.Structs.Frame
       alias Flamelex.GUI.Structs.Layout
+      alias ScenicWidgets.Core.Structs.Frame
       
       alias Flamelex.GUI.Utils.Draw
 
