@@ -17,11 +17,9 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
         Logger.debug "swapping from app: #{inspect app} to :memex..."
 
         new_memex_graph = Scenic.Graph.build()
-        # |> Flamelex.GUI.Component.MemexLayout.add_to_graph(%{})
-        |> ScenicWidgets.TestPattern.add_to_graph(%{})
-        # |> Flamelex.GUI.Component.MemexScreen.add_to_graph(%{
-        #         frame: Frame.new(radix_state.gui.viewport)
-        #     }, id: :memex_screen)
+        |> Flamelex.GUI.Memex.Layout.add_to_graph(%{
+                frame: Frame.new(radix_state.gui.viewport)
+            }, id: :memex)
 
         new_radix_state =
             radix_state
