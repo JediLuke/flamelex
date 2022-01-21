@@ -19,7 +19,7 @@ defmodule Flamelex.GUI.Component.MemexScreen do
       # Flamelex.Utils.PubSub.subscribe(topic: :gui_update_bus)
 
       # new_graph = DefaultGUI.draw(state)
-      # GenServer.cast(Flamelex.GUI.RootScene, {:redraw, new_graph})
+      # GenServer.call(Flamelex.GUI.RootScene, {:redraw, new_graph})
       # {:noreply, %{state|graph: new_graph}}
 
       # {:ok, state, {:continue, :draw_default_gui}}

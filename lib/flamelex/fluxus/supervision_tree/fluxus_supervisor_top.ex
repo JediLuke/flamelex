@@ -15,7 +15,7 @@ defmodule Flamelex.Fluxus.TopLevelSupervisor do
       # {Task.Supervisor, name: Flamelex.Fluxus.InputHandler.TaskSupervisor},
       # {Task.Supervisor, name: Flamelex.Fluxus.RootReducer.TaskSupervisor},
       
-      Flamelex.Fluxus.Stash,
+      Flamelex.Fluxus.RadixStore,
       # Flamelex.FluxusRadix,
       Flamelex.Fluxus.ActionListener
     ]

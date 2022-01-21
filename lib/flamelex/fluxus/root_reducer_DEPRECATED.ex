@@ -86,17 +86,7 @@ defmodule Flamelex.Fluxus.RootReducerDeprecated do
     # GenServer.cast(Flamelex.GUI.Controller, {:activate, :homebase})
   end
 
-  #TODO/note - ok so for implementing something, next step is, we need
-  #            to implement a fluxus-radix reduceR!
-  def async_reduce(radix_state, {:action, :open_memex} = action) do
-    Logger.debug "opening the MemexWrap..."
-    
-    Flamelex.Fluxus.Reducers.Mode.handle(radix_state, {:action, {:switch_mode, :memex}})
-    
-    #TODO update GUI state - :memex
-    GenServer.cast(Flamelex.GUI.Controller, :open_memex)
-    :ok
-  end
+
 
   # def async_reduce(radix_state, {:action, :close_memex} = action) do
   #   Logger.debug "opening the MemexWrap..."

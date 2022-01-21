@@ -30,6 +30,62 @@ defmodule Flamelex.Fluxus do
   # Fluxus, then it opens up the possibility of having things like Vim
   # keymaps that exist at a higher level than just a Scenic component)
   def input(ii) do
+
+
+    ##TODO it's simpler to route these different right now.
+    # call Flamelex.Fluxus.UserInput.
+
+    # This is an example of the "state-centered" approach - we keep
+    # wanting to store things in the scene - maybe I should just put everything
+    # in here lol
+
+    # The whole idea of 'fluxus' is to seperate out the state of your
+    # application, from the state of your Scenic GUI processes
+
+    #TODO this is one area of quandary - either I spin up a new process
+    # to handle everything (nice security), but then I have to wait here
+    # for a callback. Or, if I don't wait, then I have to give up my
+    # ability to mutate the scene here.
+
+    # Maybe how this should work is - instead of messaging a GenServer
+    # which holds the root state, we just start a process, which fetches
+    # a copy of the root state inside itself
+
+
+
+
+  # @impl Scenic.Scene
+  # def handle_event( {:click, :btn}, _, %{assigns: %{count: count}} = scene ) do
+  #   count = count + 1
+
+  #   # modify the graph to show the current click count
+  #   graph =
+  #     graph()
+  #     |> Scenic.Graph.modify(:count, &text(&1, "Count: " <> inspect(count)))
+
+  #   # update the count and push the modified graph
+  #   scene =
+  #     scene
+  #     |> assign( count: count )
+  #     |> push_graph( graph )
+
+  #   # return the updated scene
+  #   { :noreply, scene }
+  # end
+
+  # # handle all other (not-ignored) input...
+  # def handle_event(input, _context, scene) do
+  #   IO.puts "SOME NON IGNORED INPUT #{inspect input}"
+  #   # Flamelex.Fluxus.handle_user_input(input)
+  #   {:noreply, scene}
+  # end
+
+
+
+
+
+
+
     EventBus.notify(%EventBus.Model.Event{
       id: UUID.uuid4(),
       topic: :general,

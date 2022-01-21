@@ -14,6 +14,7 @@ defmodule Flamelex.Fluxus.RootReducer do
   ]
 
   def process(radix_state, action) when action in @memex_actions do
+    # GenServer.call(Flamelex.GUI.Controller, :open_memex)
     Flamelex.Fluxus.Reducers.Memex.process(radix_state, action)
   end
 
