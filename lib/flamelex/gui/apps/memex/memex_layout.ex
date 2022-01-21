@@ -16,9 +16,14 @@ defmodule Flamelex.GUI.Memex.Layout do
         Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
 
         init_graph = Scenic.Graph.build()
-        |> Memex.CollectionsPane.add_to_graph(%{frame: left_quadrant(params.frame)})
+        # |> Memex.CollectionsPane.add_to_graph(%{frame: left_quadrant(params.frame)})
         # |> Memex.StoryRiver.add_to_graph(%{frame: mid_section(params.frame)})
         |> Memex.SideBar.add_to_graph(%{frame: right_quadrant(params.frame)})
+        # |> Memex.SecondSideBar.add_to_graph(%{frame: right_quadrant(params.frame)})
+
+        #TODO here - use a WindowArrangement of {:columns, [1,2,1]}
+
+
 
         new_scene = init_scene
         |> assign(graph: init_graph)

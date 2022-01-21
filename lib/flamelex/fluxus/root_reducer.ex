@@ -31,13 +31,13 @@ defmodule Flamelex.Fluxus.RootReducer do
     :open_memex
   ]
 
-  def process(radix_state, action) when action in @memex_actions do
-    if Application.get_env(:memelex, :active?) do
-      Flamelex.Fluxus.Reducers.Memex.process(radix_state, action)
-    else
-      Logger.warn "#{__MODULE__} ignoring a memex action, because the memex is set to `inactive`"
-      :ignore
-    end
+  def process(%{memex: %{active?: false}}, _action) do
+    Logger.warn "#{__MODULE__} ignoring a memex action, because the memex is set to `inactive`"
+    :ignore
+  end
+
+  def process(%{memex: %{active?: true}} = radix_state, action) when action in @memex_actions do
+    Flamelex.Fluxus.Reducers.Memex.process(radix_state, action)
   end
 
   def process(radix_state, action) do

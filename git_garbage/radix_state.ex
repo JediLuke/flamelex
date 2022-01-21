@@ -1,4 +1,4 @@
-defmodule Flamelex.Fluxus.Structs.RadixState do
+defmodule Flamelex.Fluxus.Structs.RadixState do #TODO deprecate
   @moduledoc false
   use Flamelex.ProjectAliases
 
