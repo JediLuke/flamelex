@@ -51,13 +51,20 @@ defmodule Flamelex.Fluxus.RadixStore do
     Agent.get(__MODULE__, & &1)
   end
 
-  def initialize(args) do
-    Agent.update(__MODULE__, fn old -> old |> Map.merge(args) end)
+  #NOTE: These get updated when Flamelex.GUI.RootScene boots, that's what
+  #      this function is for
+  def initialize(graph: new_graph, viewport: new_viewport) do
+    Agent.update(__MODULE__, fn old ->
+      new_root = old.root |> Map.put(:graph, new_graph)
+      new_gui  = old.gui |> Map.put(:viewport, new_viewport)
+      
+      old |> Map.merge(%{root: new_root, gui: new_gui})
+    end)
   end
 
-  def put(new_state) do
-    Logger.debug("#{__MODULE__} updating state...")
-    #Logger.debug("#{__MODULE__} updating state: #{inspect(new_state)}")
+  def broadcast(new_state) do
+    Logger.debug("#{__MODULE__} updating state & broadcasting new_state...")
+    #Logger.debug("#{__MODULE__} updating state & broadcasting new_state: #{inspect(new_state)}")
 
     # NOTE: Although I did try it, I decided not to go with using the
     #      event bus for updating the GUI due to a state change. The event-

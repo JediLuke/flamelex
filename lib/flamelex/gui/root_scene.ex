@@ -30,13 +30,9 @@ defmodule Flamelex.GUI.RootScene do
 
     Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
 
-    Flamelex.Fluxus.RadixStore.initialize(%{
-      root: %{
-        graph: init_graph },
-      gui: %{
-        viewport: init_scene.viewport }
-    })
-    
+    Flamelex.Fluxus.RadixStore.initialize(graph: init_graph,
+                                       viewport: init_scene.viewport)
+
     # capture_input(scene, [:key])
     request_input(new_scene, [:cursor_button, :cursor_scroll, :key])
 

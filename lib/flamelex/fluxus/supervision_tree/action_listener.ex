@@ -35,7 +35,7 @@ defmodule Flamelex.Fluxus.ActionListener do
                 {:ok, new_radix_state} ->
                     Logger.debug "#{__MODULE__} processed event, state changed..."
                     #Logger.debug "#{__MODULE__} processed event, state changed... #{inspect(%{radix_state: radix_state, action: action})}"
-                    Flamelex.Fluxus.RadixStore.put(new_radix_state)
+                    Flamelex.Fluxus.RadixStore.broadcast(new_radix_state)
                     EventBus.mark_as_completed({__MODULE__, event_shadow})
                     :ok
                 {:error, reason} ->
