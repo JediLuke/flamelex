@@ -24,6 +24,7 @@ defmodule Flamelex.Fluxus.RootReducer do
   https://css-tricks.com/understanding-how-reducers-are-used-in-redux/
 
   """
+  require Logger
 
 
   @memex_actions [
@@ -31,8 +32,12 @@ defmodule Flamelex.Fluxus.RootReducer do
   ]
 
   def process(radix_state, action) when action in @memex_actions do
-    # GenServer.call(Flamelex.GUI.Controller, :open_memex)
-    Flamelex.Fluxus.Reducers.Memex.process(radix_state, action)
+    if Application.get_env(:memelex, :active?) do
+      Flamelex.Fluxus.Reducers.Memex.process(radix_state, action)
+    else
+      Logger.warn "#{__MODULE__} ignoring a memex action, because the memex is set to `inactive`"
+      :ignore
+    end
   end
 
   def process(radix_state, action) do
