@@ -36,6 +36,13 @@ defmodule Flamelex.Fluxus.RadixStore do
     memex: %{
       active?: Application.get_env(:memelex, :active?),
       graph: nil, # Store the %Graph{} here if we need to (for switching between apps easily)
+      sidebar: %{
+        active_tab: :open_tidbits,
+        search: %{
+          active?: false,
+          string: ""
+        }
+      }
     },
     history: %{
       keystrokes:   [],
@@ -52,8 +59,9 @@ defmodule Flamelex.Fluxus.RadixStore do
     Agent.get(__MODULE__, & &1)
   end
 
-  #NOTE: These get updated when Flamelex.GUI.RootScene boots, that's what
-  #      this function is for
+  #NOTE: When `Flamelex.GUI.RootScene` boots, it calls this function
+  #      to reset the values of `graph` and `viewport`.
+  #      We don't want to broadcast these changes out.
   def initialize(graph: new_graph, viewport: new_viewport) do
     Agent.update(__MODULE__, fn old ->
       new_root = old.root |> Map.put(:graph, new_graph)

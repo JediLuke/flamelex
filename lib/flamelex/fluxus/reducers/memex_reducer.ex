@@ -18,7 +18,8 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
 
         new_memex_graph = Scenic.Graph.build()
         |> Flamelex.GUI.Memex.Layout.add_to_graph(%{
-                frame: Frame.new(radix_state.gui.viewport)
+                frame: Frame.new(radix_state.gui.viewport),
+                state: radix_state.memex
             }, id: :memex)
 
         new_radix_state =
