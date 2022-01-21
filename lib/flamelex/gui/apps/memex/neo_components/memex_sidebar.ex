@@ -33,6 +33,20 @@ defmodule Flamelex.GUI.Component.Memex.SideBar.New do
             #                 translate: {text_buffer, text_buffer+24},
             #                 font_size: 24,
             #                 fill: :black)
+
+
+
+            #       |> Sidebar.SearchBox.add_to_graph(%{
+#             id: :search_box,
+#             frame: Frame.new(pin: {0, @search_box_offset}, size: {w, @search_box_height}),
+#             mode: :inactive},
+#             id: :search_box)
+
+
+
+
+|## INTO ANOTHER GROUP lol, the "lower pane"
+
        end,
        id: __MODULE__,
        translate: args.frame.pin)

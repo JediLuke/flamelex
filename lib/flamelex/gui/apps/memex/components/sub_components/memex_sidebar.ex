@@ -1,20 +1,5 @@
 
-#     def render(%{assigns: %{first_render?: true, frame: %Frame{} = frame, active_tab: "Open"}} = scene) do
-        
-#         new_graph =
-#             Scenic.Graph.build()
-#             |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-#                     id: :sidebar_bg,
-#                     fill: :light_blue,
-#                     translate: {
-#                         frame.top_left.x,
-#                         frame.top_left.y})
-#             # |> Scenic.Primitives.line(sidebar_line_spec(scene.assigns.frame),
-#             #         id: :sidebar_line,
-#             #         stroke: {2, :antique_white})
-#             # |> Scenic.Primitives.line(sidebar_line_two_spec(scene.assigns.frame),
-#             #     id: :sidebar_line_two,
-#             #     stroke: {2, :antique_white})
+
 #             |> Sidebar.SearchBox.add_to_graph(%{
 #                     mode: :inactive,
 #                     frame: search_box_frame(scene.assigns.frame)},
