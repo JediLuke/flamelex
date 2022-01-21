@@ -20,7 +20,7 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
         |> Flamelex.GUI.Memex.Layout.add_to_graph(%{
                 frame: Frame.new(radix_state.gui.viewport),
                 state: radix_state.memex
-            }, id: :memex)
+            }, id: :memex, theme: radix_state.gui.theme)
 
         new_radix_state =
             radix_state

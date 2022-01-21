@@ -21,12 +21,7 @@ defmodule Flamelex.GUI.Component.Memex.SideBar.New do
         init_graph = Scenic.Graph.build()
         |> Scenic.Primitives.group(fn graph ->
             graph
-            # |> Scenic.Primitives.rect(args.frame.size, fill: theme.background)
-            |> Scenic.Primitives.rect(args.frame.size, fill: :purple)
-            # |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-            #             id: @component_id,
-            #             fill: @background_color,
-            #             scissor: {frame.dimensions.width, frame.dimensions.height})
+            |> Scenic.Primitives.rect(args.frame.size, fill: theme.background)
             # |> Scenic.Primitives.text("UNABLE TO RENDER BODY",
             #                 # id: :hypercard_body,
             #                 font: :ibm_plex_mono,
@@ -45,7 +40,7 @@ defmodule Flamelex.GUI.Component.Memex.SideBar.New do
 
 
 
-|## INTO ANOTHER GROUP lol, the "lower pane"
+## INTO ANOTHER GROUP lol, the "lower pane"
 
        end,
        id: __MODULE__,

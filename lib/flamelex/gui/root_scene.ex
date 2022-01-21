@@ -18,11 +18,13 @@ defmodule Flamelex.GUI.RootScene do
 
 
   @impl Scenic.Scene
-  def init(init_scene, _params, _opts) do
+  def init(init_scene, _params, opts) do
 
     Process.register(self(), __MODULE__)
 
     init_graph = Flamelex.Fluxus.RadixStore.get() |> render()
+
+    opts = opts |> set_theme(Flamelex.GUI.Utils.Theme.default())
 
     new_scene = init_scene
     |> assign(graph: init_graph)
@@ -136,4 +138,7 @@ defmodule Flamelex.GUI.RootScene do
   def render(%{root: %{graph: %Scenic.Graph{} = root_graph}} = _radix_state) do
     root_graph
   end
+
+  defp set_theme(opts, new_theme), do: Keyword.replace(opts, :theme, new_theme)
+
 end

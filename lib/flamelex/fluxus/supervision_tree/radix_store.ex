@@ -22,8 +22,9 @@ defmodule Flamelex.Fluxus.RadixStore do
     },
     gui: %{
       viewport: nil,
-      layers: nil
+      layers: nil,
       # layers: [WindowArrangement.single_pane()], # A list of layers, which are in turn, lists of %WindowArrangement{} structs
+      theme: Flamelex.GUI.Utils.Theme.default()
     },
     desktop: %{},
     editor: %{
