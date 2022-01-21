@@ -4,7 +4,7 @@ defmodule Flamelex.API.KeyMappings.VimClone.InsertMode do
 
 
   # this is the function which gets called externally
-  def keymap(%RadixState{mode: :insert, active_buffer: b} = state, input) when not is_nil(b) do
+  def keymap(%{mode: :insert, active_buffer: b} = state, input) when not is_nil(b) do
     key_def(state, input)
   end
 

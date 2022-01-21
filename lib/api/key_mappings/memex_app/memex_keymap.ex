@@ -2,13 +2,13 @@ defmodule Flamelex.API.KeyMappings.Memex do
     alias Flamelex.Fluxus.Structs.RadixState
     use ScenicWidgets.ScenicEventsDefinitions
 
-    # def keymap(%RadixState{mode: :memex} = state, %{input: {:cursor_button, {:btn_left, 1, [], _coords}}} = input) do
-    def keymap(%RadixState{mode: :memex} = state, {:cursor_button, {:btn_left, 1, [], _coords}} = input) do
+    # def keymap(%{mode: :memex} = state, %{input: {:cursor_button, {:btn_left, 1, [], _coords}}} = input) do
+    def keymap(%{mode: :memex} = state, {:cursor_button, {:btn_left, 1, [], _coords}} = input) do
       {:execute_function, fn -> Flamelex.Fluxus.action({:memex, :new_random}) end}
     end
   
     # this is the function which gets called externally
-    def keymap(%RadixState{mode: :memex} = state, input) do
+    def keymap(%{mode: :memex} = state, input) do
       # leader_binding_def(state, input)
       map(state)[input.input] #TODO YUCKKKKKK
     end

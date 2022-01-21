@@ -4,7 +4,7 @@ defmodule Flamelex.API.KeyMappings.VimClone.KommandMode do
   require Logger
 
 
-  def keymap(%RadixState{mode: :kommand}, @escape_key) do
+  def keymap(%{mode: :kommand}, @escape_key) do
     # {:fire_action, {:switch_mode, :normal}} #TODO this doesn't de-activate the command buffer (unless we get gui broadcast working...)
     {:fire_actions, [
       {KommandBuffer, :hide}, #TOD this should be de-activate, so it clears the buffer
@@ -16,19 +16,19 @@ defmodule Flamelex.API.KeyMappings.VimClone.KommandMode do
   end
 
 
-  def keymap(%RadixState{mode: :kommand}, @enter_key) do
+  def keymap(%{mode: :kommand}, @enter_key) do
     {:fire_action, {KommandBuffer, :execute}}
     # GenServer.cast(Flamelex.Buffer.KommandBuffer, :execute)
     # GenServer.cast(Flamelex.Buffer.KommandBuffer, :hide)
   end
 
-  def keymap(%RadixState{mode: :kommand}, @backspace_key) do
+  def keymap(%{mode: :kommand}, @backspace_key) do
     # GenServer.cast(KommandBuffer, {:backspace, 1})
     GenServer.cast(KommandBuffer, {:modify, %{backspace: {:cursor, 1}}}) #TODO hard-coded 1, again!
   end
 
 
-  def keymap(%RadixState{mode: :kommand}, input)
+  def keymap(%{mode: :kommand}, input)
   #TODO maybe this should be an action...
     when input in @valid_text_input_characters do
       Logger.debug "detected a valid character as input in :kommand mode: #{inspect input}"

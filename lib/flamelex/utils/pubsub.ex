@@ -2,14 +2,6 @@ defmodule Flamelex.Utils.PubSub do
   @moduledoc """
   A wrapper of convenience around the internal PubSub functionality
   of flamelex.
-
-  ## Internal topics
-
-  We have 2 topics so far
-
-  * :action_event_bus
-  * :gui_update_bus
-
   """
 
   def broadcast([topic: topic, msg: msg]) do

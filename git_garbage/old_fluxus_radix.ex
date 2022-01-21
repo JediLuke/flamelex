@@ -55,7 +55,7 @@
 #   end
 
 
-#   def init(%RadixState{} = radix_state) do
+#   def init(%{} = radix_state) do
 #     Logger.debug "#{__MODULE__} initializing..."
 #     Process.register(self(), __MODULE__)
 #     {:ok, radix_state}
@@ -98,7 +98,7 @@
 
 #   #   # #TODO maybe we dont even wait for a callback???
 #   #   # case radix_state |> Flamelex.Fluxus.RootReducer.handle({:action, a}) do
-#   #   #   {:ok, %RadixState{} = updated_radix_state} ->
+#   #   #   {:ok, %{} = updated_radix_state} ->
 #   #   #       {:noreply, updated_radix_state |> RadixState.record(action: a)}
 #   #   #   {:error, reason} ->
 #   #   #       IO.puts "error handling action: #{inspect a}, #{inspect reason}"
@@ -122,7 +122,7 @@
 #   #   {:noreply, radix_state |> RadixState.record(update: uu)}
 #   # end
 
-#   def handle_cast({:radix_state_update, %RadixState{} = new_radix_state}, _old_radix_state) do
+#   def handle_cast({:radix_state_update, %{} = new_radix_state}, _old_radix_state) do
 #     {:noreply, new_radix_state}
 #   end
 

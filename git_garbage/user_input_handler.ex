@@ -145,14 +145,14 @@ defmodule Flamelex.Fluxus.UserInputHandler do
   end
 
 
-  def lookup_action_for_input_async(%RadixState{mode: :memex} = radix_state, user_input) do
+  def lookup_action_for_input_async(%{mode: :memex} = radix_state, user_input) do
     #Logger.debug "#{__MODULE__} routing input received in Memex :mode."
     Flamelex.API.KeyMappings.Memex.keymap(radix_state, user_input)
     |> handle_lookup(radix_state)
   end
 
   #NOTE: this function is defined here, but it is run in it's own process...
-  def lookup_action_for_input_async(%RadixState{mode: m} = radix_state, user_input)
+  def lookup_action_for_input_async(%{mode: m} = radix_state, user_input)
     when m in [:normal, :insert, :kommand] do
     Logger.debug "Async Process: lookup_action_for_input_async - #{inspect user_input}"
 

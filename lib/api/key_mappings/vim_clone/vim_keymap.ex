@@ -39,7 +39,7 @@ defmodule Flamelex.API.KeyMappings.VimClone do
     end
   end
 
-  def keymap(%RadixState{mode: :normal} = state, input) do
+  def keymap(%{mode: :normal} = state, input) do
     if last_keystroke_was_leader?(state) do
       #Logger.debug "doing a LeaderBindings lookup on: #{inspect input}"
       LeaderBindings.keymap(state, input)
@@ -51,12 +51,12 @@ defmodule Flamelex.API.KeyMappings.VimClone do
 
 
   #TODO move this up into the Root reducer - follow Memex
-  def keymap(%RadixState{mode: :kommand} = state, input) do
+  def keymap(%{mode: :kommand} = state, input) do
     KommandMode.keymap(state, input)
   end
 
 
-  def keymap(%RadixState{mode: :insert} = state, input) do
+  def keymap(%{mode: :insert} = state, input) do
     #Logger.debug "#{__MODULE__} received input: #{inspect input}, routing it to InsertMode..."
     InsertMode.keymap(state, input)
   end

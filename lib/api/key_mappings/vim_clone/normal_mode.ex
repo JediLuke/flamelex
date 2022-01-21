@@ -10,7 +10,7 @@ defmodule Flamelex.API.KeyMappings.VimClone.NormalMode do
   end
 
 
-  def keymap(%RadixState{mode: :normal} = state, input) do
+  def keymap(%{mode: :normal} = state, input) do
     map(state)[input]
   end
 

@@ -7,7 +7,7 @@
 #   alias Flamelex.Fluxus.Structs.RadixState
 #   alias Flamelex.GUI.Control.Input.KeyMapping
 
-#   def handle(%RadixState{} = state, input) when input in @valid_command_buffer_inputs do
+#   def handle(%{} = state, input) when input in @valid_command_buffer_inputs do
 #     case KeyMapping.lookup(state, input) do
 #       :ignore_input ->
 #           state |> RadixState.add_to_history(input)
@@ -32,7 +32,7 @@
 #   #   state |> RadixState.add_to_history(input)
 #   # end
 
-#   # def handle_input(%RadixState{mode: mode} = state, @escape_key) when mode in [:kommand, :insert] do
+#   # def handle_input(%{mode: mode} = state, @escape_key) when mode in [:kommand, :insert] do
 #   #   Flamelex.API.CommandBuffer.deactivate()
 #   #   Flamelex.FluxusRadix.switch_mode(:normal)
 #   #   state |> RadixState.set(mode: :normal)

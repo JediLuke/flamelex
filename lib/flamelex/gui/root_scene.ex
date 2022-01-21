@@ -13,7 +13,7 @@ defmodule Flamelex.GUI.RootScene do
   # since FluxusRadix holds the global state, and we need that to lookup
   # what to do with this input, as illustrated below:
   #
-  #     %RadixState{}  +  %Keystroke{}  ->  %Action{}
+  #     %{}  +  %Keystroke{}  ->  %Action{}
   #
 
 

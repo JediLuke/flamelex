@@ -11,12 +11,7 @@ defmodule Flamelex.Fluxus.TopLevelSupervisor do
     Logger.debug "#{__MODULE__} initializing..."
 
     children = [
-      #TODO these can both fuck off now that we're moving to tht EventBus
-      # {Task.Supervisor, name: Flamelex.Fluxus.InputHandler.TaskSupervisor},
-      # {Task.Supervisor, name: Flamelex.Fluxus.RootReducer.TaskSupervisor},
-      
       Flamelex.Fluxus.RadixStore,
-      # Flamelex.FluxusRadix,
       Flamelex.Fluxus.ActionListener
     ]
 

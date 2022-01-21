@@ -1,5 +1,4 @@
 defmodule Flamelex.Fluxus.Reducers.Buffer do #TODO rename module
-  use Flamelex.Fluxus.ReducerBehaviour
   require Logger
 
 

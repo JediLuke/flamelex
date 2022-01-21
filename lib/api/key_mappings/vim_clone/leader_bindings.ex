@@ -9,7 +9,7 @@ defmodule Flamelex.API.KeyMappings.VimClone.LeaderBindings do
 
 
   # this is the function which gets called externally
-  def keymap(%RadixState{mode: :normal} = state, input) do
+  def keymap(%{mode: :normal} = state, input) do
     # leader_binding_def(state, input)
     map(state)[input]
   end

@@ -66,6 +66,6 @@
 #   If a key must fire off multiple actions, it can return a list of those
 #   actions - but the function itself returns a map.
 #   """
-#   @callback keymap(map(), map()) :: map() #TODO the first param is a R%RadixState{} typespec
+#   @callback keymap(map(), map()) :: map() #TODO the first param is a R%{} typespec
 
 # end
