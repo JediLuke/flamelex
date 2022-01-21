@@ -34,6 +34,7 @@ defmodule Flamelex.GUI.RootScene do
                                        viewport: init_scene.viewport)
 
     # capture_input(scene, [:key])
+    # request_input(new_scene, [:viewport, :cursor_button, :cursor_scroll, :key])
     request_input(new_scene, [:cursor_button, :cursor_scroll, :key])
 
     {:ok, new_scene}
@@ -67,6 +68,21 @@ defmodule Flamelex.GUI.RootScene do
     {:noreply, scene}
   end
 
+
+  # def handle_input({:viewport, {:reshape, {new_width, new_height} = new_dimensions}}, context, scene) do # e.g. of new_dimensions: {1025, 818}
+  #     Logger.debug "#{__MODULE__} received :viewport :reshape, dim: #{inspect new_dimensions}"
+
+  #     new_scene = scene
+  #     |> assign(frame: Frame.new(
+  #                        pin: {0, 0},
+  #                        orientation: :top_left,
+  #                        size: {new_width, new_height},
+  #                        #TODO deprecate below args
+  #                        top_left: Coordinates.new(x: 0, y: 0), # this is a guess
+  #                        dimensions: Dimensions.new(width: new_width, height: new_height)))
+  #     |> render_push_graph()
+  #     {:noreply, scene}
+  # end
 
   # Scenic sends us lots of keypresses etc... easiest to just filter them
   # out right where they're detected, otherwise they clog up things like
