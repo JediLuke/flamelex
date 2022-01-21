@@ -25,7 +25,11 @@ config :logger,
 
 # https://github.com/otobus/event_bus/wiki/Creating-(Registering)-Topics
 config :event_bus,
-  topics: [:general]
+  topics: [
+    :general,         # This topic is used by Fluxus, it's for updating internal Fluxus state by firing actions #TODO rename this to `actions`?
+    :user_input,      # This topic is for transmitting user input throughout the application, to the appropriate listeners, which will likely in turn fire off Fluxus actions as a result of that input
+    :interrupts       # The idea behind this topic is to handle external interrupts, e.g. perhaps we will add email as a feature to Flamelex, well getting an email might go on the interrupts channel
+  ]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

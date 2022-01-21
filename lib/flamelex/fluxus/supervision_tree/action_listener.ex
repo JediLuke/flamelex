@@ -17,20 +17,33 @@ defmodule Flamelex.Fluxus.ActionListener do
     end
   
     def process({:general = _topic, _id} = event_shadow) do
-      # GenServer.cast(self(), {:event, event_shadow})
-      fluxus_radix = Flamelex.Fluxus.Stash.get()
-      event = EventBus.fetch_event(event_shadow)
-      :ok = do_process(fluxus_radix, event.data)
-      EventBus.mark_as_completed({__MODULE__, event_shadow})
+        event = EventBus.fetch_event(event_shadow)
+        if not an_action?(event) do
+            :ignore
+        else
+            radix_state = Flamelex.Fluxus.Stash.get()
+            case Flamelex.Fluxus.NeoRootReducer.process(radix_state, action) do
+                :ignore ->
+                    EventBus.mark_as_completed({__MODULE__, event_shadow})
+                    Logger.debug "#{__MODULE__} ignoring... #{inspect(%{radix_state: radix_state, action: action})}"
+                    :ignore
+                {:ok, ^radix_state} ->
+                    EventBus.mark_as_completed({__MODULE__, event_shadow})
+                    Logger.debug "#{__MODULE__} ignoring (no state-change)... #{inspect(%{radix_state: radix_state, action: action})}"
+                    :ignore
+                {:ok, new_radix_state} ->
+                    Logger.debug "#{__MODULE__} processed event, state changed... #{inspect(%{radix_state: radix_state, action: action})}"
+                    QuillEx.RadixAgent.put(new_radix_state)
+                    EventBus.mark_as_completed({__MODULE__, event_shadow})
+                    :ok
+                {:error, reason} ->
+                    Logger.error "Unable to process event `#{inspect event}`, reason: #{inspect reason}"
+                    raise reason
+            end
+        end
     end
+
+    defp an_action?(%{data: {:action, _action}}), do: true
+    defp an_action?(_otherwise), do: false
   
-    ## --------------------------------------------------------
-  
-    def do_process(radix_state, action) do
-      Logger.debug(
-        "#{__MODULE__} ignoring... #{inspect(%{radix_state: radix_state, action: action})}"
-      )
-      :ok
-    end
-  end
-  
+end
