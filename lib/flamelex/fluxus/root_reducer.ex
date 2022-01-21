@@ -15,7 +15,7 @@ defmodule Flamelex.Fluxus.RootReducer do
   alias Flamelex.Fluxus.Reducers.Kommand, as: KommandReducer
 
 
-  def handle(radix_state, action) do
+  def process(radix_state, action) do
     # spin up a new process to do the handling...
     Task.Supervisor.start_child(
         Flamelex.Fluxus.RootReducer.TaskSupervisor,
