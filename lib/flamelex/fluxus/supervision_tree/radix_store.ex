@@ -12,6 +12,7 @@ defmodule Flamelex.Fluxus.RadixStore do
     :desktop,     # The default screen, a personalized "homepage"
     :editor,      # The text-editor interface
     :memex        # The memex screen
+    #TODO whiteboard, comms/`switchboard`
   ]
 
   @fluxus_radix %{
@@ -26,8 +27,11 @@ defmodule Flamelex.Fluxus.RadixStore do
       # layers: [WindowArrangement.single_pane()], # A list of layers, which are in turn, lists of %WindowArrangement{} structs
       theme: Flamelex.GUI.Utils.Theme.default()
     },
-    desktop: %{},
+    desktop: %{
+      graph: nil,
+    },
     editor: %{
+      graph: nil,
       buffers: [], # A list of %Buffer{} structs
       active_buf: nil,
       config: %{
@@ -38,7 +42,7 @@ defmodule Flamelex.Fluxus.RadixStore do
       active?: Application.get_env(:memelex, :active?),
       graph: nil, # Store the %Graph{} here if we need to (for switching between apps easily)
       sidebar: %{
-        active_tab: :open_tidbits,
+        active_tab: :ctrl_panel,
         search: %{
           active?: false,
           string: ""

@@ -110,19 +110,7 @@
 #             dimensions: {w, tab_bar_height})
 #     end
 
-#     def sidebar_open_tidbits_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-#         title_height = 60
-#         buffer_margin = 20
-#         tab_bar_height = dateline_height = 40 # from elsewhere in the app (lol)
-#         external_margin = 0
-#         line_y = 3*title_height + 2*buffer_margin
-#         height_of_top_section = y+line_y+external_margin+dateline_height
 
-
-#         Frame.new(
-#             top_left: {x, y+height_of_top_section+tab_bar_height},
-#             dimensions: {w, h-height_of_top_section-tab_bar_height})
-#     end
 
 #     def sidebar_search_results_frame(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
 #         title_height = 60

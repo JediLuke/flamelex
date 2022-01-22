@@ -25,43 +25,7 @@ defmodule Flamelex.Fluxus.RootReducerDeprecated do
       )
   end
 
-  @doc """
-  Here we have the function which `reduces` a radix_state and an action.
 
-  Our main way of handling actions is simply to broadcast them on to the
-  `:actions` broker, which will forward it to all the main Manager processes
-  in turn (GUiManager, BufferManager, AgentManager, etc.)
-
-  The reason for this is, what's going to happen is, say I send a command
-  like `open_buffer` to open my journal. We spin up this action handler
-  task - say that takes 2 seconds to run for some reason. If I send the
-  same action again, another process will spin up. Eventually, they're
-  both going to finish, and whoever is getting the results (FluxusRadix)
-  is going to get 2 messages, and then have to handle the situation of
-  dealing with double-processes of actions (yuck!)
-
-  what we want to do instead is, the reducer broadcasts the message to
-  the "actions" channel - all the managers are able to react to this event.
-  """
-
-  def async_reduce(%{mode: :memex} = radix_state, {:action, {:memex, :new_random}}) do
-    Logger.debug "received an action `{:memex, :new_random}` while in :memex mode..."
-    t = Memex.random()
-    # GenServer.cast(:hypercard, {:new_tidbit, t})
-    GenServer.cast(Flamelex.GUI.Component.Memex.HyperCard, {:new_tidbit, t})
-  end
-
-  def async_reduce(%{mode: :memex} = radix_state, {:action, {:open_tidbit, t}}) do
-    Logger.debug "received an action `{:open_tidbit, t}` while in :memex mode..."
-    # GenServer.cast(Flamelex.GUI.Component.Memex.HyperCard, {:new_tidbit, t})
-    GenServer.cast(Flamelex.GUI.StageManager.Memex, {:open_tidbit, t})
-  end
-
-  def async_reduce(%{mode: :memex} = radix_state, {:action, {:memex, :open_random_tidbit}}) do
-    Logger.debug "received an action `{:memex, :open_random_tidbit}` while in :memex mode..."
-    #TODO here - instead, we would call StateManager.Memex!@!
-    GenServer.cast(Flamelex.GUI.StageManager.Memex, :open_random_tidbit)
-  end
 
   def async_reduce(%{mode: :memex} = radix_state, {:action, {:switch_mode, :normal}} = action) do
     # ModeReducer.handle(radix_state, action)
