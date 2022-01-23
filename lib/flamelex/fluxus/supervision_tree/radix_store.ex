@@ -12,8 +12,17 @@ defmodule Flamelex.Fluxus.RadixStore do
     :desktop,     # The default screen, a personalized "homepage"
     :editor,      # The text-editor interface
     :memex        # The memex screen
-    #TODO whiteboard, comms/`switchboard`
+    #TODO whiteboard, comms/`switchboard`, :workbench
   ]
+
+  #   #HUGE IDEA 2 - the GUI.Component and the Buffer.Component have a shared
+#   #              state, via an Agent process!!
+#   #              They receive an action, they go fetch the state, they
+#   #              can lock it if needed (call), and they can process it.
+#   #              If the state changes, then act of changing it can
+#   #              publish a msg to other listeners (i.e. the GUI.Component)
+#   #              who will have to re-render their shit.
+
 
   @fluxus_radix %{
     root: %{
@@ -25,7 +34,8 @@ defmodule Flamelex.Fluxus.RadixStore do
       viewport: nil,
       layers: nil,
       # layers: [WindowArrangement.single_pane()], # A list of layers, which are in turn, lists of %WindowArrangement{} structs
-      theme: Flamelex.GUI.Utils.Theme.default()
+      theme: Flamelex.GUI.Utils.Theme.default(),
+      font_metrics: nil
     },
     desktop: %{
       graph: nil,
@@ -53,6 +63,9 @@ defmodule Flamelex.Fluxus.RadixStore do
         }
       }
     },
+    workbench: %{
+      graph: nil,
+    },
     history: %{
       keystrokes:   [],
       actions:      []
@@ -68,13 +81,23 @@ defmodule Flamelex.Fluxus.RadixStore do
     Agent.get(__MODULE__, & &1)
   end
 
+  def fetch_font_metrics(font_name) do
+    get().gui.font_metrics |> Map.get(font_name)
+  end
+
   #NOTE: When `Flamelex.GUI.RootScene` boots, it calls this function
   #      to reset the values of `graph` and `viewport`.
   #      We don't want to broadcast these changes out.
   def initialize(graph: new_graph, viewport: new_viewport) do
     Agent.update(__MODULE__, fn old ->
-      new_root = old.root |> Map.put(:graph, new_graph)
-      new_gui  = old.gui |> Map.put(:viewport, new_viewport)
+
+      {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
+
+      new_root = old.root
+                 |> Map.put(:graph, new_graph)
+      new_gui  = old.gui
+                 |> Map.put(:viewport, new_viewport)
+                 |> Map.put(:font_metrics, %{ibm_plex_mono: metrics})
       
       old |> Map.merge(%{root: new_root, gui: new_gui})
     end)

@@ -12,10 +12,7 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
     def init(scene, args, opts) do
         Logger.debug "#{__MODULE__} initializing..."
 
-        IO.puts "SLEEEEEEEEEEEEEEEPPPPPPPPp #{inspect args}"
-
         new_graph = Scenic.Graph.build()
-        #|> ScenicWidgets.FrameBox.add_to_graph(%{frame: args.frame, color: :antique_white})
         |> render_tidbits(args)
 
         Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
@@ -54,7 +51,16 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         |> Scenic.Graph.delete(__MODULE__)
         |> Scenic.Primitives.group(fn graph ->
                 graph
-                |> ScenicWidgets.HyperCard.add_to_graph(%{id: t.uuid, frame: hypercard_frame(frame)})
+                #TODO here is where new args will go
+                # |> ScenicWidgets.HyperCard.add_to_graph(%{
+                |> Flamelex.GUI.Component.Memex.HyperCard.add_to_graph(%{
+                        id: t.uuid,
+                        frame: hypercard_frame(frame),
+                        state: %{
+                            # title: t.title
+                            title: "This is a test title, it's a very long string that will go over the right size"
+                        }
+                })
             end, [
                 id: __MODULE__,
                 translate: scroll
@@ -84,6 +90,7 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
 
         bm = _buffer_margin = 50 # px
         Frame.new(top_left: {x+bm, y+bm}, dimensions: {w-(2*bm), 700}) #TODO just hard-code hypercards at 700 high for now
+        # Frame.new(top_left: {x+bm, y+bm}, dimensions: {w-(2*bm), :flex})
 
     end
 
