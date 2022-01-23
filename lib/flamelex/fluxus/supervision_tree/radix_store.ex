@@ -42,7 +42,8 @@ defmodule Flamelex.Fluxus.RadixStore do
       active?: Application.get_env(:memelex, :active?),
       graph: nil, # Store the %Graph{} here if we need to (for switching between apps easily)
       story_river: %{
-        open_tidbits: []
+        open_tidbits: [],
+        scroll: 0.0
       },
       sidebar: %{
         active_tab: :ctrl_panel,

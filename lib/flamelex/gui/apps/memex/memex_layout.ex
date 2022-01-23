@@ -17,12 +17,13 @@ defmodule Flamelex.GUI.Memex.Layout do
 
         init_graph = Scenic.Graph.build()
         # |> Memex.CollectionsPane.add_to_graph(%{frame: left_quadrant(params.frame)})
-        # |> Memex.StoryRiver.add_to_graph(%{frame: mid_section(params.frame)})
+        |> Memex.StoryRiver.add_to_graph(%{
+                frame: mid_section(args.frame),
+                state: args.state.story_river})
         # |> Memex.SideBar.add_to_graph(%{frame: right_quadrant(params.frame)})
         |> Memex.SideBar.add_to_graph(%{
                 frame: right_quadrant(args.frame),
-                state: args.state.sidebar
-            })
+                state: args.state.sidebar})
         # |> Memex.SecondSideBar.add_to_graph(%{frame: right_quadrant(params.frame)})
 
         #TODO here - use a WindowArrangement of {:columns, [1,2,1]}

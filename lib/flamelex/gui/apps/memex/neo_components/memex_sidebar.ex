@@ -59,6 +59,12 @@ defmodule Flamelex.GUI.Component.Memex.SideBar do
             {:noreply, scene}
     end
 
+    #NOTE: if `sidebar_state` matches, here, then they are the same, and no change in state has occured
+    def handle_info({:radix_state_change, %{memex: %{sidebar: sidebar_state}}}, %{assigns: %{state: sidebar_state}} = scene) do
+        Logger.debug "#{__MODULE__} ignoring a :radix_state_change, it didn't change the Memex.Sidebar..."
+        {:noreply, scene}
+    end
+
     def render_background(graph, dimensions: size, color: color) do
         graph |> Scenic.Primitives.rect(size, fill: color)
     end
