@@ -13,20 +13,18 @@ defmodule Flamelex.GUI.Memex.Layout do
     def init(init_scene, args, opts) do
         Logger.debug "#{__MODULE__} initializing..."
     
-        Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
+        #NOTE: This component doesn't need to subscribe to RadixState changes
 
+        #TODO here - use a WindowArrangement of {:columns, [1,2,1]}
         init_graph = Scenic.Graph.build()
-        # |> Memex.CollectionsPane.add_to_graph(%{frame: left_quadrant(params.frame)})
+        #TODO make this a ScenicWidgets.ExpandableNavBar
+        |> ScenicWidgets.FrameBox.add_to_graph(%{frame: left_quadrant(args.frame), color: :alice_blue})
         |> Memex.StoryRiver.add_to_graph(%{
                 frame: mid_section(args.frame),
                 state: args.state.story_river})
-        # |> Memex.SideBar.add_to_graph(%{frame: right_quadrant(params.frame)})
         |> Memex.SideBar.add_to_graph(%{
                 frame: right_quadrant(args.frame),
                 state: args.state.sidebar})
-        # |> Memex.SecondSideBar.add_to_graph(%{frame: right_quadrant(params.frame)})
-
-        #TODO here - use a WindowArrangement of {:columns, [1,2,1]}
 
         new_scene = init_scene
         |> assign(graph: init_graph)
@@ -35,13 +33,6 @@ defmodule Flamelex.GUI.Memex.Layout do
         |> push_graph(init_graph)
   
         {:ok, new_scene}
-    end
-
-    def handle_info({:radix_state_change, _new_radix_state}, scene) do
-        #NOTE: I don't think the Layout component really needs to know
-        #      about state changes, maybe changes to viewport??
-        #Logger.debug "#{__MODULE__} ignoring a RadixState change..."
-        {:noreply, scene}
     end
 
 

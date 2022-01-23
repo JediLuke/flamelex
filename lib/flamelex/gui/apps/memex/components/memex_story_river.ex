@@ -53,58 +53,14 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         new_graph = graph
         |> Scenic.Graph.delete(__MODULE__)
         |> Scenic.Primitives.group(fn graph ->
-                # {_final_offset, final_graph} = 
                 graph
-                # |> ScenicWidgets.HyperCard.add_to_graph(%{
-                |> ScenicWidgets.FrameBox.add_to_graph(%{
-                        color: :antique_white,
-                        frame: hypercard_frame(frame), # calculate hypercard based of story_river
-                        data: t },
-                        id: {:hypercard, t.uuid})
-
-
+                |> ScenicWidgets.HyperCard.add_to_graph(%{id: t.uuid, frame: hypercard_frame(frame)})
             end, [
                 id: __MODULE__,
                 translate: scroll
             ])
     end
 
-    #     # def render(%{assigns: %{graph: %Scenic.Graph{} = graph, frame: frame, open_tidbits: [t]}} = scene) do
-#     #     new_graph = graph
-#     #     # |> Scenic.Graph.delete(:story_river)
-#     #     # |> Scenic.Graph.delete(:hypercard) #TODO is this how it works with Components? Not sure...
-#     #     |> common_render(frame, t, scene.assigns.scroll)
-#     #     # |> Scenic.Primitives.rect({frame.dimensions.width, frame.dimensions.height},
-#     #     #             id: :story_river,
-#     #     #             fill: :beige,
-#     #     #             translate: {
-#     #     #                 frame.top_left.x,
-#     #     #                 frame.top_left.y})
-#     #     # |> HyperCard.add_to_graph(%{
-#     #     #     frame: hypercard_frame(scene.assigns.frame), # calculate hypercard based of story_river
-#     #     #     tidbit: t },
-#     #     #     id: :hypercard)
-
-#     #     # GenServer.call(HyperCard, {:re_render, %{frame: hypercard_frame(scene.assigns.frame)}})
-
-#     #     scene
-#     #     |> assign(graph: new_graph)
-#     # end
-
-    # def render_tidbits(graph, %{open_tidbits: open_tidbits_list} = _story_river_state) do
-    #     graph
-    #     |> Scenic.Primitives.group(fn graph ->
-    #             {_final_offset, final_graph} = 
-    #                 open_tidbits_list
-
-    #         end, [
-    #             id: __MODULE__,
-    #             translate: scene.assigns.state.scroll
-    #         ])
-    #     end
-
-
-    # end
 
 
 
