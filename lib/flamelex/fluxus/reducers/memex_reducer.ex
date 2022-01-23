@@ -13,6 +13,17 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
         :ignore
     end
 
+    def process(%{root: %{active_app: active_app}, memex: %{graph: %Scenic.Graph{} = stashed_memex_graph}} = radix_state, :open_memex) when active_app != :memex do
+        Logger.debug "swapping from `#{inspect active_app}` to `:memex` (with history)..."
+        Logger.warn "here, we ought to be stashign the previous graph into something..."
+
+        new_radix_state = radix_state
+        |> put_in([:root, :active_app], :memex)
+        |> put_in([:root, :graph], stashed_memex_graph)
+
+        {:ok, new_radix_state}
+    end
+
     def process(%{memex: %{graph: nil}} = radix_state, :open_memex) do
         Logger.debug "Opening (with no history) the memex..."
 
