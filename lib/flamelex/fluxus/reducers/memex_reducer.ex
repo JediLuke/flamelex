@@ -13,8 +13,8 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
         :ignore
     end
 
-    def process(%{root: %{active_app: app}, memex: %{graph: nil}} = radix_state, :open_memex) do
-        Logger.debug "swapping from app: #{inspect app} to :memex..."
+    def process(%{memex: %{graph: nil}} = radix_state, :open_memex) do
+        Logger.debug "Opening (with no history) the memex..."
 
         new_memex_graph = Scenic.Graph.build()
         |> Flamelex.GUI.Memex.Layout.add_to_graph(%{
@@ -22,13 +22,45 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
                 state: radix_state.memex
             }, id: :memex, theme: radix_state.gui.theme)
 
-        new_radix_state =
-            radix_state
-            |> put_in([:root, :active_app], :memex)
-            |> put_in([:root, :graph], new_memex_graph)
+        new_radix_state = radix_state
+        |> put_in([:root, :active_app], :memex)
+        |> put_in([:root, :graph], new_memex_graph)
 
         {:ok, new_radix_state}
     end
+
+    def process(%{root: %{active_app: :memex}, desktop: %{graph: nil}} = radix_state, :close_memex) do
+        Logger.debug "swapping from `:memex` to `:desktop`, but we need to render a new desktop..."
+        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Desktop, :show_desktop})
+        :ignore
+    end
+
+    def process(%{root: %{active_app: :memex}, desktop: %{graph: %Scenic.Graph{} = stashed_desktop_graph}} = radix_state, :close_memex) do
+        Logger.debug "swapping from `:memex` to `:desktop`..."
+
+        new_radix_state = radix_state
+        |> put_in([:memex, :graph], radix_state.root.graph) # stash the current graph for the memex
+        |> put_in([:root, :active_app], :desktop)
+        |> put_in([:root, :graph], stashed_desktop_graph)
+
+        {:ok, new_radix_state}
+    end
+
+    def process(%{root: %{active_app: :memex}, memex: %{story_river: %{open_tidbits: currently_open_tidbits_list}}} = radix_state, {:open_tidbit, %Memelex.TidBit{} = t}) do
+        Logger.debug "opening TidBit: #{inspect t.title}..."
+        new_radix_state = radix_state
+        |> put_in([:memex, :story_river, :open_tidbits], currently_open_tidbits_list ++ [t])
+        {:ok, new_radix_state}
+    end
+
+    def process(%{root: %{active_app: :memex}} = radix_state, {:open_tidbit, :random}) do
+        Logger.debug "opening a random TidBit..."
+        process(radix_state, {:open_tidbit, Memelex.My.Wiki.random()})
+    end
+
+
+
+
 
 
     #   def handle_cast(:open_random_tidbit, state) do
@@ -42,12 +74,6 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
 #     {:noreply, new_state}
 #   end
 
-#   def handle_cast({:open_tidbit, t}, state) do
-#     Logger.debug "#{__MODULE__} recv'd msg: {:open_random, #{t.title}}"
-#     new_state = %{state|open: state.open ++ [t]}
-#     GenServer.cast(Flamelex.GUI.Component.Memex.StoryRiver, {:add_tidbit, t})
-#     {:noreply, new_state}
-#   end
 
 #   def handle_call(:get_open_tidbits, _from, %{open: []} = state) do
 #     Logger.warn "Dont wanna open empty Memex yet lol, just render a rando..."

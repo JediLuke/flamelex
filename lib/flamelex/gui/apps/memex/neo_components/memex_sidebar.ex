@@ -1,8 +1,9 @@
-defmodule Flamelex.GUI.Component.Memex.SideBar.New do
+defmodule Flamelex.GUI.Component.Memex.SideBar do
     use Scenic.Component
     use Flamelex.ProjectAliases
     require Logger
     alias Flamelex.GUI.Component.Memex
+    alias Flamelex.Fluxus.Reducers.Memex, as: MemexReducer
 
     @valid_sidebar_tabs [:open_tidbits, :ctrl_panel]
 
@@ -41,17 +42,21 @@ defmodule Flamelex.GUI.Component.Memex.SideBar.New do
         {:ok, new_scene}
     end
 
-    def handle_event({:click, :open_random}, _from, scene) do
-        # IO.inspect event
-        #TODO get a random TidBit here
-        IO.puts "CLICKED OPEN RANDOM - TODO, now call Flamelex.Fluxux.action({Memex.Reducer, :open_random})"
+    def handle_event({:click, :open_random_tidbit_btn}, _from, scene) do
+        Flamelex.Fluxus.action({MemexReducer, {:open_tidbit, :random}})
         {:noreply, scene}
     end
 
-    def handle_event({:click, :create_new}, _from, scene) do
-        # IO.inspect event
-        IO.puts "CLICKED OPEN RANDOM - TODO, now call Flamelex.Fluxux.action({Memex.Reducer, :open_random})"
+    def handle_event({:click, :create_new_tidbit_btn}, _from, scene) do
+        Flamelex.Fluxus.action({MemexReducer, :new_tidbit})
         {:noreply, scene}
+    end
+
+    def handle_info({:radix_state_change, %{memex: %{sidebar: new_sidebar_state}}}, %{assigns: %{state: current_state}} = scene)
+        when current_state != new_sidebar_state do
+            Logger.warn "#{__MODULE__} updating due to a change in the Memex.SideBar state..."
+            raise "cant do this yet"
+            {:noreply, scene}
     end
 
     def render_background(graph, dimensions: size, color: color) do
@@ -67,8 +72,8 @@ defmodule Flamelex.GUI.Component.Memex.SideBar.New do
         |> Scenic.Primitives.group(fn graph ->
             graph
             |> render_background(dimensions: lower_pane_frame.size, color: :green)
-            |> Scenic.Components.button("Open random TidBit", id: :open_random, translate: {15, 20})
-            |> Scenic.Components.button("Create new TidBit", id: :create_new, translate: {15, 75})
+            |> Scenic.Components.button("Open random TidBit", id: :open_random_tidbit_btn, translate: {15, 20})
+            |> Scenic.Components.button("Create new TidBit", id: :create_new_tidbit_btn, translate: {15, 75})
         end,
         id: {__MODULE__, :ctrl_panel},
         translate: lower_pane_frame.pin)

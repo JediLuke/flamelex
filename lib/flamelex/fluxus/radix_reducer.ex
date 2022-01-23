@@ -47,11 +47,16 @@ defmodule Flamelex.Fluxus.RootReducer do
   require Logger
 
 
+  def process(radix_state, {reducer, action}) do
+    reducer.process(radix_state, action)
+  end
+
+
   @memex_actions [
-    :open_memex
+    :open_memex, :close_memex
   ]
 
-  def process(%{memex: %{active?: false}}, _action) do
+  def process(%{memex: %{active?: false}}, action) when action in @memex_actions do
     Logger.warn "#{__MODULE__} ignoring a memex action, because the memex is set to `inactive`"
     :ignore
   end

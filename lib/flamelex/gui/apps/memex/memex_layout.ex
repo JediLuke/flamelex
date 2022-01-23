@@ -19,7 +19,7 @@ defmodule Flamelex.GUI.Memex.Layout do
         # |> Memex.CollectionsPane.add_to_graph(%{frame: left_quadrant(params.frame)})
         # |> Memex.StoryRiver.add_to_graph(%{frame: mid_section(params.frame)})
         # |> Memex.SideBar.add_to_graph(%{frame: right_quadrant(params.frame)})
-        |> Memex.SideBar.New.add_to_graph(%{
+        |> Memex.SideBar.add_to_graph(%{
                 frame: right_quadrant(args.frame),
                 state: args.state.sidebar
             })
@@ -36,7 +36,12 @@ defmodule Flamelex.GUI.Memex.Layout do
         {:ok, new_scene}
     end
 
-
+    def handle_info({:radix_state_change, _new_radix_state}, scene) do
+        #NOTE: I don't think the Layout component really needs to know
+        #      about state changes, maybe changes to viewport??
+        #Logger.debug "#{__MODULE__} ignoring a RadixState change..."
+        {:noreply, scene}
+    end
 
 
     def left_quadrant(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}} = frame) do
