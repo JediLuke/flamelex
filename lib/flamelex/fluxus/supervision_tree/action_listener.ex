@@ -23,7 +23,7 @@ defmodule Flamelex.Fluxus.ActionListener do
         else
             %EventBus.Model.Event{id: _id, topic: :general, data: {:action, action}} = event
             radix_state = Flamelex.Fluxus.RadixStore.get()
-            case Flamelex.Fluxus.RootReducer.process(radix_state, action) do
+            case Flamelex.Fluxus.RadixReducer.process(radix_state, action) do
                 x when x in [:ignore, :ok] ->
                     EventBus.mark_as_completed({__MODULE__, event_shadow})
                     Logger.debug "#{__MODULE__} ignoring... #{inspect(%{action: action})}"

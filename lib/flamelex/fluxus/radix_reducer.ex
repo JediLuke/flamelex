@@ -1,4 +1,4 @@
-defmodule Flamelex.Fluxus.RootReducer do
+defmodule Flamelex.Fluxus.RadixReducer do
   @moduledoc """
   The RootReducer for all flamelex actions.
 
@@ -47,7 +47,7 @@ defmodule Flamelex.Fluxus.RootReducer do
   require Logger
 
 
-  def process(radix_state, {reducer, action}) do
+  def process(radix_state, {reducer, action}) when is_atom(reducer) do
     reducer.process(radix_state, action)
   end
 

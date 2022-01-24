@@ -36,11 +36,16 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
 
             new_scene = scene
             |> assign(graph: new_graph)
+            |> assign(state: new_story_river_state)
             |> push_graph(new_graph)
     
             {:noreply, new_scene}
     end
 
+    #NOTE: If `story_river_state` binds on both variables here, then they are the same, no state-change occured and we can ignore this update
+    def handle_info({:radix_state_change, %{memex: %{story_river: story_river_state}}}, %{assigns: %{state: story_river_state}} = scene) do
+        {:noreply, scene}
+    end
 
     def render_tidbits(graph, %{state: %{open_tidbits: []}} = _story_river_state) do
         graph |> Scenic.Graph.delete(__MODULE__)

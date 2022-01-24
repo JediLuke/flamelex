@@ -44,8 +44,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 								# text_wrap_opts: :wrap #TODO
 								background_color: :yellow
 						}) #TODO theme: theme?? Does this get automatically passed down??
-						|> Scenic.Components.button("Edit", id: {:edit_tidbit_btn, args.id}, translate: {50, 200})
-						|> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {50, 250})
+						|> Scenic.Components.button("Edit", id: {:edit_tidbit_btn, args.id}, translate: {args.frame.dimensions.width-100, 10})
+						|> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {args.frame.dimensions.width-100, 60})
 					end,
 					id: {__MODULE__, args.id},
 					translate: args.frame.pin)
@@ -61,14 +61,12 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 	end
 
 	def handle_event({:click, {:edit_tidbit_btn, tidbit_uuid}}, _from, scene) do
-		Logger.warn "EDITING>>>>"
-        # Flamelex.Fluxus.action({MemexReducer, {:activate_edit_mode, %{tidbit_uuid: args.id}}})
+        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:switch_mode, :edit, %{tidbit_uuid: tidbit_uuid}}})
         {:noreply, scene}
     end
 
 	def handle_event({:click, {:close_tidbit_btn, tidbit_uuid}}, _from, scene) do
-		Logger.warn "CLOSING>>>>"
-        # Flamelex.Fluxus.action({MemexReducer, {:close_tidbit, %{tidbit_uuid: args.id}}})
+        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:close_tidbit, %{tidbit_uuid: tidbit_uuid}}})
         {:noreply, scene}
     end
 
