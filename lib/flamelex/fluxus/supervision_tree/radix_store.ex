@@ -103,7 +103,7 @@ defmodule Flamelex.Fluxus.RadixStore do
     end)
   end
 
-  def broadcast(new_state) do
+  def broadcast_update(new_state) do
     Logger.debug("#{__MODULE__} updating state & broadcasting new_state...")
     #Logger.debug("#{__MODULE__} updating state & broadcasting new_state: #{inspect(new_state)}")
 

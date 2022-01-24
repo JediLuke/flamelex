@@ -115,44 +115,6 @@
 #             fill: :grey)
 #   end
 
-#   def render(scene, _params) do
 
-#     todo_list = Memex.My.todos()
-#     IO.inspect todo_list, label: "TODOs"
-
-#     Scenic.Graph.build()
-#     |> Scenic.Primitives.rect({800, 400}, translate: {500, 200}, fill: :lemon_chiffon)
-#     |> Scenic.Primitives.line({{500, 300}, {1300, 300}}, stroke: {2, :green})
-#     |> Scenic.Primitives.text("My TODO list",
-#           font: :ibm_plex_mono,
-#           translate: {560, 280}, # text draws from bottom-left corner??
-#           font_size: 36,
-#           fill: :black)
-#     |> render_list(Enum.map(todo_list, & &1.title))
-
-#     |> Scenic.Primitives.rect({800, 400}, translate: {500, 700}, fill: :lemon_chiffon)
-#     |> Scenic.Primitives.line({{500, 800}, {1300, 800}}, stroke: {2, :green})
-#     |> Scenic.Primitives.text("My other TODO list",
-#           font: :ibm_plex_mono,
-#           translate: {560, 780}, # text draws from bottom-left corner??
-#           font_size: 36,
-#           fill: :black)
-#   end
-
-#   def render_list(scene, list) do
-#     render_list(scene, list, 0) # this is where we kickstart the recursion
-#   end
-
-#   def render_list(scene, [], _offset), do: scene
-
-#   def render_list(scene, [item|rest], offset) do
-#     scene
-#     |> Scenic.Primitives.text("* " <> item,
-#           font: :ibm_plex_mono,
-#           translate: {560, 340+(offset*50)}, # text draws from bottom-left corner??
-#           font_size: 36,                     # offset has to equal text size??
-#           fill: :black)
-#     |> render_list(rest, offset+1)
-#   end
       
 # end
