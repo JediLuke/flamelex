@@ -41,8 +41,28 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 			|> assign(state: args.state)
 			|> push_graph(init_graph)
 	
-		{:ok, init_scene}
+		{:ok, init_scene, {:continue, :publish_bounds}}
 	end
+
+	#         #TODO good idea: render each sub-component as a seperate graph,
+#         #                calculate their heights, then use Scenic.Graph.add_to
+#         #                to put them into the `:hypercard_itself` group
+#         #                -> Unfortunately, this doesn't work because Scenic
+#         #                doesn't seem to support "merging" 2 graphs, or
+#         #                if I return a graph (each component), no way to
+#         #                simply add that to another graph, as a sub-component
+
+	def handle_continue(:publish_bounds, scene) do
+        bounds = Scenic.Graph.bounds(scene.assigns.graph)
+
+		#         body_height = calc_wrapped_text_height(%{frame: frame, text: data})
+
+		Logger.warn "#TODO need to report bounds back after we've rendered..."
+        # Flamelex.GUI.Component.LayoutList
+        # |> GenServer.cast({:component_height, scene.assigns.tidbit, bounds})
+        
+        {:noreply, scene}
+    end
 
 	def handle_event({:click, {:edit_tidbit_btn, tidbit_uuid}}, _from, scene) do
         Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:switch_mode, :edit, %{tidbit_uuid: tidbit_uuid}}})
@@ -81,6 +101,13 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		}) #TODO theme: theme?? Does this get automatically passed down??
 		|> Scenic.Components.button("Save", id: {:save_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
 		# |> ScenicWidgets.FrameBox.add_to_graph(%{frame: calc_body_frame(frame), color: :blue})
+
+#     # - work on body component displaying how we actually want it to work
+#     #       - wraps at correct width
+#     #       - renders infinitely long
+#     #       - only works for pure text, shows "NOT AVAILABLE" or whatever otherwise (centered ;)
+
+
 		|> Scenic.Primitives.rrect({frame.dimensions.width-(2*@opts.margin), 170, 12}, t: {@opts.margin, 100}, fill: :pink)
 		# |> ScenicWidgets.TextPad.add_to_graph(%{
 		# 		frame: calc_body_frame(frame),
@@ -120,6 +147,11 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		}) #TODO theme: theme?? Does this get automatically passed down??
 		|> Scenic.Components.button("Edit", id: {:edit_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
 		|> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 60})
+		#     |> Scenic.Primitives.text(t.created |> human_formatted_date(),
+#             font: :ibm_plex_mono,
+#             translate: {tl_x+left_margin, tl_y+top_margin+title_height}, # text draws from bottom-left corner??
+#             font_size: 24,
+#             fill: :grey)
 		|> ScenicWidgets.TextPad.add_to_graph(%{
 				frame: calc_body_frame(frame),
 				mode: :read_only,
@@ -160,6 +192,102 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 			pin: {@opts.margin, 150},
 			size: {hypercard_frame.dimensions.width-(2*@opts.margin), 170})
 	end
+
+	#     @doc """
+#     Calculates the render height of a bunch of text (after wrapping) for
+#     a given frame (including margins!)
+#     """
+#     def calc_wrapped_text_height(%{frame: frame, text: unwrapped_text}) when is_bitstring(unwrapped_text) do
+
+#         width = frame.dimensions.width
+#         textbox_width = width-@margin.left-@margin.right
+
+#         {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
+#         wrapped_text = FontMetrics.wrap(unwrapped_text, textbox_width, @font_size, metrics)
+
+#         #NOTE: This tells us, how long the body will be - because in Scenic
+#         #      we take the top-left corner as the origin, the bottom of
+#         #      a bounding box is greater than the top. The total height
+#         #      is the bottom minus the top.
+#         {_left, top, _right, bottom} =
+#             Scenic.Graph.build()
+#             |> Scenic.Primitives.text(wrapped_text, font: :ibm_plex_mono, font_size: @font_size)
+#             |> Scenic.Graph.bounds()
+        
+#         body_height = (bottom-top)+@margin.top+@margin.bottom
+
+#         if body_height <= @min_body_height do
+#             @min_body_height
+#         else
+#             body_height
+#         end
+#     end
+
+#     def calc_wrapped_text_height(_otherwise) do
+#         @min_body_height
+#     end
+
+
+
+
+#   def human_formatted_date(date) do
+#     Logger.debug "parsing date: #{inspect date} into human readable format..."
+#     {:ok, date, 0} = DateTime.from_iso8601(date)
+#     day = case Date.day_of_week(date) do
+#       1 -> "Mon"
+#       2 -> "Tue"
+#       3 -> "Wed"
+#       4 -> "Thu"
+#       5 -> "Fri"
+#       6 -> "Sat"
+#       7 -> "Sun"
+#     end
+#     month = case date.month do
+#       1 -> "Jan"
+#       2 -> "Feb"
+#       3 -> "Mar"
+#       4 -> "Apr"
+#       5 -> "May"
+#       6 -> "Jun"
+#       7 -> "Jul"
+#       8 -> "Aug"
+#       9 -> "Sep"
+#       10 -> "Oct"
+#       11 -> "Nov"
+#       12 -> "Dec"
+#     end
+#     #IO.inspect date
+#     "#{day} #{date.day} #{month} #{date.year}"
+#   end
+
+
+#   def render_tags(graph, %{tags: []}, _offset) do
+#     graph
+#   end
+
+#   def render_tags(graph, %{tags: [tag|rest], coords: {tl_x, tl_y}}, offset \\ 0) do
+#     # render_tags(graph, tags, :new_render)
+#     IO.puts "ONCE"
+#     left_margin = 60 #TODO this is from above lol
+#     top_margin = 80
+#     title_height = 60
+#     why_not = 40
+#     tag_width = 70
+
+#     translate = {tl_x+left_margin+offset*tag_width, tl_y+top_margin+title_height+why_not}
+#     translate_label = {tl_x+left_margin+offset*tag_width-10, tl_y+top_margin+title_height+why_not - 15}
+#     tag_height = 20
+
+#     graph
+#     |> Scenic.Primitives.rounded_rectangle( {tag_width, tag_height, 12}, t: translate_label, fill: :red)
+#     |> Scenic.Primitives.text(tag,
+#           font: :ibm_plex_mono,
+#           translate: translate, # text draws from bottom-left corner??
+#           font_size: 14,
+#           fill: :black)
+#     |> render_tags(%{tags: rest, coords: {tl_x, tl_y}}, offset+1)
+#   end
+
 end
   
 
