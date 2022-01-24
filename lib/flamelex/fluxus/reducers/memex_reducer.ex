@@ -70,14 +70,42 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
     end
 
     def process(radix_state, {:switch_mode, :edit, %{tidbit_uuid: tidbit_uuid}}) do
-        raise "cant edit"
-    end
-# 
-    # def process(radix_state, {:close_tidbit, %{tidbit_uuid: tidbit_uuid}}) do
-    def process(radix_state, {:close_tidbit, close_this_tidbit_uuid}) do
         new_open_tidbits_list =
             radix_state.memex.story_river.open_tidbits
-            |> Enum.filter(& &1.uuid == close_this_tidbit_uuid)
+            |> Enum.map(fn 
+                    %{uuid: ^tidbit_uuid} = tidbit ->
+                        tidbit |> Map.merge(%{edit_mode?: true})
+                    other_tidbit ->
+                        other_tidbit
+                    end)
+
+        new_radix_state = radix_state
+        |> put_in([:memex, :story_river, :open_tidbits], new_open_tidbits_list)
+
+        {:ok, new_radix_state}
+    end
+# 
+    def process(radix_state, {:close_tidbit, %{tidbit_uuid: tidbit_uuid}}) do
+        new_open_tidbits_list =
+            radix_state.memex.story_river.open_tidbits
+            |> Enum.reject(& &1.uuid == tidbit_uuid)
+
+        new_radix_state = radix_state
+        |> put_in([:memex, :story_river, :open_tidbits], new_open_tidbits_list)
+
+        {:ok, new_radix_state}
+    end
+
+    def process(radix_state, {:save_tidbit, %{tidbit_uuid: tidbit_uuid}}) do
+        new_open_tidbits_list =
+            radix_state.memex.story_river.open_tidbits
+            |> Enum.map(fn 
+                    %{uuid: ^tidbit_uuid} = tidbit ->
+                        tidbit |> Map.merge(%{edit_mode?: false})
+                        #TODO really save the TidBit in the Memex
+                    other_tidbit ->
+                        other_tidbit
+                    end)
 
         new_radix_state = radix_state
         |> put_in([:memex, :story_river, :open_tidbits], new_open_tidbits_list)

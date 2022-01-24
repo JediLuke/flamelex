@@ -25,27 +25,11 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 			(opts[:theme] || Scenic.Primitive.Style.Theme.preset(:light))
 			|> Scenic.Primitive.Style.Theme.normalize()
 
-		heading_font = %{
-			name: :ibm_plex_mono,
-			size: 36,
-			metrics: Flamelex.Fluxus.RadixStore.fetch_font_metrics(:ibm_plex_mono)}
-	
 		init_graph =
 			Scenic.Graph.build()
 			|> Scenic.Primitives.group(
 					fn graph ->
-						graph
-						|> Scenic.Primitives.rect(args.frame.size, fill: :white) # background rectangle
-						|> ScenicWidgets.Simple.Heading.add_to_graph(%{
-								text: args.state.title,
-								frame: calc_title_frame(args.frame),
-								font: heading_font,
-								color: :green,
-								# text_wrap_opts: :wrap #TODO
-								background_color: :yellow
-						}) #TODO theme: theme?? Does this get automatically passed down??
-						|> Scenic.Components.button("Edit", id: {:edit_tidbit_btn, args.id}, translate: {args.frame.dimensions.width-100, 10})
-						|> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {args.frame.dimensions.width-100, 60})
+						graph |> render_tidbit(args)
 					end,
 					id: {__MODULE__, args.id},
 					translate: args.frame.pin)
@@ -65,10 +49,61 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         {:noreply, scene}
     end
 
+	def handle_event({:click, {:save_tidbit_btn, tidbit_uuid}}, _from, scene) do
+        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:save_tidbit, %{tidbit_uuid: tidbit_uuid}}})
+        {:noreply, scene}
+    end
+
 	def handle_event({:click, {:close_tidbit_btn, tidbit_uuid}}, _from, scene) do
         Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:close_tidbit, %{tidbit_uuid: tidbit_uuid}}})
         {:noreply, scene}
     end
+
+	def render_tidbit(graph, %{state: %{edit_mode?: true} = tidbit, frame: frame} = args) do
+
+		background_color = :red
+
+		heading_font = %{
+			name: :ibm_plex_mono,
+			size: 36,
+			metrics: Flamelex.Fluxus.RadixStore.fetch_font_metrics(:ibm_plex_mono)}
+
+		graph
+		|> Scenic.Primitives.rect(frame.size, fill: background_color) # background rectangle
+		|> ScenicWidgets.Simple.Heading.add_to_graph(%{
+				text: tidbit.title,
+				frame: calc_title_frame(frame),
+				font: heading_font,
+				color: :green,
+				# text_wrap_opts: :wrap #TODO
+				background_color: :yellow
+		}) #TODO theme: theme?? Does this get automatically passed down??
+		|> Scenic.Components.button("Save", id: {:save_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
+		# |> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 60})
+	end
+
+	def render_tidbit(graph, %{state: tidbit, frame: frame} = args) do
+
+		background_color = :antique_white
+
+		heading_font = %{
+			name: :ibm_plex_mono,
+			size: 36,
+			metrics: Flamelex.Fluxus.RadixStore.fetch_font_metrics(:ibm_plex_mono)}
+
+		graph
+		|> Scenic.Primitives.rect(frame.size, fill: background_color) # background rectangle
+		|> ScenicWidgets.Simple.Heading.add_to_graph(%{
+				text: tidbit.title,
+				frame: calc_title_frame(frame),
+				font: heading_font,
+				color: :green,
+				# text_wrap_opts: :wrap #TODO
+				background_color: :yellow
+		}) #TODO theme: theme?? Does this get automatically passed down??
+		|> Scenic.Components.button("Edit", id: {:edit_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
+		|> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 60})
+	end
 
 	def calc_title_frame(hypercard_frame) do
 		#REMINDER: Because we render this from within the group (which is
