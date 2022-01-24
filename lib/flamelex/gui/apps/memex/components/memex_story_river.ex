@@ -2,8 +2,16 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
     use Scenic.Component
     use Flamelex.ProjectAliases
     require Logger
+    # use ScenicWidgets.Macros.ImplementScrolling
 
-    def validate(%{frame: %Frame{} = _f} = data) do
+    def validate(%{frame: %Frame{} = _f, state: %{
+        open_tidbits: [],
+        scroll: %{
+          accumulator: {_x, _y},
+          direction: :vertical,
+          components: [],
+          #acc_length: nil # this will get populated by the component, and will accumulate as TidBits get put in the StoryRiver 
+    }}} = data) do
         Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
         {:ok, data}
     end
@@ -23,6 +31,8 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         |> assign(state: args.state)
         |> push_graph(new_graph)
 
+        request_input(new_scene, [:cursor_scroll])
+
         {:ok, new_scene}
     end
 
@@ -31,7 +41,7 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
             Logger.debug "#{__MODULE__} updating StoryRiver..."
 
             new_graph = Scenic.Graph.build()
-            #|> ScenicWidgets.FrameBox.add_to_graph(%{frame: scene.assigns.frame, color: :pink})
+            # |> ScenicWidgets.FrameBox.add_to_graph(%{frame: scene.assigns.frame, color: :pink})
             |> render_tidbits(%{state: new_story_river_state, frame: scene.assigns.frame})
 
             new_scene = scene
@@ -44,6 +54,52 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
 
     #NOTE: If `story_river_state` binds on both variables here, then they are the same, no state-change occured and we can ignore this update
     def handle_info({:radix_state_change, %{memex: %{story_river: story_river_state}}}, %{assigns: %{state: story_river_state}} = scene) do
+        IO.puts "NO CHNGE MYBE"
+        {:noreply, scene}
+    end
+
+    def handle_input(
+        {:cursor_scroll, {{_x_scroll, _y_scroll} = delta_scroll, coords}},
+        _context,
+        scene
+        # %{
+        #   assigns: %{
+        #     state: %{
+        #       scroll: %{
+        #         accumulator: {_x, _y} = current_scroll,
+        #         direction: :vertical
+        #       }
+        #     } = current_state
+        #   }
+        # } = scene
+      ) do
+
+        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:scroll, delta_scroll, __MODULE__}})
+
+        # IO.puts "YESYES"
+        # fast_scroll = {0, 3 * y_scroll}
+
+        # new_cumulative_scroll =
+        #     cap_position(scene, Scenic.Math.Vector2.add(current_scroll, fast_scroll))
+
+        # new_scroll_state =
+        #     scene.assigns.state.scroll |> Map.put(:accumulator, new_cumulative_scroll)
+
+        # new_state = %{current_state | scroll: new_scroll_state}
+
+        # new_graph = scene.assigns.graph
+        #   |> IO.inspect
+        #   |> Scenic.Graph.modify(
+        #     __MODULE__,
+        #     &Scenic.Primitives.update_opts(&1, translate: new_state.scroll.accumulator)
+        #   )
+        #   |> IO.inspect
+
+        # new_scene = scene
+        #   |> assign(graph: new_graph)
+        #   |> assign(state: new_state)
+        #   |> push_graph(new_graph)
+
         {:noreply, scene}
     end
 
@@ -56,8 +112,6 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         |> Scenic.Graph.delete(__MODULE__)
         |> Scenic.Primitives.group(fn graph ->
                 graph
-                #TODO here is where new args will go
-                # |> ScenicWidgets.HyperCard.add_to_graph(%{
                 |> Flamelex.GUI.Component.Memex.HyperCard.add_to_graph(%{
                         id: tidbit.uuid,
                         frame: hypercard_frame(frame),
@@ -65,43 +119,14 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
                 })
             end, [
                 id: __MODULE__,
-                translate: scroll
+                translate: scroll.accumulator
             ])
     end
 
-
-
-
-
-        #           |> LayoutList.add_to_graph(%{
-#                 id: :story_layout_list, #TODO lol
-#                 frame: params.frame,
-#                 # components: calc_component_list(open_tidbits)
-#                 components: [],
-#                     # %{module: HyperCard, params: hd(open_tidbits), opts: []} #TODO?
-#                 layout: :flex_grow,
-#                 scroll: true
-#           }, id: :story_layout_list) #TODO lol
-
-
-
-
-
-    # def hypercard_frame(%Frame{top_left: %Coordinates{x: x, y: y}, dimensions: %Dimensions{width: w, height: h}}) do
     def hypercard_frame(%Frame{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}}) do
-
         bm = _buffer_margin = 50 # px
-        Frame.new(top_left: {x+bm, y+bm}, dimensions: {w-(2*bm), 700}) #TODO just hard-code hypercards at 700 high for now
-        # Frame.new(top_left: {x+bm, y+bm}, dimensions: {w-(2*bm), :flex})
-
+        Frame.new(top_left: {x+bm, y+bm}, dimensions: {w-(2*bm), {:flex_grow, %{min_height: 500}}})
     end
 
-    # def second_hypercard_frame(%Frame{top_left: %Coordinates{x: x, y: y}, dimensions: %Dimensions{width: w, height: h}}) do
-
-    #     bm = _buffer_margin = 50 # px
-    #     second_offset = 800
-    #     Frame.new(top_left: {x+bm, y+bm+second_offset}, dimensions: {w-(2*bm), 700}) #TODO just hard-code hypercards at 700 high for now
-
-    # end
-        
+   
 end

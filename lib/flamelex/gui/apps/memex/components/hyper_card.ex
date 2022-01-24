@@ -135,8 +135,13 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 			size: 36,
 			metrics: Flamelex.Fluxus.RadixStore.fetch_font_metrics(:ibm_plex_mono)}
 
+		#TODO here we need to pre-calculate the height of the TidBit
+		# this is a workaround because of flex_grow
+		{width, {:flex_grow, %{min_height: min_height}}} = frame.size
+		frame_size = {width, min_height}
+
 		graph
-		|> Scenic.Primitives.rect(frame.size, fill: background_color) # background rectangle
+		|> Scenic.Primitives.rect(frame_size, fill: background_color) # background rectangle
 		|> ScenicWidgets.Simple.Heading.add_to_graph(%{
 				text: tidbit.title,
 				frame: calc_title_frame(frame),
