@@ -55,14 +55,16 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 	def handle_continue(:publish_bounds, scene) do
         bounds = Scenic.Graph.bounds(scene.assigns.graph)
 
-		#         body_height = calc_wrapped_text_height(%{frame: frame, text: data})
-
-		Logger.warn "#TODO need to report bounds back after we've rendered..."
-        # Flamelex.GUI.Component.LayoutList
-        # |> GenServer.cast({:component_height, scene.assigns.tidbit, bounds})
+		Flamelex.GUI.Component.Memex.StoryRiver
+		|> GenServer.cast({:new_component_bounds, {scene.assigns.state.uuid, bounds}})
         
-        {:noreply, scene}
+        {:noreply, scene, {:continue, :render_next_hyper_card}}
     end
+
+	def handle_continue(:render_next_hyper_card, scene) do
+		Flamelex.GUI.Component.Memex.StoryRiver |> GenServer.cast(:render_next_component)
+		{:noreply, scene}
+	end
 
 	def handle_event({:click, {:edit_tidbit_btn, tidbit_uuid}}, _from, scene) do
         Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:switch_mode, :edit, %{tidbit_uuid: tidbit_uuid}}})
@@ -95,6 +97,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 			metrics: Flamelex.Fluxus.RadixStore.fetch_font_metrics(:ibm_plex_mono)}
 
 		#TODO here we need to pre-calculate the height of the TidBit
+		# body_height = calc_wrapped_text_height(%{frame: frame, text: data})
 		# this is a workaround because of flex_grow
 		{width, {:flex_grow, %{min_height: min_height}}} = frame.size
 		frame_size = {width, min_height}
