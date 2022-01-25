@@ -82,6 +82,11 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 	def render_tidbit(graph, %{state: %{edit_mode?: true, data: text} = tidbit, frame: frame} = args)
 	when is_bitstring(text) do
 
+		# - work on body component displaying how we actually want it to work
+		# - wraps at correct width
+		# - renders infinitely long
+		# - only works for pure text, shows "NOT AVAILABLE" or whatever otherwise (centered ;)
+
 		background_color = :red
 
 		heading_font = %{
@@ -89,8 +94,13 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 			size: 36,
 			metrics: Flamelex.Fluxus.RadixStore.fetch_font_metrics(:ibm_plex_mono)}
 
+		#TODO here we need to pre-calculate the height of the TidBit
+		# this is a workaround because of flex_grow
+		{width, {:flex_grow, %{min_height: min_height}}} = frame.size
+		frame_size = {width, min_height}
+
 		graph
-		|> Scenic.Primitives.rect(frame.size, fill: background_color) # background rectangle
+		|> Scenic.Primitives.rect(frame_size, fill: background_color) # background rectangle
 		|> ScenicWidgets.Simple.Heading.add_to_graph(%{
 				text: tidbit.title,
 				frame: calc_title_frame(frame),
@@ -100,30 +110,23 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 				background_color: :yellow
 		}) #TODO theme: theme?? Does this get automatically passed down??
 		|> Scenic.Components.button("Save", id: {:save_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
-		# |> ScenicWidgets.FrameBox.add_to_graph(%{frame: calc_body_frame(frame), color: :blue})
-
-#     # - work on body component displaying how we actually want it to work
-#     #       - wraps at correct width
-#     #       - renders infinitely long
-#     #       - only works for pure text, shows "NOT AVAILABLE" or whatever otherwise (centered ;)
-
-
-		|> Scenic.Primitives.rrect({frame.dimensions.width-(2*@opts.margin), 170, 12}, t: {@opts.margin, 100}, fill: :pink)
-		# |> ScenicWidgets.TextPad.add_to_graph(%{
-		# 		frame: calc_body_frame(frame),
-		# 		text: tidbit.data,
-		# 		format_opts: %{
-		# 			alignment: :left,
-		# 			wrap_opts: {:wrap, :end_of_line},
-		# 			show_line_num?: false
-		# 		},
-		# 		font: %{
-		# 			name: heading_font.name,
-		# 			size: 24,
-		# 			metrics: heading_font.metrics
-		# 		}
-		# })
-		# |> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 60})
+		
+		|> ScenicWidgets.TextPad.add_to_graph(%{
+				frame: calc_body_frame(frame),
+				text: tidbit.data,
+				mode: :edit,
+				format_opts: %{
+					alignment: :left,
+					wrap_opts: {:wrap, :end_of_line},
+					show_line_num?: false
+				},
+				font: %{
+					name: heading_font.name,
+					size: 24,
+					metrics: heading_font.metrics
+				}
+		})
+		|> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 60})
 	end
 
 	def render_tidbit(graph, %{state: tidbit, frame: frame} = args) do
