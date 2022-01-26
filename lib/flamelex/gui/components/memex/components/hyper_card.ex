@@ -20,11 +20,19 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 			id: _id,
 			frame: %Frame{} = _f,
 			state: %{
-				title: title
-			}
+				title: title,
+			} = state
 	} = data) when is_bitstring(title) do
 		Logger.debug("#{__MODULE__} accepted params: #{inspect(data)}")
-		{:ok, data}
+
+		new_state = 
+			if state |> Map.has_key?(:mode) do
+				state
+			else
+				state |> Map.merge(%{mode: :read_only})
+			end
+
+		{:ok, %{data|state: new_state}}
 	end
 	
 	def init(scene, args, opts) do
@@ -34,8 +42,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 			(opts[:theme] || Scenic.Primitive.Style.Theme.preset(:light))
 			|> Scenic.Primitive.Style.Theme.normalize()
 
-		init_graph =
-			Scenic.Graph.build()
+		init_graph = Scenic.Graph.build()
 			|> Scenic.Primitives.group(
 					fn graph ->
 						graph |> render_tidbit(args)
@@ -43,17 +50,14 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 					id: {__MODULE__, args.id},
 					translate: args.frame.pin)
 	
-		init_scene =
-			scene
+		init_scene = scene
 			|> assign(graph: init_graph)
 			|> assign(frame: args.frame)
 			|> assign(state: args.state)
 			|> push_graph(init_graph)
-	
+
 		{:ok, init_scene, {:continue, :publish_bounds}}
 	end
-
-
 
 	def handle_continue(:publish_bounds, scene) do
         bounds = Scenic.Graph.bounds(scene.assigns.graph)
@@ -70,6 +74,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 	end
 
 	def handle_event({:click, {:edit_tidbit_btn, tidbit_uuid}}, _from, scene) do
+		Logger.debug "HYPERCARD -- opening :edit mode..."
         Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:switch_mode, :edit, %{tidbit_uuid: tidbit_uuid}}})
         {:noreply, scene}
     end
@@ -89,8 +94,15 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         {:noreply, scene}
     end
 
+	#NOTE: Take note of the matching `tidbit_uuid` variables, these have to be the same for this pattern-match to bind
+	#TODO make this be {:body, tidbit_uuid}
+	def handle_event({:value_changed, tidbit_uuid, new_text}, _from, %{assigns: %{state: %{uuid: tidbit_uuid, mode: :edit}}} = scene) do
+		new_tidbit = scene.assigns.state |> Map.merge(%{data: new_text, saved?: false})
+		Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:update_tidbit, new_tidbit}})
+        {:noreply, scene}
+    end
 
-	def render_tidbit(graph, %{state: %{edit_mode?: true, data: text} = tidbit, frame: frame} = args)
+	def render_tidbit(graph, %{state: %{mode: :edit, data: text} = tidbit, frame: frame} = args)
 	when is_bitstring(text) do
 
 		# - work on body component displaying how we actually want it to work
@@ -258,6 +270,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 	def render_text_pad(graph, %{mode: mode, tidbit: tidbit, frame: hypercard_frame}) do
 		graph
 		|> ScenicWidgets.TextPad.add_to_graph(%{
+				id: tidbit.uuid,
 				frame: calc_body_frame(hypercard_frame),
 				text: tidbit.data,
 				mode: mode,

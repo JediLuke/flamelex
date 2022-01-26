@@ -31,7 +31,8 @@ defmodule Flamelex.Fluxus.ActionListener do
                     :ignore
                 {:ok, ^radix_state} ->
                     EventBus.mark_as_completed({__MODULE__, event_shadow})
-                    Logger.debug "#{__MODULE__} ignoring (no state-change)... #{inspect(%{radix_state: radix_state, action: action})}"
+                    #Logger.debug "#{__MODULE__} ignoring (no state-change)... #{inspect(%{radix_state: radix_state, action: action})}"
+                    Logger.debug "#{__MODULE__} ignoring (no state-change)..."
                     :ignore
                 {:ok, new_radix_state} ->
                     Logger.debug "#{__MODULE__} processed event, state changed..."

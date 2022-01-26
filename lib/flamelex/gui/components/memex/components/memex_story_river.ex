@@ -76,16 +76,16 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         # #TODO get current scroll for the river_pane, so we can use it again
         # #     as an option when we add the new HyperCard to the graph - I feel
         # #     like Scenic should have respected my initial options, but anyway...
-        
+
         new_graph = scene.assigns.graph
         |> Scenic.Graph.add_to(__MODULE__, fn graph ->
             graph
             |> Flamelex.GUI.Component.Memex.HyperCard.add_to_graph(%{
-                id: tidbit.uuid,
+                    id: tidbit.uuid,
                     frame: calc_hypercard_frame(scene),
                     state: tidbit
-                    })
-                end)
+                })
+            end)
                 
         # #NOTE this is supposed to get the existing scroll but we need to cann it for now
         # # [%{transforms: %{translate: scroll_coords}}] = Scenic.Graph.get(scene.assigns.graph, :river_pane)
