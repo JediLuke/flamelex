@@ -2,6 +2,15 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     use Scenic.Component
     require Logger
 	alias ScenicWidgets.Core.Structs.Frame
+
+	#TODO document this point
+	#TODO good idea: render each sub-component as a seperate graph,
+    #                calculate their heights, then use Scenic.Graph.add_to
+    #                to put them into the `:hypercard_itself` group
+    #                -> Unfortunately, this doesn't work because Scenic
+    #                doesn't seem to support "merging" 2 graphs, or
+    #                if I return a graph (each component), no way to
+    #                simply add that to another graph, as a sub-component
     
 	@opts %{
 		margin: 5
@@ -44,13 +53,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		{:ok, init_scene, {:continue, :publish_bounds}}
 	end
 
-	#         #TODO good idea: render each sub-component as a seperate graph,
-#         #                calculate their heights, then use Scenic.Graph.add_to
-#         #                to put them into the `:hypercard_itself` group
-#         #                -> Unfortunately, this doesn't work because Scenic
-#         #                doesn't seem to support "merging" 2 graphs, or
-#         #                if I return a graph (each component), no way to
-#         #                simply add that to another graph, as a sub-component
+
 
 	def handle_continue(:publish_bounds, scene) do
         bounds = Scenic.Graph.bounds(scene.assigns.graph)
@@ -147,17 +150,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		|> render_text_pad(%{mode: :read_only, tidbit: tidbit, frame: frame})
 	end
 
-	def calc_title_frame(hypercard_frame) do
-		#REMINDER: Because we render this from within the group (which is
-		#		   already getting translated, we only need be concerned
-		#		   here with the _relative_ offset from the group. Or
-		#		   in other words, this is all referenced off the top-left
-		#		   corner of the HyperCard, not the top-left corner
-		#		   of the screen.
-		Frame.new(
-			pin: {@opts.margin, @opts.margin},
-			size: {hypercard_frame.dimensions.width*0.72, {:max_lines, 2}})
-	end
+
 
 
 
@@ -198,11 +191,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 
 
 	def render_tags_box(graph, %{mode: :read_only, tidbit: tidbit, frame: hypercard_frame}) do
-		tags_box_frame = Frame.new(pin: {@opts.margin, 140}, size: {hypercard_frame.dimensions.width-(2*@opts.margin), 80})
-
-		# f = Frame.new(
-		# 	pin: {@opts.margin, 150},
-		# 	size: {hypercard_frame.dimensions.width-(2*@opts.margin), 170})
+		tags_box_frame =
+			Frame.new(pin: {@opts.margin, 140},
+					 size: {hypercard_frame.dimensions.width-(2*@opts.margin), 80})
 
 		graph
 		|> Scenic.Primitives.group(
@@ -215,11 +206,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 	end
 
 	def render_tags_box(graph, %{mode: :edit, tidbit: tidbit, frame: hypercard_frame}) do
-		tags_box_frame = Frame.new(pin: {@opts.margin, 140}, size: {hypercard_frame.dimensions.width-(2*@opts.margin), 80})
-
-		# f = Frame.new(
-		# 	pin: {@opts.margin, 150},
-		# 	size: {hypercard_frame.dimensions.width-(2*@opts.margin), 170})
+		tags_box_frame =
+			Frame.new(pin: {@opts.margin, 140},
+					 size: {hypercard_frame.dimensions.width-(2*@opts.margin), 80})
 
 		graph
 		|> Scenic.Primitives.group(
@@ -229,7 +218,6 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 				|> render_tags(tidbit)
 			end,
 			translate: tags_box_frame.pin)
-
 	end
 
 	def render_tags(graph, %{tags: []}, _offset) do
@@ -237,20 +225,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 	end
 
 	def render_tags(graph, %{tags: [tag|rest]}, offset \\ 0) do
-	    # render_tags(graph, tags, :new_render)
-	    # IO.puts "ONCE"
-	    # left_margin = 60 #TODO this is from above lol
-	    # top_margin = 80
-	    # title_height = 60
-	    # why_not = 40
-		
-	    # translate = {tl_x+left_margin+offset*tag_width, tl_y+top_margin+title_height+why_not}
-	    # translate_label = {tl_x+left_margin+offset*tag_width-10, tl_y+top_margin+title_height+why_not - 15}
-
-	    tag_width = 70
+	    tag_width  = 70
 	    tag_height = 20
-		tag_color = :red
-
+		tag_color  = :red
 		tag_translation = {@opts.margin+(offset*tag_width), @opts.margin}
 
 	    graph
@@ -265,11 +242,20 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 						fill: :black)
 				end,
 				translate: tag_translation)
-	    |> render_tags(%{tags: rest}, offset+1)
+	    |> render_tags(%{tags: rest}, offset+1) #NOTE: This is a recursive call...
+	end
+
+	def render_dateline(graph, tidbit) do
+		graph
+		|> Scenic.Primitives.text(
+				tidbit.created |> human_formatted_date(),
+					font: :ibm_plex_mono,
+					translate: {@opts.margin, 128},
+					font_size: 24,
+					fill: :dark_grey)
 	end
 
 	def render_text_pad(graph, %{mode: mode, tidbit: tidbit, frame: hypercard_frame}) do
-
 		graph
 		|> ScenicWidgets.TextPad.add_to_graph(%{
 				frame: calc_body_frame(hypercard_frame),
@@ -288,14 +274,16 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		})
 	end
 
-	def render_dateline(graph, tidbit) do
-		graph
-		|> Scenic.Primitives.text(
-				tidbit.created |> human_formatted_date(),
-					font: :ibm_plex_mono,
-					translate: {@opts.margin, 128},
-					font_size: 24,
-					fill: :dark_grey)
+	def calc_title_frame(hypercard_frame) do
+		#REMINDER: Because we render this from within the group (which is
+		#		   already getting translated, we only need be concerned
+		#		   here with the _relative_ offset from the group. Or
+		#		   in other words, this is all referenced off the top-left
+		#		   corner of the HyperCard, not the top-left corner
+		#		   of the screen.
+		Frame.new(
+			pin: {@opts.margin, @opts.margin},
+			size: {hypercard_frame.dimensions.width*0.72, {:max_lines, 2}})
 	end
 
 	def calc_body_frame(hypercard_frame) do
@@ -306,8 +294,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		#		   corner of the HyperCard, not the top-left corner
 		#		   of the screen.
 		Frame.new(
-			pin: {@opts.margin, 240},
-			size: {hypercard_frame.dimensions.width-(2*@opts.margin), 170})
+			pin: {@opts.margin, 225},
+			size: {hypercard_frame.dimensions.width-(2*@opts.margin), 270})
 	end
 
 	def human_formatted_date(date) do
