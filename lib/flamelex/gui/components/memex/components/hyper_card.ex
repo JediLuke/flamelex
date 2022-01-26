@@ -81,6 +81,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         {:noreply, scene}
     end
 
+
 	def render_tidbit(graph, %{state: %{edit_mode?: true, data: text} = tidbit, frame: frame} = args)
 	when is_bitstring(text) do
 
@@ -91,10 +92,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 
 		background_color = :red
 
-		heading_font = %{
-			name: :ibm_plex_mono,
-			size: 36,
-			metrics: Flamelex.Fluxus.RadixStore.fetch_font_metrics(:ibm_plex_mono)}
+
 
 		#TODO here we need to pre-calculate the height of the TidBit
 		# body_height = calc_wrapped_text_height(%{frame: frame, text: data})
@@ -107,7 +105,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		|> ScenicWidgets.Simple.Heading.add_to_graph(%{
 				text: tidbit.title,
 				frame: calc_title_frame(frame),
-				font: heading_font,
+				font: heading_font(),
 				color: :green,
 				# text_wrap_opts: :wrap #TODO
 				background_color: :yellow
@@ -118,14 +116,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		|> render_text_pad(%{mode: :edit, tidbit: tidbit, frame: frame})
 	end
 
+	# def render_tidbit(graph, %{state: %{edit_mode?: false} = tidbit, frame: frame} = args) do
+	#NOTE: For now have this case here as a catch-all, but better to really match on a mode
 	def render_tidbit(graph, %{state: tidbit, frame: frame} = args) do
-
-		background_color = :antique_white
-
-		heading_font = %{
-			name: :ibm_plex_mono,
-			size: 36,
-			metrics: Flamelex.Fluxus.RadixStore.fetch_font_metrics(:ibm_plex_mono)}
 
 		#TODO here we need to pre-calculate the height of the TidBit
 		# this is a workaround because of flex_grow
@@ -133,22 +126,23 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		frame_size = {width, min_height}
 
 		graph
-		|> Scenic.Primitives.rect(frame_size, fill: background_color) # background rectangle
+		|> Scenic.Primitives.rect(frame_size, fill: :antique_white) # background rectangle
 		|> ScenicWidgets.Simple.Heading.add_to_graph(%{
 				text: tidbit.title,
 				frame: calc_title_frame(frame),
-				font: heading_font,
+				font: heading_font(),
 				color: :green,
 				# text_wrap_opts: :wrap #TODO
 				background_color: :yellow
 		}) #TODO theme: theme?? Does this get automatically passed down??
 		|> Scenic.Components.button("Edit", id: {:edit_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
 		|> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 60})
-		#     |> Scenic.Primitives.text(t.created |> human_formatted_date(),
-#             font: :ibm_plex_mono,
-#             translate: {tl_x+left_margin, tl_y+top_margin+title_height}, # text draws from bottom-left corner??
-#             font_size: 24,
-#             fill: :grey)
+		|> Scenic.Primitives.text(tidbit.created |> human_formatted_date(),
+            font: :ibm_plex_mono,
+            # translate: {tl_x+left_margin, tl_y+top_margin+title_height}, # text draws from bottom-left corner??
+			translate: {@opts.margin, 130},
+            font_size: 24,
+            fill: :dark_grey)
 		|> render_tags_box(%{mode: :read_only, tidbit: tidbit, frame: frame})
 		|> render_text_pad(%{mode: :read_only, tidbit: tidbit, frame: frame})
 
@@ -203,37 +197,6 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 #     end
 
 
-
-
-#   def human_formatted_date(date) do
-#     Logger.debug "parsing date: #{inspect date} into human readable format..."
-#     {:ok, date, 0} = DateTime.from_iso8601(date)
-#     day = case Date.day_of_week(date) do
-#       1 -> "Mon"
-#       2 -> "Tue"
-#       3 -> "Wed"
-#       4 -> "Thu"
-#       5 -> "Fri"
-#       6 -> "Sat"
-#       7 -> "Sun"
-#     end
-#     month = case date.month do
-#       1 -> "Jan"
-#       2 -> "Feb"
-#       3 -> "Mar"
-#       4 -> "Apr"
-#       5 -> "May"
-#       6 -> "Jun"
-#       7 -> "Jul"
-#       8 -> "Aug"
-#       9 -> "Sep"
-#       10 -> "Oct"
-#       11 -> "Nov"
-#       12 -> "Dec"
-#     end
-#     #IO.inspect date
-#     "#{day} #{date.day} #{month} #{date.year}"
-#   end
 
 	def render_tags_box(graph, %{mode: :read_only, tidbit: tidbit, frame: hypercard_frame}) do
 		tags_box_frame = Frame.new(pin: {@opts.margin, 140}, size: {hypercard_frame.dimensions.width-(2*@opts.margin), 80})
@@ -292,7 +255,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		tag_translation = {@opts.margin+(offset*tag_width), @opts.margin}
 
 	    graph
-		|> Scenic.Primitives.group(
+		|> Scenic.Primitives.group( # render a single tag
 				fn graph ->
 					graph
 					|> Scenic.Primitives.rounded_rectangle({tag_width, tag_height, 8}, fill: tag_color)
@@ -308,11 +271,6 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 
 	def render_text_pad(graph, %{mode: mode, tidbit: tidbit, frame: hypercard_frame}) do
 
-		heading_font = %{
-			name: :ibm_plex_mono,
-			size: 36,
-			metrics: Flamelex.Fluxus.RadixStore.fetch_font_metrics(:ibm_plex_mono)}
-
 		graph
 		|> ScenicWidgets.TextPad.add_to_graph(%{
 				frame: calc_body_frame(hypercard_frame),
@@ -324,9 +282,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 					show_line_num?: false
 				},
 				font: %{
-					name: heading_font.name,
+					name: heading_font().name,
 					size: 24,
-					metrics: heading_font.metrics
+					metrics: heading_font().metrics
 				}
 		})
 	end
@@ -343,6 +301,44 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 			size: {hypercard_frame.dimensions.width-(2*@opts.margin), 170})
 	end
 
+	def human_formatted_date(date) do
+		Logger.debug "parsing date: #{inspect date} into human readable format..."
+		{:ok, date, 0} = DateTime.from_iso8601(date)
+		#IO.inspect date
+		day = case Date.day_of_week(date) do
+				1 -> "Mon"
+				2 -> "Tue"
+				3 -> "Wed"
+				4 -> "Thu"
+				5 -> "Fri"
+				6 -> "Sat"
+				7 -> "Sun"
+			end
+		month = case date.month do
+				1 -> "Jan"
+				2 -> "Feb"
+				3 -> "Mar"
+				4 -> "Apr"
+				5 -> "May"
+				6 -> "Jun"
+				7 -> "Jul"
+				8 -> "Aug"
+				9 -> "Sep"
+				10 -> "Oct"
+				11 -> "Nov"
+				12 -> "Dec"
+			end
+		"#{day} #{date.day} #{month} #{date.year}"
+	end
+
+	defp heading_font do
+		# This is just the font details for the TidBit/HyperCard heading
+		%{
+			name: :ibm_plex_mono,
+			size: 36,
+			metrics: Flamelex.Fluxus.RadixStore.fetch_font_metrics(:ibm_plex_mono)
+		}
+	end
 end
   
 
