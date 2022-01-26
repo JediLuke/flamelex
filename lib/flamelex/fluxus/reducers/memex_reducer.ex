@@ -129,7 +129,7 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
 
 
     # # <3 @vacarsu
-    # def cap_position(%{assigns: %{frame: frame}} = scene, coord) do
+    # defp cap_position(%{assigns: %{frame: frame}} = scene, coord) do
     #     # NOTE: We must keep track of components, because one could
     #     #      get yanked out the middle.
     #     height = calc_acc_height(scene)
@@ -145,13 +145,13 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
     #     end
     # end
 
-    # def calc_acc_height(%{assigns: %{state: %{scroll: %{components: components}}}}) do
+    # defp calc_acc_height(%{assigns: %{state: %{scroll: %{components: components}}}}) do
     #     do_calc_acc_height(0, components)
     # end
 
-    # def do_calc_acc_height(acc, []), do: acc
+    # defp do_calc_acc_height(acc, []), do: acc
 
-    # def do_calc_acc_height(acc, [{_id, bounds} = c | rest]) do
+    # defp do_calc_acc_height(acc, [{_id, bounds} = c | rest]) do
     #     # top is less than bottom, because the axis starts in top-left corner
     #     {_left, top, _right, bottom} = bounds
     #     component_height = bottom - top

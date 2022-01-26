@@ -52,6 +52,7 @@ defmodule Flamelex.Fluxus.RadixStore do
       active?: Application.get_env(:memelex, :active?),
       graph: nil, # Store the %Graph{} here if we need to (for switching between apps easily)
       story_river: %{
+        #TODO put the scroll in another process, then it a) will hopefully be more seperated and b) we can just update that one (maybe even just by calling update_opts) and don't have to re-render every component we're scrolling, which is kinda crazy
         open_tidbits: [],
         scroll: %{
           accumulator: {0, 0},

@@ -113,23 +113,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 				background_color: :yellow
 		}) #TODO theme: theme?? Does this get automatically passed down??
 		|> Scenic.Components.button("Save", id: {:save_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
-		
-		|> ScenicWidgets.TextPad.add_to_graph(%{
-				frame: calc_body_frame(frame),
-				text: tidbit.data,
-				mode: :edit,
-				format_opts: %{
-					alignment: :left,
-					wrap_opts: {:wrap, :end_of_line},
-					show_line_num?: false
-				},
-				font: %{
-					name: heading_font.name,
-					size: 24,
-					metrics: heading_font.metrics
-				}
-		})
 		|> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 60})
+		|> render_tags_box(%{mode: :edit, tidbit: tidbit, frame: frame})
+		|> render_text_pad(%{mode: :edit, tidbit: tidbit, frame: frame})
 	end
 
 	def render_tidbit(graph, %{state: tidbit, frame: frame} = args) do
@@ -163,21 +149,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 #             translate: {tl_x+left_margin, tl_y+top_margin+title_height}, # text draws from bottom-left corner??
 #             font_size: 24,
 #             fill: :grey)
-		|> ScenicWidgets.TextPad.add_to_graph(%{
-				frame: calc_body_frame(frame),
-				mode: :read_only,
-				text: tidbit.data,
-				format_opts: %{
-					alignment: :left,
-					wrap_opts: {:wrap, :end_of_line},
-					show_line_num?: false
-				},
-				font: %{
-					name: heading_font.name,
-					size: 24,
-					metrics: heading_font.metrics
-				}
-		})
+		|> render_tags_box(%{mode: :read_only, tidbit: tidbit, frame: frame})
+		|> render_text_pad(%{mode: :read_only, tidbit: tidbit, frame: frame})
+
 	end
 
 	def calc_title_frame(hypercard_frame) do
@@ -192,17 +166,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 			size: {hypercard_frame.dimensions.width*0.72, {:max_lines, 2}})
 	end
 
-	def calc_body_frame(hypercard_frame) do
-		#REMINDER: Because we render this from within the group (which is
-		#		   already getting translated, we only need be concerned
-		#		   here with the _relative_ offset from the group. Or
-		#		   in other words, this is all referenced off the top-left
-		#		   corner of the HyperCard, not the top-left corner
-		#		   of the screen.
-		Frame.new(
-			pin: {@opts.margin, 150},
-			size: {hypercard_frame.dimensions.width-(2*@opts.margin), 170})
-	end
+
 
 	#     @doc """
 #     Calculates the render height of a bunch of text (after wrapping) for
@@ -271,33 +235,113 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 #     "#{day} #{date.day} #{month} #{date.year}"
 #   end
 
+	def render_tags_box(graph, %{mode: :read_only, tidbit: tidbit, frame: hypercard_frame}) do
+		tags_box_frame = Frame.new(pin: {@opts.margin, 140}, size: {hypercard_frame.dimensions.width-(2*@opts.margin), 80})
 
-#   def render_tags(graph, %{tags: []}, _offset) do
-#     graph
-#   end
+		# f = Frame.new(
+		# 	pin: {@opts.margin, 150},
+		# 	size: {hypercard_frame.dimensions.width-(2*@opts.margin), 170})
 
-#   def render_tags(graph, %{tags: [tag|rest], coords: {tl_x, tl_y}}, offset \\ 0) do
-#     # render_tags(graph, tags, :new_render)
-#     IO.puts "ONCE"
-#     left_margin = 60 #TODO this is from above lol
-#     top_margin = 80
-#     title_height = 60
-#     why_not = 40
-#     tag_width = 70
+		graph
+		|> Scenic.Primitives.group(
+			fn graph ->
+				graph
+				|> Scenic.Primitives.rect(tags_box_frame.size, fill: :green)
+				|> render_tags(tidbit |> Map.merge(%{coords: tags_box_frame.pin}))
+			end,
+			translate: tags_box_frame.pin)
+	end
 
-#     translate = {tl_x+left_margin+offset*tag_width, tl_y+top_margin+title_height+why_not}
-#     translate_label = {tl_x+left_margin+offset*tag_width-10, tl_y+top_margin+title_height+why_not - 15}
-#     tag_height = 20
+	def render_tags_box(graph, %{mode: :edit, tidbit: tidbit, frame: hypercard_frame}) do
+		tags_box_frame = Frame.new(pin: {@opts.margin, 140}, size: {hypercard_frame.dimensions.width-(2*@opts.margin), 80})
 
-#     graph
-#     |> Scenic.Primitives.rounded_rectangle( {tag_width, tag_height, 12}, t: translate_label, fill: :red)
-#     |> Scenic.Primitives.text(tag,
-#           font: :ibm_plex_mono,
-#           translate: translate, # text draws from bottom-left corner??
-#           font_size: 14,
-#           fill: :black)
-#     |> render_tags(%{tags: rest, coords: {tl_x, tl_y}}, offset+1)
-#   end
+		# f = Frame.new(
+		# 	pin: {@opts.margin, 150},
+		# 	size: {hypercard_frame.dimensions.width-(2*@opts.margin), 170})
+
+		graph
+		|> Scenic.Primitives.group(
+			fn graph ->
+				graph
+				|> Scenic.Primitives.rect(tags_box_frame.size, fill: :yellow)
+				|> render_tags(tidbit)
+			end,
+			translate: tags_box_frame.pin)
+
+	end
+
+	def render_tags(graph, %{tags: []}, _offset) do
+		graph
+	end
+
+	def render_tags(graph, %{tags: [tag|rest]}, offset \\ 0) do
+	    # render_tags(graph, tags, :new_render)
+	    # IO.puts "ONCE"
+	    # left_margin = 60 #TODO this is from above lol
+	    # top_margin = 80
+	    # title_height = 60
+	    # why_not = 40
+		
+	    # translate = {tl_x+left_margin+offset*tag_width, tl_y+top_margin+title_height+why_not}
+	    # translate_label = {tl_x+left_margin+offset*tag_width-10, tl_y+top_margin+title_height+why_not - 15}
+
+	    tag_width = 70
+	    tag_height = 20
+		tag_color = :red
+
+		tag_translation = {@opts.margin+(offset*tag_width), @opts.margin}
+
+	    graph
+		|> Scenic.Primitives.group(
+				fn graph ->
+					graph
+					|> Scenic.Primitives.rounded_rectangle({tag_width, tag_height, 8}, fill: tag_color)
+					|> Scenic.Primitives.text(tag,
+						font: :ibm_plex_mono,
+						translate: {10, 15}, # text draws from bottom-left corner??
+						font_size: 14,
+						fill: :black)
+				end,
+				translate: tag_translation)
+	    |> render_tags(%{tags: rest}, offset+1)
+	end
+
+	def render_text_pad(graph, %{mode: mode, tidbit: tidbit, frame: hypercard_frame}) do
+
+		heading_font = %{
+			name: :ibm_plex_mono,
+			size: 36,
+			metrics: Flamelex.Fluxus.RadixStore.fetch_font_metrics(:ibm_plex_mono)}
+
+		graph
+		|> ScenicWidgets.TextPad.add_to_graph(%{
+				frame: calc_body_frame(hypercard_frame),
+				text: tidbit.data,
+				mode: mode,
+				format_opts: %{
+					alignment: :left,
+					wrap_opts: {:wrap, :end_of_line},
+					show_line_num?: false
+				},
+				font: %{
+					name: heading_font.name,
+					size: 24,
+					metrics: heading_font.metrics
+				}
+		})
+	end
+
+	def calc_body_frame(hypercard_frame) do
+		#REMINDER: Because we render this from within the group (which is
+		#		   already getting translated, we only need be concerned
+		#		   here with the _relative_ offset from the group. Or
+		#		   in other words, this is all referenced off the top-left
+		#		   corner of the HyperCard, not the top-left corner
+		#		   of the screen.
+		Frame.new(
+			pin: {@opts.margin, 240},
+			size: {hypercard_frame.dimensions.width-(2*@opts.margin), 170})
+	end
 
 end
   
