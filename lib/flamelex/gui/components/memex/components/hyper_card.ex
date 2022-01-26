@@ -81,6 +81,11 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         {:noreply, scene}
     end
 
+	def handle_event({:click, {:discard_changes_btn, tidbit_uuid}}, _from, scene) do
+        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:switch_mode, :read_only, %{tidbit_uuid: tidbit_uuid}}})
+        {:noreply, scene}
+    end
+
 
 	def render_tidbit(graph, %{state: %{edit_mode?: true, data: text} = tidbit, frame: frame} = args)
 	when is_bitstring(text) do
@@ -111,7 +116,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 				background_color: :yellow
 		}) #TODO theme: theme?? Does this get automatically passed down??
 		|> Scenic.Components.button("Save", id: {:save_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
-		|> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 60})
+		|> Scenic.Components.button("Discard", id: {:discard_changes_btn, args.id}, translate: {frame.dimensions.width-100, 60})
 		|> render_tags_box(%{mode: :edit, tidbit: tidbit, frame: frame})
 		|> render_text_pad(%{mode: :edit, tidbit: tidbit, frame: frame})
 	end
@@ -138,10 +143,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		|> Scenic.Components.button("Edit", id: {:edit_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
 		|> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 60})
 		|> render_dateline(tidbit)
-
 		|> render_tags_box(%{mode: :read_only, tidbit: tidbit, frame: frame})
 		|> render_text_pad(%{mode: :read_only, tidbit: tidbit, frame: frame})
-
 	end
 
 	def calc_title_frame(hypercard_frame) do
@@ -346,5 +349,3 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		}
 	end
 end
-  
-
