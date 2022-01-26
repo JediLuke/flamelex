@@ -11,7 +11,7 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
    
 
     def validate(%{frame: %Frame{} = _f, state: %{
-        open_tidbits: [],
+        open_tidbits: _open_tidbits_list,
         scroll: %{
           accumulator: {_x, _y},
           direction: :vertical,

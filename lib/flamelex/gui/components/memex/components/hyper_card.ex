@@ -137,12 +137,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		}) #TODO theme: theme?? Does this get automatically passed down??
 		|> Scenic.Components.button("Edit", id: {:edit_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
 		|> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 60})
-		|> Scenic.Primitives.text(tidbit.created |> human_formatted_date(),
-            font: :ibm_plex_mono,
-            # translate: {tl_x+left_margin, tl_y+top_margin+title_height}, # text draws from bottom-left corner??
-			translate: {@opts.margin, 130},
-            font_size: 24,
-            fill: :dark_grey)
+		|> render_dateline(tidbit)
+
 		|> render_tags_box(%{mode: :read_only, tidbit: tidbit, frame: frame})
 		|> render_text_pad(%{mode: :read_only, tidbit: tidbit, frame: frame})
 
@@ -287,6 +283,16 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 					metrics: heading_font().metrics
 				}
 		})
+	end
+
+	def render_dateline(graph, tidbit) do
+		graph
+		|> Scenic.Primitives.text(
+				tidbit.created |> human_formatted_date(),
+					font: :ibm_plex_mono,
+					translate: {@opts.margin, 128},
+					font_size: 24,
+					fill: :dark_grey)
 	end
 
 	def calc_body_frame(hypercard_frame) do
