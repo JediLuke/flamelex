@@ -6,12 +6,12 @@ defmodule Flamelex.GUI.Memex.Layout do
     alias Flamelex.GUI.Component.Memex
 
     def validate(%{frame: %Frame{} = _f, state:  _memex} = data) do
-        Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
+        #Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
         {:ok, data}
     end
 
     def init(init_scene, args, opts) do
-        Logger.debug "#{__MODULE__} initializing..."
+        #Logger.debug "#{__MODULE__} initializing..."
     
         #NOTE: This component doesn't need to subscribe to RadixState changes
 
@@ -31,6 +31,8 @@ defmodule Flamelex.GUI.Memex.Layout do
         |> assign(frame: args.frame)
         |> assign(state: args.state)
         |> push_graph(init_graph)
+
+        # cast_children(scene, :start_caret)
   
         {:ok, new_scene}
     end

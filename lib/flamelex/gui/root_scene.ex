@@ -4,6 +4,7 @@ defmodule Flamelex.GUI.RootScene do
   use ScenicWidgets.ScenicEventsDefinitions
   import Scenic.Primitives
   import Scenic.Components
+  alias Flamelex.GUI.Component.Layer
   require Logger
   # NOTE:
   # This Scenic.Scene contains the root graph. Re-drawing anything which
@@ -22,17 +23,56 @@ defmodule Flamelex.GUI.RootScene do
 
     Process.register(self(), __MODULE__)
 
-    init_graph = Flamelex.Fluxus.RadixStore.get() |> render()
-
     opts = opts |> set_theme(Flamelex.GUI.Utils.Theme.default())
+
+    layer_1_graph = primary_app()
+    layer_2_graph = menu_bar()
+    layer_3_graph = kommander()
+    layer_4_graph = Scenic.Graph.build()
+
+    layers = [
+      {:one, layer_1_graph},
+      {:two, layer_2_graph},
+      {:three, layer_3_graph},
+      {:four, layer_4_graph}
+    ]
+
+    init_graph = Scenic.Graph.build()
+    # |> Layer.add_to_graph(%{id: :base,  graph: Scenic.Graph.build()})
+    |> Layer.add_to_graph(%{id: :one, graph: layer_1_graph})
+    |> Layer.add_to_graph(%{id: :two, graph: layer_2_graph})
+    |> Layer.add_to_graph(%{id: :three, graph: layer_3_graph})
+    |> Layer.add_to_graph(%{id: :four, graph: layer_4_graph})
+
+
+
+    # |> Scenic.Primitives.group(fn graph -> graph end, id: {:layer, :one})
+    # |> Scenic.Primitives.group(fn graph -> graph end, id: {:layer, :two})
+    # |> Scenic.Primitives.group(fn graph -> graph end, id: {:layer, :three})
+    # |> Scenic.Primitives.group(fn graph -> graph end, id: {:layer, :four})
+    # |> Scenic.Primitives.group(fn graph -> graph end, id: {:layer, :five})
+    # |> Scenic.Primitives.group(fn graph -> graph end, id: {:layer, :six})
+    # |> Scenic.Primitives.group(fn graph -> graph end, id: {:layer, :seven})
 
     new_scene = init_scene
     |> assign(graph: init_graph)
+    #REMINDER: We need to track these, so that we can detect changes
+    # |> assign(layer_1: Scenic.Graph.get(init_graph, {:layer, :one}))
+    # |> assign(layer_2: Scenic.Graph.get(init_graph, {:layer, :two}))
+    # |> assign(layer_3: Scenic.Graph.get(init_graph, {:layer, :three}))
+    # |> assign(layer_4: Scenic.Graph.get(init_graph, {:layer, :four}))
+    # |> assign(layer_5: Scenic.Graph.get(init_graph, {:layer, :five}))
+    # |> assign(layer_6: Scenic.Graph.get(init_graph, {:layer, :six}))
+    # |> assign(layer_7: Scenic.Graph.get(init_graph, {:layer, :seven}))
     |> push_graph(init_graph)
 
-    Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
+    #TODO ok, changes for the layer system
+    # root scene doesn't subscribe to changes, it just spins up 7 layer processes
+    # these _do_ subscribe to changes, specifically, just the change in their layer ;)
+    # Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
 
     Flamelex.Fluxus.RadixStore.initialize(graph: init_graph,
+                                         layers: layers,
                                        viewport: init_scene.viewport)
 
     # capture_input(scene, [:key])
@@ -42,6 +82,18 @@ defmodule Flamelex.GUI.RootScene do
     {:ok, new_scene}
   end
 
+  def primary_app do
+    Scenic.Graph.build()
+  end
+
+  def menu_bar do
+    Scenic.Graph.build()
+    |> Scenic.Primitives.rect({400, 200}, t: {300, 400}, fill: :green)
+  end
+
+  def kommander do
+    Scenic.Graph.build()
+  end
 
   def handle_call(:get_viewport, _from, scene) do
     {:reply, {:ok, scene.viewport}, scene}
@@ -56,19 +108,6 @@ defmodule Flamelex.GUI.RootScene do
     {:reply, :ok, new_scene}
   end
 
-  def handle_info({:radix_state_change, %{root: %{graph: new_root_graph}}}, %{assigns: %{graph: current_graph}} = scene)
-    when current_graph != new_root_graph do
-      Logger.debug "#{__MODULE__} RadixState changed, re-drawing the RootScene..."
-      new_scene = scene
-        |> assign(graph: new_root_graph)
-        |> push_graph(new_root_graph)
-      {:noreply, new_scene |> assign(graph: new_root_graph)}
-  end
-
-  def handle_info({:radix_state_change, _new_radix_state}, scene) do
-    Logger.debug "#{__MODULE__} ignoring a RadixState change..."
-    {:noreply, scene}
-  end
 
 
   # def handle_input({:viewport, {:reshape, {new_width, new_height} = new_dimensions}}, context, scene) do # e.g. of new_dimensions: {1025, 818}
@@ -126,17 +165,6 @@ defmodule Flamelex.GUI.RootScene do
         context: context,
         input: input })
     {:noreply, scene}
-  end
-
-
-
-  def render(%{root: %{graph: nil}} = _radix_state) do
-    Scenic.Graph.build()
-    #TODO here get MenuBar etc
-  end
-
-  def render(%{root: %{graph: %Scenic.Graph{} = root_graph}} = _radix_state) do
-    root_graph
   end
 
   defp set_theme(opts, new_theme), do: Keyword.replace(opts, :theme, new_theme)

@@ -645,7 +645,7 @@ in other languages that already used it, etc... I had already gotten very
 into the alchemist theme by this point, so decided to change the name to
 `flamelex` after the famous alchemist, Nicholas Flamel.
 
-The first flamelex release, `v0.2.7-alfonz` was beginning to become finalized
+The first flamelex release was beginning to become finalized
 around the start of 2021. Up until this point, all work was just one series of
 commits by me, JediLuke. I decided to keep this series of commits as the
 branch `franklin_dev`, as a tip-o'-the-hat to Franklin, the original seed

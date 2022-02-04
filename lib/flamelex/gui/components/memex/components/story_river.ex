@@ -136,15 +136,6 @@ defmodule Flamelex.GUI.Component.Memex.StoryRiver do
         {:noreply, new_scene}
     end
 
-    # def handle_info(
-    #     {:_input, {:cursor_scroll, {{_x_scroll, _y_scroll} = delta_scroll, coords}}},
-    #     # _context,
-    #     scene
-    # ) do
-    #     Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:scroll, delta_scroll, __MODULE__}})
-    #     {:noreply, scene}
-    # end
-
     def handle_info({:radix_state_change, %{memex: %{story_river: new_story_river_state}}}, %{assigns: %{state: current_state}} = scene)
         when new_story_river_state != current_state do
             Logger.debug "#{__MODULE__} updating StoryRiver..."

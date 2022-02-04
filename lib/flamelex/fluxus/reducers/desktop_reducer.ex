@@ -3,6 +3,7 @@ defmodule Flamelex.Fluxus.Reducers.Desktop do
     use Flamelex.ProjectAliases
     require Logger
   
+    @app_layer :one
 
     #NOTE: It is not the responsibility of this reducer, to stash whatever
     #      graph was for the app that came before it. That should happen
@@ -11,12 +12,16 @@ defmodule Flamelex.Fluxus.Reducers.Desktop do
         Logger.debug "Opening (with no history) the desktop..."
 
         new_desktop_graph = Scenic.Graph.build()
-        |> ScenicWidgets.TestPattern.add_to_graph(%{})
-        |> Scenic.Primitives.text("This is the Desktop!", t: {140, 150})
+        |> Scenic.Primitives.group(fn graph ->
+                graph  
+                |> ScenicWidgets.TestPattern.add_to_graph(%{})
+                |> Scenic.Primitives.text("This is the Desktop!", t: {140, 150})
+        end)
+        # end, id: :layer_2) #REMINDER: If we're updating a layer, we need to wrap that layer in a group called `:layer_x`, so that root_reducer can extract this layers top level group as a primitive
 
         new_radix_state = radix_state
         |> put_in([:root, :active_app], :desktop)
-        |> put_in([:root, :graph], new_desktop_graph)
+        |> put_in([:root, :layers, @app_layer], new_desktop_graph)
 
         {:ok, new_radix_state}
     end

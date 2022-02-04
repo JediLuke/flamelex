@@ -28,13 +28,32 @@ defmodule Flamelex.Fluxus.RadixStore do
     root: %{
       active_app: :desktop,
       mode: :normal,
-      graph: nil, # The final %Graph{} which we are holding on to for 
+      # layers: [WindowArrangement.single_pane()], # A list of layers, which are in turn, lists of %WindowArrangement{} structs
+      #NOTE: We use a list of tuples, as it works better for pattern matching than maps with keys
+      graph: nil, # This holds the layers construct
+      layers: [ # The final %Graph{} which we are holding on to for, for each layer
+        one: nil,
+        two: nil,
+        three: nil,
+        four: nil
+        # {:one, nil},
+        # {:two, nil},
+        # {:three, nil},
+        # {:four, nil}
+        # base: nil,
+        # one: nil,
+        # two: nil, #NOTE: Layer2 is the main "working" layer - it gets switched in & out all the time
+        # three: nil, # this is MenuBar
+        # four: nil, # This is KommandBuffer
+        # five: nil,
+        # six: nil,
+        # seven: nil
+      ]
     },
     gui: %{
       viewport: nil,
-      layers: nil,
-      # layers: [WindowArrangement.single_pane()], # A list of layers, which are in turn, lists of %WindowArrangement{} structs
       theme: Flamelex.GUI.Utils.Theme.default(),
+      #TODO make this just `fonts`
       font_metrics: nil
     },
     desktop: %{
@@ -49,11 +68,11 @@ defmodule Flamelex.Fluxus.RadixStore do
       },
     },
     memex: %{
-      active?: Application.get_env(:memelex, :active?),
       graph: nil, # Store the %Graph{} here if we need to (for switching between apps easily)
+      active?: Application.get_env(:memelex, :active?), # If the Memex is disabled at the app config level, we need to ignore a lot of actions
       story_river: %{
-        #TODO put the scroll in another process, then it a) will hopefully be more seperated and b) we can just update that one (maybe even just by calling update_opts) and don't have to re-render every component we're scrolling, which is kinda crazy
         open_tidbits: [],
+        #TODO put the scroll in another process, then it a) will hopefully be more seperated and b) we can just update that one (maybe even just by calling update_opts) and don't have to re-render every component we're scrolling, which is kinda crazy
         scroll: %{
           accumulator: {0, 0},
           direction: :vertical,
@@ -94,13 +113,14 @@ defmodule Flamelex.Fluxus.RadixStore do
   #NOTE: When `Flamelex.GUI.RootScene` boots, it calls this function
   #      to reset the values of `graph` and `viewport`.
   #      We don't want to broadcast these changes out.
-  def initialize(graph: new_graph, viewport: new_viewport) do
+  def initialize(graph: new_graph, layers: layers, viewport: new_viewport) do
     Agent.update(__MODULE__, fn old ->
 
       {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
 
       new_root = old.root
                  |> Map.put(:graph, new_graph)
+                 |> Map.put(:layers, layers)
       new_gui  = old.gui
                  |> Map.put(:viewport, new_viewport)
                  |> Map.put(:font_metrics, %{ibm_plex_mono: metrics})

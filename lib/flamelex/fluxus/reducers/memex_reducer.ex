@@ -3,6 +3,8 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
     use Flamelex.ProjectAliases
     require Logger
   
+    @app_layer :one
+
     ##NOTE: Steps to add a new piece of functionality:
     #           1) Create a new API function, in an API module
     #           2) Create a reducer function, in a Reducer module <-- You are here.
@@ -15,11 +17,10 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
 
     def process(%{root: %{active_app: active_app}, memex: %{graph: %Scenic.Graph{} = stashed_memex_graph}} = radix_state, :open_memex) when active_app != :memex do
         Logger.debug "swapping from `#{inspect active_app}` to `:memex` (with history)..."
-        Logger.warn "here, we ought to be stashign the previous graph into something..."
 
         new_radix_state = radix_state
         |> put_in([:root, :active_app], :memex)
-        |> put_in([:root, :graph], stashed_memex_graph)
+        |> put_in([:root, :layers, @app_layer], stashed_memex_graph)
 
         {:ok, new_radix_state}
     end
@@ -31,11 +32,11 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
         |> Flamelex.GUI.Memex.Layout.add_to_graph(%{
                 frame: Frame.new(radix_state.gui.viewport),
                 state: radix_state.memex
-            }, id: :memex, theme: radix_state.gui.theme)
+            }, id: :layer_2, theme: radix_state.gui.theme)
 
         new_radix_state = radix_state
         |> put_in([:root, :active_app], :memex)
-        |> put_in([:root, :graph], new_memex_graph)
+        |> put_in([:root, :layers, @app_layer], new_memex_graph)
 
         {:ok, new_radix_state}
     end
@@ -52,7 +53,7 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
         new_radix_state = radix_state
         |> put_in([:memex, :graph], radix_state.root.graph) # stash the current graph for the memex
         |> put_in([:root, :active_app], :desktop)
-        |> put_in([:root, :graph], stashed_desktop_graph)
+        |> put_in([:root, :layers, @app_layer], stashed_desktop_graph)
 
         {:ok, new_radix_state}
     end
@@ -69,12 +70,12 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
         process(radix_state, {:open_tidbit, Memelex.My.Wiki.random()})
     end
 
-    def process(radix_state, {:switch_mode, new_mode, %{tidbit_uuid: tidbit_uuid}}) do
+    def process(radix_state, {:switch_mode, :edit, %{tidbit_uuid: tidbit_uuid}}) do
         new_open_tidbits_list =
             radix_state.memex.story_river.open_tidbits
             |> Enum.map(fn 
                     %{uuid: ^tidbit_uuid} = tidbit ->
-                        tidbit |> Map.merge(%{mode: new_mode})
+                        tidbit |> Map.merge(%{mode: :edit})
                     other_tidbit ->
                         other_tidbit
                     end)
@@ -84,6 +85,8 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
 
         {:ok, new_radix_state}
     end
+
+    #TODO discard - simply re-read in the TidBit from memory & dump our changes
 
     def process(radix_state, {:update_tidbit, %{uuid: tidbit_uuid} = new_tidbit}) do
         new_open_tidbits_list =
