@@ -87,8 +87,48 @@ defmodule Flamelex.GUI.RootScene do
   end
 
   def menu_bar do
+
+    vp_width = 500
+
+    menu_map = [
+      {"Buffer",
+       [
+         {"new", &Flamelex.API.Buffer.new/0},
+         {"save", &Flamelex.API.Buffer.save/0},
+         {"close", &Flamelex.API.Buffer.close/0}
+       ]}
+      # {"Help", [
+          # {"About QuillEx", &Flamelex.API.Misc.makers_mark/0}]},
+    ]
+
+    # @menubar %{height: 60}
+    menubar = %{height: 60}
+
+    {:ok, ibm_plex_mono_metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
+
     Scenic.Graph.build()
-    |> Scenic.Primitives.rect({400, 200}, t: {300, 400}, fill: :green)
+    |> ScenicWidgets.MenuBar.add_to_graph(
+      %{
+        frame:
+        ScenicWidgets.Core.Structs.Frame.new(
+            pin: {0, 0},
+            size: {vp_width, menubar.height}
+          ),
+        menu_opts: menu_map,
+        item_width: {:fixed, 180},
+        font: %{
+          name: :ibm_plex_mono,
+          size: 36,
+          metrics: ibm_plex_mono_metrics
+        },
+        sub_menu: %{
+          height: 40,
+          font: %{size: 22}
+        }
+      },
+      id: :menu_bar
+    )
+    # |> Scenic.Primitives.rect({400, 200}, t: {300, 400}, fill: :green)
   end
 
   def kommander do
