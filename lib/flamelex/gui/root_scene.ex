@@ -88,16 +88,43 @@ defmodule Flamelex.GUI.RootScene do
 
   def menu_bar(%{viewport: %{size: {vp_width, _vp_height} = _vp_size}} = scene) do
 
+    # default_map = %{
+    #   "Flamelex" => %{
+    #     "temet nosce" => {Flamelex, :temet_nosce, []},
+    #     "show cmder" => {Flamelex.API.CommandBuffer, :show, []}
+    #   },
+    #   "Memex" => %{
+    #     "open" => {Flamelex.API.MemexWrap, :open, []},
+    #     "random quote" => {Flamelex.Memex, :random_quote, []},
+    #     "journal" => {Flamelex.MemexWrap.Journal, :now, []}
+    #   },
+    #   "GUI" => %{}, #TODO auto-generate it from the GUI file
+    #   "Buffer" => %{
+    #     "open README" => {Flamelex.API.Buffer, :open!, ["/Users/luke/workbench/elixir/flamelex/README.md"]},
+    #     # "close" => {Flamelex.API.Buffer, :close, ["/Users/luke/workbench/elixir/flamelex/README.md"]},
+    #     "close" => fn -> Buffer.active_buffer() |> Buffer.close() end
+    #   },
+    #   "DevTools" => %{},
+    #   "Help" => %{
+    #     "Getting Started" => nil,
+    #     "About" => nil
+    #   },
+    # }
+
+
+    #TODO this has to go into radix, so we can update it as needed.
     menu_map = [
       {"Buffer",
        [
          {"new", &Flamelex.API.Buffer.new/0},
+        #  {"list", &Flamelex.API.Buffer.new/0}, #TODO list should be an arrow-out menudown, that lists open buffers
          {"save", &Flamelex.API.Buffer.save/0},
          {"close", &Flamelex.API.Buffer.close/0}
        ]},
       {"Memex",
        [
-         {"open", &Flamelex.API.Memex.open/0}
+         {"open", &Flamelex.API.Memex.open/0},
+         {"close", &Flamelex.API.Memex.close/0},
        ]}
       # {"Help", [
           # {"About QuillEx", &Flamelex.API.Misc.makers_mark/0}]},

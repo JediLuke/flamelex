@@ -4,30 +4,14 @@ defmodule Flamelex.API.Buffer do
   """
   use Flamelex.ProjectAliases
   alias Flamelex.BufferManager
+  alias Flamelex.Fluxus.Reducers.Buffer, as: BufferReducer
 
   def new do
     new("")
   end
 
   def new(data) when is_bitstring(data) do
-    GenServer.call(Flamelex.FluxusRadix, {:action, {
-      :open_buffer, %{
-          type: Flamelex.Buffer.Text,
-          source: :none,
-          data: data,
-          label: "Unsaved file",
-          open_in_gui?: true, #TODO set active buffer
-          callback_list: [self()]
-    }}})
-
-    receive do
-      {:ok_open_buffer, tag} ->
-        tag
-    after
-      :timer.seconds(1) ->
-        raise "Buffer failed to open. reason: TimedOut."
-    end
-
+    Flamelex.Fluxus.action({BufferReducer, {:open_buffer, %{data: data}}})
   end
 
   @doc """
@@ -37,6 +21,11 @@ defmodule Flamelex.API.Buffer do
     %{buffer_list: buffer_list} = GenServer.call(BufferManager, :get_state)
     #TODO we ought to trigger a GUI update here - possibly, this should indeed reside in BufferManager... since then at least GUI updates wiull be in sync
     buffer_list
+  end
+
+  #TODO activate an already "open" buffer
+  def open do
+    
   end
 
 
