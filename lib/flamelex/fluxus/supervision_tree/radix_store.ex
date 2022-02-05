@@ -56,6 +56,9 @@ defmodule Flamelex.Fluxus.RadixStore do
       #TODO make this just `fonts`
       font_metrics: nil
     },
+    menu_bar: %{
+      height: 60
+    },
     desktop: %{
       graph: nil,
     },

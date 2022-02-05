@@ -26,7 +26,7 @@ defmodule Flamelex.GUI.RootScene do
     opts = opts |> set_theme(Flamelex.GUI.Utils.Theme.default())
 
     layer_1_graph = primary_app()
-    layer_2_graph = menu_bar()
+    layer_2_graph = menu_bar(init_scene)
     layer_3_graph = kommander()
     layer_4_graph = Scenic.Graph.build()
 
@@ -86,9 +86,7 @@ defmodule Flamelex.GUI.RootScene do
     Scenic.Graph.build()
   end
 
-  def menu_bar do
-
-    vp_width = 500
+  def menu_bar(%{viewport: %{size: {vp_width, _vp_height} = _vp_size}} = scene) do
 
     menu_map = [
       {"Buffer",
@@ -96,6 +94,10 @@ defmodule Flamelex.GUI.RootScene do
          {"new", &Flamelex.API.Buffer.new/0},
          {"save", &Flamelex.API.Buffer.save/0},
          {"close", &Flamelex.API.Buffer.close/0}
+       ]},
+      {"Memex",
+       [
+         {"open", &Flamelex.API.Memex.open/0}
        ]}
       # {"Help", [
           # {"About QuillEx", &Flamelex.API.Misc.makers_mark/0}]},
