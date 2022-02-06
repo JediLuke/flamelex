@@ -12,19 +12,17 @@ defmodule Flamelex.API.Kommander do
 
 
   @doc """
-  Make the KommandBuffer visible, and put us in :kommand mode.
+  Make the KommandBuffer visible.
   """
   def show do
-    Flamelex.Fluxus.action({KommandBuffer, :show})
+    Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Kommander, :show})
   end
 
 
   @doc """
-  Same as show/0 - open up (or, make visible) the KommandBuffer, and put
-  us in :kommand mode.
+  Same as show/0
   """
   def open do
-    Logger.debug "opening KommandBuffer..."
     show()
   end
 
@@ -33,7 +31,7 @@ defmodule Flamelex.API.Kommander do
   Make the KommandBuffer not-visible, and put us in :normal mode.
   """
   def hide do
-    Flamelex.Fluxus.fire_action({KommandBuffer, :hide})
+    Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Kommander, :hide})
   end
 
 
@@ -41,7 +39,7 @@ defmodule Flamelex.API.Kommander do
   Resets the text field to an empty string.
   """
   def clear do
-    Flamelex.Fluxus.fire_action({KommandBuffer, :clear})
+    Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Kommander, :clear})
   end
 
 
@@ -51,18 +49,18 @@ defmodule Flamelex.API.Kommander do
   away we also want to forget all the state in the KommandBuffer - like
   when you mash escape to go back to :edit mode
   """
-  def reset do
-    Flamelex.Fluxus.fire_actions([
-      clear(),
-      hide()
-    ])
-  end
+  # def reset do
+  #   Flamelex.Fluxus.action([
+  #     clear(),
+  #     hide()
+  #   ])
+  # end
 
 
   @doc """
   Execute the command in the API.CommandBuffer
   """
   def execute do
-    Flamelex.Fluxus.fire_action({KommandBuffer, :execute})
+    Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Kommander, :execute})
   end
 end

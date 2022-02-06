@@ -42,11 +42,15 @@ defmodule Flamelex.GUI.RootScene do
     radix_state = Flamelex.Fluxus.RadixStore.get()
 
     layer_1_graph = Scenic.Graph.build() # primary_app()
+                    # |> Flamelex.GUI.Renseijin.add_to_graph  
     layer_2_graph = Scenic.Graph.build()
                     |> Flamelex.GUI.Component.MenuBar.add_to_graph(%{
                         viewport: init_scene.viewport,
                         state: radix_state.menu_bar})
-    layer_3_graph = Scenic.Graph.build() # kommander()
+    layer_3_graph = Scenic.Graph.build()
+                    |> Flamelex.GUI.KommandBuffer.add_to_graph(%{
+                        viewport: init_scene.viewport
+                    })
     layer_4_graph = Scenic.Graph.build()
 
     init_graph = Scenic.Graph.build()
@@ -135,10 +139,7 @@ defmodule Flamelex.GUI.RootScene do
 
   def handle_input(input, context, scene) do
     #Logger.debug "#{__MODULE__} recv'd some (non-ignored) input: #{inspect input}"
-    Flamelex.Fluxus.handle_user_input(%{
-        source: __MODULE__,
-        context: context,
-        input: input })
+    Flamelex.Fluxus.input(input)
     {:noreply, scene}
   end
 

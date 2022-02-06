@@ -223,17 +223,7 @@ defmodule Flamelex.Fluxus.UserInputHandler do
 
   def handle_lookup(:ignore_input, _radix_state), do: :ok
 
-  def handle_lookup({:fire_action, a}, _radix_state) do
-    Logger.debug " -- FIRING ACTION --> #{inspect a}"
-    Flamelex.Fluxus.fire_action(a)
-  end
 
-  def handle_lookup({:fire_actions, action_list}, _radix_state)
-    when is_list(action_list) and length(action_list) > 0 do
-      action_list |> Enum.map(fn (m) -> 
-        Flamelex.Fluxus.fire_action(m)
-      end)
-  end
 
 #   case key_mapping.lookup(radix_state, user_input.input) do #TODO this is not grat, probably need to ditch the rest first
 #   nil ->

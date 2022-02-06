@@ -28,7 +28,8 @@ defmodule Flamelex.Fluxus.RadixStore do
       {"Flamelex",
           [
               {"temet nosce", &Flamelex.temet_nosce/0},
-              #  {"show cmder", &Flamelex.API.Memex.close/0},
+               {"show cmder", &Flamelex.API.Kommander.show/0},
+               {"hide cmder", &Flamelex.API.Kommander.hide/0}
               #DevTools
           ]},
       {"Buffer",
@@ -77,6 +78,9 @@ defmodule Flamelex.Fluxus.RadixStore do
         height: 40,
         font: %{name: :ibm_plex_mono, size: 22}
       }
+    },
+    kommander: %{
+      hidden?: true
     },
     desktop: %{
       graph: nil,
