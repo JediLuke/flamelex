@@ -22,7 +22,7 @@ defmodule Flamelex.Fluxus.InputListener do
             :ignore
         else
             %EventBus.Model.Event{id: _id, topic: :general, data: {:input, input}} = event
-            radix_state = Flamelex.Fluxus.RadixStore.get()
+            radix_state = Flamelex.Fluxus.RadixStore.get() #TODO lock the store?
             case Flamelex.Fluxus.RadixUserInputHandler.handle(radix_state, input) do
                 x when x in [:ignore, :ok] ->
                     EventBus.mark_as_completed({__MODULE__, event_shadow})
@@ -37,7 +37,7 @@ defmodule Flamelex.Fluxus.InputListener do
                 {:ok, new_radix_state} ->
                     Logger.debug "#{__MODULE__} processed event, state changed..."
                     #Logger.debug "#{__MODULE__} processed event, state changed... #{inspect(%{radix_state: radix_state, action: action})}"
-                    Flamelex.Fluxus.RadixStore.broadcast_update(new_radix_state)
+                    Flamelex.Fluxus.RadixStore.put(new_radix_state)
                     EventBus.mark_as_completed({__MODULE__, event_shadow})
                     :ok
                 {:error, reason} ->

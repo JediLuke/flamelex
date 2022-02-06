@@ -54,7 +54,6 @@ defmodule Flamelex.Fluxus.RadixStore do
   @fluxus_radix %{
     root: %{
       active_app: :desktop,
-      mode: :normal,
       # TODO: [WindowArrangement.single_pane()], # A list of layers, which are in turn, lists of %WindowArrangement{} structs
       graph: nil, # This holds the layers construct
       layers: [ # The final %Graph{} which we are holding on to for, for each layer
@@ -119,7 +118,7 @@ defmodule Flamelex.Fluxus.RadixStore do
     },
     history: %{
       keystrokes:   [],
-      actions:      []
+      # actions:      []
     }
   }
 
@@ -132,6 +131,12 @@ defmodule Flamelex.Fluxus.RadixStore do
     Agent.get(__MODULE__, & &1)
   end
 
+  def put(new_state) do
+    #NOTE: Update, dont't broadcast changes. For example, adding user-input
+    #      to the input history.
+    Logger.debug("#{__MODULE__} updating state...")
+    Agent.update(__MODULE__, fn _old -> new_state end)
+  end
 
   #NOTE: When `Flamelex.GUI.RootScene` boots, it calls this function
   #      to reset the values of `graph` and `viewport`.
