@@ -24,40 +24,59 @@ defmodule Flamelex.Fluxus.RadixStore do
 #   #              who will have to re-render their shit.
 
 
+  @default_menu_map [
+      {"Flamelex",
+          [
+              {"temet nosce", &Flamelex.temet_nosce/0},
+              #  {"show cmder", &Flamelex.API.Memex.close/0},
+              #DevTools
+          ]},
+      {"Buffer",
+          [
+              {"new", &Flamelex.API.Buffer.new/0},
+              #  {"list", &Flamelex.API.Buffer.new/0}, #TODO list should be an arrow-out menudown, that lists open buffers
+              {"save", &Flamelex.API.Buffer.save/0},
+              {"close", &Flamelex.API.Buffer.close/0}
+          ]},
+      {"Memex",
+          [
+              {"open", &Flamelex.API.Memex.open/0},
+              {"close", &Flamelex.API.Memex.close/0},
+              # random
+              # journal
+          ]}
+      # {"Help", [
+      # GettingStarted
+      # {"About QuillEx", &Flamelex.API.Misc.makers_mark/0}]},
+      ]
+
   @fluxus_radix %{
     root: %{
       active_app: :desktop,
       mode: :normal,
-      # layers: [WindowArrangement.single_pane()], # A list of layers, which are in turn, lists of %WindowArrangement{} structs
-      #NOTE: We use a list of tuples, as it works better for pattern matching than maps with keys
+      # TODO: [WindowArrangement.single_pane()], # A list of layers, which are in turn, lists of %WindowArrangement{} structs
       graph: nil, # This holds the layers construct
       layers: [ # The final %Graph{} which we are holding on to for, for each layer
+        #NOTE: We use a Keyword list, as it works better for pattern matching than maps with keys
         one: nil,
         two: nil,
         three: nil,
         four: nil
-        # {:one, nil},
-        # {:two, nil},
-        # {:three, nil},
-        # {:four, nil}
-        # base: nil,
-        # one: nil,
-        # two: nil, #NOTE: Layer2 is the main "working" layer - it gets switched in & out all the time
-        # three: nil, # this is MenuBar
-        # four: nil, # This is KommandBuffer
-        # five: nil,
-        # six: nil,
-        # seven: nil
       ]
     },
     gui: %{
       viewport: nil,
       theme: Flamelex.GUI.Utils.Theme.default(),
-      #TODO make this just `fonts`
       font_metrics: nil
     },
     menu_bar: %{
-      height: 60
+      height: 60,
+      menu_map: @default_menu_map,
+      font: %{name: :ibm_plex_mono, size: 36},
+      sub_menu: %{
+        height: 40,
+        font: %{name: :ibm_plex_mono, size: 22}
+      }
     },
     desktop: %{
       graph: nil,
@@ -109,9 +128,6 @@ defmodule Flamelex.Fluxus.RadixStore do
     Agent.get(__MODULE__, & &1)
   end
 
-  def fetch_font_metrics(font_name) do
-    get().gui.font_metrics |> Map.get(font_name)
-  end
 
   #NOTE: When `Flamelex.GUI.RootScene` boots, it calls this function
   #      to reset the values of `graph` and `viewport`.
@@ -119,14 +135,14 @@ defmodule Flamelex.Fluxus.RadixStore do
   def initialize(graph: new_graph, layers: layers, viewport: new_viewport) do
     Agent.update(__MODULE__, fn old ->
 
-      {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
+      {:ok, ibm_plex_mono_metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
 
       new_root = old.root
                  |> Map.put(:graph, new_graph)
                  |> Map.put(:layers, layers)
       new_gui  = old.gui
                  |> Map.put(:viewport, new_viewport)
-                 |> Map.put(:font_metrics, %{ibm_plex_mono: metrics})
+                 |> Map.put(:font_metrics, %{ibm_plex_mono: ibm_plex_mono_metrics})
       
       old |> Map.merge(%{root: new_root, gui: new_gui})
     end)

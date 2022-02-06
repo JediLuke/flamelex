@@ -342,11 +342,12 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 	end
 
 	defp heading_font do
+		%{ibm_plex_mono: metrics} = Flamelex.Fluxus.RadixStore.get().gui.font_metrics
 		# This is just the font details for the TidBit/HyperCard heading
 		%{
 			name: :ibm_plex_mono,
 			size: 36,
-			metrics: Flamelex.Fluxus.RadixStore.fetch_font_metrics(:ibm_plex_mono)
+			metrics: metrics
 		}
 	end
 end
