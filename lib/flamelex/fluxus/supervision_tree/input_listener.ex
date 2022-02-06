@@ -40,9 +40,6 @@ defmodule Flamelex.Fluxus.InputListener do
                     Flamelex.Fluxus.RadixStore.put(new_radix_state)
                     EventBus.mark_as_completed({__MODULE__, event_shadow})
                     :ok
-                {:error, reason} ->
-                    Logger.error "Unable to process event `#{inspect event}`, reason: #{inspect reason}"
-                    raise reason
             end
         end
     end

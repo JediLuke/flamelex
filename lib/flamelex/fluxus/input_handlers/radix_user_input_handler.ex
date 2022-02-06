@@ -8,22 +8,35 @@ defmodule Flamelex.Fluxus.RadixUserInputHandler do
 
     #NOTE: kommander.hidden? == false, means it is NOT hidden, i.e. KommandBuffer is visible
     def handle(%{kommander: %{hidden?: false}} = radix_state, input) do
-        {:ok, new_radix_state} = Keymaps.Kommander.handle(radix_state, input)
-        {:ok, new_radix_state |> record_input(input)}
+        # {:ok, new_radix_state} = Keymaps.Kommander.handle(radix_state, input)
+        # {:ok, new_radix_state |> record_input(input)}
+        Keymaps.Kommander |> handle_with_rescue(radix_state, input)
     end
 
     def handle(%{kommander: %{hidden?: true}} = radix_state, input) do
-        try do
-            {:ok, new_radix_state} = Keymaps.Normal.handle(radix_state, input)
-            {:ok, new_radix_state |> record_input(input)}
-        rescue
-            FunctionClauseError ->
-                Logger.warn "input: #{inspect input} not handled."
-                {:ok, radix_state |> record_input(input)}
-        end
+        #TODO use similat try/do & first try global level, then Memex level
+        Keymaps.Normal |> handle_with_rescue(radix_state, input)
     end
 
 
+
+    defp handle_with_rescue(reducer, radix_state, input) do
+        try do
+            reducer.handle(radix_state, input)
+        rescue
+            FunctionClauseError ->
+                Logger.warn "input: #{inspect input} not handled."
+                # {:ok, radix_state |> record_input(input)}
+                :ignore
+        else
+            :ok ->
+                {:ok, radix_state |> record_input(input)}
+            {:ok, new_radix_state} ->
+                {:ok, new_radix_state |> record_input(input)}
+            :ignore ->
+                :ignore
+        end
+    end
   
     defp record_input(radix_state, {:key, {key, @key_pressed, []}} = input) when input in @valid_text_input_characters do
         Logger.debug "-- Recording INPUT: #{inspect input}"

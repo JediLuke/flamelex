@@ -61,8 +61,8 @@ defmodule Flamelex.GUI.KommandBuffer do
         |> Scenic.Primitives.group(fn graph ->
             graph
             |> Draw.background(frame, :cornflower_blue)
-            # |> draw_command_prompt(args.frame)
-            # |> draw_textbox(args.frame)
+            |> draw_command_prompt(frame)
+            |> draw_textbox(frame)
             #  |> DrawingHelpers.draw_input_textbox(textbox_frame)
             #  |> DrawingHelpers.draw_cursor(textbox_frame, id: cursor_component_id)
             #  |> DrawingHelpers.draw_text_field("", textbox_frame, id: text_field_id) #NOTE: Start with an empty string
@@ -77,8 +77,8 @@ defmodule Flamelex.GUI.KommandBuffer do
     @prompt_margin 12
     def draw_command_prompt(graph, %Frame{
       #NOTE: These are the coords/dimens for the whole CommandBuffer Frame
-      top_left: %Coordinates{x: _top_left_x, y: top_left_y},
-      dimensions: %Dimensions{height: height, width: _width}
+      top_left: %{x: _top_left_x, y: top_left_y},
+      dimensions: %{height: height, width: _width}
     }) do
       #NOTE: The y_offset
       #      ------------
@@ -111,23 +111,25 @@ defmodule Flamelex.GUI.KommandBuffer do
     def draw_textbox(graph, %Frame{} = outer_frame) do
         # text_field_id                 = {@component_id, :text_field}
     
+        #TODO here we want our own TextPad component eventually
         graph
-        |> Flamelex.GUI.Component.TextBox.add_to_graph(%{
-             ref: {KommandBufferGUI, TextBox},
-             frame: calc_textbox_frame(outer_frame),
-             border: {:solid, 1, :px},
-             lines: [%{line: 1, text: ""}],
-             draw_footer?: false,
-             mode: :insert
-        })
+        |> Scenic.Components.text_field("test", id: :search_field, translate: {5,5})
+        # |> Flamelex.GUI.Component.TextBox.add_to_graph(%{
+        #      ref: {KommandBufferGUI, TextBox},
+        #      frame: calc_textbox_frame(outer_frame),
+        #      border: {:solid, 1, :px},
+        #      lines: [%{line: 1, text: ""}],
+        #      draw_footer?: false,
+        #      mode: :insert
+        # })
       end
     
     
       # figure out the size of the text box
       def calc_textbox_frame(_buffer_frame = %Frame{
         #NOTE: These are the coords/dimens for the whole CommandBuffer Frame
-        top_left: %Coordinates{x: cmd_buf_top_left_x, y: cmd_buf_top_left_y},
-        dimensions: %Dimensions{height: cmd_buf_height, width: cmd_buf_width}
+        top_left: %{x: cmd_buf_top_left_x, y: cmd_buf_top_left_y},
+        dimensions: %{height: cmd_buf_height, width: cmd_buf_width}
       }) do
         total_prompt_width = prompt_width(@prompt_size) + (2*@prompt_margin)
     
