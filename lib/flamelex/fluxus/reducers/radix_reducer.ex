@@ -52,6 +52,9 @@ defmodule Flamelex.Fluxus.RadixReducer do
   end
 
 
+
+
+
   @memex_actions [
     :open_memex, :close_memex
   ]
@@ -64,6 +67,10 @@ defmodule Flamelex.Fluxus.RadixReducer do
   def process(%{memex: %{active?: true}} = radix_state, action) when action in @memex_actions do
     Flamelex.Fluxus.Reducers.Memex.process(radix_state, action)
   end
+
+
+
+
 
   def process(radix_state, action) do
     {:error, "RootReducer bottomed-out! No match was found."}
