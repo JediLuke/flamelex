@@ -1,6 +1,7 @@
-defmodule Flamelex.Fluxus.RadixUserInputHandler do
+defmodule Flamelex.Fluxus.UserInputHandler do
     @moduledoc """
-
+    This is the highest-level input handler. All user-input gets routed
+    through this module.
     """
     require Logger
     use ScenicWidgets.ScenicEventsDefinitions
@@ -8,8 +9,6 @@ defmodule Flamelex.Fluxus.RadixUserInputHandler do
 
     #NOTE: kommander.hidden? == false, means it is NOT hidden, i.e. KommandBuffer is visible
     def handle(%{kommander: %{hidden?: false}} = radix_state, input) do
-        # {:ok, new_radix_state} = Keymaps.Kommander.handle(radix_state, input)
-        # {:ok, new_radix_state |> record_input(input)}
         Keymaps.Kommander |> handle_with_rescue(radix_state, input)
     end
 

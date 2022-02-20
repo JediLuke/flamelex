@@ -5,6 +5,11 @@
 3) make this action available, via the API
 4) bind that API call to an input via a key-mapping
 
+  # The process of adding functionality
+
+  ## 1) Create an API function e.g. Buffer.switch(b)
+  ## 2) Probably, it fires an action to FluxusRadix
+
 <!-- 
 This is the "flow"
 

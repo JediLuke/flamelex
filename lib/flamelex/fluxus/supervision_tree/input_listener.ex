@@ -23,7 +23,7 @@ defmodule Flamelex.Fluxus.InputListener do
         else
             %EventBus.Model.Event{id: _id, topic: :general, data: {:input, input}} = event
             radix_state = Flamelex.Fluxus.RadixStore.get() #TODO lock the store?
-            case Flamelex.Fluxus.RadixUserInputHandler.handle(radix_state, input) do
+            case Flamelex.Fluxus.UserInputHandler.handle(radix_state, input) do
                 x when x in [:ignore, :ok] ->
                     EventBus.mark_as_completed({__MODULE__, event_shadow})
                     Logger.debug "#{__MODULE__} ignoring... #{inspect(%{input: input})}"

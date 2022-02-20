@@ -3,28 +3,43 @@ defmodule Flamelex.Keymaps.Normal do
     require Logger
 
     #NOTE: This Keymap contains the "global", Flamelex-wide keymaps.
+    @leader :key_space
 
-    def handle(%{history: %{keystrokes: [:key_space|_rest]}} = radix_state, @lowercase_k) do
+    # open the KommandBudder with keybinding <leader>k
+    def handle(%{history: %{keystrokes: [@leader|_rest]}} = radix_state, @lowercase_k) do
         Logger.debug "Opening KommandBuffer..."
         Flamelex.API.Kommander.show()
-        {:ok, radix_state}
+        :ok
     end
 
-    def handle(%{history: %{keystrokes: [:key_space|_rest]}} = radix_state, @lowercase_h) do
+    # open the Memex with keybinding <leader>h
+    def handle(%{history: %{keystrokes: [@leader|_rest]}} = radix_state, @lowercase_h) do
         Flamelex.API.Memex.open()
-        {:ok, radix_state}
+        :ok
+    end
+
+    def handle(%{history: %{keystrokes: [@leader|_rest]}} = radix_state, @lowercase_h) do
+        Flamelex.API.Memex.open()
+        :ok
+    end
+
+    def handle(%{root: %{active_app: :memex}} = radix_state, input) do
+        Flamelex.API.Memex.open()
+        :ok
     end
 
     #TODO in editor mode, save the buffer with leader-s
 
-    def handle(%{history: %{keystrokes: [:key_space|_rest]}} = radix_state, input) do
-        #   {:error, "RadixUserInputHandler bottomed-out! No match was found."}
-        Logger.debug "Handling... #{inspect input}"
-        IO.puts "\n\nLAST KEY WAS SPACE\n\n"
-        {:ok, radix_state}
-    end
+    # def handle(%{history: %{keystrokes: [@leader|_rest]}} = radix_state, input) do
+    #     #   {:error, "UserInputHandler bottomed-out! No match was found."}
+    #     Logger.debug "Handling... #{inspect input}"
+    #     IO.puts "\n\nLAST KEY WAS SPACE\n\n"
+    #     {:ok, radix_state}
+    # end
   
-    def handle(_radix_state, input) when input in @valid_text_input_characters do
+    def handle(radix_state, input) when input in @valid_text_input_characters do
+        IO.puts "YASSSSS"
+        IO.inspect radix_state
         #REMINDER: We need to acknowledge the keystrokes in order to save
         # them into the keystroke history
         :ok

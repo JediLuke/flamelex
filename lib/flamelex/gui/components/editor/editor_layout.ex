@@ -26,11 +26,25 @@ defmodule Flamelex.GUI.Editor.Layout do
         #         frame: right_quadrant(args.frame),
         #         state: args.state.sidebar})
 
+        radix_store = Flamelex.Fluxus.RadixStore.get()
 
-        #TODO here we need to render a ScenicWidgets.TextPad
-
+        #TODO here need to get all the buffer details, probably from radix_state??
         init_graph = Scenic.Graph.build()
         |> Scenic.Primitives.rect(args.frame.size, translate: args.frame.pin, fill: :purple)
+        |> ScenicWidgets.TextPad.add_to_graph(%{
+            id: "tidbit.uuid",
+            frame: Frame.new(
+                pin: {200, 225},
+                size: {500, 500}),
+            text: "it is written",
+            mode: :read_only,
+            format_opts: %{
+                alignment: :left,
+                wrap_opts: {:wrap, :end_of_line},
+                show_line_num?: false
+            },
+            font: radix_store.gui.fonts.ibm_plex_mono |> Map.merge(%{size: 24})
+        })
 
         new_scene = init_scene
         |> assign(graph: init_graph)
@@ -43,6 +57,17 @@ defmodule Flamelex.GUI.Editor.Layout do
         {:ok, new_scene}
     end
 
+    def calc_body_frame(hypercard_frame) do
+		#REMINDER: Because we render this from within the group (which is
+		#		   already getting translated, we only need be concerned
+		#		   here with the _relative_ offset from the group. Or
+		#		   in other words, this is all referenced off the top-left
+		#		   corner of the HyperCard, not the top-left corner
+		#		   of the screen.
+		Frame.new(
+			pin: {200, 225},
+			size: {500, 500})
+	end
 
     # def left_quadrant(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}} = frame) do
     #     Frame.new(top_left: {x, y}, dimensions: {w/4, h})

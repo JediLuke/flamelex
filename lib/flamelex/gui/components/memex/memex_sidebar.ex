@@ -52,6 +52,12 @@ defmodule Flamelex.GUI.Component.Memex.SideBar do
         {:noreply, scene}
     end
 
+    # def handle_event({:value_changed, :text_pad, new_value}, _from, scene) do
+
+    #     {:noreply, scene}
+    # end
+    
+
     def handle_info({:radix_state_change, %{memex: %{sidebar: new_sidebar_state}}}, %{assigns: %{state: current_state}} = scene)
         when current_state != new_sidebar_state do
             Logger.warn "#{__MODULE__} updating due to a change in the Memex.SideBar state..."

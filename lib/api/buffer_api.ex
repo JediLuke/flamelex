@@ -6,35 +6,41 @@ defmodule Flamelex.API.Buffer do
   alias Flamelex.BufferManager
   alias Flamelex.Fluxus.Reducers.Buffer, as: BufferReducer
 
+  @doc """
+  List all the open buffers.
+  """
+  def list do
+    Flamelex.Fluxus.RadixStore.get().editor.buffers
+  end
+
   def new do
     new("")
   end
 
   def new(data) when is_bitstring(data) do
     Flamelex.Fluxus.action({BufferReducer, {:open_buffer, %{data: data}}})
+    #TODO - the challenge here is, to maybe, get a callback? Listen to events? We want to return the buffer ref
   end
 
-  @doc """
-  List all the open buffers.
-  """
-  def list do
-    %{buffer_list: buffer_list} = GenServer.call(BufferManager, :get_state)
-    #TODO we ought to trigger a GUI update here - possibly, this should indeed reside in BufferManager... since then at least GUI updates wiull be in sync
-    buffer_list
+  def open(filename) do
+    Flamelex.Fluxus.action({BufferReducer, {:open_buffer, %{file: filename}}})
+    #TODO - the challenge here is, to maybe, get a callback? Listen to events? We want to return the buffer ref
   end
-
-  #TODO activate an already "open" buffer
-  def open do
-    
-  end
-
 
   @doc """
   Return the active Buffer.
   """
   def active_buffer do
-    %{active_buffer: active_buffer} = GenServer.call(BufferManager, :get_state)
-    active_buffer
+    Flamelex.Fluxus.RadixStore.get().editor.active_buf
+  end
+
+  def switch(buf) do
+    # turn an already open buffer into the active_buf
+    activate(buf)
+  end
+
+  def activate({:buffer, _details} = buf) do
+    Flamelex.Fluxus.action({BufferReducer, {:activate, buf}})
   end
 
 
@@ -124,14 +130,8 @@ defmodule Flamelex.API.Buffer do
     }})
   end
 
-  # The process of adding functionality
 
-  ## 1) Create an API function e.g. Buffer.switch(b)
-  ## 2) Probably, it fires an action to FluxusRadix
 
-  def switch({:buffer, _details} = buf) do
-    GenServer.call(Flamelex.FluxusRadix, {:action, {:activate, buf}})
-  end
 
   @doc """
   Tell a buffer to save it's contents.

@@ -31,6 +31,15 @@ defmodule Flamelex.GUI.RootScene do
     :viewport_exit,
   ]
 
+  #TODO use this snippet to fill he MenuBar with Elixir functions
+  # def get_dropdown_options() do
+  #   :code.all_loaded()
+  #   |> Enum.map( fn {module, _} -> module end )
+  #   |> Enum.filter( fn mod -> String.starts_with?( "#{mod}", "Elixir.ScenicContribGraphingExamples.Scene") end)
+  #   |> Enum.map( fn module ->
+  #     {module.example_name(), module}
+  #   end)
+  # end
 
   @impl Scenic.Scene
   def init(init_scene, _params, opts) do

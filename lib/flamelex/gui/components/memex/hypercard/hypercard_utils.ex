@@ -1,108 +1,32 @@
-defmodule Flamelex.GUI.Component.Memex.HyperCard do
-    use Scenic.Component
+defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
+    # just a function for splitting of code into to help organise
+    # the HyperCard module
+    alias ScenicWidgets.Core.Structs.Frame
     require Logger
-	alias ScenicWidgets.Core.Structs.Frame
 
-	#TODO document this point
-	#TODO good idea: render each sub-component as a seperate graph,
-    #                calculate their heights, then use Scenic.Graph.add_to
-    #                to put them into the `:hypercard_itself` group
-    #                -> Unfortunately, this doesn't work because Scenic
-    #                doesn't seem to support "merging" 2 graphs, or
-    #                if I return a graph (each component), no way to
-    #                simply add that to another graph, as a sub-component
-    
-	@opts %{
+    @opts %{
 		margin: 5
 	}
 
-	def validate(%{
-			id: _id,
-			frame: %Frame{} = _f,
-			state: %{
-				title: title,
-			} = state
-	} = data) when is_bitstring(title) do
-		Logger.debug("#{__MODULE__} accepted params: #{inspect(data)}")
-
-		new_state = 
-			if state |> Map.has_key?(:mode) do
-				state
-			else
-				state |> Map.merge(%{mode: :read_only})
-			end
-
-		{:ok, %{data|state: new_state}}
-	end
-	
-	def init(scene, args, opts) do
-		Logger.debug("#{__MODULE__} initializing...")
-	
-		theme =
-			(opts[:theme] || Scenic.Primitive.Style.Theme.preset(:light))
-			|> Scenic.Primitive.Style.Theme.normalize()
-
-		init_graph = Scenic.Graph.build()
-			|> Scenic.Primitives.group(
-					fn graph ->
-						graph |> render_tidbit(args)
-					end,
-					id: {__MODULE__, args.id},
-					translate: args.frame.pin)
-	
-		init_scene = scene
-			|> assign(graph: init_graph)
-			|> assign(frame: args.frame)
-			|> assign(state: args.state)
-			|> push_graph(init_graph)
-
-		{:ok, init_scene, {:continue, :publish_bounds}}
-	end
-
-	def handle_continue(:publish_bounds, scene) do
-        bounds = Scenic.Graph.bounds(scene.assigns.graph)
-
-		Flamelex.GUI.Component.Memex.StoryRiver
-		|> GenServer.cast({:new_component_bounds, {scene.assigns.state.uuid, bounds}})
-        
-        {:noreply, scene, {:continue, :render_next_hyper_card}}
+    def default_mode(%{mode: existing_mode} = state, _default_mode) do
+        state
     end
 
-	def handle_continue(:render_next_hyper_card, scene) do
-		Flamelex.GUI.Component.Memex.StoryRiver |> GenServer.cast(:render_next_component)
-		{:noreply, scene}
-	end
-
-	def handle_event({:click, {:edit_tidbit_btn, tidbit_uuid}}, _from, scene) do
-		Logger.debug "HYPERCARD -- opening :edit mode..."
-        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:switch_mode, :edit, %{tidbit_uuid: tidbit_uuid}}})
-        {:noreply, scene}
+    def default_mode(state, default_mode) do
+        state |> Map.merge(%{mode: default_mode})
     end
 
-	def handle_event({:click, {:save_tidbit_btn, tidbit_uuid}}, _from, scene) do
-        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:save_tidbit, %{tidbit_uuid: tidbit_uuid}}})
-        {:noreply, scene}
+    def render(args) do
+        Scenic.Graph.build()
+        |> Scenic.Primitives.group(
+                fn graph ->
+                    graph |> render_tidbit(args)
+                end,
+                id: {__MODULE__, args.id},
+                translate: args.frame.pin)
     end
 
-	def handle_event({:click, {:close_tidbit_btn, tidbit_uuid}}, _from, scene) do
-        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:close_tidbit, %{tidbit_uuid: tidbit_uuid}}})
-        {:noreply, scene}
-    end
-
-	def handle_event({:click, {:discard_changes_btn, tidbit_uuid}}, _from, scene) do
-        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:switch_mode, :read_only, %{tidbit_uuid: tidbit_uuid}}})
-        {:noreply, scene}
-    end
-
-	#NOTE: Take note of the matching `tidbit_uuid` variables, these have to be the same for this pattern-match to bind
-	#TODO make this be {:body, tidbit_uuid}
-	def handle_event({:value_changed, tidbit_uuid, new_text}, _from, %{assigns: %{state: %{uuid: tidbit_uuid, mode: :edit}}} = scene) do
-		new_tidbit = scene.assigns.state |> Map.merge(%{data: new_text, saved?: false})
-		Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:update_tidbit, new_tidbit}})
-        {:noreply, scene}
-    end
-
-	def render_tidbit(graph, %{state: %{mode: :edit, data: text} = tidbit, frame: frame} = args)
+    def render_tidbit(graph, %{state: %{mode: :edit, data: text} = tidbit, frame: frame} = args)
 	when is_bitstring(text) do
 
 		# - work on body component displaying how we actually want it to work
@@ -162,47 +86,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		|> render_text_pad(%{mode: :read_only, tidbit: tidbit, frame: frame})
 	end
 
-
-
-
-
-	#     @doc """
-#     Calculates the render height of a bunch of text (after wrapping) for
-#     a given frame (including margins!)
-#     """
-#     def calc_wrapped_text_height(%{frame: frame, text: unwrapped_text}) when is_bitstring(unwrapped_text) do
-
-#         width = frame.dimensions.width
-#         textbox_width = width-@margin.left-@margin.right
-
-#         {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
-#         wrapped_text = FontMetrics.wrap(unwrapped_text, textbox_width, @font_size, metrics)
-
-#         #NOTE: This tells us, how long the body will be - because in Scenic
-#         #      we take the top-left corner as the origin, the bottom of
-#         #      a bounding box is greater than the top. The total height
-#         #      is the bottom minus the top.
-#         {_left, top, _right, bottom} =
-#             Scenic.Graph.build()
-#             |> Scenic.Primitives.text(wrapped_text, font: :ibm_plex_mono, font_size: @font_size)
-#             |> Scenic.Graph.bounds()
-        
-#         body_height = (bottom-top)+@margin.top+@margin.bottom
-
-#         if body_height <= @min_body_height do
-#             @min_body_height
-#         else
-#             body_height
-#         end
-#     end
-
-#     def calc_wrapped_text_height(_otherwise) do
-#         @min_body_height
-#     end
-
-
-
-	def render_tags_box(graph, %{mode: :read_only, tidbit: tidbit, frame: hypercard_frame}) do
+    def render_tags_box(graph, %{mode: :read_only, tidbit: tidbit, frame: hypercard_frame}) do
 		tags_box_frame =
 			Frame.new(pin: {@opts.margin, 140},
 					 size: {hypercard_frame.dimensions.width-(2*@opts.margin), 80})
@@ -350,4 +234,41 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 			metrics: metrics
 		}
 	end
+
+
+	#     @doc """
+#     Calculates the render height of a bunch of text (after wrapping) for
+#     a given frame (including margins!)
+#     """
+#     def calc_wrapped_text_height(%{frame: frame, text: unwrapped_text}) when is_bitstring(unwrapped_text) do
+
+#         width = frame.dimensions.width
+#         textbox_width = width-@margin.left-@margin.right
+
+#         {:ok, metrics} = TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
+#         wrapped_text = FontMetrics.wrap(unwrapped_text, textbox_width, @font_size, metrics)
+
+#         #NOTE: This tells us, how long the body will be - because in Scenic
+#         #      we take the top-left corner as the origin, the bottom of
+#         #      a bounding box is greater than the top. The total height
+#         #      is the bottom minus the top.
+#         {_left, top, _right, bottom} =
+#             Scenic.Graph.build()
+#             |> Scenic.Primitives.text(wrapped_text, font: :ibm_plex_mono, font_size: @font_size)
+#             |> Scenic.Graph.bounds()
+        
+#         body_height = (bottom-top)+@margin.top+@margin.bottom
+
+#         if body_height <= @min_body_height do
+#             @min_body_height
+#         else
+#             body_height
+#         end
+#     end
+
+#     def calc_wrapped_text_height(_otherwise) do
+#         @min_body_height
+#     end
+
+
 end
