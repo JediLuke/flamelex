@@ -5,6 +5,7 @@ defmodule Flamelex.API.Buffer do
   use Flamelex.ProjectAliases
   alias Flamelex.BufferManager
   alias Flamelex.Fluxus.Reducers.Buffer, as: BufferReducer
+  alias Flamelex.Fluxus.Reducers.Memex, as: MemexReducer
 
   @doc """
   List all the open buffers.
@@ -119,16 +120,22 @@ defmodule Flamelex.API.Buffer do
 
   Buffer.modify(b, insertion_op)
   ```
+  #NOTE: Modifying TidBits is a bit of a special case...
   """
-  def modify(buf, modification) do
-    # GenServer.cast(Flamelex.FluxusRadix, {:action, {
-    GenServer.call(Flamelex.FluxusRadix, {:action, {
-        :modify_buffer, %{
-            buffer: buf,
-            details: modification
-        }
-    }})
+  def modify(%Memelex.TidBit{} = t, modification) do
+    Flamelex.Fluxus.action({MemexReducer, {:modify_tidbit, t, modification}})
   end
+
+  # def modify(buf, modification) do
+  #   # GenServer.cast(Flamelex.FluxusRadix, {:action, {
+  #   GenServer.call(Flamelex.FluxusRadix, {:action, {
+  #       :modify_buffer, %{
+  #           buffer: buf,
+  #           details: modification
+  #       }
+  #   }})
+  # end
+
 
 
 

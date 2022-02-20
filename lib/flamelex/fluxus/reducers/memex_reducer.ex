@@ -58,6 +58,18 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
         {:ok, new_radix_state}
     end
 
+    def process(%{memex: memex} = radix_state, :new_tidbit) do
+        Logger.debug "creating a new TidBit..."
+        #TODO here check to make sure no other TidBit is already in Edit mode !!
+        #NOTE - we dont truly need to save it yet...
+        # {:ok, t} = Memelex.My.Wiki.new(%{title: ""})
+        t = Memelex.TidBit.construct(%{title: ""})
+        t = t |> Map.merge(%{type: "text", mode: :edit, saved?: false, cursor: 0, volatile?: true})
+        new_radix_state = radix_state
+        |> put_in([:memex, :story_river, :open_tidbits], memex.story_river.open_tidbits ++ [t])
+        {:ok, new_radix_state}
+    end
+
     def process(%{root: %{active_app: :memex}, memex: %{story_river: %{open_tidbits: currently_open_tidbits_list}}} = radix_state, {:open_tidbit, %Memelex.TidBit{} = t}) do
         Logger.debug "opening TidBit: #{inspect t.title}..."
         new_radix_state = radix_state
@@ -75,7 +87,7 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
             radix_state.memex.story_river.open_tidbits
             |> Enum.map(fn 
                     %{uuid: ^tidbit_uuid} = tidbit ->
-                        tidbit |> Map.merge(%{mode: :edit})
+                        tidbit |> Map.merge(%{mode: :edit, cursor: String.length(tidbit.data)})
                     other_tidbit ->
                         other_tidbit
                     end)
@@ -104,6 +116,24 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
         {:ok, new_radix_state}
     end
 
+    def process(radix_state, {:modify_tidbit, %{uuid: t_uuid} = t, %{data: new_data, cursor: new_cursor}}) do
+        # update data, move the cursor & mark as not-saved
+        updated_tidbits_list =
+            radix_state.memex.story_river.open_tidbits
+            |> Enum.map(fn
+                    t_to_modify = %{uuid: ^t_uuid} ->
+                        %{t_to_modify|data: new_data, cursor: new_cursor} |> Map.merge(%{saved?: false})
+                    not_the_tidbit_were_looking_for ->
+                        not_the_tidbit_were_looking_for # no modifications
+                end)
+        
+        new_radix_state = radix_state
+        |> put_in([:memex, :story_river, :open_tidbits], updated_tidbits_list)
+
+        {:ok, new_radix_state}
+    end
+
+
     def process(radix_state, {:close_tidbit, %{tidbit_uuid: tidbit_uuid}}) do
         new_open_tidbits_list =
             radix_state.memex.story_river.open_tidbits
@@ -119,9 +149,22 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
         new_open_tidbits_list =
             radix_state.memex.story_river.open_tidbits
             |> Enum.map(fn 
+                    %{uuid: ^tidbit_uuid, volatile?: true} = tidbit ->
+                        #NOTE: a "volatile_tidbit" is one which only exists inside temporary
+                        #      memory inside Flamelex, and hasn't been saved into the Memex proper
+                        tidbit = tidbit
+                        # |> Map.delete(:volatile?)
+                        # |> Map.delete(:saved?)
+                        # |> Map.delete(:mode)
+                        # |> Map.delete(:cursor)
+
+                        new_tidbit = Memelex.My.Wiki.new(tidbit)
+                        IO.inspect new_tidbit
+                        #TODO case, wha if the tidbit was in errpr, we need to update th RadixStore/TidBit in story river with some kind of error state & msg
+
+                        new_tidbit |> Map.merge(%{mode: :read_only, saved?: true, volatile?: false})
                     %{uuid: ^tidbit_uuid, saved?: false} = tidbit ->
-                        #TODO really save the TidBit in the Memex
-                        Logger.warn "Need to save the TidBit in the Memex here!!"
+                        {:ok, tidbit} = Memelex.My.Wiki.update(tidbit, tidbit) #NOTE: We have to send a changeset to Wiki.update/2, we just send a map with all the same fields again, maybe we can do better than this one day lol
                         tidbit |> Map.merge(%{mode: :read_only, saved?: true})
                     other_tidbit ->
                         other_tidbit

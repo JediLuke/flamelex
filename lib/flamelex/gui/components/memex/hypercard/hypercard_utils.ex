@@ -157,6 +157,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 				id: tidbit.uuid,
 				frame: calc_body_frame(hypercard_frame),
 				text: tidbit.data,
+				cursor: Map.get(tidbit, :cursor, 0),
 				mode: mode,
 				format_opts: %{
 					alignment: :left,

@@ -3,6 +3,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     require Logger
 	alias ScenicWidgets.Core.Structs.Frame
 	alias Flamelex.GUI.Component.Memex.HyperCard.Utils
+	alias Flamelex.Fluxus.Reducers.Memex, as: MemexReducer
 
 	#TODO document this point
 	#TODO good idea: render each sub-component as a seperate graph,
@@ -62,28 +63,28 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 
 	def handle_continue(:render_next_hyper_card, scene) do
 		#TODO use cast to parent instead
+		# send_parent_event(scene, {:value_changed, scene.assigns.id, new_text})
 		Flamelex.GUI.Component.Memex.StoryRiver |> GenServer.cast(:render_next_component)
 		{:noreply, scene}
 	end
 
 	def handle_event({:click, {:edit_tidbit_btn, tidbit_uuid}}, _from, scene) do
-		Logger.debug "HYPERCARD -- opening :edit mode..."
-        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:switch_mode, :edit, %{tidbit_uuid: tidbit_uuid}}})
+        Flamelex.Fluxus.action({MemexReducer, {:switch_mode, :edit, %{tidbit_uuid: tidbit_uuid}}})
         {:noreply, scene}
     end
 
 	def handle_event({:click, {:save_tidbit_btn, tidbit_uuid}}, _from, scene) do
-        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:save_tidbit, %{tidbit_uuid: tidbit_uuid}}})
+        Flamelex.Fluxus.action({MemexReducer, {:save_tidbit, %{tidbit_uuid: tidbit_uuid}}})
         {:noreply, scene}
     end
 
 	def handle_event({:click, {:close_tidbit_btn, tidbit_uuid}}, _from, scene) do
-        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:close_tidbit, %{tidbit_uuid: tidbit_uuid}}})
+        Flamelex.Fluxus.action({MemexReducer, {:close_tidbit, %{tidbit_uuid: tidbit_uuid}}})
         {:noreply, scene}
     end
 
 	def handle_event({:click, {:discard_changes_btn, tidbit_uuid}}, _from, scene) do
-        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:switch_mode, :read_only, %{tidbit_uuid: tidbit_uuid}}})
+        Flamelex.Fluxus.action({MemexReducer, {:switch_mode, :read_only, %{tidbit_uuid: tidbit_uuid}}})
         {:noreply, scene}
     end
 
@@ -91,7 +92,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 	#TODO make this be {:body, tidbit_uuid}
 	def handle_event({:value_changed, tidbit_uuid, new_text}, _from, %{assigns: %{state: %{uuid: tidbit_uuid, mode: :edit}}} = scene) do
 		new_tidbit = scene.assigns.state |> Map.merge(%{data: new_text, saved?: false})
-		Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, {:update_tidbit, new_tidbit}})
+		Flamelex.Fluxus.action({MemexReducer, {:update_tidbit, new_tidbit}})
         {:noreply, scene}
     end
 
@@ -100,12 +101,5 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 		IO.puts "PUSSSYYYYYYY"
         {:noreply, scene}
     end
-
-
-
-
-
-
-
 
 end

@@ -23,25 +23,5 @@ defmodule Flamelex.Keymaps.Normal do
         :ok
     end
 
-    def handle(%{root: %{active_app: :memex}} = radix_state, input) do
-        Flamelex.API.Memex.open()
-        :ok
-    end
 
-    #TODO in editor mode, save the buffer with leader-s
-
-    # def handle(%{history: %{keystrokes: [@leader|_rest]}} = radix_state, input) do
-    #     #   {:error, "UserInputHandler bottomed-out! No match was found."}
-    #     Logger.debug "Handling... #{inspect input}"
-    #     IO.puts "\n\nLAST KEY WAS SPACE\n\n"
-    #     {:ok, radix_state}
-    # end
-  
-    def handle(radix_state, input) when input in @valid_text_input_characters do
-        IO.puts "YASSSSS"
-        IO.inspect radix_state
-        #REMINDER: We need to acknowledge the keystrokes in order to save
-        # them into the keystroke history
-        :ok
-    end
 end
