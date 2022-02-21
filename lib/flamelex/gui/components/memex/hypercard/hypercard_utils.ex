@@ -26,7 +26,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
                 translate: args.frame.pin)
     end
 
-    def render_tidbit(graph, %{state: %{mode: :edit, data: text} = tidbit, frame: frame} = args)
+    def render_tidbit(graph, %{state: %{mode: :edit, activate: :title, data: text} = tidbit, frame: frame} = args)
 	when is_bitstring(text) do
 
 		# - work on body component displaying how we actually want it to work
@@ -46,14 +46,34 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 
 		graph
 		|> Scenic.Primitives.rect(frame_size, fill: background_color) # background rectangle
-		|> ScenicWidgets.Simple.Heading.add_to_graph(%{
-				text: tidbit.title,
-				frame: calc_title_frame(frame),
-				font: heading_font(),
-				color: :green,
-				# text_wrap_opts: :wrap #TODO
-				background_color: :yellow
-		}) #TODO theme: theme?? Does this get automatically passed down??
+		|> render_heading(tidbit, frame, mode: :edit)
+		|> Scenic.Components.button("Save", id: {:save_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
+		|> Scenic.Components.button("Discard", id: {:discard_changes_btn, args.id}, translate: {frame.dimensions.width-100, 60})
+		|> render_tags_box(%{mode: :edit, tidbit: tidbit, frame: frame})
+		|> render_text_pad(%{mode: :read_only, tidbit: tidbit, frame: frame})
+	end
+
+	def render_tidbit(graph, %{state: %{mode: :edit, activate: :body, data: text} = tidbit, frame: frame} = args)
+	when is_bitstring(text) do
+
+		# - work on body component displaying how we actually want it to work
+		# - wraps at correct width
+		# - renders infinitely long
+		# - only works for pure text, shows "NOT AVAILABLE" or whatever otherwise (centered ;)
+
+		background_color = :red
+
+
+
+		#TODO here we need to pre-calculate the height of the TidBit
+		# body_height = calc_wrapped_text_height(%{frame: frame, text: data})
+		# this is a workaround because of flex_grow
+		{width, {:flex_grow, %{min_height: min_height}}} = frame.size
+		frame_size = {width, min_height}
+
+		graph
+		|> Scenic.Primitives.rect(frame_size, fill: background_color) # background rectangle
+		|> render_heading(tidbit, frame)
 		|> Scenic.Components.button("Save", id: {:save_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
 		|> Scenic.Components.button("Discard", id: {:discard_changes_btn, args.id}, translate: {frame.dimensions.width-100, 60})
 		|> render_tags_box(%{mode: :edit, tidbit: tidbit, frame: frame})
@@ -71,19 +91,62 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 
 		graph
 		|> Scenic.Primitives.rect(frame_size, fill: :antique_white) # background rectangle
-		|> ScenicWidgets.Simple.Heading.add_to_graph(%{
-				text: tidbit.title,
-				frame: calc_title_frame(frame),
-				font: heading_font(),
-				color: :green,
-				# text_wrap_opts: :wrap #TODO
-				background_color: :yellow
-		}) #TODO theme: theme?? Does this get automatically passed down??
+		|> render_heading(tidbit, frame)
 		|> Scenic.Components.button("Edit", id: {:edit_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
 		|> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 60})
 		|> render_dateline(tidbit)
 		|> render_tags_box(%{mode: :read_only, tidbit: tidbit, frame: frame})
 		|> render_text_pad(%{mode: :read_only, tidbit: tidbit, frame: frame})
+	end
+
+	def render_heading(graph, tidbit, frame) do
+		Logger.warn "DEPRECATE ME543"
+		render_heading(graph, tidbit, frame, mode: :read_only)
+	end
+
+	def render_heading(graph, tidbit, frame, mode: mode) do
+		graph
+
+		# |> Scenic.Primitives.group(
+		# 	fn graph ->
+		# 	  graph
+		# 	#   |> Scenic.Primitives.rect(heading_rectangular_size,
+		# 	# 	fill: background_color
+		# 	#   )
+		# 	  |> Scenic.Primitives.text(wrapped_text,
+		# 		font: font_name,
+		# 		font_size: font_size,
+		# 		translate: {0, vpos},
+		# 		fill: font_color
+		# 	  )
+		# 	end,
+		# 	scissor: heading_rectangular_size,
+		# 	# translate: {tl_x+left_margin, tl_y+top_margin}, # text draws from bottom-left corner??
+		# 	translate: args.frame.pin
+		#   )
+
+
+		|> ScenicWidgets.TextPad.add_to_graph(%{
+			id: "__heading__" <> tidbit.uuid,
+			frame: calc_title_frame(frame),
+			text: tidbit.title,
+			cursor: Map.get(tidbit, :cursor, 0),
+			mode: mode,
+			format_opts: %{
+				alignment: :left,
+				wrap_opts: {:wrap, :end_of_line},
+				show_line_num?: false
+			},
+			font: heading_font()
+		})
+		# |> ScenicWidgets.Simple.Heading.add_to_graph(%{
+		# 	text: tidbit.title,
+		# 	frame: calc_title_frame(frame),
+		# 	font: heading_font(),
+		# 	color: :green,
+		# 	# text_wrap_opts: :wrap #TODO
+		# 	background_color: :yellow
+		# }) #TODO theme: theme?? Does this get automatically passed down??
 	end
 
     def render_tags_box(graph, %{mode: :read_only, tidbit: tidbit, frame: hypercard_frame}) do
@@ -181,7 +244,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 		#		   of the screen.
 		Frame.new(
 			pin: {@opts.margin, @opts.margin},
-			size: {hypercard_frame.dimensions.width*0.72, {:max_lines, 2}})
+			# size: {hypercard_frame.dimensions.width*0.72, {:max_lines, 2}})
+			size: {hypercard_frame.dimensions.width*0.72, 100}) #TODO get real height somewhere
 	end
 
 	def calc_body_frame(hypercard_frame) do

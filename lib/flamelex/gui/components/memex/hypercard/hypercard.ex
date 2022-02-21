@@ -55,6 +55,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
         bounds = Scenic.Graph.bounds(scene.assigns.graph)
 
 		#TODO use cast to parent instead
+		# send_parent_event(scene, {:value_changed, scene.assigns.id, new_text})
 		Flamelex.GUI.Component.Memex.StoryRiver
 		|> GenServer.cast({:new_component_bounds, {scene.assigns.state.uuid, bounds}})
         
@@ -89,16 +90,20 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     end
 
 	#NOTE: Take note of the matching `tidbit_uuid` variables, these have to be the same for this pattern-match to bind
-	#TODO make this be {:body, tidbit_uuid}
-	def handle_event({:value_changed, tidbit_uuid, new_text}, _from, %{assigns: %{state: %{uuid: tidbit_uuid, mode: :edit}}} = scene) do
-		new_tidbit = scene.assigns.state |> Map.merge(%{data: new_text, saved?: false})
-		Flamelex.Fluxus.action({MemexReducer, {:update_tidbit, new_tidbit}})
-        {:noreply, scene}
-    end
+	# #TODO make this be {:body, tidbit_uuid}
+	# def handle_event({:value_changed, tidbit_uuid, new_text}, _from, %{assigns: %{state: %{uuid: tidbit_uuid, mode: :edit}}} = scene) do
+	# 	new_tidbit = scene.assigns.state |> Map.merge(%{data: new_text, saved?: false})
+	# 	Flamelex.Fluxus.action({MemexReducer, {:update_tidbit, new_tidbit}})
+    #     {:noreply, scene}
+    # end
+
+	def handle_event(unhandled_event, _from, scene) do
+		Logger.warn "#{__MODULE__} ignoring an event... #{inspect unhandled_event}"
+		{:noreply, scene}
+	end
 
 	def handle_info({:radix_state_change, _new_radix_state}, scene) do
         Logger.debug "#{__MODULE__} ignoring a :radix_state_change..."
-		IO.puts "PUSSSYYYYYYY"
         {:noreply, scene}
     end
 
