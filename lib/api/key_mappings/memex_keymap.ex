@@ -1,6 +1,7 @@
 defmodule Flamelex.Keymaps.Memex do
     alias Flamelex.Fluxus.Structs.RadixState
     use ScenicWidgets.ScenicEventsDefinitions
+    alias Flamelex.Fluxus.Reducers.Memex, as: MemexReducer
     require Logger
 
 
@@ -14,7 +15,7 @@ defmodule Flamelex.Keymaps.Memex do
                 Flamelex.API.Buffer.modify(tidbit, %{activate: :body})
                 :ok
             nil ->
-                Logger.warn "No open tidbits so we dont do anything"
+                Logger.warn "No TidBits currently in edit mode."
                 :ok
         end
     end
@@ -26,6 +27,16 @@ defmodule Flamelex.Keymaps.Memex do
                 IO.puts "GOT EM"
                 Flamelex.API.Buffer.modify(tidbit, %{activate: :title})
                 :ok
+            nil ->
+                Logger.warn "No open tidbits so we dont do anything"
+                :ok
+        end
+    end
+
+    def handle(%{root: %{active_app: :memex}, memex: memex} = radix_state, @meta_lowercase_s) do
+        case find_open_tidbit(memex) do
+            [t = %{uuid: tidbit_uuid}] ->
+                Flamelex.Fluxus.action({MemexReducer, {:save_tidbit, %{tidbit_uuid: tidbit_uuid}}})
             nil ->
                 Logger.warn "No open tidbits so we dont do anything"
                 :ok

@@ -81,8 +81,8 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
         Logger.debug "opening a random TidBit..."
         process(radix_state, {:open_tidbit, Memelex.My.Wiki.random()})
     end
-
-    def process(radix_state, {:switch_mode, :edit, %{tidbit_uuid: tidbit_uuid}}) do
+    
+    def process(radix_state, {:edit_tidbit, %{tidbit_uuid: tidbit_uuid}}) do
         new_open_tidbits_list =
             radix_state.memex.story_river.open_tidbits
             |> Enum.map(fn 
@@ -101,6 +101,50 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
 
         {:ok, new_radix_state}
     end
+
+    def process(radix_state, {:discard_changes, %{tidbit_uuid: tidbit_uuid}}) do
+        # need to refresh TidBit from DB to discard anything we might
+        # have "saved" in temporary memory
+        saved_tidbit = Memelex.My.Wiki.find!(%{uuid: tidbit_uuid})
+
+        new_open_tidbits_list =
+            radix_state.memex.story_river.open_tidbits
+            |> Enum.map(fn 
+                    %{uuid: ^tidbit_uuid} = tidbit ->
+                        saved_tidbit |> Map.merge(%{
+                            mode: :read_only,
+                            saved?: true
+                        })
+                    other_tidbit ->
+                        other_tidbit
+                    end)
+
+        new_radix_state = radix_state
+        |> put_in([:memex, :story_river, :open_tidbits], new_open_tidbits_list)
+
+        {:ok, new_radix_state}
+    end
+
+    def process(radix_state, {:switch_mode, :read_only, %{tidbit_uuid: tidbit_uuid}}) do
+        new_open_tidbits_list =
+            radix_state.memex.story_river.open_tidbits
+            |> Enum.map(fn 
+                    %{uuid: ^tidbit_uuid} = tidbit ->
+                        tidbit |> Map.merge(%{
+                            mode: :edit,
+                            cursor: String.length(tidbit.data),
+                            activate: :title
+                        })
+                    other_tidbit ->
+                        other_tidbit
+                    end)
+
+        new_radix_state = radix_state
+        |> put_in([:memex, :story_river, :open_tidbits], new_open_tidbits_list)
+
+        {:ok, new_radix_state}
+    end
+
 
     #TODO discard - simply re-read in the TidBit from memory & dump our changes
 
@@ -186,20 +230,14 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
         new_open_tidbits_list =
             radix_state.memex.story_river.open_tidbits
             |> Enum.map(fn 
-                    %{uuid: ^tidbit_uuid, volatile?: true} = tidbit ->
+                    %{uuid: ^tidbit_uuid, mode: :edit, volatile?: true} = tidbit ->
                         #NOTE: a "volatile_tidbit" is one which only exists inside temporary
                         #      memory inside Flamelex, and hasn't been saved into the Memex proper
-                        tidbit = tidbit
-                        # |> Map.delete(:volatile?)
-                        # |> Map.delete(:saved?)
-                        # |> Map.delete(:mode)
-                        # |> Map.delete(:cursor)
 
-                        {:ok, new_tidbit} = Memelex.My.Wiki.new(tidbit)
                         #TODO case, wha if the tidbit was in errpr, we need to update th RadixStore/TidBit in story river with some kind of error state & msg
-
+                        {:ok, new_tidbit} = Memelex.My.Wiki.new(tidbit)
                         new_tidbit |> Map.merge(%{mode: :read_only, saved?: true, volatile?: false})
-                    %{uuid: ^tidbit_uuid, saved?: false} = tidbit ->
+                    %{uuid: ^tidbit_uuid, mode: :edit, saved?: false} = tidbit ->
                         Logger.debug "saving tidbit..."
                         {:ok, tidbit} = Memelex.My.Wiki.update(tidbit, tidbit) #NOTE: We have to send a changeset to Wiki.update/2, we just send a map with all the same fields again, maybe we can do better than this one day lol
                         tidbit |> Map.merge(%{mode: :read_only, saved?: true})

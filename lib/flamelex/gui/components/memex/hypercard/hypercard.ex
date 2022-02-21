@@ -70,7 +70,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
 	end
 
 	def handle_event({:click, {:edit_tidbit_btn, tidbit_uuid}}, _from, scene) do
-        Flamelex.Fluxus.action({MemexReducer, {:switch_mode, :edit, %{tidbit_uuid: tidbit_uuid}}})
+        Flamelex.Fluxus.action({MemexReducer, {:edit_tidbit, %{tidbit_uuid: tidbit_uuid}}})
         {:noreply, scene}
     end
 
@@ -85,7 +85,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard do
     end
 
 	def handle_event({:click, {:discard_changes_btn, tidbit_uuid}}, _from, scene) do
-        Flamelex.Fluxus.action({MemexReducer, {:switch_mode, :read_only, %{tidbit_uuid: tidbit_uuid}}})
+        Flamelex.Fluxus.action({MemexReducer, {:discard_changes, %{tidbit_uuid: tidbit_uuid}}})
         {:noreply, scene}
     end
 
