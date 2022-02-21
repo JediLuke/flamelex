@@ -154,6 +154,23 @@ defmodule Flamelex.Fluxus.Reducers.Memex do
         {:ok, new_radix_state}
     end
 
+    def process(radix_state, {:modify_tidbit, %{uuid: t_uuid} = t, %{activate: section}}) do
+        # update data, move the cursor & mark as not-saved
+        updated_tidbits_list =
+            radix_state.memex.story_river.open_tidbits
+            |> Enum.map(fn
+                    t_to_modify = %{uuid: ^t_uuid} ->
+                        t_to_modify |> Map.merge(%{activate: section})
+                    not_the_tidbit_were_looking_for ->
+                        not_the_tidbit_were_looking_for # no modifications
+                end)
+        
+        new_radix_state = radix_state
+        |> put_in([:memex, :story_river, :open_tidbits], updated_tidbits_list)
+
+        {:ok, new_radix_state}
+    end
+
     def process(radix_state, {:close_tidbit, %{tidbit_uuid: tidbit_uuid}}) do
         new_open_tidbits_list =
             radix_state.memex.story_river.open_tidbits

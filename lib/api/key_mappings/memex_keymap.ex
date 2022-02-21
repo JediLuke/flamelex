@@ -4,6 +4,34 @@ defmodule Flamelex.Keymaps.Memex do
     require Logger
 
 
+    #TODO save the TidBit
+    # def handle(%{root: %{active_app: :memex}, memex: memex} = radix_state, @enter_key) do
+
+    def handle(%{root: %{active_app: :memex}, memex: memex} = radix_state, @tab_key) do
+        # move the focus from the title, to the body
+        case find_open_tidbit(memex) do
+            [%{activate: :title, title: old_title} = tidbit] ->
+                Flamelex.API.Buffer.modify(tidbit, %{activate: :body})
+                :ok
+            nil ->
+                Logger.warn "No open tidbits so we dont do anything"
+                :ok
+        end
+    end
+
+    def handle(%{root: %{active_app: :memex}, memex: memex} = radix_state, @shift_tab) do
+        # move the focus from the title, to the body
+        case find_open_tidbit(memex) do
+            [%{activate: :body, title: old_title} = tidbit] ->
+                IO.puts "GOT EM"
+                Flamelex.API.Buffer.modify(tidbit, %{activate: :title})
+                :ok
+            nil ->
+                Logger.warn "No open tidbits so we dont do anything"
+                :ok
+        end
+    end
+
     # def handle(%{root: %{active_app: :memex}, kommander: %{hidden?: true}} = radix_state, input) when input in @valid_text_input_characters do
     def handle(%{root: %{active_app: :memex}, memex: memex}, input) when input in @valid_text_input_characters do
         case find_open_tidbit(memex) do
