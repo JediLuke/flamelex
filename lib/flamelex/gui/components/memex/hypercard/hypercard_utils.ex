@@ -26,7 +26,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
                 translate: args.frame.pin)
     end
 
-    def render_tidbit(graph, %{state: %{mode: :edit, activate: :title, data: text} = tidbit, frame: frame} = args)
+	#TODO write a blog post about using matches to distinguish the case vs just for convenience (if for convenience, do it inside the function)
+    def render_tidbit(graph, %{state: %{
+			mode: :edit,
+			activate: :title, data: text} = tidbit} = args)
 	when is_bitstring(text) do
 
 		# - work on body component displaying how we actually want it to work
@@ -35,7 +38,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 		# - only works for pure text, shows "NOT AVAILABLE" or whatever otherwise (centered ;)
 
 		background_color = :red
-
+		frame = args.frame
 
 
 		#TODO here we need to pre-calculate the height of the TidBit
@@ -53,7 +56,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 		|> render_text_pad(%{mode: :read_only, tidbit: tidbit, frame: frame})
 	end
 
-	def render_tidbit(graph, %{state: %{mode: :edit, activate: :body, data: text} = tidbit, frame: frame} = args)
+	def render_tidbit(graph, %{state: %{
+			mode: :edit,
+			activate: :body, data: text} = tidbit} = args)
 	when is_bitstring(text) do
 
 		# - work on body component displaying how we actually want it to work
@@ -61,8 +66,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 		# - renders infinitely long
 		# - only works for pure text, shows "NOT AVAILABLE" or whatever otherwise (centered ;)
 
-		background_color = :red
-
+		background_color = :pink
+		frame = args.frame
 
 
 		#TODO here we need to pre-calculate the height of the TidBit
@@ -80,9 +85,10 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 		|> render_text_pad(%{mode: :edit, tidbit: tidbit, frame: frame})
 	end
 
-	# def render_tidbit(graph, %{state: %{edit_mode?: false} = tidbit, frame: frame} = args) do
-	#NOTE: For now have this case here as a catch-all, but better to really match on a mode
-	def render_tidbit(graph, %{state: tidbit, frame: frame} = args) do
+	def render_tidbit(graph, %{state: %{
+			mode: :read_only,
+			data: text} = tidbit, frame: frame} = args)
+	when is_bitstring(text) do
 
 		#TODO here we need to pre-calculate the height of the TidBit
 		# this is a workaround because of flex_grow
@@ -97,6 +103,27 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 		|> render_dateline(tidbit)
 		|> render_tags_box(%{mode: :read_only, tidbit: tidbit, frame: frame})
 		|> render_text_pad(%{mode: :read_only, tidbit: tidbit, frame: frame})
+	end
+
+	# def render_tidbit(graph, %{state: %{edit_mode?: false} = tidbit, frame: frame} = args) do
+	#NOTE: For now have this case here as a catch-all, but better to really match on a mode
+	#NOTE: THis case means we failed to match any known case for rendering the body
+	def render_tidbit(graph, %{state: tidbit, frame: frame} = args) do
+		Logger.error "Could not successfully render TidBit: #{inspect tidbit}"
+
+		#TODO here we need to pre-calculate the height of the TidBit
+		# this is a workaround because of flex_grow
+		{width, {:flex_grow, %{min_height: min_height}}} = frame.size
+		frame_size = {width, min_height}
+
+		graph
+		|> Scenic.Primitives.rect(frame_size, fill: :antique_white) # background rectangle
+		|> render_heading(tidbit, frame)
+		|> Scenic.Components.button("Edit", id: {:edit_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 10})
+		|> Scenic.Components.button("Close", id: {:close_tidbit_btn, args.id}, translate: {frame.dimensions.width-100, 60})
+		|> render_dateline(tidbit)
+		|> render_tags_box(%{mode: :read_only, tidbit: tidbit, frame: frame})
+		|> show_unrenderable_box(%{tidbit: tidbit, frame: frame})
 	end
 
 	def render_heading(graph, tidbit, frame) do
@@ -159,7 +186,11 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 			fn graph ->
 				graph
 				|> Scenic.Primitives.rect(tags_box_frame.size, fill: :green)
-				|> render_tags(tidbit |> Map.merge(%{coords: tags_box_frame.pin}))
+				|> Flamelex.GUI.Component.Layout.add_to_graph(%{
+					frame: tags_box_frame,
+					components: tags_list(tidbit),
+					layout: :inline_block
+				})
 			end,
 			translate: tags_box_frame.pin)
 	end
@@ -174,34 +205,43 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 			fn graph ->
 				graph
 				|> Scenic.Primitives.rect(tags_box_frame.size, fill: :yellow)
-				|> render_tags(tidbit)
+				|> Flamelex.GUI.Component.Layout.add_to_graph(%{
+						frame: tags_box_frame,
+						components: tags_list(tidbit),
+						layout: :inline_block
+				})
 			end,
 			translate: tags_box_frame.pin)
 	end
 
-	def render_tags(graph, %{tags: []}, _offset) do
-		graph
+
+	def tags_list(%{tags: tags}) do
+		tags_list([], tags)
 	end
 
-	def render_tags(graph, %{tags: [tag|rest]}, offset \\ 0) do
-	    tag_width  = 70
-	    tag_height = 20
-		tag_color  = :red
-		tag_translation = {@opts.margin+(offset*tag_width), @opts.margin}
+	def tags_list(acc, []), do: acc
 
-	    graph
-		|> Scenic.Primitives.group( # render a single tag
-				fn graph ->
-					graph
-					|> Scenic.Primitives.rounded_rectangle({tag_width, tag_height, 8}, fill: tag_color)
-					|> Scenic.Primitives.text(tag,
-						font: :ibm_plex_mono,
-						translate: {10, 15}, # text draws from bottom-left corner??
-						font_size: 14,
-						fill: :black)
-				end,
-				translate: tag_translation)
-	    |> render_tags(%{tags: rest}, offset+1) #NOTE: This is a recursive call...
+	def tags_list(acc, [tag|rest]) when is_bitstring(tag) do
+		tag_render_fn =
+			fn(graph, %{frame: frame}) ->
+				
+				{:flex_grow, %{min_width: tag_width}} = frame.dimensions.width #TODO calculate real width from text width
+
+				graph
+				|> Scenic.Primitives.group( # render a single tag
+						fn graph ->
+							graph
+							|> Scenic.Primitives.rounded_rectangle({tag_width, frame.dimensions.height, 8}, fill: :yellow)
+							|> Scenic.Primitives.text(tag,
+								font: :ibm_plex_mono,
+								translate: {10, 15}, # text draws from bottom-left corner??
+								font_size: 14, #TODO get this from somewhere better
+								fill: :black)
+						end,
+						translate: frame.pin)
+			end
+
+		tags_list(acc ++ [tag_render_fn], rest)
 	end
 
 	def render_dateline(graph, tidbit) do
@@ -258,6 +298,19 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 		Frame.new(
 			pin: {@opts.margin, 225},
 			size: {hypercard_frame.dimensions.width-(2*@opts.margin), 270})
+	end
+
+	def show_unrenderable_box(graph, %{tidbit: tidbit, frame: hypercard_frame}) do
+		Logger.error "Unable to render TidBit: #{inspect tidbit}"
+		body_frame = calc_body_frame(hypercard_frame)
+		graph
+		|> Scenic.Primitives.rrect(
+			{body_frame.dimensions.width, body_frame.dimensions.height, 12},
+			fill: :red,
+			stroke: {2, :white},
+			scissor: body_frame.size,
+			translate: body_frame.pin
+		  )
 	end
 
 	def human_formatted_date(date) do
