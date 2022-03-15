@@ -136,6 +136,10 @@ defmodule Flamelex.API.Buffer do
   #   }})
   # end
 
+  #TODO %Buffer{} ??
+  def modify({:buffer, _buf_id} = buffer, modification) do
+    Flamelex.Fluxus.action({BufferReducer, {:modify_buf, buffer, modification}})
+  end
 
 
 

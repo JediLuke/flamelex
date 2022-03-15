@@ -23,6 +23,10 @@ defmodule Flamelex.Fluxus.UserInputHandler do
         Keymaps.Memex |> handle_with_rescue(radix_state, input)
     end
 
+    def handle(%{root: %{active_app: :editor}} = radix_state, input) do
+        Keymaps.Editor |> handle_with_rescue(radix_state, input)
+    end
+
     def handle(_radix_state, input) do
         Logger.warn "ignoring input: #{inspect input}"
         :ignore
@@ -61,7 +65,7 @@ defmodule Flamelex.Fluxus.UserInputHandler do
         Logger.debug "NOT recording: #{inspect input} as input..."
         radix_state
     end
-  end
+end
   
 
 
@@ -217,14 +221,14 @@ defmodule Flamelex.Fluxus.UserInputHandler do
 #     Logger.debug "Async Process: lookup_action_for_input_async - #{inspect user_input}"
 
 #     #TODO just hard-code it for now, much easier...
-#     Flamelex.API.KeyMappings.VimClone.lookup(radix_state, user_input.input) #TODO here user_input still has all this shit in it (user_input.input <vomit>)
+#     Flamelex.API.KeyMappings.Vim.lookup(radix_state, user_input.input) #TODO here user_input still has all this shit in it (user_input.input <vomit>)
 #     |> handle_lookup(radix_state)
 
 #     # # IO.puts "#{__MODULE__} processing input... #{inspect event}"
 
 #     # #TODO key_mapping should be? a property of RadixState?
 #     # # key_mapping = Application.fetch_env!(:flamelex, :key_mapping)
-#     # key_mapping = Flamelex.API.KeyMappings.VimClone #TODO just hard-code it for now, much easier...
+#     # key_mapping = Flamelex.API.KeyMappings.Vim #TODO just hard-code it for now, much easier...
 
 #     # #TODO this should probably be a lookup inside the module?
 #     # #     or rather, maybe we pass the module into the lookup function?

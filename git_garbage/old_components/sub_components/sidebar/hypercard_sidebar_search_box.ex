@@ -95,8 +95,6 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
     def handle_input({:cursor_button, {:btn_left, 0, [], coords}}, _context, %{assigns: %{mode: :inactive}} = scene) do
         Logger.debug "#{__MODULE__} recv'd :btn_left"
        bounds = Scenic.Graph.bounds(scene.assigns.graph) 
-       IO.inspect bounds
-       IO.inspect coords
     #    if Scenic.Scene.global_to_local(scene, coords) |> inside?(bounds) do
        if coords |> inside?(bounds) do
         IO.puts "INSIDE"

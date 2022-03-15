@@ -50,7 +50,6 @@ defmodule Flamelex.GUI.KommandBuffer do
 
     #NOTE: If `state` binds on here, then both variables are the same, no state-change occured and we can ignore this update
     def handle_info({:radix_state_change, %{kommander: state}}, %{assigns: %{state: state}} = scene) do
-        IO.puts "NO CHANGESSS"
         {:noreply, scene}
     end
 

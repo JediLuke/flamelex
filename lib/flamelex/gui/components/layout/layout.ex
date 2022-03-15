@@ -28,6 +28,7 @@ defmodule Flamelex.GUI.Component.Layout do
         init_scene = scene
         |> assign(frame: args.frame)
         |> assign(render_queue: args.components) # used to buffer the rendering of flexible components (because they're flexible, so we can't render the next one until we know how big this one renders as)
+        #TODO put something in here saying, we're waiting a bounds callback for component, then we will know if it's time to render the next component (when we get that callback)
         |> assign(layout: []) # no components in the layout yet
         # |> assign(id: args.id)
         # |> assign(graph: args.graph)

@@ -9,7 +9,7 @@ defmodule Flamelex.Keymaps.Kommander do
 
 end
 
-# defmodule Flamelex.API.KeyMappings.VimClone.KommandMode do
+# defmodule Flamelex.API.KeyMappings.Vim.KommandMode do
 #     alias Flamelex.Fluxus.Structs.RadixState
 #     use ScenicWidgets.ScenicEventsDefinitions
 #     require Logger

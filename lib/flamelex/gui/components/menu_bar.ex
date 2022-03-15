@@ -22,7 +22,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
 
     def render(%{viewport: %{size: {vp_width, _vp_height}}, state: menu_bar}) do
 
-        %{ibm_plex_mono: metrics} = Flamelex.Fluxus.RadixStore.get().gui.font_metrics
+        %{metrics: metrics} = Flamelex.Fluxus.RadixStore.get().fonts.ibm_plex_mono
 
         Scenic.Graph.build()
         |> ScenicWidgets.MenuBar.add_to_graph( %{

@@ -3,15 +3,14 @@ defmodule Flamelex.GUI.Editor.Layout do
     use Flamelex.ProjectAliases
     require Logger
 
-    # alias Flamelex.GUI.Component.Memex
 
-    def validate(%{frame: %Frame{} = _f} = data) do
-        #Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
+    def validate(%{buffer_id: {:buffer, _id}, frame: %Frame{} = _fr, font: _fnt, state: _s} = data) do
+        Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
         {:ok, data}
     end
 
     def init(init_scene, args, opts) do
-        # #Logger.debug "#{__MODULE__} initializing..."
+        Logger.debug "#{__MODULE__} initializing..."
     
         # #NOTE: This component doesn't need to subscribe to RadixState changes
 
@@ -26,33 +25,35 @@ defmodule Flamelex.GUI.Editor.Layout do
         #         frame: right_quadrant(args.frame),
         #         state: args.state.sidebar})
 
-        radix_store = Flamelex.Fluxus.RadixStore.get()
-
         #TODO here need to get all the buffer details, probably from radix_state??
         init_graph = Scenic.Graph.build()
         |> Scenic.Primitives.rect(args.frame.size, translate: args.frame.pin, fill: :purple)
         |> ScenicWidgets.TextPad.add_to_graph(%{
-            id: "tidbit.uuid",
+            id: args.buffer_id,
+            #TODO args.frame?
             frame: Frame.new(
                 pin: {200, 225},
                 size: {500, 500}),
-            text: "it is written",
-            mode: :read_only,
+            text: args.state.data,
+            mode: args.state.mode,
             format_opts: %{
                 alignment: :left,
-                wrap_opts: {:wrap, :end_of_line},
-                show_line_num?: false
+                wrap_opts: :no_wrap,
+                scroll_opts: :all_directions,
+                show_line_num?: true
             },
-            font: radix_store.gui.fonts.ibm_plex_mono |> Map.merge(%{size: 24})
+            font: args.font |> Map.merge(%{size: 24})
         })
 
         new_scene = init_scene
+        |> assign(buffer_id: args.buffer_id)
         |> assign(graph: init_graph)
-        # |> assign(frame: args.frame)
-        # |> assign(state: args.state)
+        |> assign(frame: args.frame)
+        |> assign(state: args.state)
         |> push_graph(init_graph)
 
-        # # cast_children(scene, :start_caret)
+        # cast_children(scene, :start_caret)
+        Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
   
         {:ok, new_scene}
     end
@@ -64,9 +65,8 @@ defmodule Flamelex.GUI.Editor.Layout do
 		#		   in other words, this is all referenced off the top-left
 		#		   corner of the HyperCard, not the top-left corner
 		#		   of the screen.
-		Frame.new(
-			pin: {200, 225},
-			size: {500, 500})
+		Frame.new(pin: {200, 225},
+			      size: {500, 500})
 	end
 
     # def left_quadrant(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}} = frame) do
@@ -81,4 +81,47 @@ defmodule Flamelex.GUI.Editor.Layout do
     # def right_quadrant(%{top_left: %{x: x, y: y}, dimensions: %{width: w, height: h}} = frame) do
     #     Frame.new(top_left: {x+((3/4)*w), y}, dimensions: {w/4, h})
     # end
+
+    # def handle_info({:radix_state_change, %{kommander: new_state}}, %{assigns: %{state: current_state}} = scene)
+    # when new_state != current_state do
+
+    # def handle_info({:radix_state_change, %{root: %{layers: layer_list}}}, scene) do
+
+    #     this_layer = scene.assigns.id #REMINDER: this will be an atom, like `:one`
+    #     [{^this_layer, radix_layer_graph}] =
+    #         layer_list |> Enum.filter(fn {layer, graph} -> layer == scene.assigns.id end)
+    
+    #     if scene.assigns.graph != radix_layer_graph do
+    #         Logger.debug "#{__MODULE__} Layer_ #{inspect scene.assigns.id} changed, re-drawing the RootScene..."
+            
+    #         new_scene = scene
+    #         |> assign(graph: radix_layer_graph)
+    #         |> push_graph(radix_layer_graph)
+    
+    #         {:noreply, new_scene}
+    #     else
+    #         Logger.debug "Layer #{inspect scene.assigns.id}, ignoring.."
+    #         {:noreply, scene}
+    #     end
+    # end
+
+    def handle_info({:radix_state_change, %{editor: %{buffers: buffers}}}, %{assigns: %{buffer_id: this_buf_id}} = scene) do
+        this_buf = buffers |> Enum.find(& &1.id == this_buf_id)
+        if this_buf.graph != scene.assigns.graph do
+            Logger.debug "Buffer `#{inspect this_buf.id}` has changed, updating it."
+            
+            IO.inspect this_buf, label: "THIS BUGF"
+
+            new_scene = scene
+            |> assign(graph: this_buf.graph)
+            |> assign(state: this_buf)
+            |> push_graph(this_buf.graph)
+
+            {:noreply, new_scene}
+        else
+            Logger.debug "Buffer `#{inspect this_buf.id}` not updating, nothing has changed..."
+            {:noreply, scene}
+        end
+    end
+
 end

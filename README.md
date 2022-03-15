@@ -612,7 +612,7 @@ when a user presses a key...
         -> spins up a new `Task` process, executing
           `lookup_action_for_input_async/2` under `InputHandler.TaskSupervisor`
           -> that function will look in the key-mapping module, e.g.
-             `Flamelex.API.KeyMappings.VimClone` if this lookup fails/crashes,
+             `Flamelex.API.KeyMappings.Vim` if this lookup fails/crashes,
              no problem really. If a lookup is successful, then maybe
              actions get fired, functions get called... whatever.
 

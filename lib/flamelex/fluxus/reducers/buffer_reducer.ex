@@ -5,36 +5,94 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do
   
     @app_layer :one
 
-    def process(%{root: %{active_app: :desktop}, editor: %{active_buf: nil, buffers: []}} = radix_state, {:open_buffer, %{data: data}}) do
-        IO.inspect radix_state
-        #TODO we need to add a new buffer here
+    # Open a new buffer, when we have no buffers already open, just by accepting some text
+    def process(%{editor: %{active_buf: nil, buffers: []}} = radix_state, {:open_buffer, %{data: text}}) when is_bitstring(text) do
+        #Logger.debug "opening new buffer..."
 
-        # update layer 2, with new graph, new active app, add buffer data in aswell
-        # Logger.debug "swapping from `#{inspect active_app}` to `:memex` (with history)..."
+        # %Buffer{
+        #             # rego_tag:
+        #             type: Flamelex.Buffer.Text,
+        #             source: {:file, filepath},
+        #             label: filepath,
+        #             mode: :normal,
+        #             open_in_gui?: true, #TODO set active buffer
+        #             callback_list: [self()]
+        #             data: file_contents,    # the raw data
+        #             unsaved_changes?: nil,  # a flag to say if we have unsaved changes
+        #             time_opened #TODO
+        #             cursors: [%{line: 1, col: 1}],
+        #             lines: file_contents |> TextBufferUtils.parse_raw_text_into_lines(),
+        #             gui_data: %{
+        #             component_rego: ,
+        # }
 
-        # new_radix_state = radix_state
-        # |> put_in([:root, :active_app], :memex)
-        # |> put_in([:root, :layers, @app_layer], stashed_memex_graph)
-
-        # {:ok, new_radix_state}
-
-        #FOR each buffer, spin up a new component
+        new_buffer = %{ #TODO buffer struct?
+            id: {:buffer, "untitled"},
+            type: :text,
+            source: nil,
+            label: nil,
+            data: text,
+            mode: {:vim, :normal},
+            unsaved_changes?: false,
+            cursors: [%{line: 1, col: 1}]
+        }
 
         new_editor_graph = Scenic.Graph.build()
         |> Flamelex.GUI.Editor.Layout.add_to_graph(%{
+                #TODO dont pass in menubar_height as a param to Frame :facepalm:
+                buffer_id: new_buffer.id,
                 frame: Frame.new(radix_state.gui.viewport, menubar_height: 60), #TODO get this value from somewhere better
-                font: radix_state.gui.fonts.ibm_plex_mono
-                # state: radix_state.memex
-            }, id: :editor)
+                font: radix_state.fonts.ibm_plex_mono,
+                state: new_buffer
+            }, id: new_buffer.id)
 
         new_radix_state = radix_state
-        |> put_in([:root, :active_app], :editor)
+        |> put_in([:editor, :buffers], [new_buffer |> Map.merge(%{graph: new_editor_graph})])
+        |> put_in([:editor, :active_buf], new_buffer.id)
+        |> put_in([:root, :active_app], :editor) #TODO maybe don't put it all in RadixState, because then changes will be broadcast out everywhere...
         |> put_in([:root, :layers, @app_layer], new_editor_graph)
 
         {:ok, new_radix_state}
     end
 
 
+
+    def process(%{editor: %{buffers: []}} = radix_state, {:modify_buf, _buf_id, _modification} = action) do
+        raise "Received :modify_buf action, but there are no open buffers. Action: #{inspect action}"    
+    end
+
+    def process(%{editor: %{buffers: buffers}} = radix_state, {:modify_buf, buf_id, {:set_mode, m}}) do
+        # buf = buffers |> Enum.find(& &1.id == buf_id)
+        # new_buf = buf |> Map.merge(%{mode: m})
+
+        IO.puts "SETTING MODE #{inspect buf_id} to #{inspect m}"
+    
+        new_buffers = buffers |> Enum.map(fn
+          %{id: ^buf_id} = old_buf ->
+
+            new_editor_graph = Scenic.Graph.build()
+            |> Flamelex.GUI.Editor.Layout.add_to_graph(%{
+                    #TODO dont pass in menubar_height as a param to Frame :facepalm:
+                    buffer_id: old_buf.id,
+                    frame: Frame.new(radix_state.gui.viewport, menubar_height: 60), #TODO get this value from somewhere better
+                    font: radix_state.fonts.ibm_plex_mono,
+                    state: old_buf |> Map.merge(%{mode: m})
+                }, id: old_buf.id)
+
+            old_buf |> Map.merge(%{
+                mode: m,
+                graph: new_editor_graph
+            })
+
+          other_buf ->
+              other_buf
+        end)
+
+        new_radix_state = radix_state
+        |> put_in([:editor, :buffers], new_buffers)
+
+        {:ok, new_radix_state}
+    end
 
 end
 

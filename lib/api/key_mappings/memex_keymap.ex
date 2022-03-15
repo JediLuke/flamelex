@@ -24,7 +24,6 @@ defmodule Flamelex.Keymaps.Memex do
         # move the focus from the title, to the body
         case find_open_tidbit(memex) do
             [%{activate: :body, title: old_title} = tidbit] ->
-                IO.puts "GOT EM"
                 Flamelex.API.Buffer.modify(tidbit, %{activate: :title})
                 :ok
             nil ->
@@ -94,13 +93,13 @@ defmodule Flamelex.Keymaps.Memex do
     # def keymap(%{mode: :memex} = state, {:cursor_button, {:btn_left, 1, [], _coords}} = input) do
     #   {:execute_function, fn -> Flamelex.Fluxus.action({:memex, :new_random}) end}
     # end
-  
+
     # # this is the function which gets called externally
     # def keymap(%{mode: :memex} = state, input) do
     #   # leader_binding_def(state, input)
     #   map(state)[input.input] #TODO YUCKKKKKK
     # end
-  
+
     # #NOTE: Ok, this was an issue (sort-of?)
     # #
     # #      We can't run functions here, or else there will be side-effects
@@ -186,7 +185,6 @@ defmodule Flamelex.Keymaps.Memex do
 
   defp find_open_tidbit(%{story_river: %{open_tidbits: tidbit_list}}) do
       tidbit_list |> Enum.filter(& &1.mode == :edit) 
-      |> IO.inspect(label: "SHORTLIST")
   end
 
 end

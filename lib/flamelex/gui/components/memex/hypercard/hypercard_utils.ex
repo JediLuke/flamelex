@@ -227,11 +227,15 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 				
 				{:flex_grow, %{min_width: tag_width}} = frame.dimensions.width #TODO calculate real width from text width
 
+				#TODO ok this needs to be it's own component, so it can call back & report it's own size
 				graph
-				|> Scenic.Primitives.group( # render a single tag
+				|> Flamelex.GUI.Component.Layoutable.add_to_graph(%{
+					render_fn: fn(graph, %{frame: frame}) ->
+						graph
+						|> Scenic.Primitives.group( # render a single tag
 						fn graph ->
 							graph
-							|> Scenic.Primitives.rounded_rectangle({tag_width, frame.dimensions.height, 8}, fill: :yellow)
+							|> Scenic.Primitives.rounded_rectangle({tag_width, frame.dimensions.height, 10}, fill: :yellow)
 							|> Scenic.Primitives.text(tag,
 								font: :ibm_plex_mono,
 								translate: {10, 15}, # text draws from bottom-left corner??
@@ -239,6 +243,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 								fill: :black)
 						end,
 						translate: frame.pin)
+					end
+				})
 			end
 
 		tags_list(acc ++ [tag_render_fn], rest)
@@ -344,13 +350,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 	end
 
 	defp heading_font do
-		%{ibm_plex_mono: metrics} = Flamelex.Fluxus.RadixStore.get().gui.font_metrics
 		# This is just the font details for the TidBit/HyperCard heading
-		%{
-			name: :ibm_plex_mono,
-			size: 36,
-			metrics: metrics
-		}
+		Flamelex.Fluxus.RadixStore.get().fonts.ibm_plex_mono
+		|> Map.merge(%{size: 36})
 	end
 
 

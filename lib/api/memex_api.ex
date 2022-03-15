@@ -27,6 +27,9 @@ defmodule Flamelex.API.Memex do
     Flamelex.Fluxus.action({:open_tidbit, t})
   end
 
+  #TODO modify an existing TidBit (but that would require us to call)
+  # def modify()
+
   def close do
     Logger.debug "#{__MODULE__} closing the Memex..."
     Flamelex.Fluxus.action(:close_memex)
