@@ -87,7 +87,8 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
       #TODO could also put all these apps under some `apps` key
       menu_bar: %{
         height: 60,
-        menu_map: calc_menu_map(),
+        #NOTE: We pass in a function which will compute the menu_map dynamically, rather than just passing in straight data. This lets us change the contents of the MenuMap based on, how manu buffers are open for example
+        menu_map_fn: &Flamelex.GUI.Component.MenuBar.calc_menu_map/0,
         font: %{name: :ibm_plex_mono, size: 36},
         sub_menu: %{
           height: 40,
@@ -140,34 +141,6 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
     }
   end
 
-  def calc_menu_map do
-    [
-      {"Flamelex",
-          [
-              {"temet nosce", &Flamelex.temet_nosce/0},
-               {"show cmder", &Flamelex.API.Kommander.show/0},
-               {"hide cmder", &Flamelex.API.Kommander.hide/0}
-              #DevTools
-          ]},
-      {"Buffer",
-          [
-              {"new", &Flamelex.API.Buffer.new/0},
-              #  {"list", &Flamelex.API.Buffer.new/0}, #TODO list should be an arrow-out menudown, that lists open buffers
-              {"save", &Flamelex.API.Buffer.save/0},
-              {"close", &Flamelex.API.Buffer.close/0}
-          ]},
-      {"Memex",
-          [
-              {"open", &Flamelex.API.Memex.open/0},
-              {"close", &Flamelex.API.Memex.close/0},
-              # random
-              # journal
-          ]}
-      # {"Help", [
-      # GettingStarted
-      # {"About QuillEx", &Flamelex.API.Misc.makers_mark/0}]},
-    ]
-  end
 
 
 

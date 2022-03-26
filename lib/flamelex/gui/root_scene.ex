@@ -31,15 +31,6 @@ defmodule Flamelex.GUI.RootScene do
     :viewport_exit,
   ]
 
-  #TODO use this snippet to fill he MenuBar with Elixir functions
-  # def get_dropdown_options() do
-  #   :code.all_loaded()
-  #   |> Enum.map( fn {module, _} -> module end )
-  #   |> Enum.filter( fn mod -> String.starts_with?( "#{mod}", "Elixir.ScenicContribGraphingExamples.Scene") end)
-  #   |> Enum.map( fn module ->
-  #     {module.example_name(), module}
-  #   end)
-  # end
 
   @impl Scenic.Scene
   def init(init_scene, _params, opts) do
@@ -50,37 +41,21 @@ defmodule Flamelex.GUI.RootScene do
 
     radix_state = Flamelex.Fluxus.RadixStore.get()
 
-    layer_1_graph = Scenic.Graph.build() # primary_app()
-                    # |> Flamelex.GUI.Renseijin.add_to_graph  
-    layer_2_graph = Scenic.Graph.build()
-                    |> Flamelex.GUI.Component.MenuBar.add_to_graph(%{
-                        viewport: init_scene.viewport,
-                        state: radix_state.menu_bar})
-    layer_3_graph = Scenic.Graph.build()
-                    |> Flamelex.GUI.KommandBuffer.add_to_graph(%{
-                        viewport: init_scene.viewport
-                    })
-    layer_4_graph = Scenic.Graph.build()
-
-    init_graph = Scenic.Graph.build()
-    |> Layer.add_to_graph(%{id: :one, graph: layer_1_graph})
-    |> Layer.add_to_graph(%{id: :two, graph: layer_2_graph})
-    |> Layer.add_to_graph(%{id: :three, graph: layer_3_graph})
-    |> Layer.add_to_graph(%{id: :four, graph: layer_4_graph})
+    graphs = render_all_layers(init_scene, radix_state)
 
     # We update a few details in the RadixStore which are force-refreshed
     # due to this process starting up
     Flamelex.Fluxus.RadixStore.initialize(
-        graph: init_graph,
-        layers: [{:one, layer_1_graph},
-                 {:two, layer_2_graph},
-                 {:three, layer_3_graph},
-                 {:four, layer_4_graph}],
+        graph: graphs.init,
+        layers: [{:one, graphs.layer_1},
+                 {:two, graphs.layer_2},
+                 {:three, graphs.layer_3},
+                 {:four, graphs.layer_4}],
         viewport: init_scene.viewport)
 
     new_scene = init_scene
-    |> assign(graph: init_graph)
-    |> push_graph(init_graph)
+    |> assign(graph: graphs.init)
+    |> push_graph(graphs.init)
 
     # capture_input(scene, [:key])
     # request_input(new_scene, [:viewport, :cursor_button, :cursor_scroll, :key])
@@ -150,6 +125,47 @@ defmodule Flamelex.GUI.RootScene do
     #Logger.debug "#{__MODULE__} recv'd some (non-ignored) input: #{inspect input}"
     Flamelex.Fluxus.input(input)
     {:noreply, scene}
+  end
+
+  def render_all_layers(init_scene, radix_state) do
+    
+    #TODO add a layer 0, to render the Renseijin
+    # |> Flamelex.GUI.Renseijin.add_to_graph  
+
+    #NOTE: Layer 1 is the primary app layer
+    layer_1_graph = Scenic.Graph.build()
+    
+
+    layer_2_graph = Scenic.Graph.build()
+        |> Flamelex.GUI.Component.MenuBar.add_to_graph(%{
+            viewport: init_scene.viewport,
+            state: radix_state.menu_bar
+        })
+
+    layer_3_graph = Scenic.Graph.build()
+        |> Flamelex.GUI.KommandBuffer.add_to_graph(%{
+            viewport: init_scene.viewport
+        })
+
+    layer_4_graph = Scenic.Graph.build()
+
+    init_graph = Scenic.Graph.build()
+    |> Layer.add_to_graph(%{id: :one, graph: layer_1_graph})
+    |> Layer.add_to_graph(%{id: :two, graph: layer_2_graph})
+    |> Layer.add_to_graph(%{id: :three, graph: layer_3_graph})
+    |> Layer.add_to_graph(%{id: :four, graph: layer_4_graph})
+
+    #NOTE: Although `init_graph` is a complete graph containing all the
+    #      layers (and this is the %Graph{} we will render), we need to
+    #      keep the other layer graphs in memory so that we can compare
+    #      and update them with any changes
+    %{
+      init: init_graph,
+      layer_1: layer_1_graph,
+      layer_2: layer_2_graph,
+      layer_3: layer_3_graph,
+      layer_4: layer_4_graph,
+    }
   end
 
   defp set_theme(opts, new_theme), do: Keyword.replace(opts, :theme, new_theme)

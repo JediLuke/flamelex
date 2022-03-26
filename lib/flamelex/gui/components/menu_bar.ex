@@ -2,7 +2,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
     use Scenic.Component
     require Logger
     
-    def validate(%{viewport: %Scenic.ViewPort{} = _vp, state: %{height: _h, menu_map: _m, font: _font}} = data) do
+    def validate(%{viewport: %Scenic.ViewPort{} = _vp, state: %{height: _h, menu_map_fn: _m, font: _font}} = data) do
         {:ok, data}
     end
 
@@ -29,7 +29,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
                 frame: ScenicWidgets.Core.Structs.Frame.new(
                     pin: {0, 0},
                     size: {vp_width, menu_bar.height}),
-                menu_opts: menu_bar.menu_map,
+                menu_opts: menu_bar.menu_map_fn.(),
                 item_width: {:fixed, 180},
                 font: menu_bar.font |> Map.merge(%{metrics: metrics}),
                 sub_menu: menu_bar.sub_menu
@@ -42,4 +42,44 @@ defmodule Flamelex.GUI.Component.MenuBar do
     end
 
 
+      #TODO use this snippet to fill he MenuBar with Elixir functions
+  # def get_dropdown_options() do
+  #   :code.all_loaded()
+  #   |> Enum.map( fn {module, _} -> module end )
+  #   |> Enum.filter( fn mod -> String.starts_with?( "#{mod}", "Elixir.ScenicContribGraphingExamples.Scene") end)
+  #   |> Enum.map( fn module ->
+  #     {module.example_name(), module}
+  #   end)
+  # end
+
+
+    def calc_menu_map do
+        [
+          {"Flamelex",
+              [
+                  {"temet nosce", &Flamelex.temet_nosce/0},
+                   {"show cmder", &Flamelex.API.Kommander.show/0},
+                   {"hide cmder", &Flamelex.API.Kommander.hide/0}
+                  #DevTools
+              ]},
+          {"Buffer",
+              [
+                  {"new", &Flamelex.API.Buffer.new/0},
+                  #  {"list", &Flamelex.API.Buffer.new/0}, #TODO list should be an arrow-out menudown, that lists open buffers
+                  {"save", &Flamelex.API.Buffer.save/0},
+                  {"close", &Flamelex.API.Buffer.close/0}
+              ]},
+          {"Memex",
+              [
+                  {"open", &Flamelex.API.Memex.open/0},
+                  {"close", &Flamelex.API.Memex.close/0},
+                  # random
+                  # journal
+              ]}
+          # {"Help", [
+          # GettingStarted
+          # {"About QuillEx", &Flamelex.API.Misc.makers_mark/0}]},
+        ]
+      end
+    
 end
