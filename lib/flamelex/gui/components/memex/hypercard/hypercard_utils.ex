@@ -8,6 +8,8 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 		margin: 5
 	}
 
+	@heading_1 36 # The font size for top-level headings
+
     def default_mode(%{mode: existing_mode} = state, _default_mode) do
         state
     end
@@ -19,11 +21,9 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
     def render(args) do
         Scenic.Graph.build()
         |> Scenic.Primitives.group(
-                fn graph ->
-                    graph |> render_tidbit(args)
-                end,
-                id: {__MODULE__, args.id},
-                translate: args.frame.pin)
+                fn graph -> graph |> render_tidbit(args) end,
+            id: {__MODULE__, args.id},
+            translate: args.frame.pin)
     end
 
 	#TODO write a blog post about using matches to distinguish the case vs just for convenience (if for convenience, do it inside the function)
@@ -164,7 +164,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 				wrap_opts: {:wrap, :end_of_line},
 				show_line_num?: false
 			},
-			font: heading_font()
+			font: ibm_plex_mono(size: @heading_1)
 		})
 		# |> ScenicWidgets.Simple.Heading.add_to_graph(%{
 		# 	text: tidbit.title,
@@ -273,11 +273,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 					wrap_opts: {:wrap, :end_of_line},
 					show_line_num?: false
 				},
-				font: %{
-					name: heading_font().name,
-					size: 24,
-					metrics: heading_font().metrics
-				}
+				font: ibm_plex_mono(size: 24) #TODO use a better name like #heading_2 or something
 		})
 	end
 
@@ -349,10 +345,15 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Utils do
 		"#{day} #{date.day} #{month} #{date.year}"
 	end
 
-	defp heading_font do
-		# This is just the font details for the TidBit/HyperCard heading
+	# defp heading_font do
+	# 	# This is just the font details for the TidBit/HyperCard heading
+	# 	Flamelex.Fluxus.RadixStore.get().fonts.ibm_plex_mono
+	# 	|> Map.merge(%{size: 36})
+	# end
+
+	defp ibm_plex_mono(size: s) do
 		Flamelex.Fluxus.RadixStore.get().fonts.ibm_plex_mono
-		|> Map.merge(%{size: 36})
+		|> Map.merge(%{size: s})
 	end
 
 

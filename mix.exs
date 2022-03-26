@@ -38,12 +38,12 @@ defmodule Flamelex.MixProject do
       #         also break stuff
 
       #NOTE: These are the public declarations (pulled from github)
-      # {:scenic, "~> 0.11.0-beta.0"},
-      # {:scenic_driver_local, "~> 0.11.0-beta.0"},
+      {:scenic, "~> 0.11.0-beta.0"},
+      {:scenic_driver_local, "~> 0.11.0-beta.0"},
       # {:memelex, git: "https://github.com/JediLuke/memelex"},
       #      These are the imports for local dev
-      {:scenic, path: "../scenic", override: true},
-      {:scenic_driver_local, path: "../scenic_driver_local", override: true},
+      # {:scenic, path: "../scenic", override: true},
+      # {:scenic_driver_local, path: "../scenic_driver_local", override: true},
       {:scenic_widget_contrib, path: "../scenic-widget-contrib", override: true},
       {:memelex, path: "../memelex"},
       # these deps should all be fine
@@ -57,6 +57,7 @@ defmodule Flamelex.MixProject do
       {:gproc, "~> 0.5.0"}, #TODO remove gproc, use Registry
       {:tzdata, "~> 1.0.4"},
       {:event_bus, "~> 1.6.2"},
+      {:struct_access, "~> 1.1.2"},
       {:ex_doc, "~> 0.23", only: :dev, runtime: false},
       {:ice_cream, "~> 0.0.5", only: [:dev, :test]},
       {:stream_data, "~> 0.5", only: :test}
