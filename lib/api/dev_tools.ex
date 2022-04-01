@@ -1,9 +1,15 @@
 defmodule DevTools do
-    require Logger
+    # require Logger
     
-    def widget_workbench do
-        Logger.debug "#{__MODULE__} opening the WidgetWorkbench..."
-        Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.DevTools, :open_widget_workbench})
+    # def widget_workbench do
+    #     Logger.debug "#{__MODULE__} opening the WidgetWorkbench..."
+    #     Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.DevTools, :open_widget_workbench})
+    # end
+
+    def refresh_menubar do
+        radix_state = Flamelex.Fluxus.RadixStore.get()
+        _res = send Flamelex.GUI.Component.MenuBar, {:radix_state_change, radix_state}
+        :ok
     end
 end
 

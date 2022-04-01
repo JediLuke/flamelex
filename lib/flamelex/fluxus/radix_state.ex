@@ -51,6 +51,7 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
   that is populated upon applications startup.  
   """
   def default do
+
     {:ok, ibm_plex_mono_metrics} =
       TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
 
@@ -61,7 +62,8 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
     }
 
     default_fluxus_radix()
-    |> put_in([:fonts], fonts_and_metrics)
+    |> put_in([:fonts], fonts_and_metrics) #TODO deprecate having fonts here
+    |> put_in([:gui, :fonts], fonts_and_metrics)
   end
 
 
@@ -82,17 +84,17 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
       gui: %{
         viewport: nil,
         theme: Flamelex.GUI.Utils.Theme.default(),
+        fonts: %{} #NOTE: These get loaded in during creation
       },
       fonts: %{}, #TODO move this under :gui would probably be nicer...
       #TODO could also put all these apps under some `apps` key
       menu_bar: %{
+        font: :ibm_plex_mono,
         height: 60,
-        #NOTE: We pass in a function which will compute the menu_map dynamically, rather than just passing in straight data. This lets us change the contents of the MenuMap based on, how manu buffers are open for example
-        menu_map_fn: &Flamelex.GUI.Component.MenuBar.calc_menu_map/0,
-        font: %{name: :ibm_plex_mono, size: 36},
+        font_size: 36,
         sub_menu: %{
           height: 40,
-          font: %{name: :ibm_plex_mono, size: 22}
+          font_size: 22
         }
       },
       kommander: %{

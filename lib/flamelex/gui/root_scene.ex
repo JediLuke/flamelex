@@ -135,11 +135,11 @@ defmodule Flamelex.GUI.RootScene do
     #NOTE: Layer 1 is the primary app layer
     layer_1_graph = Scenic.Graph.build()
     
-
     layer_2_graph = Scenic.Graph.build()
         |> Flamelex.GUI.Component.MenuBar.add_to_graph(%{
             viewport: init_scene.viewport,
-            state: radix_state.menu_bar
+            state: radix_state.menu_bar,
+            gui: radix_state.gui
         })
 
     layer_3_graph = Scenic.Graph.build()
