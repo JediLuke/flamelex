@@ -35,8 +35,6 @@ defmodule Flamelex.GUI.Component.MenuBar do
             Map.get(args.gui.fonts, menu_bar.font)
             |> Map.merge(%{size: menu_bar.font_size})
 
-        IO.inspect menubar_font, label: "FFF"
-
         Scenic.Graph.build()
         |> ScenicWidgets.MenuBar.add_to_graph( %{
                 frame: ScenicWidgets.Core.Structs.Frame.new(
@@ -76,15 +74,15 @@ defmodule Flamelex.GUI.Component.MenuBar do
 
     def calc_menu_map(radix_state) do
         [
-          {"Flamelex",
+          {:sub_menu, "Flamelex",
               [
                   {"temet nosce", &Flamelex.temet_nosce/0},
                    {"show cmder", &Flamelex.API.Kommander.show/0},
                    {"hide cmder", &Flamelex.API.Kommander.hide/0}
                   #DevTools
               ]},
-          {"Buffer", buffer_menu(radix_state)},
-          {"Memex",
+          {:sub_menu, "Buffer", buffer_menu(radix_state)},
+          {:sub_menu, "Memex",
               [
                   {"open", &Flamelex.API.Memex.open/0},
                   {"close", &Flamelex.API.Memex.close/0},
