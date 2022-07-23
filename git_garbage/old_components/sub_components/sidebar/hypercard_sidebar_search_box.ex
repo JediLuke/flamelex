@@ -8,7 +8,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
     @background_color :antique_white
 
     def validate(%{frame: %Frame{} = _f} = data) do
-        Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
+        #Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
         {:ok, data}
     end
 
@@ -18,7 +18,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
 
 
     def init(scene, params, opts) do
-        Logger.debug "#{__MODULE__} initializing..."
+        #Logger.debug "#{__MODULE__} initializing..."
         Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
 
         init_scene =
@@ -93,7 +93,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.SearchBox do
     #      for this reason I'm just going to use `:value_changed` event,
     #      but eventually would be better to just have click
     def handle_input({:cursor_button, {:btn_left, 0, [], coords}}, _context, %{assigns: %{mode: :inactive}} = scene) do
-        Logger.debug "#{__MODULE__} recv'd :btn_left"
+        #Logger.debug "#{__MODULE__} recv'd :btn_left"
        bounds = Scenic.Graph.bounds(scene.assigns.graph) 
     #    if Scenic.Scene.global_to_local(scene, coords) |> inside?(bounds) do
        if coords |> inside?(bounds) do

@@ -38,13 +38,13 @@ defmodule Flamelex.GUI.Component.Layer do
 
         {:noreply, new_scene}
     else
-        Logger.debug "Layer #{inspect scene.assigns.id}, ignoring.."
+        #Logger.debug "Layer #{inspect scene.assigns.id}, ignoring.."
         {:noreply, scene}
     end
   end
 
   def handle_info({:radix_state_change, _new_radix_state}, scene) do
-    Logger.debug "#{__MODULE__} ignoring a RadixState change..."
+    #Logger.debug "#{__MODULE__} ignoring a RadixState change..."
     {:noreply, scene}
   end
 

@@ -167,15 +167,18 @@ defmodule Flamelex.API.Buffer do
   #   {:noreply, buf}
   # end
 
+  def close do
+    active_buffer() |> close()
+  end
 
   def close(buf) do
     #TODO this is causing GUI controller & VimServer to also restart??
-    Flamelex.Fluxus.fire_action({:close_buffer, buf})
+    Flamelex.Fluxus.action({BufferReducer, {:close_buffer, buf}})
   end
 
   def close_all! do
     raise "this should work, but is it too dangerous??"
-    list()
-    |> Enum.each(&Flamelex.Fluxus.fire_action({:close_buffer, &1}))
+    list() |> Enum.each(&close(&1))
+    # |> Enum.each(&Flamelex.Fluxus.fire_action({:close_buffer, &1}))
   end
 end

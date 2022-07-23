@@ -6,7 +6,7 @@ defmodule Flamelex.Application do
 
   def start(_type, _args) do
 
-    Logger.debug "#{__MODULE__} initializing..."
+    #Logger.debug "#{__MODULE__} initializing..."
 
     children = [
       #Note: Fluxus has to come before gui cause gui calls RadixStore to get it's init state
@@ -29,7 +29,7 @@ defmodule Flamelex.Application do
   def viewport_config do
     [
       name: :main_viewport,
-      size: @window_size_macbook_pro_2,
+      size: @macbook_pro,
       default_scene: {Flamelex.GUI.RootScene, nil},
       drivers: [
         [

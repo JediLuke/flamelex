@@ -11,10 +11,8 @@ defmodule Flamelex.GUI.Component.MenuBar do
     end
 
     def init(scene, args, opts) do
-
-        radix_state = Flamelex.Fluxus.RadixStore.get()
-        menu_map = calc_menu_map(radix_state)
-        init_graph = render(args |> Map.merge(%{menu_map: menu_map}))
+        menu_map = Flamelex.Fluxus.RadixStore.get() |> calc_menu_map()
+        init_graph = init_render(args |> Map.merge(%{menu_map: menu_map}))
 
         Process.register(self(), __MODULE__)
 
@@ -24,12 +22,12 @@ defmodule Flamelex.GUI.Component.MenuBar do
         |> assign(graph: init_graph)
         |> push_graph(init_graph)
 
-        # Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
+        Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
 
         {:ok, init_scene}
     end
 
-    def render(%{viewport: %{size: {vp_width, _vp_height}}, state: menu_bar, menu_map: _menu_map} = args) do
+    def init_render(%{viewport: %{size: {vp_width, _vp_height}}, state: menu_bar, menu_map: _menu_map} = args) do
 
         menubar_font =
             Map.get(args.gui.fonts, menu_bar.font)
@@ -51,13 +49,13 @@ defmodule Flamelex.GUI.Component.MenuBar do
         # Logger.debug "#{__MODULE__} ignoring a :radix_state_change..."
         #TODO here use cast to children, send new menubar options
         new_menu_map = calc_menu_map(new_radix_state)
-
         if new_menu_map != current_menu_map do
             IO.puts "NEW MENU MAP"
             cast_children(scene, {:put_menu_map, new_menu_map})
+            {:noreply, scene |> assign(menu_map: new_menu_map)}
+        else
+            {:noreply, scene}
         end
-
-        {:noreply, scene}
     end
 
 

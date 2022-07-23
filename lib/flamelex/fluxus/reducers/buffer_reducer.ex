@@ -61,6 +61,21 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do
         raise "Received :modify_buf action, but there are no open buffers. Action: #{inspect action}"    
     end
 
+    def process(%{editor: %{buffers: []}}, {:close_buffer, buffer}) do
+        Logger.warn "Tried closing a buffer `#{inspect buffer}` but none are open."
+        :ignore
+    end
+
+    def process(%{editor: %{buffers: buf_list}} = radix_state, {:close_buffer, buffer}) do
+        new_buf_list = buf_list |> Enum.reject(& &1.id == buffer)
+
+        new_radix_state = radix_state
+        |> put_in([:editor, :buffers], new_buf_list)
+        |> put_in([:editor, :active_buf], nil)
+
+        {:ok, new_radix_state}
+    end
+
     def process(%{editor: %{buffers: buffers}} = radix_state, {:modify_buf, buf_id, {:set_mode, m}}) do
         # buf = buffers |> Enum.find(& &1.id == buf_id)
         # new_buf = buf |> Map.merge(%{mode: m})
@@ -161,9 +176,7 @@ end
 #     #TODO update GUI here
 #   end
 
-#   def async_reduce(%{action: {:close_buffer, buffer}}) do
-#     GenServer.cast(Flamelex.BufferManager, {:close, buffer})
-#   end
+
 
 
 #   # below here are the pattern match functions to handle actions we

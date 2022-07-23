@@ -7,7 +7,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.OpenTidBits do
     @background_color :red
 
     def validate(%{frame: %Frame{} = _f} = data) do
-        Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
+        #Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
         {:ok, data}
     end
 
@@ -17,7 +17,7 @@ defmodule Flamelex.GUI.Component.Memex.HyperCard.Sidebar.OpenTidBits do
 
 
     def init(scene, params, opts) do
-        Logger.debug "#{__MODULE__} initializing..."
+        #Logger.debug "#{__MODULE__} initializing..."
         # Process.register(self(), __MODULE__) #TODO this is something that the old use Component system had - inbuilt process registration
 
         init_scene =

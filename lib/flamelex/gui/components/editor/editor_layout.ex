@@ -4,6 +4,7 @@ defmodule Flamelex.GUI.Editor.Layout do
     require Logger
 
 
+    #TODO the editor layour itself shouldn't need a buffer to render else what happens if we close it??
     def validate(%{buffer_id: {:buffer, _id}, frame: %Frame{} = _fr, font: _fnt, state: _s} = data) do
         Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
         {:ok, data}
@@ -104,6 +105,22 @@ defmodule Flamelex.GUI.Editor.Layout do
     #         {:noreply, scene}
     #     end
     # end
+
+    def handle_info({:radix_state_change, %{editor: %{buffers: []}}}, scene) do
+        #TODO do a better job here lol
+        # new_state = 
+
+        new_graph = Scenic.Graph.build()
+
+        new_scene = scene
+        |> assign(buffer_id: nil)
+        |> assign(graph: new_graph)
+        # |> assign(frame: args.frame)
+        # |> assign(state: args.state)
+        |> push_graph(new_graph)
+
+        {:noreply, new_scene}
+    end
 
     def handle_info({:radix_state_change, %{editor: %{buffers: buffers}}}, %{assigns: %{buffer_id: this_buf_id}} = scene) do
         this_buf = buffers |> Enum.find(& &1.id == this_buf_id)

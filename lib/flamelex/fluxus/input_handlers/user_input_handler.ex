@@ -41,7 +41,7 @@ defmodule Flamelex.Fluxus.UserInputHandler do
             reducer.handle(radix_state, input)
         rescue
             FunctionClauseError ->
-                Logger.warn "input: #{inspect input} not handled."
+                #Logger.warn "input: #{inspect input} not handled."
                 # {:ok, radix_state |> record_input(input)}
                 :ignore
         else

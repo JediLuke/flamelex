@@ -18,7 +18,7 @@ defmodule Flamelex.GUI.VimServer do
   end
 
   def init(init_state) do
-    Logger.debug "#{__MODULE__} initializing..."
+    #Logger.debug "#{__MODULE__} initializing..."
     Process.register(self(), __MODULE__)
     {:ok, init_state}
   end

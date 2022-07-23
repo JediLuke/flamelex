@@ -26,16 +26,16 @@ defmodule Flamelex.Fluxus.ActionListener do
             case Flamelex.Fluxus.RadixReducer.process(radix_state, action) do
                 x when x in [:ignore, :ok] ->
                     EventBus.mark_as_completed({__MODULE__, event_shadow})
-                    Logger.debug "#{__MODULE__} ignoring... #{inspect(%{action: action})}"
+                    #Logger.debug "#{__MODULE__} ignoring... #{inspect(%{action: action})}"
                     #Logger.debug "#{__MODULE__} ignoring... #{inspect(%{radix_state: radix_state, action: action})}"
                     :ignore
                 {:ok, ^radix_state} ->
                     EventBus.mark_as_completed({__MODULE__, event_shadow})
                     #Logger.debug "#{__MODULE__} ignoring (no state-change)... #{inspect(%{radix_state: radix_state, action: action})}"
-                    Logger.debug "#{__MODULE__} ignoring (no state-change)..."
+                    #Logger.debug "#{__MODULE__} ignoring (no state-change)..."
                     :ignore
                 {:ok, new_radix_state} ->
-                    Logger.debug "#{__MODULE__} processed event, state changed..."
+                    #Logger.debug "#{__MODULE__} processed event, state changed..."
                     #Logger.debug "#{__MODULE__} processed event, state changed... #{inspect(%{radix_state: radix_state, action: action})}"
                     Flamelex.Fluxus.RadixStore.broadcast_update(new_radix_state)
                     EventBus.mark_as_completed({__MODULE__, event_shadow})

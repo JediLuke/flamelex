@@ -9,7 +9,7 @@ defmodule Flamelex.Fluxus.Reducers.Desktop do
     #      graph was for the app that came before it. That should happen
     #      when we call "close" or whatever on the DesktOP?? (But I just know, I will end up calling "show desktop" and want to stash the graph...)
     def process(%{desktop: %{graph: nil}} = radix_state, :show_desktop) do
-        Logger.debug "Opening (with no history) the desktop..."
+        #Logger.debug "Opening (with no history) the desktop..."
 
         new_desktop_graph = Scenic.Graph.build()
         |> Scenic.Primitives.group(fn graph ->
