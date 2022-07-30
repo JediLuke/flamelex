@@ -38,7 +38,7 @@ defmodule Flamelex.GUI.Component.MenuBar do
                 frame: ScenicWidgets.Core.Structs.Frame.new(
                     pin: {0, 0},
                     size: {vp_width, menu_bar.height}),
-                menu_opts: args.menu_map,
+                menu_map: args.menu_map,
                 item_width: {:fixed, 180},
                 font: menubar_font,
                 sub_menu: menu_bar.sub_menu
@@ -75,8 +75,28 @@ defmodule Flamelex.GUI.Component.MenuBar do
           {:sub_menu, "Flamelex",
               [
                   {"temet nosce", &Flamelex.temet_nosce/0},
-                   {"show cmder", &Flamelex.API.Kommander.show/0},
-                   {"hide cmder", &Flamelex.API.Kommander.hide/0}
+                  {"show cmder", &Flamelex.API.Kommander.show/0},
+                  {"hide cmder", &Flamelex.API.Kommander.hide/0},
+                  {:sub_menu, "sub menu test", [
+                      {"first item", fn -> IO.puts "clicked: `first item`" end},
+                      {"second item", fn -> IO.puts "clicked: `second item`" end},
+                      {:sub_menu, "sub sub menu", [
+                         {"item [1,4,3,1]", fn -> IO.puts "clicked: `[1,4,3,1]`" end}
+                      ]},
+                      {"fourth item", fn -> IO.puts "clicked: `fourth item`" end},
+                      {:sub_menu, "another sub menu", [
+                            {:sub_menu, "deeply nested", [
+                                {"deeply nested 1", fn -> IO.puts "clicked: `2-3-1`" end},
+                                {:sub_menu, "deepest menu", [
+                                    {"another button", fn -> IO.puts "clicked: `another button`" end},
+                                    {"treasure", fn -> IO.puts "Congratulations! You found the treasure!" end},
+                                ]},
+                                {"deeply nested 2", fn -> IO.puts "Yes" end},
+                                {"deeply nested 3", fn -> IO.puts "Yes" end},
+                            ]}
+                      ]},
+                      {"last item", fn -> IO.puts "clicked: `last`" end}
+                  ]}
                   #DevTools
               ]},
           {:sub_menu, "Buffer", buffer_menu(radix_state)},
@@ -102,7 +122,8 @@ defmodule Flamelex.GUI.Component.MenuBar do
     end
 
     def buffer_menu(%{editor: %{buffers: open_buffers}} = _radix_state) do
-        # build the open-buffers sub-menu & open the nuffer when we click on one
+        # build the open-buffers sub-menu & open the buffer when we click on one
+        #TODO if the buffer is unsaved, put an * at the end of it
         open_bufs_sub_menu = open_buffers
         |> Enum.map(fn %{id: {:buffer, name} = buf_id} ->
                 #NOTE: Wrap this call in it's closure so it's a function of arity /0
