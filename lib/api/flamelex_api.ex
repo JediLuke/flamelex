@@ -1,9 +1,27 @@
 defmodule Flamelex do
   @moduledoc """
   The main interface to the Flamelex application.
-  """
-  use Flamelex.ProjectAliases
 
+  Note that in order to have these functions automatically
+  available in the MenuBar, they need to be in a module called
+  `Flamelex.API` - but this is less desirable for users calling
+  the functions directly in the command line (where I want to
+  be able to say `Flamelex.temet_nosce` rather than the more
+  cumbersome `Flamelex.API.temet_nosce`) - the workaround is to
+  delegate functions here to Flamelex.API
+  """
+
+  #NOTE if I ever figure out some cool way of doing this
+  # automatically, post it back here https://elixirforum.com/t/batch-delegate-functions-to-a-module/25046
+  @api Flamelex.API
+  
+  defdelegate temet_nosce(), to: @api
+
+
+end
+
+defmodule Flamelex.API do
+  use Flamelex.ProjectAliases
 
   @doc """
   `Know Thyself`

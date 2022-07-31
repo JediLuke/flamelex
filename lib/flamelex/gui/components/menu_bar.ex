@@ -1,6 +1,7 @@
 defmodule Flamelex.GUI.Component.MenuBar do
     use Scenic.Component
     require Logger
+    alias Flamelex.GUI.Component.MenuBar.ArityZeroDemo
     
     def validate(%{
             viewport: %Scenic.ViewPort{} = _vp,
@@ -8,6 +9,12 @@ defmodule Flamelex.GUI.Component.MenuBar do
             gui: _gui
         } = data) do
                 {:ok, data}
+    end
+
+    def refresh do
+        radix_state = Flamelex.Fluxus.RadixStore.get()
+        send __MODULE__, {:radix_state_change, radix_state}
+        :ok
     end
 
     def init(scene, args, opts) do
@@ -46,29 +53,15 @@ defmodule Flamelex.GUI.Component.MenuBar do
     end
 
     def handle_info({:radix_state_change, new_radix_state}, %{assigns: %{menu_map: current_menu_map}} = scene) do
-        # Logger.debug "#{__MODULE__} ignoring a :radix_state_change..."
-        #TODO here use cast to children, send new menubar options
         new_menu_map = calc_menu_map(new_radix_state)
         if new_menu_map != current_menu_map do
-            IO.puts "NEW MENU MAP"
+            Logger.debug "refreshing the MenuBar..."
             cast_children(scene, {:put_menu_map, new_menu_map})
             {:noreply, scene |> assign(menu_map: new_menu_map)}
         else
             {:noreply, scene}
         end
     end
-
-
-      #TODO use this snippet to fill he MenuBar with Elixir functions
-  # def get_dropdown_options() do
-  #   :code.all_loaded()
-  #   |> Enum.map( fn {module, _} -> module end )
-  #   |> Enum.filter( fn mod -> String.starts_with?( "#{mod}", "Elixir.ScenicContribGraphingExamples.Scene") end)
-  #   |> Enum.map( fn module ->
-  #     {module.example_name(), module}
-  #   end)
-  # end
-
 
     def calc_menu_map(radix_state) do
         [
@@ -86,17 +79,18 @@ defmodule Flamelex.GUI.Component.MenuBar do
                       {"fourth item", fn -> IO.puts "clicked: `fourth item`" end},
                       {:sub_menu, "another sub menu", [
                             {:sub_menu, "deeply nested", [
-                                {"deeply nested 1", fn -> IO.puts "clicked: `2-3-1`" end},
+                                {"deeply nested 1", fn -> IO.puts "clicked: `deeply nested 1`" end},
                                 {:sub_menu, "deepest menu", [
                                     {"another button", fn -> IO.puts "clicked: `another button`" end},
                                     {"treasure", fn -> IO.puts "Congratulations! You found the treasure!" end},
                                 ]},
-                                {"deeply nested 2", fn -> IO.puts "Yes" end},
-                                {"deeply nested 3", fn -> IO.puts "Yes" end},
+                                {"deeply nested 2", fn -> IO.puts "deeply nested 2" end},
+                                {"deeply nested 3", fn -> IO.puts "deeply nested 3" end},
                             ]}
                       ]},
                       {"last item", fn -> IO.puts "clicked: `last`" end}
-                  ]}
+                  ]},
+                  {:sub_menu, "arity/0 demo", ScenicWidgets.MenuBar.zero_arity_functions(ArityZeroDemo)}
                   #DevTools
               ]},
           {:sub_menu, "Buffer", buffer_menu(radix_state)},
@@ -106,7 +100,8 @@ defmodule Flamelex.GUI.Component.MenuBar do
                   {"close", &Flamelex.API.Memex.close/0},
                   # random
                   # journal
-              ]}
+              ]},
+          {:sub_menu, "API", ScenicWidgets.MenuBar.modules_and_zero_arity_functions("Elixir.Flamelex.API")},
           # {"Help", [
           # GettingStarted
           # {"About QuillEx", &Flamelex.API.Misc.makers_mark/0}]},
@@ -137,5 +132,25 @@ defmodule Flamelex.GUI.Component.MenuBar do
             {"save", &Flamelex.API.Buffer.save/0},
             {"close", &Flamelex.API.Buffer.close/0}
         ] 
+    end
+
+end
+
+defmodule Flamelex.GUI.Component.MenuBar.ArityZeroDemo do
+
+    def custom_fn do
+        IO.puts "You called the custom fn!"
+    end
+
+    def my_fave_fn do
+        IO.puts "This is my favourite function..."
+    end
+
+    # def new_func do
+    #     IO.puts "We made a new func!"
+    # end
+
+    def arity_one(x) do
+        IO.puts "You passed in: #{inspect x}"
     end
 end

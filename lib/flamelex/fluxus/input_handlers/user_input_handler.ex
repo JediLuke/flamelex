@@ -211,7 +211,7 @@ end
 
 #   def lookup_action_for_input_async(%{mode: :memex} = radix_state, user_input) do
 #     #Logger.debug "#{__MODULE__} routing input received in Memex :mode."
-#     Flamelex.API.KeyMappings.Memex.keymap(radix_state, user_input)
+#     Flamelex.KeyMappings.Memex.keymap(radix_state, user_input)
 #     |> handle_lookup(radix_state)
 #   end
 
@@ -221,14 +221,14 @@ end
 #     Logger.debug "Async Process: lookup_action_for_input_async - #{inspect user_input}"
 
 #     #TODO just hard-code it for now, much easier...
-#     Flamelex.API.KeyMappings.Vim.lookup(radix_state, user_input.input) #TODO here user_input still has all this shit in it (user_input.input <vomit>)
+#     Flamelex.KeyMappings.Vim.lookup(radix_state, user_input.input) #TODO here user_input still has all this shit in it (user_input.input <vomit>)
 #     |> handle_lookup(radix_state)
 
 #     # # IO.puts "#{__MODULE__} processing input... #{inspect event}"
 
 #     # #TODO key_mapping should be? a property of RadixState?
 #     # # key_mapping = Application.fetch_env!(:flamelex, :key_mapping)
-#     # key_mapping = Flamelex.API.KeyMappings.Vim #TODO just hard-code it for now, much easier...
+#     # key_mapping = Flamelex.KeyMappings.Vim #TODO just hard-code it for now, much easier...
 
 #     # #TODO this should probably be a lookup inside the module?
 #     # #     or rather, maybe we pass the module into the lookup function?

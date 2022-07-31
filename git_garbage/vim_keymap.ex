@@ -1,11 +1,11 @@
-# defmodule Flamelex.API.KeyMappings.Vim do
+# defmodule Flamelex.KeyMappings.Vim do
 #   @moduledoc """
 #   Implements the Vim keybindings for editing text inside flamelex.
 
 #   https://hea-www.harvard.edu/~fine/Tech/vi.html
 #   """
 #   # use Flamelex.Fluxus.KeyMappingBehaviour
-#   alias Flamelex.API.KeyMappings.Vim.{NormalMode, KommandMode,
+#   alias Flamelex.KeyMappings.Vim.{NormalMode, KommandMode,
 #                                            InsertMode, LeaderBindings}
 #   use Flamelex.ProjectAliases
 #   use ScenicWidgets.ScenicEventsDefinitions

@@ -1,4 +1,4 @@
-defmodule Flamelex.API.KeyMappings.Vim.InsertMode do
+defmodule Flamelex.KeyMappings.Vim.InsertMode do
   alias Flamelex.Fluxus.Structs.RadixState
   use ScenicWidgets.ScenicEventsDefinitions
 

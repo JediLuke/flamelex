@@ -2,7 +2,7 @@ defmodule Flamelex.Keymaps.Editor do
     use ScenicWidgets.ScenicEventsDefinitions
     require Logger
 
-    alias Flamelex.API.KeyMappings.Vim
+    alias Flamelex.KeyMappings.Vim
 
     @valid_inputs @valid_text_input_characters ++ [@escape_key]
     # #NOTE: This Keymap contains the "global", Flamelex-wide keymaps.
