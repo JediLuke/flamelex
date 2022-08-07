@@ -38,7 +38,7 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do
         }
 
         new_editor_graph = Scenic.Graph.build()
-        |> Flamelex.GUI.Editor.Layout.add_to_graph(%{
+        |> Flamelex.GUI.TextFile.Layout.add_to_graph(%{
                 #TODO dont pass in menubar_height as a param to Frame :facepalm:
                 buffer_id: new_buffer.id,
                 frame: Frame.new(radix_state.gui.viewport, menubar_height: 60), #TODO get this value from somewhere better
@@ -86,7 +86,7 @@ defmodule Flamelex.Fluxus.Reducers.Buffer do
           %{id: ^buf_id} = old_buf ->
 
             new_editor_graph = Scenic.Graph.build()
-            |> Flamelex.GUI.Editor.Layout.add_to_graph(%{
+            |> Flamelex.GUI.TextFile.Layout.add_to_graph(%{
                     #TODO dont pass in menubar_height as a param to Frame :facepalm:
                     buffer_id: old_buf.id,
                     frame: Frame.new(radix_state.gui.viewport, menubar_height: 60), #TODO get this value from somewhere better

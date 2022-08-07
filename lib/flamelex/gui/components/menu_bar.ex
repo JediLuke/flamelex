@@ -146,9 +146,9 @@ defmodule Flamelex.GUI.Component.MenuBar.ArityZeroDemo do
         IO.puts "This is my favourite function..."
     end
 
-    # def new_func do
-    #     IO.puts "We made a new func!"
-    # end
+    def new_func do
+        IO.puts "We made a new func!"
+    end
 
     def arity_one(x) do
         IO.puts "You passed in: #{inspect x}"

@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Editor.Layout do
+defmodule Flamelex.GUI.TextFile.Layout do
     use Scenic.Component
     use Flamelex.ProjectAliases
     require Logger
@@ -6,7 +6,7 @@ defmodule Flamelex.GUI.Editor.Layout do
 
     #TODO the editor layour itself shouldn't need a buffer to render else what happens if we close it??
     def validate(%{buffer_id: {:buffer, _id}, frame: %Frame{} = _fr, font: _fnt, state: _s} = data) do
-        Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
+        #Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
         {:ok, data}
     end
 
@@ -28,7 +28,7 @@ defmodule Flamelex.GUI.Editor.Layout do
 
         #TODO here need to get all the buffer details, probably from radix_state??
         init_graph = Scenic.Graph.build()
-        |> Scenic.Primitives.rect(args.frame.size, translate: args.frame.pin, fill: :purple)
+        |> Scenic.Primitives.rect(args.frame.size, translate: args.frame.pin, fill: :purple) #TODO remove this one I know I am lining up buffers correctly
         |> ScenicWidgets.TextPad.add_to_graph(%{
             id: args.buffer_id,
             #TODO args.frame?

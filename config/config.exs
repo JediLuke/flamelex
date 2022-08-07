@@ -8,7 +8,7 @@ config :scenic,
   :assets, module: Flamelex.Assets
 
 config :flamelex,
-  :key_mapping, Flamelex.API.KeyMappings.VimClone
+  :key_mapping, Flamelex.KeyMappings.VimClone
 
 config :memelex,
   active?: false,

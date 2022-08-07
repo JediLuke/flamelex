@@ -12,6 +12,7 @@ defmodule Flamelex.API.Buffer do
   """
   def list do
     Flamelex.Fluxus.RadixStore.get().editor.buffers
+    |> Enum.map(&Map.delete(&1, :graph)) # remove the Scenic.Graph simply because we almost definitely don't ever need it via this API module and it takes up a lot of space in the console...
   end
 
   def new do

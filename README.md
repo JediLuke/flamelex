@@ -22,6 +22,19 @@ with built-in TiddlyWiki"
 
 ## Installing Flamelex
 
+### Install Scenic dependencies
+
+The GUI in Flamelex is built with Scenic. Scenic requires gfx drivers.
+The most up to date information on how to install Scenic for your platform
+can be found in the [Scenic documentation](https://hexdocs.pm/scenic/install_dependencies.html)
+
+As of June 2022, for MacOS the easiest way is to use HomeBrew:
+
+```
+brew update
+brew install glfw3 glew pkg-config
+```
+
 ### clone the repo & install dependencies
 
 Simply navigate to a directory you would like to put a new git project.
@@ -32,13 +45,6 @@ cd flamelex
 mix deps.get
 iex -S mix run
 ```
-
-### Install Scenic dependencies
-
-The GUI in Flamelex is built with Scenic. Scenic requires gfx drivers.
-The most up to date information on how to install Scenic for your platform
-can be found in the [Scenic documentation](https://hexdocs.pm/scenic/install_dependencies.html)
-
 
 ### Adjusting the window size
 
@@ -366,7 +372,7 @@ of how keymappings are achieved.
 example:
 
 
-### The Flamelex MenuBar #TODO
+### The Flamelex MenuBar
 
 The MenuBar is currently not functional, but the idea in the future is to
 link buttons in the MenuBar directly to modules/functions inside flamelex,
@@ -406,6 +412,34 @@ up at FluxusRadix. We don't just directly affect Flamelex, we instead
 use the mechanism of firing actions, which correctly processes the input
 and propagates it through the internal messaging infrastructure of Flamelex.
 
+## A short note on 'modes'
+  
+There are several famous & intelligent engineers who are strongly opposed
+to the concept of modes - and I respect their opinion; it is not without
+merit. Modes are complicated and unintuitive to the user. They require
+training and practice to use effectively - when that is achieved though,
+it has been my experience in using vim at least, that a very satisfying,
+intuitive (or perhaps just, performed in the "back of my mind", not the
+same part that likes to think about what I'm programming), efficient &
+economical form of Human-Computer interaction. So yeah, I think if people
+want to maximize their bandwidth when interacting with computers, I think
+it's worth learning a modal editor.
+
+In a future life, when we're all Start Fleet officers, we can continue
+the discussion, about whether or not modes would be a good/bad idea in
+LCARS.
+
+In Flamelex, I treat modes as a strictly user-input side concern. The
+mode changes what happens when you press the buttons. It changes how
+some things are rendered. However, nothing "internal" to Flamelex ever
+changes. There is no concept of a mode in the `Buffer` API, for example.
+Changing the mode, doesn't affect the result of any of those underlying
+functions, there is no internal state in that part of the application
+which understands modes.
+
+Right now, modes are global. Insert mode will put the active Buffer, into
+insert mode. It might be prudent at some point to scope modes to active
+(or not?) Buffers/Windows.
 
 ## the Flamelex API
 
@@ -612,7 +646,7 @@ when a user presses a key...
         -> spins up a new `Task` process, executing
           `lookup_action_for_input_async/2` under `InputHandler.TaskSupervisor`
           -> that function will look in the key-mapping module, e.g.
-             `Flamelex.API.KeyMappings.Vim` if this lookup fails/crashes,
+             `Flamelex.KeyMappings.Vim` if this lookup fails/crashes,
              no problem really. If a lookup is successful, then maybe
              actions get fired, functions get called... whatever.
 
