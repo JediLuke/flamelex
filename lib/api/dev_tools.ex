@@ -12,6 +12,10 @@ defmodule Flamelex.API.DevTools do
       Flamelex.FluxusRadix
       |> GenServer.cast({:action, {:switch_mode, m}})
     end
+
+    def refresh_menubar do
+        Flamelex.GUI.Component.MenuBar.refresh()
+    end
 end
 
 defmodule Flamelex.API.DevTools.SubMenuTestOne do
