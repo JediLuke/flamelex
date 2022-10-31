@@ -80,9 +80,6 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
          kommander: %{
             hidden?: true
          },
-         desktop: %{
-            graph: nil,
-         },
          memex: %{
             graph: nil, # Store the %Graph{} here if we need to (for switching between apps easily)
             active?: Application.get_env(:memelex, :active?), # If the Memex is disabled at the app config level, we need to ignore a lot of actions

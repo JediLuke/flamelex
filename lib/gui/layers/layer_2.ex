@@ -21,6 +21,10 @@ defmodule Flamelex.GUI.Layers.LayerTwo do
       )
    end
 
+   def state(radix_state) do
+      calc_menu_map(radix_state)
+   end
+
    def calc_menu_map(radix_state) do
       [
          {:sub_menu, "Flamelex",

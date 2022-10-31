@@ -51,7 +51,7 @@ defmodule Flamelex.GUI.RootScene do
       radix_state = Flamelex.Fluxus.RadixStore.get()
 
       # NOTE `graphcake` contains the graphs of all the Layers, & the combined Graph
-      {:ok, graphcake} = render_layers(init_scene, radix_state)
+      {:ok, graphcake} = render_layers(radix_state)
 
       # We update a few details in the RadixStore which are
       # force-refreshed due to this process starting up
@@ -128,10 +128,8 @@ defmodule Flamelex.GUI.RootScene do
 
 
 
-   def render_layers(init_scene, radix_state) do
+   def render_layers(radix_state) do
          
-      layer_args = %{scene: init_scene, radix_state: radix_state}
-
       layer_1_graph = Flamelex.GUI.Layers.LayerOne.render(radix_state)
       layer_2_graph = Flamelex.GUI.Layers.LayerTwo.render(radix_state)
       layer_3_graph = Flamelex.GUI.Layers.LayerThree.render(radix_state)
@@ -147,6 +145,8 @@ defmodule Flamelex.GUI.RootScene do
          }, id: :one)
          |> Layer.add_to_graph(%{
             graph: layer_2_graph,
+            state: Flamelex.GUI.Layers.LayerTwo.state(radix_state),
+            calc_state_fn: &Flamelex.GUI.Layers.LayerTwo.state/1,
             render_fn: &Flamelex.GUI.Layers.LayerTwo.render/1
          }, id: :two)
          |> Layer.add_to_graph(%{

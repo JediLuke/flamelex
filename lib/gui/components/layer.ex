@@ -8,16 +8,38 @@ defmodule Flamelex.GUI.Component.Layer do
       {:ok, data}
    end
 
+   #TODO handle the state & calc_state_fn not being mandatory args...
+
    def init(scene, args, opts) do
       init_scene = scene
       |> assign(id: opts[:id] || raise "invalid ID")
       |> assign(render_fn: args.render_fn)
+      |> assign(calc_state_fn: args[:calc_state_fn] || nil)
       |> assign(graph: args.graph)
+      |> assign(state: args[:state] || nil)
       |> push_graph(args.graph)
 
       Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
 
       {:ok, init_scene}
+   end
+
+   def handle_info({:radix_state_change, new_radix_state}, %{assigns: %{state: old_state, calc_state_fn: calc_state_fn}} = scene)
+      when not is_nil(old_state) and is_function(calc_state_fn) do
+         if old_state != calc_state_fn.(new_radix_state) do
+
+            new_graph =
+               scene.assigns.render_fn.(new_radix_state)
+
+            new_scene =
+               scene
+               |> assign(graph: new_graph)
+               |> push_graph(new_graph)
+   
+            {:noreply, new_scene}
+         else
+            {:noreply, scene}
+         end
    end
 
    # def handle_info({:radix_state_change, %{root: %{layers: layer_list}}}, scene) do

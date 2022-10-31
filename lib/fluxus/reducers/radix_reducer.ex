@@ -44,7 +44,6 @@ defmodule Flamelex.Fluxus.RadixReducer do
 
 
   """
-  require Logger
 
 
   def process(radix_state, {reducer, action}) when is_atom(reducer) do
@@ -52,35 +51,8 @@ defmodule Flamelex.Fluxus.RadixReducer do
       reducer.process(radix_state, action)
     # rescue
     #   e in FunctionClauseError ->
-    #     IO.inspect action, label: "action"
-    #     IO.inspect e
     #     reraise e, __STACKTRACE__
+    #     {:error, "No Reducer/action match found. %{reducer: #{inspect reducer}, action: #{inspect action}}"}
     # end
   end
-
-
-
-
-
-  @memex_actions [
-    :open_memex, :close_memex
-  ]
-
-  def process(%{memex: %{active?: false}}, action) when action in @memex_actions do
-    Logger.warn "#{__MODULE__} ignoring a memex action, because the memex is set to `inactive`"
-    :ignore
-  end
-
-  def process(%{memex: %{active?: true}} = radix_state, action) when action in @memex_actions do
-    Flamelex.Fluxus.Reducers.Memex.process(radix_state, action)
-  end
-
-
-
-
-
-  def process(radix_state, action) do
-    {:error, "RootReducer bottomed-out! No match was found."}
-  end
-
 end

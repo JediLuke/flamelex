@@ -16,6 +16,10 @@ defmodule Flamelex.API.DevTools do
     def refresh_menubar do
         Flamelex.GUI.Component.MenuBar.refresh()
     end
+
+    def get_radix_state do
+        Flamelex.Fluxus.RadixStore.get()
+    end
 end
 
 defmodule Flamelex.API.DevTools.SubMenuTestOne do

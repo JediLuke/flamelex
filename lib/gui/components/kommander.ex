@@ -3,33 +3,48 @@ defmodule Flamelex.GUI.Component.Kommander do
    alias ScenicWidgets.Core.Structs.Frame
    require Logger
 
-   
 
-   def validate(%{frame: %Frame{} = _f} = data) do
+   def validate(%{frame: %Frame{} = _f, radix_state: _radix_state} = data) do
       #Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
       {:ok, data}
    end
 
    def init(scene, args, opts) do
 
-      init_state = %{
-         hidden?: true
-      }
+      init_state = args.radix_state.kommander
 
       init_graph =
          render(args.frame, init_state)
 
       init_scene = scene
-      |> assign(state: init_state)
-      |> assign(frame: args.frame)
-      |> assign(graph: init_graph)
-      |> push_graph(init_graph)
+         |> assign(state: init_state)
+         |> assign(frame: args.frame)
+         |> assign(graph: init_graph)
+         |> push_graph(init_graph)
 
       Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
 
       {:ok, init_scene}
    end
 
+   def handle_info({:radix_state_change, %{kommander: %{hidden?: hidden?}}}, %{assigns: %{state: %{hidden?: hidden?}}} = scene) do
+      # if we match here, hidden status hasn't changed
+      IO.puts "NO CHANGE IN HIDENNESS"
+      {:noreply, scene}
+   end
+
+   def handle_info({:radix_state_change, %{kommander: %{hidden?: hidden?}}}, scene) do
+      new_graph =
+         scene.assigns.graph
+         |> Scenic.Graph.modify(:kommander, &Scenic.Primitives.update_opts(&1, hidden: hidden?))
+
+      new_scene = scene
+         |> assign(state: %{hidden?: hidden?})
+         |> assign(graph: new_graph)
+         |> push_graph(new_graph)
+
+      {:noreply, new_scene}
+   end
 
    def render(frame, state) do
       Scenic.Graph.build()

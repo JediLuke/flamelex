@@ -1,6 +1,7 @@
 defmodule Flamelex.GUI.Layers.LayerThree do
    alias ScenicWidgets.Core.Structs.Frame
 
+
    @kommander_height 50 #TODO
 
 
@@ -12,7 +13,8 @@ defmodule Flamelex.GUI.Layers.LayerThree do
 
       Scenic.Graph.build()
       |> Flamelex.GUI.Component.Kommander.add_to_graph(%{
-          frame: kommander_frame
+          frame: kommander_frame,
+          radix_state: radix_state
       })
    end
 
