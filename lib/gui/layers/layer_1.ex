@@ -3,6 +3,9 @@ defmodule Flamelex.GUI.Layers.LayerOne do
 
    def render(%{root: %{active_app: :desktop}}) do
       #NOTE: Layer 1 is the primary app layer
+      
+      # Flamelex.GUI.Renseijin
+
       Scenic.Graph.build()
    end
 

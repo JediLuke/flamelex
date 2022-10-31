@@ -57,10 +57,12 @@ defmodule Flamelex.GUI.RootScene do
       # force-refreshed due to this process starting up
       Flamelex.Fluxus.RadixStore.put_root_graph(
          graph: graphcake.full,
-         layers: [ {:one, graphcake.layer_1},
-                   {:two, graphcake.layer_2},
-                   {:three, graphcake.layer_3},
-                   {:four, graphcake.layer_4} ]
+         layers: [
+            {:one, graphcake.layer_1},
+            {:two, graphcake.layer_2},
+            {:three, graphcake.layer_3},
+            {:four, graphcake.layer_4}
+         ]
       )
 
       new_scene = init_scene
@@ -72,9 +74,9 @@ defmodule Flamelex.GUI.RootScene do
       {:ok, new_scene}
    end
 
-   def handle_call(:get_viewport, _from, scene) do
-      {:reply, {:ok, scene.viewport}, scene}
-   end
+   # def handle_call(:get_viewport, _from, scene) do
+   #    {:reply, {:ok, scene.viewport}, scene}
+   # end
 
   def handle_input({:viewport, {:reshape, {new_width, new_height} = new_dimensions}}, context, scene) do # e.g. of new_dimensions: {1025, 818}
       Logger.debug "#{__MODULE__} received :viewport :reshape, dim: #{inspect new_dimensions}"
@@ -91,8 +93,7 @@ defmodule Flamelex.GUI.RootScene do
       # |> render_push_graph()
 
       {:noreply, scene}
-  end
-
+   end
 
    def handle_input({event, _details}, _context, scene)
       when event in @ignorable_input_events do
@@ -125,14 +126,16 @@ defmodule Flamelex.GUI.RootScene do
       {:noreply, scene}
    end
 
+
+
    def render_layers(init_scene, radix_state) do
          
       layer_args = %{scene: init_scene, radix_state: radix_state}
 
       layer_1_graph = Flamelex.GUI.Layers.LayerOne.render(radix_state)
       layer_2_graph = Flamelex.GUI.Layers.LayerTwo.render(radix_state)
-      layer_3_graph = render_layer(3, layer_args)
-      layer_4_graph = render_layer(4, layer_args)
+      layer_3_graph = Flamelex.GUI.Layers.LayerThree.render(radix_state)
+      layer_4_graph = Scenic.Graph.build()
 
       #TODO add a layer 0, to render the Renseijin
       #NOTE: The ids of these layers needs to mtch the keys in the RadiXState.root.layer_list
@@ -146,8 +149,10 @@ defmodule Flamelex.GUI.RootScene do
             graph: layer_2_graph,
             render_fn: &Flamelex.GUI.Layers.LayerTwo.render/1
          }, id: :two)
-      # |> Layer.add_to_graph(%{graph: layer_3_graph}, id: :three)
-      # |> Layer.add_to_graph(%{graph: layer_4_graph}, id: :four)
+         |> Layer.add_to_graph(%{
+            graph: layer_3_graph,
+            render_fn: &Flamelex.GUI.Layers.LayerThree.render/1
+         }, id: :three)
 
       #NOTE: Although `full_graph` is a complete graph containing all the
       #      layers (and this is the %Graph{} we will render), we need to
@@ -164,19 +169,5 @@ defmodule Flamelex.GUI.RootScene do
 
       {:ok, graph_layercake}
    end
-
-   def render_layer(3, %{scene: scene}) do
-      Scenic.Graph.build()
-      # |> Flamelex.GUI.KommandBuffer.add_to_graph(%{
-      #     viewport: scene.viewport
-      # })
-   end
-
-   def render_layer(4, _args) do
-      Scenic.Graph.build()
-   end
-
-
-  
 
 end

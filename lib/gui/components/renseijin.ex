@@ -13,7 +13,7 @@ defmodule Flamelex.GUI.Renseijin do
 
     GenServer.cast(pid, :transmotion_begin)
 
-    Logger.info "~~ Double, double toil and trouble; Fire burn and caldron bubble ~~"
+    Logger.info "~~ Double, double toil and trouble; Fire burn and cauldron bubble ~~"
   end
 end
 
