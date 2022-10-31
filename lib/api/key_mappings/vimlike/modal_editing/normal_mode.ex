@@ -12,7 +12,6 @@ defmodule Flamelex.KeyMappings.Vim.NormalMode do
 
   def handle(%{root: %{active_app: :editor}, editor: %{active_buf: active_buf}} = state, @lowercase_i) do
     Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :insert}})
-    :ok
   end
 
   # def keymap(%{mode: :normal} = state, input) do

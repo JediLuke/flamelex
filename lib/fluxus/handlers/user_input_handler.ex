@@ -24,6 +24,7 @@ defmodule Flamelex.Fluxus.UserInputHandler do
     end
 
     def handle(%{root: %{active_app: :editor}} = radix_state, input) do
+        Logger.debug "Accepted input: #{inspect input} -- active_app: :editor"
         Keymaps.Editor |> handle_with_rescue(radix_state, input)
     end
 
@@ -41,7 +42,7 @@ defmodule Flamelex.Fluxus.UserInputHandler do
             reducer.handle(radix_state, input)
         rescue
             FunctionClauseError ->
-                #Logger.warn "input: #{inspect input} not handled."
+                Logger.warn "input: #{inspect input} not handled by Reducer `#{inspect reducer}`"
                 # {:ok, radix_state |> record_input(input)}
                 :ignore
         else

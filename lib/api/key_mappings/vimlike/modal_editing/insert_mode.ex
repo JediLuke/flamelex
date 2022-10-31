@@ -3,12 +3,18 @@ defmodule Flamelex.KeyMappings.Vim.InsertMode do
   use ScenicWidgets.ScenicEventsDefinitions
 
 
-
-  def handle(%{root: %{active_app: :editor}, editor: %{active_buf: active_buf}} = state, @escape_key) do
-    IO.puts "OK WE GOT ESCAPE AT LEAST"
-    Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :normal}})
-    :ok
+  def handle(%{root: %{active_app: :editor}} = state, input) do
+    do_handle(state, input)
   end
+
+  def do_handle(%{editor: %{active_buf: active_buf}} = state, @escape_key) do
+    Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :normal}})
+  end
+
+  def do_handle(%{editor: %{active_buf: active_buf}} = state, @lowercase_l) do
+    Flamelex.API.Buffer.modify(active_buf, {:insert, "hello", :at_cursor})
+  end
+
 
   # # this is the function which gets called externally
   # def keymap(%{mode: :insert, active_buffer: b} = state, input) when not is_nil(b) do

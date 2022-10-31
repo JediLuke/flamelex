@@ -25,9 +25,10 @@ defmodule Flamelex.Fluxus.RadixStore do
   use Agent
   require Logger
 
+  #TODO make this a GenServer & do all edits in the context of the GenServer
 
   def start_link(_params) do
-    radix_state = Flamelex.Fluxus.Structs.RadixState.default()
+    radix_state = Flamelex.Fluxus.Structs.RadixState.initialize()
     Agent.start_link(fn -> radix_state end, name: __MODULE__)
   end
 
@@ -42,19 +43,20 @@ defmodule Flamelex.Fluxus.RadixStore do
     Agent.update(__MODULE__, fn _old -> new_state end)
   end
 
+  def put_viewport(%Scenic.ViewPort{} = new_vp) do
+    Agent.update(__MODULE__, fn radix_state ->
+      radix_state |> put_in([:gui, :viewport], new_vp)
+    end)
+  end
+
   #NOTE: When `Flamelex.GUI.RootScene` boots, it calls this function
   #      to reset the values of `graph` and `viewport`. We don't want to
   #      broadcast these changes out.
-  def initialize(graph: new_graph, layers: layers, viewport: new_viewport) do
-    Agent.update(__MODULE__, fn old ->
-
-      new_root = old.root
-                 |> Map.put(:graph, new_graph)
-                 |> Map.put(:layers, layers)
-      new_gui  = old.gui
-                 |> Map.put(:viewport, new_viewport)
-      
-      old |> Map.merge(%{root: new_root, gui: new_gui})
+  def put_root_graph(graph: new_graph, layers: new_layers) do
+    Agent.update(__MODULE__, fn radix_state ->
+      radix_state
+      |> put_in([:root, :graph], new_graph)
+      |> put_in([:root, :layers], new_layers)
     end)
   end
 
