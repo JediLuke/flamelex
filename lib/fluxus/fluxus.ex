@@ -1,27 +1,52 @@
 defmodule Flamelex.Fluxus do
-  @moduledoc """
-  Flamelex.Fluxus implements the `flux` architecture pattern, of React.js
-  fame, in Elixir/Scenic. This module provides the interface to that
-  functionality.
+   @moduledoc """
+   Flamelex.Fluxus implements the `flux` architecture pattern, of React.js
+   fame, in Elixir/Scenic. This module provides the interface to that
+   functionality.
 
-  ### background
+   ### background
 
-  https://css-tricks.com/understanding-how-reducers-are-used-in-redux/
+   https://css-tricks.com/understanding-how-reducers-are-used-in-redux/
 
-  ### prior art
+   ### prior art
 
-  https://medium.com/grandcentrix/state-management-with-phoenix-liveview-and-liveex-f53f8f1ec4d7
-  """
-  require Logger
+   https://medium.com/grandcentrix/state-management-with-phoenix-liveview-and-liveex-f53f8f1ec4d7
+   """
+   require Logger
   
-  # called to fire off an action
-  def action(a) do
-    EventBus.notify(%EventBus.Model.Event{
-      id: UUID.uuid4(),
-      topic: :general,
-      data: {:action, a}
-    })
-  end
+   # called to fire off an action
+   def action(a) do
+      EventBus.notify(%EventBus.Model.Event{
+         id: UUID.uuid4(),
+         topic: :general,
+         data: {:action, a}
+      })
+   end
+
+   # declaring means we get the results back - this function also
+   # filters those results to just the ones from ActionListener
+   def declare(a) do
+      with {:ok, results} <- do_declare(a) do
+         [final_radix_state] =
+            Enum.reduce(results, [], fn
+               {Flamelex.Fluxus.ActionListener, {:ok, new_radix_state}}, acc ->
+                  acc ++ [new_radix_state]
+               {Flamelex.Fluxus.InputListener, _res}, acc ->
+               acc
+            end)
+
+         final_radix_state
+      end
+   end
+
+
+   def do_declare(a) do
+      {:ok, EventBus.declare(%EventBus.Model.Event{
+         id: UUID.uuid4(),
+         topic: :general,
+         data: {:action, a}
+      })}
+   end
 
   # called to register user-input with the Fluxus system - Scenic MUST
   # forward input to Fluxus if it wants to be processed that way (input
@@ -43,8 +68,9 @@ defmodule Flamelex.Fluxus do
   The effect of most user input will be either to ignore it, or to dispatch
   an action - this is achieved by sending a new msg to the FluxusRadix, which
   will in turn be handled by spinning up a new Task process to handle it.
-  """
-  def input(ii) do
+
+
+
 
 
 
@@ -91,10 +117,15 @@ defmodule Flamelex.Fluxus do
 
   # # handle all other (not-ignored) input...
   # def handle_event(input, _context, scene) do
-  #   IO.puts "SOME NON IGNORED INPUT #{inspect input}"
+  #   IO.puts "SOME NON IGNORED INPUT 
   #   # Flamelex.Fluxus.handle_user_input(input)
   #   {:noreply, scene}
   # end
+
+
+
+  """
+  def input(ii) do
     EventBus.notify(%EventBus.Model.Event{
       id: UUID.uuid4(),
       topic: :general,

@@ -3,12 +3,9 @@ defmodule Flamelex.Test.Buffers.BufferTest do
 
   alias Flamelex.API.Buffer
 
-
   @content_a "“This is why alchemy exists,\" the boy said. \"So that everyone will search for his treasure, find it, and then want to be better than he was in his former life. Lead will play its role until the world has no further need for lead; and then lead will have to turn itself into gold... "
   @content_b "That's what alchemists do. They show that, when we strive to become better than we are, everything around us becomes better, too.” ― Paulo Coelho, The Alchemist"
   #TODO add a Random quote
-
-
 
   setup_all do
     test_file = File.cwd! <> "/test/sample_data/quotes.txt"
@@ -20,7 +17,6 @@ defmodule Flamelex.Test.Buffers.BufferTest do
     File.close file
 
     %{test_file: test_file}
-
   end
 
 
@@ -44,26 +40,22 @@ defmodule Flamelex.Test.Buffers.BufferTest do
 
     contents_after_modify = Buffer.read b # read it again to get the update...
 
-    :timer.sleep(:timer.seconds(1)) #TODO remove, for now just trying this...
-
     assert contents_after_modify ==
              @content_a <> "Luke is the best! " <> @content_b
 
-    Buffer.save b
+    # Buffer.save b
 
     assert Flamelex.BufferManager.count_open_buffers == 1
-
     # Buffer.modify(Buffer.active_buffer(), {:insert, MemexWrap.random_quote().text, {:cursor, 1}})
-
     Buffer.close b
+    assert Flamelex.BufferManager.count_open_buffers == 0
 
     assert File.read!(test_file) != original_file_data # check the contents on disk have been modified
 
-    assert Flamelex.BufferManager.count_open_buffers == 0
     assert Buffer.list == []
-    assert Flamelex.Buffer.Supervisor
-           |> DynamicSupervisor.count_children() == %{
-                active: 0, specs: 0, supervisors: 0, workers: 0}
+    # assert Flamelex.Buffer.Supervisor
+    #        |> DynamicSupervisor.count_children() == %{
+    #             active: 0, specs: 0, supervisors: 0, workers: 0}
 
   end
 end
