@@ -1,5 +1,6 @@
 defmodule Flamelex.GUI.Utils.Draw do
-  use Flamelex.{ProjectAliases, CustomGuards}
+  use Flamelex.ProjectAliases
+  use ScenicWidgets.Core.Utils.CustomGuards
   alias Flamelex.GUI.Component.MenuBar
   require Logger
 
