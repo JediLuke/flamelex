@@ -2,6 +2,9 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
     @moduledoc false
     use Flamelex.ProjectAliases
 
+   defdelegate change_font(radix_state, new_font), to: QuillEx.Fluxus.Structs.RadixState
+   defdelegate change_font_size(radix_state, direction), to: QuillEx.Fluxus.Structs.RadixState
+   defdelegate change_editor_scroll_state(radix_state, new_scroll_state), to: QuillEx.Fluxus.Structs.RadixState
 
     @max_keystroke_history_limit 50
     @max_action_history_limit 50
@@ -41,13 +44,13 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
             active_app: :desktop,
             # active_app: :renseijin,
             graph: nil, # This holds the layers construct
-            layers: [ # The final %Graph{} which we are holding on to for, for each layer
-               #NOTE: We use a Keyword list, as it works better for pattern matching than maps with keys
-               one: nil,
-               two: nil,
-               three: nil,
-               four: nil
-            ]
+            # layers: [ # The final %Graph{} which we are holding on to for, for each layer
+            #    #NOTE: We use a Keyword list, as it works better for pattern matching than maps with keys
+            #    one: nil,
+            #    two: nil,
+            #    three: nil,
+            #    four: nil
+            # ]
          },
          gui: %{
             viewport: nil,
@@ -111,10 +114,6 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
          }
       }
    end
-
-
-
-
 
 
 

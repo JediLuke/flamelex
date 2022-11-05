@@ -44,15 +44,18 @@ defmodule Flamelex.Fluxus.RadixReducer do
 
 
   """
+  require Logger
 
 
   def process(radix_state, {reducer, action}) when is_atom(reducer) do
-    # try do
+    try do
       reducer.process(radix_state, action)
-    # rescue
-    #   e in FunctionClauseError ->
-    #     reraise e, __STACKTRACE__
-    #     {:error, "No Reducer/action match found. %{reducer: #{inspect reducer}, action: #{inspect action}}"}
-    # end
+    rescue
+      e in FunctionClauseError ->
+        # reraise e, __STACKTRACE__
+        msg = "No Reducer/action match found. %{reducer: #{inspect reducer}, action: #{inspect action}}"
+        # Logger.error msg
+        {:error, msg}
+    end
   end
 end

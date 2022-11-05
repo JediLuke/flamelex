@@ -1,3 +1,19 @@
+defmodule Flamelex.Fluxus.Reducers.Memex do
+   @moduledoc false
+
+
+   def process(radix_state, action) do
+      # NOTE - basically we get MemEx to do everything for us...
+      MemEx.Reducer.process(radix_state, action)
+   end
+end
+
+
+
+
+
+
+
 # defmodule Flamelex.Fluxus.Reducers.Memex do
 #     @moduledoc false
 #     use Flamelex.ProjectAliases

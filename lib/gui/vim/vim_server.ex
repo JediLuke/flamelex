@@ -89,7 +89,7 @@ defmodule Flamelex.GUI.VimServer do
 
     Flamelex.Fluxus.fire_actions([
       # append a new line to the current line
-      {:modify_buffer, %{
+      {:modify_buf, %{
           buffer: radix_state.active_buffer,
           details: %{
             line: current_cursor_coords.line,

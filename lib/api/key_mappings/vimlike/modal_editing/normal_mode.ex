@@ -1,17 +1,17 @@
 defmodule Flamelex.KeyMappings.Vim.NormalMode do
-  alias Flamelex.Fluxus.Structs.RadixState
   use ScenicWidgets.ScenicEventsDefinitions
+  use Flamelex.Keymaps.Editor.GlobalBindings
   require Logger
 
-  @leader @space_bar
+  # @leader @space_bar
 
   def handle(_state, @leader) do
     Logger.debug " <<-- Leader key pressed -->>"
-    :ignore # this is the Leader key
+    :ok
   end
 
   def handle(%{root: %{active_app: :editor}, editor: %{active_buf: active_buf}} = state, @lowercase_i) do
-    Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :insert}})
+    :ok = Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :insert}})
   end
 
   # def keymap(%{mode: :normal} = state, input) do

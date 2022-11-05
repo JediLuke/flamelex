@@ -4,7 +4,7 @@ defmodule Flamelex.API.Buffer do
    """
    use Flamelex.ProjectAliases
    alias Flamelex.BufferManager
-   alias Flamelex.Fluxus.Reducers.Buffer, as: BufferReducer
+   alias QuillEx.Reducers.BufferReducer # NOTE: We use the QuillEx BufferReducer...
    alias Flamelex.Fluxus.Reducers.Memex, as: MemexReducer
    alias Flamelex.Fluxus.RadixStore
 
@@ -20,7 +20,7 @@ defmodule Flamelex.API.Buffer do
    end
 
    def new(data) when is_bitstring(data) do
-      radix_state = Flamelex.Fluxus.declare({BufferReducer, {:open_buffer, %{data: data}}})
+      radix_state = Flamelex.Fluxus.declare({BufferReducer, {:open_buffer, %{data: data, mode: {:vim, :normal}}}})
       radix_state.editor.active_buf
    end
 
@@ -43,7 +43,9 @@ defmodule Flamelex.API.Buffer do
   @doc """
   Return the active Buffer.
   """
-  def active do
+  def active, do: active_buf()
+
+  def active_buf do
     RadixStore.get().editor.active_buf
   end
 

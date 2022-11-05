@@ -1,18 +1,23 @@
 defmodule Flamelex.Utils.PubSub do
-  @moduledoc """
-  A wrapper of convenience around the internal PubSub functionality
-  of flamelex.
-  """
+  @registrar_proc Flamelex.PubSub
+  @topic :flamelex
 
-  def broadcast([topic: topic, msg: msg]) do
-    :gproc.send({:p, :l, topic}, msg)
+  def subscribe, do: subscribe(topic: @topic)
+
+  def subscribe(topic: t) do
+    {:ok, _} = Registry.register(@registrar_proc, t, [])
+    :ok
   end
 
-  def subscribe([topic: topic]) do
-    :gproc.reg({:p, :l, topic})
+  def broadcast(state_change: chng) do
+    Registry.dispatch(@registrar_proc, @topic, fn entries ->
+      for {pid, _} <- entries, do: send(pid, {:state_change, chng})
+    end)
   end
 
-  def unsubscribe([topic: _t]) do
-    raise "now this one is a pickle isn't it"
+  def broadcast(topic: topic, msg: msg) do
+    Registry.dispatch(@registrar_proc, topic, fn entries ->
+      for {pid, _} <- entries, do: send(pid, msg)
+    end)
   end
 end

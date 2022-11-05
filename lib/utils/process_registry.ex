@@ -7,6 +7,7 @@ defmodule Flamelex.Utils.ProcessRegistry do
   Register a new PiD in gproc.
   """
   def register(tag) do
+    Logger.warn "ProcessRegistry needs to be DEPRECATED"
     # https://github.com/uwiger/gproc/blob/uw-change-license/doc/gproc.md#reg3
     # :n means `name`  - and having it here enforces PiDs are registered uniquely - unique within the given context (local or global)
     # :l means `local` - so we just register the process on this node
@@ -19,6 +20,7 @@ defmodule Flamelex.Utils.ProcessRegistry do
   Returns an ok/error tuple.
   """
   def lookup(p) when is_pid(p) do
+    Logger.warn "ProcessRegistry needs to be DEPRECATED"
     if Process.alive?(p) do
       {:ok, p}
     else
@@ -52,6 +54,7 @@ defmodule Flamelex.Utils.ProcessRegistry do
   to use a :via tuple. see: https://hexdocs.pm/elixir/Registry.html#module-using-in-via
   """
   def via_tuple_name(:gproc, tag) do
+    Logger.warn "ProcessRegistry needs to be DEPRECATED"
     {:via, :gproc, {:n, :l, tag}}
   end
 

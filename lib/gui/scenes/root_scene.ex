@@ -4,7 +4,7 @@ defmodule Flamelex.GUI.RootScene do
    use ScenicWidgets.ScenicEventsDefinitions
    import Scenic.Primitives
    import Scenic.Components
-   alias Flamelex.GUI.Component.Layer
+   # alias Flamelex.GUI.Component.Layer
    require Logger
    alias ScenicWidgets.Core.Structs.Frame
    alias ScenicWidgets.Core.Utils.FlexiFrame
@@ -51,23 +51,24 @@ defmodule Flamelex.GUI.RootScene do
       radix_state = Flamelex.Fluxus.RadixStore.get()
 
       # NOTE `graphcake` contains the graphs of all the Layers, & the combined Graph
-      {:ok, graphcake} = render_layers(radix_state)
+      # {:ok, graphcake} = 
 
       # We update a few details in the RadixStore which are
       # force-refreshed due to this process starting up
-      Flamelex.Fluxus.RadixStore.put_root_graph(
-         graph: graphcake.full,
-         layers: [
-            {:one, graphcake.layer_1},
-            {:two, graphcake.layer_2},
-            {:three, graphcake.layer_3},
-            {:four, graphcake.layer_4}
-         ]
-      )
+      {:ok, root_graph} = render_layers(radix_state)
+
+      Flamelex.Fluxus.RadixStore.put_root_graph(graph: root_graph)
+      #    layers: [
+      #       {:one, graphcake.layer_1},
+      #       {:two, graphcake.layer_2},
+      #       {:three, graphcake.layer_3},
+      #       {:four, graphcake.layer_4}
+      #    ]
+      # )
 
       new_scene = init_scene
-      |> assign(graph: graphcake.full)
-      |> push_graph(graphcake.full)
+      |> assign(graph: root_graph)
+      |> push_graph(root_graph)
 
       request_input(new_scene, [:cursor_button, :cursor_scroll, :key])
 
@@ -130,28 +131,26 @@ defmodule Flamelex.GUI.RootScene do
 
    def render_layers(radix_state) do
          
-      layer_1_graph = Flamelex.GUI.Layers.LayerOne.render(radix_state)
-      layer_2_graph = Flamelex.GUI.Layers.LayerTwo.render(radix_state)
-      layer_3_graph = Flamelex.GUI.Layers.LayerThree.render(radix_state)
-      layer_4_graph = Scenic.Graph.build()
+      # layer_1_graph = Flamelex.GUI.Layers.LayerOne.render(radix_state)
+      # layer_2_graph = Flamelex.GUI.Layers.LayerTwo.render(radix_state)
+      # layer_3_graph = Flamelex.GUI.Layers.LayerThree.render(radix_state)
+      # layer_4_graph = Scenic.Graph.build()
 
       #TODO add a layer 0, to render the Renseijin
       #NOTE: The ids of these layers needs to mtch the keys in the RadiXState.root.layer_list
       full_graph =
          Scenic.Graph.build()
-         |> Layer.add_to_graph(%{
-               graph: layer_1_graph,
-               render_fn: &Flamelex.GUI.Layers.LayerOne.render/1
+         |> Flamelex.GUI.Component.Layer.add_to_graph(%{
+               layer_module: Flamelex.GUI.Layers.LayerOne,
+               radix_state: radix_state
          }, id: :one)
-         |> Layer.add_to_graph(%{
-            graph: layer_2_graph,
-            state: Flamelex.GUI.Layers.LayerTwo.state(radix_state),
-            calc_state_fn: &Flamelex.GUI.Layers.LayerTwo.state/1,
-            render_fn: &Flamelex.GUI.Layers.LayerTwo.render/1
+         |> Flamelex.GUI.Component.Layer.add_to_graph(%{
+               layer_module: Flamelex.GUI.Layers.LayerTwo,
+               radix_state: radix_state
          }, id: :two)
-         |> Layer.add_to_graph(%{
-            graph: layer_3_graph,
-            render_fn: &Flamelex.GUI.Layers.LayerThree.render/1
+         |> Flamelex.GUI.Component.Layer.add_to_graph(%{
+               layer_module: Flamelex.GUI.Layers.LayerThree,
+               radix_state: radix_state
          }, id: :three)
 
       #NOTE: Although `full_graph` is a complete graph containing all the
@@ -159,15 +158,16 @@ defmodule Flamelex.GUI.RootScene do
       #      keep the other layer graphs in memory so that we can compare
       #      and update them with any changes
 
-      graph_layercake = %{
-         full: full_graph,
-         layer_1: layer_1_graph,
-         layer_2: layer_2_graph,
-         layer_3: layer_3_graph,
-         layer_4: layer_4_graph,
-      }
+      # graph_layercake = %{
+      #    full: full_graph,
+      #    # layer_1: layer_1_graph,
+      #    # layer_2: layer_2_graph,
+      #    # layer_3: layer_3_graph,
+      #    # layer_4: layer_4_graph,
+      # }
 
-      {:ok, graph_layercake}
+      # {:ok, graph_layercake}
+      {:ok, full_graph}
    end
 
 end

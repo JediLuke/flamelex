@@ -35,7 +35,6 @@ defmodule Flamelex.Fluxus.ActionListener do
                     #Logger.debug "#{__MODULE__} ignoring (no state-change)..."
                     :ignore
                 {:ok, new_radix_state} ->
-                    IO.puts "~!!!~~~~~~~~~S"
                     #Logger.debug "#{__MODULE__} processed event, state changed..."
                     #Logger.debug "#{__MODULE__} processed event, state changed... #{inspect(%{radix_state: radix_state, action: action})}"
                     Flamelex.Fluxus.RadixStore.broadcast_update(new_radix_state)

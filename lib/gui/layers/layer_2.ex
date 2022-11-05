@@ -1,28 +1,36 @@
 defmodule Flamelex.GUI.Layers.LayerTwo do
    # NOTE: Something in here has to be about layouts
+   # NOTE: Layer 2 is the MenuBar component
 
-   def render(%{} = radix_state) do
+   @behaviour Flamelex.GUI.Layer.Behaviour
 
-      #NOTE: Layer 2 is the MenuBar component
+   @impl Flamelex.GUI.Layer.Behaviour
+   def calc_state(radix_state) do
+
       # calc the frame for the Menubar, we can choose to discard the other frames in the stack
       %{framestack: [menubar_f|_editor_f]} =
          ScenicWidgets.Core.Utils.FlexiFrame.calc(
             radix_state.gui.viewport,
             {:standard_rule, linemark: radix_state.menu_bar.height}
          )
-         
+
+      %{
+         frame: menubar_f,
+         menu_map: calc_menu_map(radix_state),
+         font: radix_state.menu_bar.font
+      }
+   end
+
+   @impl Flamelex.GUI.Layer.Behaviour
+   def render(layer_state) do
       Scenic.Graph.build()
       |> ScenicWidgets.MenuBar.add_to_graph(%{
-            frame: menubar_f,
-            menu_map: calc_menu_map(radix_state),
-            font: radix_state.menu_bar.font
+            frame: layer_state.frame,
+            menu_map: layer_state.menu_map,
+            font: layer_state.font
          },
          id: :menu_bar
       )
-   end
-
-   def state(radix_state) do
-      calc_menu_map(radix_state)
    end
 
    def calc_menu_map(radix_state) do
