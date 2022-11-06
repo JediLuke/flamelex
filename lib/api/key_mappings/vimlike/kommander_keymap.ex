@@ -9,6 +9,18 @@ defmodule Flamelex.Keymaps.Kommander do
 
 end
 
+
+
+#   def handle(%{} = state, input) when input in @valid_command_buffer_inputs do
+#     case KeyMapping.lookup(state, input) do
+#       :ignore_input ->
+#           state |> RadixState.add_to_history(input)
+#       {:apply_mfa, {module, function, args}} ->
+#           Kernel.apply(module, function, args)
+#           state |> RadixState.add_to_history(input)
+#     end
+#   end
+
 # defmodule Flamelex.KeyMappings.Vim.KommandMode do
 #     alias Flamelex.Fluxus.Structs.RadixState
 #     use ScenicWidgets.ScenicEventsDefinitions

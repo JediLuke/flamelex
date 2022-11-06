@@ -107,7 +107,19 @@ defmodule Flamelex.API.Buffer do
   end
 
 
+   @doc """
+   Scroll the buffer around.
+   """
+   def scroll({_x_scroll, _y_scroll} = scroll_delta) do
+      Flamelex.Fluxus.action({BufferReducer, {:scroll, :active_buf, {:delta, scroll_delta}}})
+   end
 
+  @doc """
+  Scroll the buffer around.
+  """
+  def move_cursor({_column_delta, _line_delta} = cursor_move_delta) do
+    Flamelex.Fluxus.action({BufferReducer, {:move_cursor, {:delta, cursor_move_delta}}})
+  end
 
   @doc """
   Tell a buffer to save it's contents.

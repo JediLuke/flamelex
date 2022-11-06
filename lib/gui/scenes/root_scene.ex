@@ -101,9 +101,12 @@ defmodule Flamelex.GUI.RootScene do
    def handle_input({:key, {key, @key_held, []}} = input, context, scene) do
       # If we hold down any kind of valid text input, pretend we just pressed it again
       # # If this works, she's a pearla!
-      equivalent_key_press = {:key, {key, @key_pressed, []}}
 
-      if equivalent_key_press |> Enum.member?(@valid_text_input_characters) do
+      # the list of keys we can hold down and have the action repeat
+      hold_downable_keys = @valid_text_input_characters ++ [@backspace_key]
+
+      equivalent_key_press = {:key, {key, @key_pressed, []}}
+      if Enum.member?(hold_downable_keys, equivalent_key_press) do
          # NOTE: It's vitally important we remember to recursively call
          # ourselves with the *equivalent_key_pressed_input* here :P
          handle_input(equivalent_key_press, context, scene)

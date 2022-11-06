@@ -19,10 +19,10 @@ defmodule Flamelex.KeyMappings.Vim.NormalMode do
    end
 
    # open the Memex with keybinding <leader>h
-   def handle(%{history: %{keystrokes: [@leader|_rest]}} = radix_state, @lowercase_h) do
-      Flamelex.API.Memex.open()
-      :ok
-   end
+   # def process(@lowercase_h, %{history: %{keystrokes: [@leader|_rest]}} = radix_state) do
+   #    Flamelex.API.Memex.open()
+   #    :ok
+   # end
 
    ## Vim normal-mode keybindings
    ## ---------------------------

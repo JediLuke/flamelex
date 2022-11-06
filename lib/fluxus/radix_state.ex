@@ -52,8 +52,18 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
             buffers: [], # A list of %Buffer{} structs
             active_buf: nil,
             config: %{
-               keymap: Flamelex.KeyMappings.Vim
-            },
+               keymap: Flamelex.KeyMappings.Vim,
+               scroll: %{
+                  # invert: %{ # change the direction of scroll wheel
+                  #   horizontal?: true,
+                  #   vertical?: false
+                  # },
+                  speed: %{ # higher value means faster scrolling
+                    horizontal: 5,
+                    vertical: 3
+                  }
+               }
+            }
          },
          kommander: %{
             hidden?: true
