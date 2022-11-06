@@ -11,13 +11,13 @@ defmodule Flamelex.Keymaps.Editor do
       when input in @valid_inputs do
          buf = buffers |> Enum.find(& &1.id == active_buf)
          case buf.mode do
-               {:vim, :normal} ->
-                  Logger.debug "-- mode: #{inspect buf.mode}, input: #{inspect input}"
-                  Flamelex.KeyMappings.Vim.NormalMode.process(radix_state, input)
-               {:vim, :insert} ->
-                  Flamelex.KeyMappings.Vim.InsertMode.process(radix_state, input)
-               other_mode ->
-                  raise "Buffer does not support mode: #{inspect other_mode}"
+            {:vim, :normal} ->
+               Logger.debug "-- mode: #{inspect buf.mode}, input: #{inspect input}"
+               Flamelex.KeyMappings.Vim.NormalMode.process(radix_state, input)
+            {:vim, :insert} ->
+               Flamelex.KeyMappings.Vim.InsertMode.process(radix_state, input)
+            other_mode ->
+               raise "Buffer does not support mode: #{inspect other_mode}"
          end
    end
 

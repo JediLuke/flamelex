@@ -2,9 +2,7 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
     @moduledoc false
     use Flamelex.ProjectAliases
 
-   defdelegate change_font(radix_state, new_font), to: QuillEx.Fluxus.Structs.RadixState
-   defdelegate change_font_size(radix_state, direction), to: QuillEx.Fluxus.Structs.RadixState
-   defdelegate change_editor_scroll_state(radix_state, new_scroll_state), to: QuillEx.Fluxus.Structs.RadixState
+
 
     @max_keystroke_history_limit 50
     @max_action_history_limit 50
@@ -115,6 +113,15 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
       }
    end
 
+
+   defdelegate change_font(radix_state, new_font),
+      to: QuillEx.Fluxus.Structs.RadixState
+
+   defdelegate change_font_size(radix_state, direction),
+      to: QuillEx.Fluxus.Structs.RadixState
+
+   defdelegate change_editor_scroll_state(radix_state, new_scroll_state),
+      to: QuillEx.Fluxus.Structs.RadixState
 
 
   #TODO it should be possible to use the action/keystroke history to record macros
