@@ -92,7 +92,7 @@ defmodule Flamelex.GUI.RootScene do
       {:noreply, scene}
    end
 
-   def handle_input({:key, {key, @key_released, []}}, _context, scene) do
+   def handle_input({:key, {key, @key_released, _opts}}, _context, scene) do
       # Ignore key releases
       #Logger.debug "#{__MODULE__} `key_released` for keypress: #{inspect key}"
       {:noreply, scene}

@@ -2,6 +2,7 @@ defmodule Flamelex.Keymaps.Desktop do
    use Flamelex.Keymaps.Editor.GlobalBindings
    require Logger
 
+   @ignorable_keys [@shift_space, @meta, @left_ctrl, @left_alt]
 
    def process(_radix_state, @leader) do
       Logger.debug " <<-- Leader key pressed -->>"
@@ -13,6 +14,10 @@ defmodule Flamelex.Keymaps.Desktop do
    end
 
    def process(_radix_state, @escape_key) do
+      :ignore
+   end
+
+   def process(_radix_state, key) when key in @ignorable_keys do
       :ignore
    end
 

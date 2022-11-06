@@ -4,6 +4,13 @@ defmodule Flamelex.GUI.Component.Kommander do
    require Logger
 
 
+   @prompt %{
+      color: :ghost_white,
+      size: 18,
+      margin: 12
+   }
+
+
    def validate(%{frame: %Frame{} = _f, radix_state: _radix_state} = data) do
       #Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
       {:ok, data}
@@ -27,9 +34,8 @@ defmodule Flamelex.GUI.Component.Kommander do
       {:ok, init_scene}
    end
 
+   # NOTE - in this pattern-match, note that `hidden?` is used twice, so we match here if the values are the same in both places, i.e. the status hasn't changed
    def handle_info({:radix_state_change, %{kommander: %{hidden?: hidden?}}}, %{assigns: %{state: %{hidden?: hidden?}}} = scene) do
-      # if we match here, hidden status hasn't changed
-      IO.puts "NO CHANGE IN HIDENNESS"
       {:noreply, scene}
    end
 
@@ -50,7 +56,8 @@ defmodule Flamelex.GUI.Component.Kommander do
       Scenic.Graph.build()
       |> Scenic.Primitives.group(fn graph ->
          graph
-         |> ScenicWidgets.FrameBox.draw(frame, %{color: :cornflower_blue})
+         |> ScenicWidgets.FrameBox.draw(frame, %{color: :rebecca_purple})
+         |> draw_command_prompt(frame)
       end, [
           id: :kommander,
           hidden: state.hidden?
@@ -77,41 +84,39 @@ defmodule Flamelex.GUI.Component.Kommander do
 #       ])
 #   end
 
-#   @prompt_color :ghost_white
-#   @prompt_size 18
-#   @prompt_margin 12
-#   def draw_command_prompt(graph, %Frame{
-#     #NOTE: These are the coords/dimens for the whole CommandBuffer Frame
-#     top_left: %{x: _top_left_x, y: top_left_y},
-#     dimensions: %{height: height, width: _width}
-#   }) do
-#     #NOTE: The y_offset
-#     #      ------------
-#     #      From the top-left position of the box, the command prompt
-#     #      y-offset. (height - prompt_size) is how much bigger the
-#     #      buffer is than the command prompt, so it gives us the extra
-#     #      space - we divide this by 2 to get how much extra space we
-#     #      need to add, to the reference y coordinate, to center the
-#     #      command prompt inside the buffer
-#     y_offset = top_left_y + (height - @prompt_size)/2
 
-#     #NOTE: How Scenic draws triangles
-#     #      --------------------------
-#     #      Scenic uses 3 points to draw a triangle, which look like this:
-#     #
-#     #           x - point1
-#     #           |\
-#     #           | \ x - point2 (apex of triangle)
-#     #           | /
-#     #           |/
-#     #           x - point3
-#     point1 = {@prompt_margin, y_offset}
-#     point2 = {@prompt_margin+prompt_width(@prompt_size), y_offset+@prompt_size/2}
-#     point3 = {@prompt_margin, y_offset + @prompt_size}
+  def draw_command_prompt(graph, %Frame{
+    #NOTE: These are the coords/dimens for the whole CommandBuffer Frame
+    coords: %{x: _top_left_x, y: top_left_y},
+    dimens: %{height: height, width: _width}
+  }) do
+    #NOTE: The y_offset
+    #      ------------
+    #      From the top-left position of the box, the command prompt
+    #      y-offset. (height - prompt.size) is how much bigger the
+    #      buffer is than the command prompt, so it gives us the extra
+    #      space - we divide this by 2 to get how much extra space we
+    #      need to add, to the reference y coordinate, to center the
+    #      command prompt inside the buffer
+    y_offset = top_left_y + (height - @prompt.size)/2
 
-#     graph
-#     |> Scenic.Primitives.triangle({point1, point2, point3}, fill: @prompt_color)
-#   end
+    #NOTE: How Scenic draws triangles
+    #      --------------------------
+    #      Scenic uses 3 points to draw a triangle, which look like this:
+    #
+    #           x - point1
+    #           |\
+    #           | \ x - point2 (apex of triangle)
+    #           | /
+    #           |/
+    #           x - point3
+    point1 = {@prompt.margin, y_offset}
+    point2 = {@prompt.margin+prompt_width(@prompt.size), y_offset+@prompt.size/2}
+    point3 = {@prompt.margin, y_offset + @prompt.size}
+
+    graph
+    |> Scenic.Primitives.triangle({point1, point2, point3}, fill: @prompt.color)
+  end
 
 #   def draw_textbox(graph, %Frame{} = outer_frame) do
 #       # text_field_id                 = {@component_id, :text_field}
@@ -136,16 +141,16 @@ defmodule Flamelex.GUI.Component.Kommander do
 #       top_left: %{x: cmd_buf_top_left_x, y: cmd_buf_top_left_y},
 #       dimensions: %{height: cmd_buf_height, width: cmd_buf_width}
 #     }) do
-#       total_prompt_width = prompt_width(@prompt_size) + (2*@prompt_margin)
+#       total_prompt.width = prompt.width(@prompt.size) + (2*@prompt.margin)
   
 #       textbox_coordinates = {
 #         # this is the x coord for the top-left corner of the Textbox - take the CommandBuffer top_left_x and add some margin
-#         cmd_buf_top_left_x + total_prompt_width,
+#         cmd_buf_top_left_x + total_prompt.width,
 #         # this is the y coord for the top-left corner of the Textbox - plus 5 to move the box down, because remember we reference from top-left corner
 #         cmd_buf_top_left_y + 5
 #       }
   
-#       textbox_width      = cmd_buf_width - total_prompt_width - @prompt_margin
+#       textbox_width      = cmd_buf_width - total_prompt.width - @prompt.margin
 #       textbox_dimensions = {textbox_width, cmd_buf_height - 10}
   
 #       textbox_frame =
@@ -156,7 +161,7 @@ defmodule Flamelex.GUI.Component.Kommander do
 #       textbox_frame
 #     end
   
-#     def prompt_width(prompt_size) do
-#       prompt_size * 0.67
-#     end
+    def prompt_width(prompt_size) do
+      prompt_size * 0.67
+    end
 end

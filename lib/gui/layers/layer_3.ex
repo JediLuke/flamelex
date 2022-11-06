@@ -11,7 +11,7 @@ defmodule Flamelex.GUI.Layers.LayerThree do
 
       kommander_frame = ScenicWidgets.Core.Structs.Frame.new(
          pin:  {0, vp_height - @kommander_height},
-         size: {vp_width, @kommander_height}
+         size: {vp_width+1, @kommander_height} #TODO why do we need this +1? Without it we see a think black stripe on the right-hand side
       )
 
       %{
