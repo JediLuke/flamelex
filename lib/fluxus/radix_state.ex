@@ -90,9 +90,9 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
                }
             }
          },
-         widget_wkb: %{
-            graph: nil,
-         },
+         # widget_wkb: %{
+         #    graph: nil,
+         # },
          history: %{
             keystrokes:   [],
             # actions:      []

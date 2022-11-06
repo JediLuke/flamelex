@@ -1,5 +1,4 @@
 defmodule Flamelex.KeyMappings.Vim.NormalMode do
-   use ScenicWidgets.ScenicEventsDefinitions
    use Flamelex.Keymaps.Editor.GlobalBindings
    require Logger
 
@@ -9,23 +8,19 @@ defmodule Flamelex.KeyMappings.Vim.NormalMode do
       :ok
    end
 
-   ## Leader-x keybindings
-   ## --------------------
-
-   # open the Kommander with keybinding <leader>k
-   def process(%{history: %{keystrokes: [@leader|_rest]}} = radix_state, @lowercase_k) do
-      Logger.debug "Opening KommandBuffer..."
-      :ok = Flamelex.API.Kommander.show()
+   # defer to Desktop key-mappings for leader commands
+   def process(%{history: %{keystrokes: [@leader|_rest]}} = radix_state, key) do
+      Flamelex.Keymaps.Desktop.process(radix_state, key)
    end
 
-   # open the Memex with keybinding <leader>h
-   # def process(@lowercase_h, %{history: %{keystrokes: [@leader|_rest]}} = radix_state) do
-   #    Flamelex.API.Memex.open()
-   #    :ok
-   # end
+   def process(%{kommander: %{hidden?: false}}, @escape_key) do
+      :ok = Flamelex.API.Kommander.hide()
+   end
+
 
    ## Vim normal-mode keybindings
    ## ---------------------------
+
 
    # switch to insert mode
    def process(%{root: %{active_app: :editor}, editor: %{active_buf: active_buf}} = state, @lowercase_i) do

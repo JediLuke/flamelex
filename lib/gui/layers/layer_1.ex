@@ -7,7 +7,6 @@ defmodule Flamelex.GUI.Layers.LayerOne do
    @impl Flamelex.GUI.Layer.Behaviour
    def calc_state(radix_state) do
 
-      IO.puts "CALCULATING LAYER 1 STATE....."
       # calc the editor frame
       %{framestack: [_menubar_f|editor_f]} =
          ScenicWidgets.Core.Utils.FlexiFrame.calc(
@@ -27,7 +26,6 @@ defmodule Flamelex.GUI.Layers.LayerOne do
    end
 
    def render(%{active_app: :editor, frame: frame}) do
-      IO.puts "RENDERING EDITOR EYYYYYY"
       radix_state = Flamelex.Fluxus.RadixStore.get()
 
       Scenic.Graph.build()

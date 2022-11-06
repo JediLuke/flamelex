@@ -3,8 +3,8 @@ defmodule Flamelex.Fluxus.UserInputHandler do
    This is the highest-level input handler. All user-input gets routed
    through this module.
    """
+   use Flamelex.Keymaps.Editor.GlobalBindings
    require Logger
-   use ScenicWidgets.ScenicEventsDefinitions
 
    # def handle(%{kommander: %{hidden?: true}} = radix_state, input) do
    #     #TODO use similat try/do & first try global level, then Memex level
@@ -21,6 +21,11 @@ defmodule Flamelex.Fluxus.UserInputHandler do
    # def handle(%{root: %{active_app: :memex}} = radix_state, input) do
    #     Keymaps.Memex |> handle_with_rescue(radix_state, input)
    # end
+
+   def process(%{root: %{active_app: :desktop}} = radix_state, input) do
+      Logger.debug "Accepted input: #{inspect input} -- active_app: :desktop"
+      Flamelex.Keymaps.Desktop |> process_with_rescue(radix_state, input)
+   end
 
    def process(%{root: %{active_app: :editor}} = radix_state, input) do
       Logger.debug "Accepted input: #{inspect input} -- active_app: :editor"
@@ -56,10 +61,10 @@ defmodule Flamelex.Fluxus.UserInputHandler do
    end
 
    defp record_input(radix_state, {:key, {key, @key_pressed, []}} = input) when input in @valid_text_input_characters do
-      Logger.debug "-- Recording INPUT: #{inspect input}"
+      Logger.debug "-- Recording INPUT: #{inspect key}"
       #NOTE: We store the latest keystroke at the front of the list, not the back
       radix_state
-      |> put_in([:history, :keystrokes], radix_state.history.keystrokes |> List.insert_at(0, key))
+      |> put_in([:history, :keystrokes], radix_state.history.keystrokes |> List.insert_at(0, input))
    end
 
    defp record_input(radix_state, input) do

@@ -6,7 +6,6 @@ defmodule Flamelex.Keymaps.Kommander do
         {:ok, radix_state}
     end
 
-
 end
 
 

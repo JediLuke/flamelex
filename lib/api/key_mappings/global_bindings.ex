@@ -2,8 +2,10 @@ defmodule Flamelex.Keymaps.Editor.GlobalBindings do
 
    defmacro __using__(_opts) do
       quote do
+         
+         use ScenicWidgets.ScenicEventsDefinitions
 
-         @leader :key_space
+         @leader @space_bar
 
       end
    end
