@@ -1,33 +1,10 @@
 defmodule Flamelex.Fluxus.Structs.RadixState do
-    @moduledoc false
-    use Flamelex.ProjectAliases
+   @moduledoc false
+   use Flamelex.ProjectAliases
 
+   @max_keystroke_history_limit 50
+   @max_action_history_limit 50
 
-
-    @max_keystroke_history_limit 50
-    @max_action_history_limit 50
-
-
-    @valid_apps [
-      :desktop,     # The default screen, a personalized "homepage"
-      :editor,      # The text-editor interface
-      :memex        # The memex screen
-      #TODO whiteboard, comms/`switchboard`, :workbench
-    ]
-
-    #TODO this struct definition isn't great, but at least now we have one
-    #TODO figure out how we have multiple apps open without updating the struct
-    # defstruct [
-    #   root: nil,
-    #   gui: nil,
-    #   menu_bar: nil,
-    #   kommander: nil,
-    #   desktop: nil,
-    #   editor: nil,
-    #   memex: nil,
-    #   workbench: nil,
-    #   history: nil
-    # ]
 
    @doc """
    This function calculates & returns the default RadixState - the one
