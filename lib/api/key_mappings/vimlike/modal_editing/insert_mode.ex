@@ -1,36 +1,22 @@
 defmodule Flamelex.KeyMappings.Vim.InsertMode do
-  alias Flamelex.Fluxus.Structs.RadixState
-  use ScenicWidgets.ScenicEventsDefinitions
+   alias Flamelex.Fluxus.Structs.RadixState
+   use ScenicWidgets.ScenicEventsDefinitions
 
 
-  def handle(%{root: %{active_app: :editor}} = state, input) do
-    do_handle(state, input)
-  end
+   def process(%{editor: %{active_buf: active_buf}}, @escape_key) do
+      Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :normal}})
+   end
 
-  def do_handle(%{editor: %{active_buf: active_buf}} = state, @escape_key) do
-    Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :normal}})
-  end
-
-  def do_handle(%{editor: %{active_buf: active_buf}} = state, @lowercase_l) do
-    Flamelex.API.Buffer.modify(active_buf, {:insert, "hello", :at_cursor})
-  end
-
-
-  # # this is the function which gets called externally
-  # def keymap(%{mode: :insert, active_buffer: b} = state, input) when not is_nil(b) do
-  #   key_def(state, input)
-  # end
-
-  # def key_def(_state, @escape_key) do
-  #   {:fire_action, {:switch_mode, :normal}}
-  # end
-
-  # def key_def(%{active_buffer: active_buf}, @backspace_key) do
-  #   {:fire_action, {:modify_buffer, %{
-  #       buffer: active_buf,
-  #       details: %{backspace: {:cursor, 1}}, #TODO why is it always cursor 1?
-  #   }}}
-  # end
+   # all input not handled above, can be handled as editor input
+   def process(_radix_state, key) do
+      try do
+         QuillEx.UserInputHandler.Editor.process(key, Flamelex.API.Buffer)
+      rescue
+         FunctionClauseError ->
+            Logger.warn "Input: #{inspect key} not handled by #{__MODULE__}..."
+            :ignore
+      end
+   end
 
 
   # def key_def(%{active_buffer: active_buf}, input) do

@@ -4,10 +4,9 @@ defmodule Flamelex.GUI.RootScene do
    use ScenicWidgets.ScenicEventsDefinitions
    import Scenic.Primitives
    import Scenic.Components
-   # alias Flamelex.GUI.Component.Layer
-   require Logger
    alias ScenicWidgets.Core.Structs.Frame
    alias ScenicWidgets.Core.Utils.FlexiFrame
+   require Logger
 
 
    # NOTE:
@@ -41,30 +40,19 @@ defmodule Flamelex.GUI.RootScene do
       :viewport_exit,
    ]
 
-
    def init(init_scene, _args, opts) do
       Logger.debug("#{__MODULE__} initializing...")
 
+      #TODO we should return the radix_state here to save us from having to fetch it again in like 5 lines time
       Flamelex.Fluxus.RadixStore.put_viewport(init_scene.viewport)
       init_theme = ScenicWidgets.Utils.Theme.get_theme(opts) #TODO put this in radix state? gui.theme?
-
       radix_state = Flamelex.Fluxus.RadixStore.get()
-
-      # NOTE `graphcake` contains the graphs of all the Layers, & the combined Graph
-      # {:ok, graphcake} = 
-
+   
       # We update a few details in the RadixStore which are
       # force-refreshed due to this process starting up
       {:ok, root_graph} = render_layers(radix_state)
 
       Flamelex.Fluxus.RadixStore.put_root_graph(graph: root_graph)
-      #    layers: [
-      #       {:one, graphcake.layer_1},
-      #       {:two, graphcake.layer_2},
-      #       {:three, graphcake.layer_3},
-      #       {:four, graphcake.layer_4}
-      #    ]
-      # )
 
       new_scene = init_scene
       |> assign(graph: root_graph)
@@ -79,7 +67,15 @@ defmodule Flamelex.GUI.RootScene do
    #    {:reply, {:ok, scene.viewport}, scene}
    # end
 
-  def handle_input({:viewport, {:reshape, {new_width, new_height} = new_dimensions}}, context, scene) do # e.g. of new_dimensions: {1025, 818}
+   # NOTE - although we don't want to put much input handling logic here,
+   # it's convenient just to filter out stuff which we know we want to ignore
+   def handle_input({event, _details}, _context, scene)
+      when event in @ignorable_input_events do
+         Logger.debug "#{__MODULE__} ignoring event: #{inspect event}"
+         {:noreply, scene}
+   end
+
+   def handle_input({:viewport, {:reshape, {new_width, new_height} = new_dimensions}}, context, scene) do # e.g. of new_dimensions: {1025, 818}
       Logger.debug "#{__MODULE__} received :viewport :reshape, dim: #{inspect new_dimensions}"
 
       raise "can't handle resizing right now"
@@ -96,25 +92,21 @@ defmodule Flamelex.GUI.RootScene do
       {:noreply, scene}
    end
 
-   def handle_input({event, _details}, _context, scene)
-      when event in @ignorable_input_events do
-         Logger.debug "#{__MODULE__} ignoring event: #{inspect event}"
-         {:noreply, scene}
-   end
-
    def handle_input({:key, {key, @key_released, []}}, _context, scene) do
+      # Ignore key releases
       #Logger.debug "#{__MODULE__} `key_released` for keypress: #{inspect key}"
       {:noreply, scene}
    end
 
-   # If this works, she's a pearla!
    def handle_input({:key, {key, @key_held, []}} = input, context, scene) do
-      # test if the `same key, just with a normal `key_pressed` event, is valid input
-      equivalent_key_pressed_input = {:key, {key, @key_pressed, []}}
-      if Enum.member?(@valid_text_input_characters, equivalent_key_pressed_input) do
-         #NOTE: It's vitally important we remember to recursively call
-         #      ourselves with the *equivalent_key_pressed_input* here :P
-         handle_input(equivalent_key_pressed_input, context, scene)
+      # If we hold down any kind of valid text input, pretend we just pressed it again
+      # # If this works, she's a pearla!
+      equivalent_key_press = {:key, {key, @key_pressed, []}}
+
+      if equivalent_key_press |> Enum.member?(@valid_text_input_characters) do
+         # NOTE: It's vitally important we remember to recursively call
+         # ourselves with the *equivalent_key_pressed_input* here :P
+         handle_input(equivalent_key_press, context, scene)
       else
          Logger.warn "#{__MODULE__} the key: #{inspect key} is being held, however `key_pressed` not valid"
          {:noreply, scene}
@@ -127,15 +119,7 @@ defmodule Flamelex.GUI.RootScene do
       {:noreply, scene}
    end
 
-
-
    def render_layers(radix_state) do
-         
-      # layer_1_graph = Flamelex.GUI.Layers.LayerOne.render(radix_state)
-      # layer_2_graph = Flamelex.GUI.Layers.LayerTwo.render(radix_state)
-      # layer_3_graph = Flamelex.GUI.Layers.LayerThree.render(radix_state)
-      # layer_4_graph = Scenic.Graph.build()
-
       #TODO add a layer 0, to render the Renseijin
       #NOTE: The ids of these layers needs to mtch the keys in the RadiXState.root.layer_list
       full_graph =
@@ -153,20 +137,6 @@ defmodule Flamelex.GUI.RootScene do
                radix_state: radix_state
          }, id: :three)
 
-      #NOTE: Although `full_graph` is a complete graph containing all the
-      #      layers (and this is the %Graph{} we will render), we need to
-      #      keep the other layer graphs in memory so that we can compare
-      #      and update them with any changes
-
-      # graph_layercake = %{
-      #    full: full_graph,
-      #    # layer_1: layer_1_graph,
-      #    # layer_2: layer_2_graph,
-      #    # layer_3: layer_3_graph,
-      #    # layer_4: layer_4_graph,
-      # }
-
-      # {:ok, graph_layercake}
       {:ok, full_graph}
    end
 
