@@ -13,10 +13,17 @@ defmodule Flamelex.Fluxus do
    https://medium.com/grandcentrix/state-management-with-phoenix-liveview-and-liveex-f53f8f1ec4d7
    """
    require Logger
+
+   # handle lists of actions
+   def action([a|rest]) do
+      action(a)
+      action(rest)
+   end
   
    # called to fire off an action
    def action(a) do
-      EventBus.notify(%EventBus.Model.Event{
+      Logger.debug "Fluxus handling action `#{inspect a}`..."
+      :ok = EventBus.notify(%EventBus.Model.Event{
          id: UUID.uuid4(),
          topic: :general,
          data: {:action, a}
@@ -28,14 +35,15 @@ defmodule Flamelex.Fluxus do
    def declare(a) do
       with {:ok, results} <- do_declare(a) do
          [final_radix_state] =
-            Enum.reduce(results, [], fn
+            Enum.reduce(results, :accumulator, fn # NOTE - we replace this atom, so we have confidence when it matches the final result that this function worked
+               # add the results from ActionListener to the accumulator, discard ones from InputListener
                {Flamelex.Fluxus.ActionListener, {:ok, new_radix_state}}, acc ->
-                  acc ++ [new_radix_state]
+                  [new_radix_state]
                {Flamelex.Fluxus.InputListener, _res}, acc ->
-               acc
+                  acc
             end)
 
-         final_radix_state
+         {:ok, final_radix_state}
       end
    end
 

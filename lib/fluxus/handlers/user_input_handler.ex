@@ -6,19 +6,14 @@ defmodule Flamelex.Fluxus.UserInputHandler do
    use Flamelex.Keymaps.Editor.GlobalBindings
    require Logger
 
-   # def handle(%{kommander: %{hidden?: true}} = radix_state, input) do
-   #     #TODO use similat try/do & first try global level, then Memex level
-   #     Keymaps.Kommander |> handle_with_rescue(radix_state, input)
-   # end
 
+   #NOTE: kommander.hidden? == false, means it is NOT hidden, i.e. KommandBuffer is visible
+   def process(%{kommander: %{hidden?: false}} = radix_state, input) do
+      Flamelex.Keymaps.Kommander |> process_with_rescue(radix_state, input)
+   end
 
-   # #NOTE: kommander.hidden? == false, means it is NOT hidden, i.e. KommandBuffer is visible
-   # def handle(%{kommander: %{hidden?: false}} = radix_state, input) do
-   #     Keymaps.Kommander |> handle_with_rescue(radix_state, input)
-   # end
-
-   # # def handle(%{root: %{active_app: :memex}, kommander: %{hidden?: true}} = radix_state, input) do
-   # def handle(%{root: %{active_app: :memex}} = radix_state, input) do
+   # # def process(%{root: %{active_app: :memex}, kommander: %{hidden?: true}} = radix_state, input) do
+   # def process(%{root: %{active_app: :memex}} = radix_state, input) do
    #     Keymaps.Memex |> handle_with_rescue(radix_state, input)
    # end
 

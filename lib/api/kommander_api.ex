@@ -8,7 +8,6 @@ defmodule Flamelex.API.Kommander do
   but there was some confusion due to a double-use, especially when you
   start to use module alias'... it's just better this way.
   """
-  require Logger
 
 
   @doc """
@@ -44,17 +43,24 @@ defmodule Flamelex.API.Kommander do
 
 
   @doc """
+  Modify the KommandBuffer.
+  """
+  def modify(modification) do
+    Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Kommander, {:modify_kommander, modification}})
+  end
+
+  @doc """
   The difference between this function and hide is that hide simply makes
   the API.CommandBuffer invisible in the GUI, but usually when we want it to go
   away we also want to forget all the state in the KommandBuffer - like
   when you mash escape to go back to :edit mode
   """
-  # def reset do
-  #   Flamelex.Fluxus.action([
-  #     clear(),
-  #     hide()
-  #   ])
-  # end
+  def reset do
+    Flamelex.Fluxus.action([
+      clear(),
+      hide()
+    ])
+  end
 
 
   @doc """

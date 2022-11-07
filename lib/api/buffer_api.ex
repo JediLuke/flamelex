@@ -20,7 +20,7 @@ defmodule Flamelex.API.Buffer do
    end
 
    def new(data) when is_bitstring(data) do
-      radix_state = Flamelex.Fluxus.declare({BufferReducer, {:open_buffer, %{data: data, mode: {:vim, :normal}}}})
+      {:ok, radix_state} = Flamelex.Fluxus.declare({BufferReducer, {:open_buffer, %{data: data, mode: {:vim, :normal}}}})
       radix_state.editor.active_buf
    end
 
@@ -36,7 +36,7 @@ defmodule Flamelex.API.Buffer do
   {:buffer, {:file, "README.md"}}
   """
   def open(filename) do
-    radix_state = Flamelex.Fluxus.declare({BufferReducer, {:open_buffer, %{file: filename}}})
+    {:ok, radix_state} = Flamelex.Fluxus.declare({BufferReducer, {:open_buffer, %{file: filename}}})
     radix_state.editor.active_buf
   end
 

@@ -5,12 +5,13 @@ defmodule Flamelex.KeyMappings.Vim.InsertMode do
    @ignorable_keys [@shift_space, @meta, @left_ctrl]
 
    def process(%{editor: %{active_buf: active_buf}}, @escape_key) do
+      #TODO MOVE ONE TO THE LEFT, except if we're already at cursor 1??
       Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :normal}})
    end
 
    # treat key repeats as a press
    def process(radix_state, {:key, {key, @key_held, mods}}) do
-      process({:key, {key, @key_pressed, mods}}, radix_state)
+      process(radix_state, {:key, {key, @key_pressed, mods}})
    end
 
    # ignore key-release inputs

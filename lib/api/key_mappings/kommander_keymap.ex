@@ -1,10 +1,62 @@
 defmodule Flamelex.Keymaps.Kommander do
-    use ScenicWidgets.ScenicEventsDefinitions
+   use ScenicWidgets.ScenicEventsDefinitions
 
-    def handle(radix_state, @escape_key) do
-        Flamelex.API.Kommander.hide()
-        {:ok, radix_state}
-    end
+   @ignorable_keys [@shift_space, @meta, @left_ctrl]
+
+   # treat key repeats as a press
+   def process(radix_state, {:key, {key, @key_held, mods}}) do
+      process(radix_state, {:key, {key, @key_pressed, mods}})
+   end
+
+   # ignore key-release inputs
+   def process(_radix_state, {:key, {_key, @key_released, _mods}}) do
+      :ignore
+   end
+
+   def process(_radix_state, key) when key in @ignorable_keys do
+      :ignore
+   end
+
+   def process(_radix_state, {:cursor_button, _details}) do
+      :ignore
+   end
+
+   def process(_radix_state, @escape_key) do
+      Flamelex.API.Kommander.hide()
+   end
+
+   def process(%{kommander: %{hidden?: false, buffer: %{mode: :edit} = k_buf}}, key)
+      when not is_nil(k_buf) and key in @valid_text_input_characters do
+         IO.puts "HERHERHERHERHER"
+         Flamelex.API.Kommander.modify({:insert, key |> key2string(), :at_cursor})
+   end
+
+   def process(_radix_state, @backspace_key) do
+      Flamelex.API.Kommander.modify({:backspace, 1, :at_cursor})
+   end
+
+   def process(_radix_state, key) when key in @arrow_keys do
+
+      # REMINDER: these tuples are in the form `{line, col}`
+      delta = case key do
+         @left_arrow ->
+            {0, -1}
+         @up_arrow ->
+            {-1, 0}
+         @right_arrow ->
+            {0, 1}
+         @down_arrow ->
+            {1, 0}
+      end
+
+      Flamelex.API.Kommander.move_cursor(delta)
+   end
+
+   def process(radix_state, key) do
+      IO.puts "#{__MODULE__} failed to process input: #{inspect key}"
+      dbg()
+   end
+
 
 end
 

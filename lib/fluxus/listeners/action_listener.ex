@@ -41,7 +41,8 @@ defmodule Flamelex.Fluxus.ActionListener do
                     EventBus.mark_as_completed({__MODULE__, event_shadow})
                     {:ok, new_radix_state}
                 {:error, reason} ->
-                    Logger.error "Unable to process event `#{inspect event}`, reason: #{inspect reason}"
+                    Logger.error "Unable to process event: #{inspect reason}"
+                    # EventBus.mark_as_completed({__MODULE__, event_shadow})
                     raise reason
             end
         end

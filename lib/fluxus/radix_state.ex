@@ -66,7 +66,13 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
             }
          },
          kommander: %{
-            hidden?: true
+            hidden?: true,
+            buffer: QuillEx.Structs.Buffer.new(%{
+               id: {:buffer, Kommander},
+               type: :text,
+               data: "",
+               mode: :edit
+            })
          },
          memex: %{
             graph: nil, # Store the %Graph{} here if we need to (for switching between apps easily)
