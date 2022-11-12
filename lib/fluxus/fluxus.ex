@@ -12,17 +12,11 @@ defmodule Flamelex.Fluxus do
 
    https://medium.com/grandcentrix/state-management-with-phoenix-liveview-and-liveex-f53f8f1ec4d7
    """
-   require Logger
 
-   # handle lists of actions
-   def action([a|rest]) do
-      action(a)
-      action(rest)
-   end
   
    # called to fire off an action
    def action(a) do
-      Logger.debug "Fluxus handling action `#{inspect a}`..."
+      #Logger.debug "Fluxus handling action `#{inspect a}`..."
       :ok = EventBus.notify(%EventBus.Model.Event{
          id: UUID.uuid4(),
          topic: :general,

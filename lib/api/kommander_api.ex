@@ -56,10 +56,8 @@ defmodule Flamelex.API.Kommander do
   when you mash escape to go back to :edit mode
   """
   def reset do
-    Flamelex.Fluxus.action([
-      clear(),
-      hide()
-    ])
+    clear()
+    hide()
   end
 
 

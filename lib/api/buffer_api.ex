@@ -35,10 +35,13 @@ defmodule Flamelex.API.Buffer do
   iex> Buffer.open("README.md")
   {:buffer, {:file, "README.md"}}
   """
-  def open(filename) do
-    {:ok, radix_state} = Flamelex.Fluxus.declare({BufferReducer, {:open_buffer, %{file: filename}}})
+  def open(filename) when is_bitstring(filename) do
+    {:ok, radix_state} = Flamelex.Fluxus.declare({BufferReducer, {:open_buffer, %{file: filename, mode: {:vim, :normal}}}})
     radix_state.editor.active_buf
   end
+
+  # this is just for convenience
+  def open(buf), do: switch(buf)
 
   @doc """
   Return the active Buffer.
@@ -49,8 +52,18 @@ defmodule Flamelex.API.Buffer do
     RadixStore.get().editor.active_buf
   end
 
-  def switch(buf) do
+  def switch({:buffer, _id} = buf) do
     Flamelex.Fluxus.action({BufferReducer, {:activate, buf}})
+  end
+
+  def switch(%{id: {:buffer, _id} = buf}) do
+    switch(buf)
+  end
+
+  def switch(n) when n >= 1 do
+    RadixStore.get().editor.buffers
+    |> Enum.at(n-1)
+    |> switch()
   end
 
   # @doc """

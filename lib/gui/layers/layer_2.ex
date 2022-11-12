@@ -15,6 +15,7 @@ defmodule Flamelex.GUI.Layers.LayerTwo do
          )
 
       %{
+         layer: 2,
          frame: menubar_f,
          menu_map: calc_menu_map(radix_state),
          font: radix_state.menu_bar.font
@@ -22,7 +23,7 @@ defmodule Flamelex.GUI.Layers.LayerTwo do
    end
 
    @impl Flamelex.GUI.Layer.Behaviour
-   def render(layer_state) do
+   def render(layer_state, _radix_state) do
       Scenic.Graph.build()
       |> ScenicWidgets.MenuBar.add_to_graph(%{
             frame: layer_state.frame,
@@ -92,7 +93,7 @@ defmodule Flamelex.GUI.Layers.LayerTwo do
       open_bufs_sub_menu = open_buffers
       |> Enum.map(fn %{id: {:buffer, name} = buf_id} ->
               #NOTE: Wrap this call in it's closure so it's a function of arity /0
-              {name, fn -> Flamemex.API.Buffer.open(buf_id) end}
+              {name, fn -> Flamelex.API.Buffer.switch(buf_id) end}
       end)
 
       [

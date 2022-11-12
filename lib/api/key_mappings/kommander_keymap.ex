@@ -1,7 +1,7 @@
 defmodule Flamelex.Keymaps.Kommander do
    use ScenicWidgets.ScenicEventsDefinitions
 
-   @ignorable_keys [@shift_space, @meta, @left_ctrl]
+   @ignorable_keys [@shift_space, @left_shift, @meta, @left_ctrl]
 
    # treat key repeats as a press
    def process(radix_state, {:key, {key, @key_held, mods}}) do
@@ -22,12 +22,18 @@ defmodule Flamelex.Keymaps.Kommander do
    end
 
    def process(_radix_state, @escape_key) do
+      Flamelex.API.Kommander.clear()
       Flamelex.API.Kommander.hide()
+   end
+
+   def process(_radix_state, @enter_key) do
+      # NOTE - `@enter_key` is a member of `@valid_text_input_characters` so we need to match here first
+      Flamelex.API.Kommander.execute()
+      Flamelex.API.Kommander.reset()
    end
 
    def process(%{kommander: %{hidden?: false, buffer: %{mode: :edit} = k_buf}}, key)
       when not is_nil(k_buf) and key in @valid_text_input_characters do
-         IO.puts "HERHERHERHERHER"
          Flamelex.API.Kommander.modify({:insert, key |> key2string(), :at_cursor})
    end
 

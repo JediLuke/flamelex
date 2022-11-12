@@ -23,7 +23,7 @@ defmodule Flamelex.GUI.Component.Layer do
       Logger.debug "Initializing layer #{opts[:id]}..."
 
       init_state = layer.calc_state(radix_state)
-      init_graph = layer.render(init_state)
+      init_graph = layer.render(init_state, radix_state)
 
       init_scene = scene
       # |> assign(id: opts[:id] || raise "invalid ID")
@@ -59,8 +59,7 @@ defmodule Flamelex.GUI.Component.Layer do
       new_layer_state = layer.calc_state(new_radix_state)
 
       if new_layer_state != old_layer_state do
-         IO.puts "LAYER CHANGED!"
-         new_graph = layer.render(new_layer_state)
+         new_graph = layer.render(new_layer_state, new_radix_state)
 
          new_scene =
             scene

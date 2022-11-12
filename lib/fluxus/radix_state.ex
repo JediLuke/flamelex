@@ -72,6 +72,11 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
                type: :text,
                data: "",
                mode: :edit
+            }),
+            font: ScenicWidgets.TextPad.Structs.Font.new(%{
+               name: :ibm_plex_mono,
+               metrics: ibm_plex_mono_font_metrics,
+               size: 24
             })
          },
          memex: %{

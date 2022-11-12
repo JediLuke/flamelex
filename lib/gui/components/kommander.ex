@@ -64,16 +64,16 @@ defmodule Flamelex.GUI.Component.Kommander do
       {:noreply, scene}
     end
 
-   def render(frame, state) do
+   def render(frame, kommander_state) do
       Scenic.Graph.build()
       |> Scenic.Primitives.group(fn graph ->
          graph
          |> ScenicWidgets.FrameBox.draw(frame, %{color: :rebecca_purple})
          |> draw_command_prompt(frame)
-         |> draw_textbox(state, frame)
+         |> draw_textbox(kommander_state, frame)
       end, [
           id: :kommander,
-          hidden: state.hidden?
+          hidden: kommander_state.hidden?
       ])
    end
 
@@ -110,7 +110,7 @@ defmodule Flamelex.GUI.Component.Kommander do
       |> Scenic.Primitives.triangle({point1, point2, point3}, fill: @prompt.color)
    end
 
-   def draw_textbox(graph, %{buffer: k_buf} = _state, %Frame{} = outer_frame) do
+   def draw_textbox(graph, %{buffer: k_buf, font: k_buf_font} = _kommander_state, %Frame{} = outer_frame) do
       textbox_frame = calc_textbox_frame(outer_frame)
 
       graph
@@ -118,7 +118,11 @@ defmodule Flamelex.GUI.Component.Kommander do
       #TODO here is where we call it... need to add text rendering using TextPad, and also accept input when kommander is visible
       |> ScenicWidgets.TextPad.add_to_graph(%{
          frame: textbox_frame,
-         state: ScenicWidgets.TextPad.new(%{buffer: k_buf, margin: %{left: 4, top: 3, bottom: 0, right: 2}})
+         state: ScenicWidgets.TextPad.new(%{
+            buffer: k_buf,
+            font: k_buf_font,
+            margin: %{left: 4, top: 3, bottom: 0, right: 2}
+         })
       }, id: {:text_pad, Kommander})
    end
 

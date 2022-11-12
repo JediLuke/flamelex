@@ -15,18 +15,19 @@ defmodule Flamelex.GUI.Layers.LayerOne do
          )
 
       %{
+         layer: 1,
          frame: hd(editor_f),
-         active_app: radix_state.root.active_app
+         active_app: radix_state.root.active_app,
+         active_buf: radix_state.editor.active_buf
       }
    end
 
    @impl Flamelex.GUI.Layer.Behaviour
-   def render(%{active_app: :desktop}) do
+   def render(%{active_app: :desktop}, _radix_state) do
       Scenic.Graph.build()
    end
 
-   def render(%{active_app: :editor, frame: frame}) do
-      radix_state = Flamelex.Fluxus.RadixStore.get()
+   def render(%{active_app: :editor, frame: frame}, radix_state) do
 
       Scenic.Graph.build()
       |> QuillEx.GUI.Components.Editor.add_to_graph(%{

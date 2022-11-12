@@ -37,6 +37,11 @@ defmodule Flamelex.Keymaps.Desktop do
       :ok = Flamelex.API.Kommander.show()
    end
 
+   # NOTE - this has to go below the match where we record the history of pressing @leader
+   def process(_radix_state, key) when key in @valid_text_input_characters do
+      :ignore
+   end
+
    def process(radix_state, key) do
       dbg()
    end
