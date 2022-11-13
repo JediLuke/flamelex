@@ -119,46 +119,68 @@ defmodule Flamelex.GUI.Component.Renseijin do
       {:noreply, scene}
    end
 
+   def handle_cast(:reset_animation, scene) do
+      #Logger.debug "#{__MODULE__} received msg: :transmotion_halt, ignoring it completely..."
+
+      scene =
+         scene
+         |> assign(rotation: 0)
+
+      new_graph =
+         scene.assigns.graph
+         |> Scenic.Graph.modify(:inner_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
+         |> Scenic.Graph.modify(:mid_triangle, &Scenic.Primitives.update_opts(&1, rotate: degree_in_radians(scene.assigns.rotation)))
+         |> Scenic.Graph.modify(:outer_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
+
+      new_scene =
+         scene
+         |> assign(graph: new_graph)
+         |> push_graph(new_graph)
+   
+      {:noreply, new_scene}
+   end
+
    def handle_info(:tick, %{assigns: %{rotation: r}} = scene)
       when scene.assigns.rotation >= 0 and scene.assigns.rotation <= 360 do
          # Logger.debug "#{__MODULE__} received: :tick"
 
-         scene = scene
-         |> assign(rotation: scene.assigns.rotation + 0.2)
+         scene =
+            scene
+            |> assign(rotation: scene.assigns.rotation + 0.2)
 
          new_graph =
-         scene.assigns.graph
-         |> Scenic.Graph.modify(:inner_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
-         |> Scenic.Graph.modify(:mid_triangle, &Scenic.Primitives.update_opts(&1, rotate: degree_in_radians(scene.assigns.rotation)))
-         |> Scenic.Graph.modify(:outer_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
+            scene.assigns.graph
+            |> Scenic.Graph.modify(:inner_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
+            |> Scenic.Graph.modify(:mid_triangle, &Scenic.Primitives.update_opts(&1, rotate: degree_in_radians(scene.assigns.rotation)))
+            |> Scenic.Graph.modify(:outer_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
 
          new_scene =
-         scene
-         |> assign(graph: new_graph)
-         |> push_graph(new_graph)
+            scene
+            |> assign(graph: new_graph)
+            |> push_graph(new_graph)
       
       {:noreply, new_scene}
    end
 
-   def handle_info(:tick, %{assigns: %{rotation: r}} = scene) do
-         # Logger.debug "#{__MODULE__} received: :tick - and we need to reset our timer!"
+   # def handle_info(:tick, %{assigns: %{rotation: r}} = scene) do
+   #       # Logger.debug "#{__MODULE__} received: :tick - and we need to reset our timer!"
 
-         scene = scene
-         |> assign(rotation: 0)
+   #       scene = scene
+   #       |> assign(rotation: 0)
 
-         new_graph =
-         scene.assigns.graph
-         |> Scenic.Graph.modify(:inner_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
-         |> Scenic.Graph.modify(:mid_triangle, &Scenic.Primitives.update_opts(&1, rotate: degree_in_radians(scene.assigns.rotation)))
-         |> Scenic.Graph.modify(:outer_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
+   #       new_graph =
+   #       scene.assigns.graph
+   #       |> Scenic.Graph.modify(:inner_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
+   #       |> Scenic.Graph.modify(:mid_triangle, &Scenic.Primitives.update_opts(&1, rotate: degree_in_radians(scene.assigns.rotation)))
+   #       |> Scenic.Graph.modify(:outer_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
 
-         new_scene =
-         scene
-         |> assign(graph: new_graph)
-         |> push_graph(new_graph)
+   #       new_scene =
+   #       scene
+   #       |> assign(graph: new_graph)
+   #       |> push_graph(new_graph)
       
-      {:noreply, new_scene}
-   end
+   #    {:noreply, new_scene}
+   # end
 
    def handle_input({:cursor_pos, {x, y}}, _context, %{assigns: %{frame: frame}} = scene) do
       centerpoint = Frame.center(frame)

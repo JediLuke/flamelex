@@ -6,6 +6,11 @@ defmodule Flamelex.API.Renseijin do
    — Friedrich Nietzsche
    """
 
+   def reset_animation do
+      Flamelex.GUI.Component.Renseijin
+      |> GenServer.cast(:reset_animation)
+   end
+
    def start_animation do
 
       # NOTE - this is one of the few components which we go around the
