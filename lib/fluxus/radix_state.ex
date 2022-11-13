@@ -14,11 +14,16 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
       {:ok, ibm_plex_mono_font_metrics} =
          TruetypeMetrics.load("./assets/fonts/IBMPlexMono-Regular.ttf")
 
+      #TODO initialize the whole all with some default layer states
+
       %{
          root: %{
             active_app: :desktop,
             # active_app: :renseijin,
             graph: nil, # This holds the layers construct
+            layers: %{
+               one: nil
+            }
             # layers: [ # The final %Graph{} which we are holding on to for, for each layer
             #    #NOTE: We use a Keyword list, as it works better for pattern matching than maps with keys
             #    one: nil,
