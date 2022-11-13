@@ -123,10 +123,12 @@ defmodule Flamelex.GUI.RootScene do
    end
 
    def render_layers(radix_state) do
-      #TODO add a layer 0, to render the Renseijin
-      #NOTE: The ids of these layers needs to mtch the keys in the RadiXState.root.layer_list
       full_graph =
          Scenic.Graph.build()
+         |> Flamelex.GUI.Component.Layer.add_to_graph(%{
+            layer_module: Flamelex.GUI.Layers.LayerZero,
+            radix_state: radix_state
+         }, id: :zero)
          |> Flamelex.GUI.Component.Layer.add_to_graph(%{
                layer_module: Flamelex.GUI.Layers.LayerOne,
                radix_state: radix_state

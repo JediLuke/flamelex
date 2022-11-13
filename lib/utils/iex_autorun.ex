@@ -26,7 +26,7 @@ defmodule Flamelex.IExAutoRun do
 
     Welcome to Flamelex
     -------------------
-    v0.3.2
+    v0.3.7
 
     ")
 

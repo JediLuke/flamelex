@@ -53,4 +53,5 @@ defmodule Flamelex.Fluxus.RadixReducer do
          {:error, "#{__MODULE__} -- Reducer `#{inspect reducer}` could not match action: #{inspect action}"}
       end
    end
+
 end

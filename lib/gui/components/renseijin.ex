@@ -1,23 +1,4 @@
-defmodule Flamelex.GUI.Renseijin do
-  @moduledoc """
-  This module provides a nice CLAPI (Command-line API) - intended to be
-  used by a programmer via IEx.
-  """
-  require Logger
-  use Flamelex.ProjectAliases
-
-  def transmote do
-    {:ok, pid} =
-      Flamelex.GUI.Component.TransmutationCircle.rego_tag(%{})
-      |> ProcessRegistry.lookup()
-
-    GenServer.cast(pid, :transmotion_begin)
-
-    Logger.info "~~ Double, double toil and trouble; Fire burn and cauldron bubble ~~"
-  end
-end
-
-defmodule Flamelex.GUI.Component.TransmutationCircle do
+defmodule Flamelex.GUI.Component.Renseijin do
   @moduledoc """
   In order to begin an alchemical transmutation, a symbol called a
   Transmutation Circle (錬成陣, Renseijin) is necessary. A Transmutation
@@ -50,64 +31,45 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
        lines of text) are prevalent and represent a multitude of other,
        specific functions for the alchemical energy that is released.
 
-    - https://fma.fandom.com/wiki/Alchemy
+  - https://fma.fandom.com/wiki/Alchemy
   """
-  # use Flamelex.GUI.ComponentBehaviour
   use Scenic.Component
-  alias Flamelex.GUI.GeometryLib.Trigonometry
   alias ScenicWidgets.Core.Structs.Frame
   require Logger
 
   @primary_color :dark_violet
   @pi 3.14159265359
 
-  def validate(%{ref: r} = data) do
+  def validate(%{frame: %Frame{} = _f, animate?: animate?} = data) when is_boolean(animate?) do
     #Logger.debug "#{__MODULE__} has valid input data."
     {:ok, data}
   end
 
-  def mount(%Scenic.Graph{} = graph, %{ref: r} = params) do
-    graph |> add_to_graph(params, id: r) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
-  end
-  def mount(%Scenic.Graph{} = graph, params) do
-    graph |> add_to_graph(params) #REMINDER: `params` goes to this modules init/2, via verify/1 (as this is the way Scenic works)
-  end
 
-
-  def init(scene, params, opts) do
+  def init(scene, args, opts) do
     Logger.debug "#{__MODULE__} initializing..."
-    # Process.register(self(), __MODULE__)
-    # Flamelex.GUI.ScenicInitialize.load_custom_fonts_into_global_cache()
 
-    Flamelex.Utils.ProcessRegistry.register(rego_tag())
-    #NOTE: `Flamelex.GUI.Controller` will boot next & take control of
-    #      the scene, so we just need to initialize it with *something*
-    new_graph = 
-      render(params.frame, %{})
+    Process.register(self(), __MODULE__)
 
-      # |> Scenic.Primitives.text("Lukey", font: :ibm_plex_mono, t: {200, 200}, font_size: 24, fill: :white)
-#                     translate: {25, 50 + offset_count * 110}, # text draws from bottom-left corner?? :( also, how high is it???
-#                     font_size: 24, fill: :black)
-      # Scenic.Graph.build()
-      # |> Scenic.Primitives.rect({80, 80}, fill: :white,  translate: {100, 100})
+    new_graph = render(args.frame)
 
     new_scene =
       scene
       |> assign(graph: new_graph)
-      |> assign(frame: params.frame)
+      |> assign(frame: args.frame)
       |> assign(rotation: 0)
-      |> assign(transmoting?: false)
+      |> assign(animate?: args.animate?)
       |> push_graph(new_graph)
     
-    request_input(new_scene, [:cursor_pos])
+    # request_input(new_scene, [:cursor_pos])
 
     {:ok, new_scene}
   end
 
   @animation_rate 10 # 100ms framerate? tick every 100ms?
 
-  def handle_cast(:transmotion_begin, %{assigns: %{transmoting?: true}} = scene) do
-    #Logger.debug "#{__MODULE__} received msg: :transmotion_begin, but ignoring it because we're already transmoting!"
+  def handle_cast(:start_animation, %{assigns: %{animate?: true}} = scene) do
+    #Logger.debug "#{__MODULE__} received msg: :start_animation, but ignoring it because we're already animated..."
     {:noreply, scene}
   end
 
@@ -133,63 +95,36 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
   # the process with timer messages (thus increasing animation speed) up
   # until a point, whereupon the animation began to SLOW again, probably
   # because it had a big backlock of messages!
-  #
-  # Remember kids, guards are good, but they don't eliminate all bugs!
 
-  def handle_cast(:transmotion_begin, scene) do
+  def handle_cast(:start_animation, scene) do
     #Logger.debug "#{__MODULE__} received msg: :transmotion_begin"
-    {:ok, timer} = :timer.send_interval(@animation_rate, :animation_tick)
+    {:ok, timer} = :timer.send_interval(@animation_rate, :tick)
     new_scene = scene
-    |> assign(transmoting?: true)
+    |> assign(animate?: true)
     |> assign(timer: timer)
     {:noreply, new_scene}
   end
 
-  def handle_cast(:transmotion_halt, %{assigns: %{transmoting?: true, timer: timer}} = scene) do
+  def handle_cast(:stop_animation, %{assigns: %{animate?: true, timer: timer}} = scene) do
     #Logger.debug "#{__MODULE__} received msg: :transmotion_halt"
     :timer.cancel(timer)
     new_scene = scene
     |> assign(timer: nil)
-    |> assign(transmoting?: false)
+    |> assign(animate?: false)
     {:noreply, new_scene}
   end
 
-  def handle_cast(:transmotion_halt, scene) do
+  def handle_cast(:stop_animation, scene) do
     #Logger.debug "#{__MODULE__} received msg: :transmotion_halt, ignoring it completely..."
     {:noreply, scene}
   end
 
 
-  def rego_tag, do: {:gui_component, :renseijin}
-  def rego_tag(_), do: rego_tag()
-
-  @impl Flamelex.GUI.ComponentBehaviour
-  # def render(%{assigns: %{graph: graph, rotation: r, frame: frame}} = scene) do
-  #   params = %{
-  #     radius: frame.dimensions.width/2, # we can get the scale_factor back this way!
-  #     center: Frame.find_center(frame),
-  #     outer_rim: 42,
-  #     gap_size: 4,
-  #     rotation: r
-  #   }
-  #   Scenic.Graph.build()
-  #   |> Scenic.Primitives.group(fn graph ->
-  #         graph
-  #         |> draw_circles(params)
-  #         |> draw_triangles(params)
-  #      end, [
-  #         id: __MODULE__,
-  #         hidden: false
-  #      ])
-  # end
-  def render(frame, _params) do
-
-
-    # |> Draw.background(frame, @primary_color)
+  def render(frame) do
 
     params = %{
-      radius: frame.dimensions.width/2, # we can get the scale_factor back this way!
-      center: Frame.find_center(frame),
+      radius: frame.dimens.width/2*0.37, # we can get the scale_factor back this way!
+      center: Frame.center(frame),
       outer_rim: 42,
       gap_size: 4,
       rotation: 0
@@ -242,20 +177,20 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
 
     graph
     |> Scenic.Primitives.triangle(
-                Trigonometry.equilateral_triangle_coords(
+                equilateral_triangle_coords(
                   center,
                   radius),
                 id: :inner_triangle,
                 stroke: {1, @primary_color})
     |> Scenic.Primitives.triangle(
-                Trigonometry.equilateral_triangle_coords(
+                equilateral_triangle_coords(
                   center,
                   radius - rim + size),
                 id: :mid_triangle,
                 stroke: {1, @primary_color},
                 rotate: r)
     |> Scenic.Primitives.triangle(
-                Trigonometry.equilateral_triangle_coords(
+                equilateral_triangle_coords(
                   center,
                   radius - rim + 2 * size + size/2),
                 id: :outer_triangle,
@@ -263,22 +198,9 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
   end
 
 
-  def show do
-
-  end
-
-  def hide do
-
-  end
-
-  @impl Flamelex.GUI.ComponentBehaviour
-  def handle_action({_state, _graph}, :hide) do
-    raise "Can't hide TransmutationCircle yet"
-  end
-
-  def handle_info(:animation_tick, %{assigns: %{rotation: r}} = scene)
+  def handle_info(:tick, %{assigns: %{rotation: r}} = scene)
     when scene.assigns.rotation >= 0 and scene.assigns.rotation <= 360 do
-      # Logger.debug "#{__MODULE__} received: :animation_tick"
+      # Logger.debug "#{__MODULE__} received: :tick"
 
       scene = scene
       |> assign(rotation: scene.assigns.rotation + 0.2)
@@ -297,8 +219,8 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
     {:noreply, new_scene}
   end
 
-  def handle_info(:animation_tick, %{assigns: %{rotation: r}} = scene) do
-      # Logger.debug "#{__MODULE__} received: :animation_tick - and we need to reset our timer!"
+  def handle_info(:tick, %{assigns: %{rotation: r}} = scene) do
+      # Logger.debug "#{__MODULE__} received: :tick - and we need to reset our timer!"
 
       scene = scene
       |> assign(rotation: 0)
@@ -320,10 +242,10 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
 
   @cool_kid_radius 80 # area of effect for awesomeness to happen
   def handle_input({:cursor_pos, {x, y}}, _context, %{assigns: %{frame: frame}} = scene) do
-    centerpoint = Frame.find_center(frame)
+    centerpoint = Frame.center(frame)
     #Logger.debug "#{__MODULE__} handling cursor_pos - centerpoint: #{inspect centerpoint}"
     if {x, y} |> within_box?(centerpoint, @cool_kid_radius) do
-      Flamelex.GUI.Renseijin.transmote()
+      Flamelex.API.Renseijin.start_animation()
       {:noreply, scene}
     else
       #Logger.debug "#{__MODULE__} detected cursor_pos `#{inspect {x, y}}`, and classified it as: outside the inner radius"
@@ -356,10 +278,6 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
     (low_x <= query_x) and (query_x <= high_x) and (low_y <= query_y) and (query_y <= high_y)
   end
 
-  # def within_radius?({query_x, query_y}, {base_x, base_y}, radius) do
-  #   raise "need to re-math again"
-  # end
-
 
   def degree_in_radians(x) do
     (2*@pi*x)/360
@@ -367,5 +285,15 @@ defmodule Flamelex.GUI.Component.TransmutationCircle do
 
   def kaomoji do
     "☆*:.｡.o(≧▽≦)o.｡.:*☆"
+  end
+
+  def equilateral_triangle_coords(centroid, centroid_to_vertex_length, _rotation \\ 0) do
+    cvl = centroid_to_vertex_length # for convenience
+
+    {
+      {centroid.x - :math.sqrt(3) * cvl / 2, centroid.y + cvl/2},
+      {centroid.x, centroid.y - cvl},
+      {centroid.x + :math.sqrt(3) * cvl / 2, centroid.y + cvl/2}
+    }
   end
 end

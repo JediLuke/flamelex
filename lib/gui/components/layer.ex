@@ -3,6 +3,7 @@ defmodule Flamelex.GUI.Component.Layer do
    require Logger
    
    @layers [
+      Flamelex.GUI.Layers.LayerZero,
       Flamelex.GUI.Layers.LayerOne,
       Flamelex.GUI.Layers.LayerTwo,
       Flamelex.GUI.Layers.LayerThree

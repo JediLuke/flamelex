@@ -38,31 +38,69 @@ defmodule Flamelex.GUI.Layers.LayerTwo do
       [
          {:sub_menu, "Flamelex",
             [
-               {"temet nosce", &Flamelex.temet_nosce/0},
-               {"show cmder", &Flamelex.API.Kommander.show/0},
-               {"hide cmder", &Flamelex.API.Kommander.hide/0},
-               {:sub_menu, "sub menu test", [
-                  {"first item", fn -> IO.puts "clicked: `first item`" end},
-                  {"second item", fn -> IO.puts "clicked: `second item`" end},
-                  {:sub_menu, "sub sub menu", [
-                     {"item [1,4,3,1]", fn -> IO.puts "clicked: `[1,4,3,1]`" end}
-                  ]},
-                  {"fourth item", fn -> IO.puts "clicked: `fourth item`" end},
-                  {:sub_menu, "another sub menu", [
-                        {:sub_menu, "deeply nested", [
-                              {"deeply nested 1", fn -> IO.puts "clicked: `deeply nested 1`" end},
-                              {:sub_menu, "deepest menu", [
-                                 {"another button", fn -> IO.puts "clicked: `another button`" end},
-                                 {"treasure", fn -> IO.puts "Congratulations! You found the treasure!" end},
-                              ]},
-                              {"deeply nested 2", fn -> IO.puts "deeply nested 2" end},
-                              {"deeply nested 3", fn -> IO.puts "deeply nested 3" end},
-                        ]}
-                  ]},
-                  {"last item", fn -> IO.puts "clicked: `last`" end}
+               {:sub_menu, "Editor", [
+                  {"toggle line nums", fn -> raise "no" end},
+                  {"toggle file tray", fn -> raise "no" end},
+                  {"toggle tab bar", fn -> raise "no" end},
+                  {:sub_menu, "font", [
+                  {:sub_menu, "primary font",
+                     [
+                     {"ibm plex mono", fn ->
+                        Flamelex.Fluxus.RadixStore.get()
+                        |> QuillEx.Reducers.RadixReducer.change_font(:ibm_plex_mono)
+                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                     end},
+                     {"roboto", fn ->
+                        Flamelex.Fluxus.RadixStore.get()
+                        |> QuillEx.Reducers.RadixReducer.change_font(:roboto)
+                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                     end},
+                     {"roboto mono", fn ->
+                        Flamelex.Fluxus.RadixStore.get()
+                        |> QuillEx.Reducers.RadixReducer.change_font(:roboto_mono)
+                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                     end},
+                     {"iosevka", fn ->
+                        Flamelex.Fluxus.RadixStore.get()
+                        |> QuillEx.Reducers.RadixReducer.change_font(:iosevka)
+                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                     end},
+                     {"source code pro", fn ->
+                        Flamelex.Fluxus.RadixStore.get()
+                        |> QuillEx.Reducers.RadixReducer.change_font(:source_code_pro)
+                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                     end},
+                     {"fira code", fn ->
+                        Flamelex.Fluxus.RadixStore.get()
+                        |> QuillEx.Reducers.RadixReducer.change_font(:fira_code)
+                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                     end},
+                     {"bitter", fn ->
+                        Flamelex.Fluxus.RadixStore.get()
+                        |> QuillEx.Reducers.RadixReducer.change_font(:bitter)
+                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                     end}
+                     ]},
+                  {"make bigger", fn ->
+                     Flamelex.Fluxus.RadixStore.get()
+                     |> QuillEx.Reducers.RadixReducer.change_font_size(:increase)
+                     |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                  end},
+                  {"make smaller", fn ->
+                     Flamelex.Fluxus.RadixStore.get()
+                     |> QuillEx.Reducers.RadixReducer.change_font_size(:decrease)
+                     |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                  end}
+                  ]}
                ]},
-               # {:sub_menu, "arity/0 demo", ScenicWidgets.MenuBar.zero_arity_functions(ArityZeroDemo)}
-               #DevTools
+               {:sub_menu, "Kommander", [
+                  {"show", &Flamelex.API.Kommander.show/0},
+                  {"hide", &Flamelex.API.Kommander.hide/0},
+               ]},
+               {:sub_menu, "DevTools", [
+                  {"get radix state", fn -> Flamelex.API.DevTools.get_radix_state() |> IO.inspect() end},
+                  {"temet nosce", &Flamelex.temet_nosce/0}
+               ]}
             ]},
          {:sub_menu, "Buffer", buffer_menu(radix_state)},
          {:sub_menu, "Memex",
@@ -75,7 +113,7 @@ defmodule Flamelex.GUI.Layers.LayerTwo do
          {:sub_menu, "API", ScenicWidgets.MenuBar.modules_and_zero_arity_functions("Elixir.Flamelex.API")},
          # {"Help", [
          # GettingStarted
-         # {"About QuillEx", &Flamelex.API.Misc.makers_mark/0}]},
+         # {"About Flamelex", &Flamelex.API.Misc.makers_mark/0}]},
       ]
    end
 

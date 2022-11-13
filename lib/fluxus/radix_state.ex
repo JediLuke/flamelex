@@ -29,14 +29,21 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
          },
          gui: %{
             viewport: nil,
-            theme: Flamelex.GUI.Utils.Theme.default(),
-            fonts: %{
-               primary: ScenicWidgets.TextPad.Structs.Font.new(%{
-                  name: :ibm_plex_mono,
-                  metrics: ibm_plex_mono_font_metrics
-               })
-            }
+            theme: Flamelex.GUI.Utils.Theme.default()
+            # fonts: %{
+            #    primary: ScenicWidgets.TextPad.Structs.Font.new(%{
+            #       name: :ibm_plex_mono,
+            #       metrics: ibm_plex_mono_font_metrics
+            #    })
+            # }
          },
+         desktop: %{
+            renseijin: %{
+               visible?: true,
+               animate?: false
+             },
+         },
+         #TODO move this into desktop...
          menu_bar: %{
             font: :ibm_plex_mono,
             height: 60,
@@ -48,6 +55,11 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
             }
          },
          editor: %{
+            font: ScenicWidgets.TextPad.Structs.Font.new(%{
+               name: :ibm_plex_mono,
+               metrics: ibm_plex_mono_font_metrics,
+               size: 24
+            }),
             graph: nil,
             buffers: [], # A list of %Buffer{} structs
             active_buf: nil,
@@ -112,14 +124,14 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
    end
 
 
-   defdelegate change_font(radix_state, new_font),
-      to: QuillEx.Fluxus.Structs.RadixState
+   # defdelegate change_font(radix_state, new_font),
+   #    to: QuillEx.Fluxus.Structs.RadixState
 
-   defdelegate change_font_size(radix_state, direction),
-      to: QuillEx.Fluxus.Structs.RadixState
+   # defdelegate change_font_size(radix_state, direction),
+   #    to: QuillEx.Fluxus.Structs.RadixState
 
-   defdelegate change_editor_scroll_state(radix_state, new_scroll_state),
-      to: QuillEx.Fluxus.Structs.RadixState
+   # defdelegate change_editor_scroll_state(radix_state, new_scroll_state),
+   #    to: QuillEx.Fluxus.Structs.RadixState
 
 
   #TODO it should be possible to use the action/keystroke history to record macros
