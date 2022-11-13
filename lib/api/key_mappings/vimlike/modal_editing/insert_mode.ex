@@ -4,9 +4,16 @@ defmodule Flamelex.KeyMappings.Vim.InsertMode do
 
    @ignorable_keys [@shift_space, @meta, @left_ctrl]
 
+   # These are convenience bindings to make the code more readable when moving cursors
+   @left_one_column {0, -1}
+   @up_one_row {-1, 0}
+   @right_one_column {0, 1}
+   @down_one_row {1, 0}
+
    def process(%{editor: %{active_buf: active_buf}}, @escape_key) do
-      #TODO MOVE ONE TO THE LEFT, except if we're already at cursor 1??
       Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :normal}})
+      # NOTE - we have to go back one column because insert & normal mode don't align on what column they're operating on...
+      Flamelex.API.Buffer.move_cursor(@left_one_column)
    end
 
    # treat key repeats as a press

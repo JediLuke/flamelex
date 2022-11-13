@@ -114,6 +114,9 @@ defmodule Flamelex.API.Buffer do
   #   Flamelex.Fluxus.action({MemexReducer, {:modify_tidbit, t, modification}})
   # end
 
+  def modify(%{id: buf_id}, modification) do
+    modify(buf_id, modification)
+  end
 
   def modify({:buffer, _buf_id} = buffer, modification) do
     Flamelex.Fluxus.action({BufferReducer, {:modify_buf, buffer, modification}})

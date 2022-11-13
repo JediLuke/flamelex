@@ -1,7 +1,13 @@
 defmodule Flamelex.KeyMappings.Vim.NormalMode do
    use Flamelex.Keymaps.Editor.GlobalBindings
+   alias QuillEx.Reducers.BufferReducer.Utils
    require Logger
 
+   # These are convenience bindings to make the code more readable when moving cursors
+   @left_one_column {0, -1}
+   @up_one_row {-1, 0}
+   @right_one_column {0, 1}
+   @down_one_row {1, 0}
 
    def process(_state, @leader) do
       Logger.debug " <<-- Leader key pressed -->>"
@@ -23,38 +29,50 @@ defmodule Flamelex.KeyMappings.Vim.NormalMode do
 
 
    # switch to insert mode
-   def process(%{root: %{active_app: :editor}, editor: %{active_buf: active_buf}} = state, @lowercase_i) do
-      :ok = Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :insert}})
+   def process(%{root: %{active_app: :editor}, editor: %{active_buf: active_buf}}, @lowercase_i) do
+      Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :insert}})
+   end
+
+   def process(%{root: %{active_app: :editor}, editor: %{active_buf: active_buf}}, @lowercase_a) do
+      Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :insert}})
+      Flamelex.API.Buffer.move_cursor(@right_one_column)
+   end
+
+   def process(radix_state, @lowercase_o) do
+      active_buf = %{cursors: [cursor]} = Utils.filter_active_buf(radix_state)
+      Flamelex.API.Buffer.modify(active_buf, {:insert_line, after: cursor.line, text: ""})
+      Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :insert}})
+      Flamelex.API.Buffer.move_cursor(@down_one_row)
    end
 
    # hjkl navigation
    def process(_radix_state, @lowercase_h) do
-      :ok = Flamelex.API.Buffer.move_cursor({0, -1})
+      Flamelex.API.Buffer.move_cursor(@left_one_column)
    end
 
    def process(_radix_state, @lowercase_j) do
-      :ok = Flamelex.API.Buffer.move_cursor({1, 0})
+      Flamelex.API.Buffer.move_cursor(@down_one_row)
    end
 
    def process(_radix_state, @lowercase_k) do
-      :ok = Flamelex.API.Buffer.move_cursor({-1, 0})
+      Flamelex.API.Buffer.move_cursor(@up_one_row)
    end
 
    def process(_radix_state, @lowercase_l) do
-      :ok = Flamelex.API.Buffer.move_cursor({0, 1})
+      Flamelex.API.Buffer.move_cursor(@right_one_column)
    end
 
    def process(_radix_state, key) when key in @arrow_keys do
       # REMINDER: these tuples are in the form `{line, col}`
       delta = case key do
          @left_arrow ->
-            {0, -1}
+            @left_one_column
          @up_arrow ->
-            {-1, 0}
+            @up_one_row
          @right_arrow ->
-            {0, 1}
+            @right_one_column
          @down_arrow ->
-            {1, 0}
+            @down_one_row
       end
 
       Flamelex.API.Buffer.move_cursor(delta)
