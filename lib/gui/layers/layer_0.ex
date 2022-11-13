@@ -4,7 +4,7 @@ defmodule Flamelex.GUI.Layers.LayerZero do
 
 
    @impl Flamelex.GUI.Layer.Behaviour
-   def calc_state(%{desktop: %{renseijin: state}} = radix_state) do
+   def calc_state(%{root: %{active_app: :desktop}, desktop: %{renseijin: state}} = radix_state) do
 
       # use the same frame as Editor for the Renseijin
       %{framestack: [_menubar_f|editor_f]} =
@@ -14,6 +14,10 @@ defmodule Flamelex.GUI.Layers.LayerZero do
          )
 
       state |> Map.merge(%{frame: hd(editor_f)})
+   end
+
+   def calc_state(_radix_state) do
+      %{visible?: false}
    end
 
 
