@@ -24,14 +24,16 @@ defmodule Flamelex.GUI.Layers.LayerTwo do
 
    @impl Flamelex.GUI.Layer.Behaviour
    def render(layer_state, _radix_state) do
-      Scenic.Graph.build()
-      |> ScenicWidgets.MenuBar.add_to_graph(%{
-            frame: layer_state.frame,
-            menu_map: layer_state.menu_map,
-            font: layer_state.font
-         },
-         id: :menu_bar
-      )
+      {:ok,
+         Scenic.Graph.build()
+         |> ScenicWidgets.MenuBar.add_to_graph(%{
+               frame: layer_state.frame,
+               menu_map: layer_state.menu_map,
+               font: layer_state.font
+            },
+            id: :menu_bar
+         )
+      }
    end
 
    def calc_menu_map(radix_state) do

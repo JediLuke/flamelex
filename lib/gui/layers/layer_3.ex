@@ -24,11 +24,13 @@ defmodule Flamelex.GUI.Layers.LayerThree do
    @impl Flamelex.GUI.Layer.Behaviour
    def render(%{frame: kommander_frame}, radix_state) do
 
-      Scenic.Graph.build()
-      |> Flamelex.GUI.Component.Kommander.add_to_graph(%{
-          frame: kommander_frame,
-          radix_state: radix_state
-      })
+      {:ok,
+         Scenic.Graph.build()
+         |> Flamelex.GUI.Component.Kommander.add_to_graph(%{
+            frame: kommander_frame,
+            radix_state: radix_state
+         })
+      }
    end
 
 end

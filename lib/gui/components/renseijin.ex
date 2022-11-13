@@ -140,6 +140,19 @@ defmodule Flamelex.GUI.Component.Renseijin do
       {:noreply, new_scene}
    end
 
+   def handle_cast({:redraw, args}, scene) do
+      new_graph = render(args.frame)
+
+      new_scene =
+         scene
+         |> assign(graph: new_graph)
+         |> assign(frame: args.frame)
+         |> assign(animate?: args.animate?)
+         |> push_graph(new_graph)
+      
+      {:noreply, new_scene}
+   end
+
    def handle_info(:tick, %{assigns: %{rotation: r}} = scene)
       when scene.assigns.rotation >= 0 and scene.assigns.rotation <= 360 do
          # Logger.debug "#{__MODULE__} received: :tick"

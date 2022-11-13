@@ -24,17 +24,18 @@ defmodule Flamelex.GUI.Layers.LayerOne do
 
    @impl Flamelex.GUI.Layer.Behaviour
    def render(%{active_app: :desktop}, _radix_state) do
-      Scenic.Graph.build()
+      {:ok, Scenic.Graph.build()}
    end
 
    def render(%{active_app: :editor, frame: frame}, radix_state) do
-
-      Scenic.Graph.build()
-      |> QuillEx.GUI.Components.Editor.add_to_graph(%{
-         frame: frame,
-         radix_state: radix_state,
-         app: Flamelex
-      })
+      {:ok,
+         Scenic.Graph.build()
+         |> QuillEx.GUI.Components.Editor.add_to_graph(%{
+            frame: frame,
+            radix_state: radix_state,
+            app: Flamelex
+         })
+      }
    end
 
 end

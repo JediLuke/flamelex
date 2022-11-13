@@ -23,15 +23,24 @@ defmodule Flamelex.GUI.Layers.LayerZero do
 
    @impl Flamelex.GUI.Layer.Behaviour
    def render(%{visible?: false}, _radix_state) do
-      Scenic.Graph.build()
+      {:ok, Scenic.Graph.build()}
    end
 
-   def render(%{frame: frame, visible?: true, animate?: animate?}, _radix_state) do
-      Scenic.Graph.build()
-      |> Renseijin.add_to_graph(%{
-         frame: frame,
-         animate?: animate?
-      })
+   def render(renseijin_state = %{frame: frame, visible?: true, animate?: animate?}, %{root: %{active_app: :desktop}, desktop: %{renseijin: %{visible?: true}}}) do
+      Process.whereis(Flamelex.GUI.Component.Renseijin)
+      |> case do
+         nil ->
+            {:ok,
+               Scenic.Graph.build()
+               |> Renseijin.add_to_graph(%{
+                  frame: frame,
+                  animate?: animate?
+               })
+            }
+         pid when is_pid(pid) ->
+            GenServer.cast(pid, {:redraw, renseijin_state})
+            :ignore
+      end
    end
 
 end
