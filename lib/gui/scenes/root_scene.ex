@@ -35,10 +35,6 @@ defmodule Flamelex.GUI.RootScene do
    # %Layer{} component, not the RootScene
 
 
-   @ignorable_input_events [
-      :viewport_enter,
-      :viewport_exit,
-   ]
 
    def init(init_scene, _args, opts) do
       Logger.debug("#{__MODULE__} initializing...")
@@ -58,7 +54,7 @@ defmodule Flamelex.GUI.RootScene do
       |> assign(graph: root_graph)
       |> push_graph(root_graph)
 
-      request_input(new_scene, [:cursor_button, :cursor_scroll, :key])
+      request_input(new_scene, [:viewport, :cursor_button, :cursor_scroll, :key])
 
       {:ok, new_scene}
    end
@@ -67,29 +63,23 @@ defmodule Flamelex.GUI.RootScene do
    #    {:reply, {:ok, scene.viewport}, scene}
    # end
 
-   # NOTE - although we don't want to put much input handling logic here,
-   # it's convenient just to filter out stuff which we know we want to ignore
-   def handle_input({event, _details}, _context, scene)
-      when event in @ignorable_input_events do
-         Logger.debug "#{__MODULE__} ignoring event: #{inspect event}"
-         {:noreply, scene}
+   def handle_input({:viewport, {:enter, _coords}}, context, scene) do
+      Logger.debug "#{__MODULE__} ignoring `:viewport_enter`..."
+      {:noreply, scene}
+   end
+
+   def handle_input({:viewport, {:exit, _coords}}, context, scene) do
+      Logger.debug "#{__MODULE__} ignoring `:viewport_exit`..."
+      {:noreply, scene}
    end
 
    def handle_input({:viewport, {:reshape, {new_width, new_height} = new_dimensions}}, context, scene) do # e.g. of new_dimensions: {1025, 818}
       Logger.debug "#{__MODULE__} received :viewport :reshape, dim: #{inspect new_dimensions}"
 
-      raise "can't handle resizing right now"
-      # new_scene = scene
-      # |> assign(frame: Frame.new(
-      #                    pin: {0, 0},
-      #                    orientation: :top_left,
-      #                    size: {new_width, new_height},
-      #                    #TODO deprecate below args
-      #                    top_left: Coordinates.new(x: 0, y: 0), # this is a guess
-      #                    dimensions: Dimensions.new(width: new_width, height: new_height)))
-      # |> render_push_graph()
+      new_viewport = %{scene.viewport|size: new_dimensions}
+      Flamelex.Fluxus.RadixStore.update_viewport(new_viewport)
 
-      {:noreply, scene}
+      {:noreply, %{scene|viewport: new_viewport}}
    end
 
    def handle_input({:key, {key, @key_released, _opts}}, _context, scene) do
@@ -117,7 +107,7 @@ defmodule Flamelex.GUI.RootScene do
    end
 
    def handle_input(input, context, scene) do
-      #Logger.debug "#{__MODULE__} recv'd some (non-ignored) input: #{inspect input}"
+      Logger.debug "#{__MODULE__} recv'd some (non-ignored) input: #{inspect input}"
       Flamelex.Fluxus.input(input)
       {:noreply, scene}
    end

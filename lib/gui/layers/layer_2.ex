@@ -48,48 +48,48 @@ defmodule Flamelex.GUI.Layers.LayerTwo do
                      {"ibm plex mono", fn ->
                         Flamelex.Fluxus.RadixStore.get()
                         |> QuillEx.Reducers.RadixReducer.change_font(:ibm_plex_mono)
-                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                        |> Flamelex.Fluxus.RadixStore.update()
                      end},
                      {"roboto", fn ->
                         Flamelex.Fluxus.RadixStore.get()
                         |> QuillEx.Reducers.RadixReducer.change_font(:roboto)
-                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                        |> Flamelex.Fluxus.RadixStore.update()
                      end},
                      {"roboto mono", fn ->
                         Flamelex.Fluxus.RadixStore.get()
                         |> QuillEx.Reducers.RadixReducer.change_font(:roboto_mono)
-                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                        |> Flamelex.Fluxus.RadixStore.update()
                      end},
                      {"iosevka", fn ->
                         Flamelex.Fluxus.RadixStore.get()
                         |> QuillEx.Reducers.RadixReducer.change_font(:iosevka)
-                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                        |> Flamelex.Fluxus.RadixStore.update()
                      end},
                      {"source code pro", fn ->
                         Flamelex.Fluxus.RadixStore.get()
                         |> QuillEx.Reducers.RadixReducer.change_font(:source_code_pro)
-                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                        |> Flamelex.Fluxus.RadixStore.update()
                      end},
                      {"fira code", fn ->
                         Flamelex.Fluxus.RadixStore.get()
                         |> QuillEx.Reducers.RadixReducer.change_font(:fira_code)
-                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                        |> Flamelex.Fluxus.RadixStore.update()
                      end},
                      {"bitter", fn ->
                         Flamelex.Fluxus.RadixStore.get()
                         |> QuillEx.Reducers.RadixReducer.change_font(:bitter)
-                        |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                        |> Flamelex.Fluxus.RadixStore.update()
                      end}
                      ]},
                   {"make bigger", fn ->
                      Flamelex.Fluxus.RadixStore.get()
                      |> QuillEx.Reducers.RadixReducer.change_font_size(:increase)
-                     |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                     |> Flamelex.Fluxus.RadixStore.update()
                   end},
                   {"make smaller", fn ->
                      Flamelex.Fluxus.RadixStore.get()
                      |> QuillEx.Reducers.RadixReducer.change_font_size(:decrease)
-                     |> Flamelex.Fluxus.RadixStore.broadcast_update()
+                     |> Flamelex.Fluxus.RadixStore.update()
                   end}
                   ]}
                ]},

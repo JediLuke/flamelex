@@ -53,6 +53,20 @@ defmodule Flamelex.Fluxus.RadixStore do
     end)
   end
 
+  def update_viewport(%Scenic.ViewPort{} = new_vp) do
+    Agent.update(__MODULE__, fn radix_state ->
+      
+      new_radix_state =
+        radix_state |> put_in([:gui, :viewport], new_vp)
+
+      Flamelex.Utils.PubSub.broadcast(
+        topic: :radix_state_change,
+        msg: {:radix_state_change, new_radix_state})
+
+      new_radix_state
+    end)
+  end
+
   #NOTE: When `Flamelex.GUI.RootScene` boots, it calls this function
   #      to reset the values of `graph` and `viewport`. We don't want to
   #      broadcast these changes out.
@@ -63,7 +77,7 @@ defmodule Flamelex.Fluxus.RadixStore do
     end)
   end
 
-  def broadcast_update(new_state) do
+  def update(new_state) do
     Logger.debug("#{__MODULE__} updating state & broadcasting new_state...")
     #Logger.debug("#{__MODULE__} updating state & broadcasting new_state: #{inspect(new_state)}")
 
