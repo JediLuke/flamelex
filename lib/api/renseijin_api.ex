@@ -24,4 +24,8 @@ defmodule Flamelex.API.Renseijin do
       |> GenServer.cast(:stop_animation)
    end
 
+   # def kaomoji do
+   #   "☆*:.｡.o(≧▽≦)o.｡.:*☆"
+   # end
+
 end
