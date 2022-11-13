@@ -27,6 +27,39 @@ defmodule Flamelex.KeyMappings.Vim.NormalMode do
       :ok = Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :insert}})
    end
 
+   # hjkl navigation
+   def process(_radix_state, @lowercase_h) do
+      :ok = Flamelex.API.Buffer.move_cursor({0, -1})
+   end
+
+   def process(_radix_state, @lowercase_j) do
+      :ok = Flamelex.API.Buffer.move_cursor({1, 0})
+   end
+
+   def process(_radix_state, @lowercase_k) do
+      :ok = Flamelex.API.Buffer.move_cursor({-1, 0})
+   end
+
+   def process(_radix_state, @lowercase_l) do
+      :ok = Flamelex.API.Buffer.move_cursor({0, 1})
+   end
+
+   def process(_radix_state, key) when key in @arrow_keys do
+      # REMINDER: these tuples are in the form `{line, col}`
+      delta = case key do
+         @left_arrow ->
+            {0, -1}
+         @up_arrow ->
+            {-1, 0}
+         @right_arrow ->
+            {0, 1}
+         @down_arrow ->
+            {1, 0}
+      end
+
+      Flamelex.API.Buffer.move_cursor(delta)
+   end
+
 
   # def map(%{active_buffer: active_buf}) do
   #   %{
