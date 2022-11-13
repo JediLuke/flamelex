@@ -123,14 +123,14 @@ defmodule Flamelex.GUI.Component.Renseijin do
       #Logger.debug "#{__MODULE__} received msg: :transmotion_halt, ignoring it completely..."
 
       scene =
-         scene
-         |> assign(rotation: 0)
+         scene |> assign(rotation: 0)
 
       new_graph =
          scene.assigns.graph
          |> Scenic.Graph.modify(:inner_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
          |> Scenic.Graph.modify(:mid_triangle, &Scenic.Primitives.update_opts(&1, rotate: degree_in_radians(scene.assigns.rotation)))
          |> Scenic.Graph.modify(:outer_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
+         |> Scenic.Graph.modify(:taijitu, &Scenic.Primitives.update_opts(&1, rotate: degree_in_radians(scene.assigns.rotation)))
 
       new_scene =
          scene
@@ -153,19 +153,15 @@ defmodule Flamelex.GUI.Component.Renseijin do
       {:noreply, new_scene}
    end
 
-   def handle_info(:tick, %{assigns: %{rotation: r}} = scene)
-      when scene.assigns.rotation >= 0 and scene.assigns.rotation <= 360 do
-         # Logger.debug "#{__MODULE__} received: :tick"
+   def handle_info(:tick, %{assigns: %{rotation: r}} = scene) when r < 0 or r > 360 do
+         # reset the rotation, we've gone full-circle
 
          scene =
-            scene
-            |> assign(rotation: scene.assigns.rotation + 0.2)
+            scene |> assign(rotation: 0)
 
          new_graph =
             scene.assigns.graph
-            |> Scenic.Graph.modify(:inner_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
-            |> Scenic.Graph.modify(:mid_triangle, &Scenic.Primitives.update_opts(&1, rotate: degree_in_radians(scene.assigns.rotation)))
-            |> Scenic.Graph.modify(:outer_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
+            |> do_animate(scene.assigns.rotation)
 
          new_scene =
             scene
@@ -175,25 +171,23 @@ defmodule Flamelex.GUI.Component.Renseijin do
       {:noreply, new_scene}
    end
 
-   # def handle_info(:tick, %{assigns: %{rotation: r}} = scene) do
-   #       # Logger.debug "#{__MODULE__} received: :tick - and we need to reset our timer!"
+   def handle_info(:tick, %{assigns: %{rotation: r}} = scene) when r >= 0 and r <= 360 do
+         #Logger.debug "#{__MODULE__} received: :tick"
 
-   #       scene = scene
-   #       |> assign(rotation: 0)
+         scene =
+            scene |> assign(rotation: r + 0.2)
 
-   #       new_graph =
-   #       scene.assigns.graph
-   #       |> Scenic.Graph.modify(:inner_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
-   #       |> Scenic.Graph.modify(:mid_triangle, &Scenic.Primitives.update_opts(&1, rotate: degree_in_radians(scene.assigns.rotation)))
-   #       |> Scenic.Graph.modify(:outer_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(scene.assigns.rotation)))
+         new_graph =
+            scene.assigns.graph
+            |> do_animate(scene.assigns.rotation)
 
-   #       new_scene =
-   #       scene
-   #       |> assign(graph: new_graph)
-   #       |> push_graph(new_graph)
+         new_scene =
+            scene
+            |> assign(graph: new_graph)
+            |> push_graph(new_graph)
       
-   #    {:noreply, new_scene}
-   # end
+      {:noreply, new_scene}
+   end
 
    def handle_input({:cursor_pos, {x, y}}, _context, %{assigns: %{frame: frame}} = scene) do
       centerpoint = Frame.center(frame)
@@ -288,11 +282,25 @@ defmodule Flamelex.GUI.Component.Renseijin do
       # |> Scenic.Primitives.line({{-5, 0}, {5, 0}}, stroke: {1, :grey})
       # |> Scenic.Primitives.line({{-5, 0}, {5, 0}}, stroke: {1, :grey}, translate: {0, -radius/2})
       # |> Scenic.Primitives.line({{-5, 0}, {5, 0}}, stroke: {1, :grey}, translate: {0, radius/2})
-      |> Scenic.Primitives.circle(radius/6, stroke: {1, :grey}, translate: {0, -radius/2})
-      |> Scenic.Primitives.circle(radius/6, stroke: {1, :grey}, translate: {0, radius/2})
-      |> Scenic.Primitives.arc({radius/2, @pi}, stroke: {1, :grey}, rotate: 3*@pi/2, translate: {0, -radius/2})
-      |> Scenic.Primitives.arc({radius/2, @pi}, stroke: {1, :grey}, rotate: @pi/2, translate: {0, radius/2})
-      |> Scenic.Primitives.circle(radius, stroke: {1, :grey})
+      |> Scenic.Primitives.group(fn graph ->
+         graph
+         |> Scenic.Primitives.circle(radius/6, stroke: {1, :grey}, translate: {0, -radius/2})
+         |> Scenic.Primitives.circle(radius/6, stroke: {1, :grey}, translate: {0, radius/2})
+         |> Scenic.Primitives.arc({radius/2, @pi}, stroke: {1, :grey}, rotate: 3*@pi/2, translate: {0, -radius/2})
+         |> Scenic.Primitives.arc({radius/2, @pi}, stroke: {1, :grey}, rotate: @pi/2, translate: {0, radius/2})
+         |> Scenic.Primitives.circle(radius, stroke: {1, :grey})
+      end, [
+         id: :taijitu,
+         rotate: args.rotation
+      ])
+   end
+
+   def do_animate(graph, rotation) do
+      graph
+      |> Scenic.Graph.modify(:inner_triangle, &Scenic.Primitives.update_opts(&1, rotate: degree_in_radians(rotation)))
+      |> Scenic.Graph.modify(:mid_triangle, &Scenic.Primitives.update_opts(&1, rotate: -1*degree_in_radians(rotation)))
+      |> Scenic.Graph.modify(:outer_triangle, &Scenic.Primitives.update_opts(&1, rotate: 2*degree_in_radians(rotation)))
+      |> Scenic.Graph.modify(:taijitu, &Scenic.Primitives.update_opts(&1, rotate: degree_in_radians(rotation)))
    end
 
    def inner_circle_radius(%{
