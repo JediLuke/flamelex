@@ -41,7 +41,7 @@ defmodule Flamelex.API.Buffer do
   end
 
   # this is just for convenience
-  def open(buf), do: switch(buf)
+  def open({:buffer, _id} = buf), do: switch(buf)
 
   @doc """
   Return the active Buffer.
@@ -140,9 +140,12 @@ defmodule Flamelex.API.Buffer do
   @doc """
   Tell a buffer to save it's contents.
   """
+  def save do
+    save(active_buf())
+  end
+
   def save({:buffer, _details} = buf) do
-    raise "THis is probably a bit different now..."
-    # ProcessRegistry.find!(buf) |> GenServer.call(:save)
+    Flamelex.Fluxus.action({BufferReducer, {:save, buf}})
   end
 
 
