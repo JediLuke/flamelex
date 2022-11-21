@@ -32,25 +32,42 @@ defmodule Flamelex.Fluxus.RadixStore do
     Agent.start_link(fn -> radix_state end, name: __MODULE__)
   end
 
-  def get() do
+  def get do
     Agent.get(__MODULE__, & &1)
   end
 
   #NOTE: Here we update, but don't broadcast the changes. For example,
   #      adding user-input to the input history, doesn't need to be broadcast.
   def put(new_state) do
-    Logger.debug("#{__MODULE__} updating state...")
+    #Logger.debug("#{__MODULE__} updating state...")
     Agent.update(__MODULE__, fn _old -> new_state end)
-  end
-
-  def put(new_radix_state, :without_broadcast) do
-    Agent.update(__MODULE__, fn _old -> new_radix_state end)
   end
 
   def put_viewport(%Scenic.ViewPort{} = new_vp) do
     Agent.update(__MODULE__, fn radix_state ->
       radix_state |> put_in([:gui, :viewport], new_vp)
     end)
+  end
+
+  #NOTE: When `Flamelex.GUI.RootScene` boots, it calls this function.
+  #      We don't want to broadcast these changes out.
+  def put_root_graph(new_graph) do
+    Agent.update(__MODULE__, fn radix_state ->
+      radix_state
+      |> put_in([:root, :graph], new_graph)
+    end)
+  end
+
+  # update/1 also broadcasts changes to the rest of the app
+  def update(new_state) do
+    #Logger.debug("#{__MODULE__} updating state & broadcasting new_state...")
+    #Logger.debug("#{__MODULE__} updating state & broadcasting new_state: #{inspect(new_state)}")
+
+    Flamelex.Utils.PubSub.broadcast(
+        topic: :radix_state_change,
+        msg: {:radix_state_change, new_state})
+
+    Agent.update(__MODULE__, fn _old -> new_state end)
   end
 
   def update_viewport(%Scenic.ViewPort{} = new_vp) do
@@ -65,26 +82,5 @@ defmodule Flamelex.Fluxus.RadixStore do
 
       new_radix_state
     end)
-  end
-
-  #NOTE: When `Flamelex.GUI.RootScene` boots, it calls this function
-  #      to reset the values of `graph` and `viewport`. We don't want to
-  #      broadcast these changes out.
-  def put_root_graph(new_graph) do
-    Agent.update(__MODULE__, fn radix_state ->
-      radix_state
-      |> put_in([:root, :graph], new_graph)
-    end)
-  end
-
-  def update(new_state) do
-    Logger.debug("#{__MODULE__} updating state & broadcasting new_state...")
-    #Logger.debug("#{__MODULE__} updating state & broadcasting new_state: #{inspect(new_state)}")
-
-    Flamelex.Utils.PubSub.broadcast(
-        topic: :radix_state_change,
-        msg: {:radix_state_change, new_state})
-
-    Agent.update(__MODULE__, fn _old -> new_state end)
   end
 end
