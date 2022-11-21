@@ -68,7 +68,7 @@ defmodule Flamelex.GUI.Component.Kommander do
       Scenic.Graph.build()
       |> Scenic.Primitives.group(fn graph ->
          graph
-         |> ScenicWidgets.FrameBox.draw(frame, %{color: :rebecca_purple})
+         |> ScenicWidgets.FrameBox.draw(%{frame: frame, fill: :rebecca_purple})
          |> draw_command_prompt(frame)
          |> draw_textbox(kommander_state, frame)
       end, [
@@ -114,7 +114,7 @@ defmodule Flamelex.GUI.Component.Kommander do
       textbox_frame = calc_textbox_frame(outer_frame)
 
       graph
-      |> ScenicWidgets.FrameBox.draw(textbox_frame, %{border: :black})
+      |> ScenicWidgets.FrameBox.draw(%{frame: textbox_frame, border: :black})
       #TODO here is where we call it... need to add text rendering using TextPad, and also accept input when kommander is visible
       |> ScenicWidgets.TextPad.add_to_graph(%{
          frame: textbox_frame,

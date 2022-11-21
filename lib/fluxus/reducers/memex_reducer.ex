@@ -1,78 +1,49 @@
 defmodule Flamelex.Fluxus.Reducers.Memex do
    @moduledoc false
+   alias Memelex.Reducers.MemexReducer
 
-
-   def process(radix_state, action) do
-      # NOTE - basically we get MemEx to do everything for us...
-      MemEx.Reducer.process(radix_state, action)
-   end
-end
-
-
-
-
-
-
-
-# defmodule Flamelex.Fluxus.Reducers.Memex do
-#     @moduledoc false
-#     use Flamelex.ProjectAliases
-#     require Logger
-  
-#     @app_layer :one
-
-#     ##NOTE: Steps to add a new piece of functionality:
-#     #           1) Create a new API function, in an API module
-#     #           2) Create a reducer function, in a Reducer module <-- You are here.
-#     #           3) Update related components to handle potential new states (just changing between known states should work already, assuming your components know how to render the new state)
 
 #     def process(%{root: %{active_app: :memex}} = radix_state, :open_memex) do
 #         Logger.debug "ignoring a command to open the memex, the memex is already active"
 #         :ignore
 #     end
 
-#     def process(%{root: %{active_app: active_app}, memex: %{graph: %Scenic.Graph{} = stashed_memex_graph}} = radix_state, :open_memex) when active_app != :memex do
-#         Logger.debug "swapping from `#{inspect active_app}` to `:memex` (with history)..."
+   def process(radix_state, :open_memex) do
+      new_radix_state = 
+         radix_state
+         |> put_in([:root, :active_app], :memex)
 
-#         new_radix_state = radix_state
-#         |> put_in([:root, :active_app], :memex)
-#         |> put_in([:root, :layers, @app_layer], stashed_memex_graph)
+      {:ok, new_radix_state}
+   end
 
-#         {:ok, new_radix_state}
-#     end
+   def process(radix_state, :close_memex) do
+      #TODO maybe look in history for previously open app?
+      new_radix_state = 
+         radix_state
+         |> put_in([:root, :active_app], :desktop)
 
-#     def process(%{memex: %{graph: nil}} = radix_state, :open_memex) do
-#         Logger.debug "Opening (with no history) the memex..."
+      {:ok, new_radix_state}
+   end
 
-#         new_memex_graph = Scenic.Graph.build()
-#         |> Flamelex.GUI.Memex.Layout.add_to_graph(%{
-#                 frame: Frame.new(radix_state.gui.viewport, menubar_height: 60), #TODO get this value from somewhere better
-#                 state: radix_state.memex
-#             }, id: :layer_2, theme: radix_state.gui.theme)
+   # def process(_radix_state, ) do
+   #    new_buf_list = buf_list |> Enum.reject(&(&1.id == buf_to_close))
+  
+   #    new_radix_state =
+   #      if new_buf_list == [] do
+   #        radix_state
+   #        |> put_in([:root, :active_app], :desktop)
+   #        |> put_in([:editor, :buffers], new_buf_list)
+   #        |> put_in([:editor, :active_buf], nil)
+   #      else
+   #        radix_state
+   #        |> put_in([:editor, :buffers], new_buf_list)
+   #        |> put_in([:editor, :active_buf], hd(new_buf_list).id)
+   #      end
+  
+   #    {:ok, new_radix_state}
+   #  end
+end
 
-#         new_radix_state = radix_state
-#         |> put_in([:root, :active_app], :memex)
-#         |> put_in([:root, :layers, @app_layer], new_memex_graph)
-
-#         {:ok, new_radix_state}
-#     end
-
-#     def process(%{root: %{active_app: :memex}, desktop: %{graph: nil}} = radix_state, :close_memex) do
-#         Logger.debug "swapping from `:memex` to `:desktop`, but we need to render a new desktop..."
-#         Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Desktop, :show_desktop})
-#         :ignore
-#     end
-
-#     def process(%{root: %{active_app: :memex}, desktop: %{graph: %Scenic.Graph{} = stashed_desktop_graph}} = radix_state, :close_memex) do
-#         Logger.debug "swapping from `:memex` to `:desktop`..."
-
-#         new_radix_state = radix_state
-#         |> put_in([:memex, :graph], radix_state.root.graph) # stash the current graph for the memex
-#         |> put_in([:root, :active_app], :desktop)
-#         |> put_in([:root, :layers, @app_layer], stashed_desktop_graph)
-
-#         {:ok, new_radix_state}
-#     end
 
 #     def process(%{memex: memex} = radix_state, :new_tidbit) do
 #         Logger.debug "creating a new TidBit..."

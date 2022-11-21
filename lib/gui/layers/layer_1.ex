@@ -76,4 +76,15 @@ defmodule Flamelex.GUI.Layers.LayerOne do
       }
    end
 
+   def render(%{active_app: :memex, frame: frame}, radix_state) do
+      {:ok,
+         Scenic.Graph.build()
+         |> Memelex.GUI.Components.Diary.add_to_graph(%{
+            frame: frame,
+            # radix_state: radix_state,
+            # app: Flamelex
+         })
+      }
+   end
+
 end
