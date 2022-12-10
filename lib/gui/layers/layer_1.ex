@@ -79,10 +79,10 @@ defmodule Flamelex.GUI.Layers.LayerOne do
    def render(%{active_app: :memex, frame: frame}, radix_state) do
       {:ok,
          Scenic.Graph.build()
-         |> Memelex.GUI.Components.MemexDiary.add_to_graph(%{
+         |> Memelex.GUI.Components.MemDesk.add_to_graph(%{
             frame: frame,
-            # radix_state: radix_state,
-            # app: Flamelex
+            state: radix_state.memex,
+            app: Flamelex
          })
       }
    end
