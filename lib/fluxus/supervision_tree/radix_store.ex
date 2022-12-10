@@ -29,22 +29,22 @@ defmodule Flamelex.Fluxus.RadixStore do
 
   def start_link(_params) do
     radix_state = Flamelex.Fluxus.Structs.RadixState.initialize()
-    Agent.start_link(fn -> radix_state end, name: __MODULE__)
+    Agent.start_link(fn -> radix_state end, name: RadixStore)
   end
 
   def get do
-    Agent.get(__MODULE__, & &1)
+    Agent.get(RadixStore, & &1)
   end
 
   #NOTE: Here we update, but don't broadcast the changes. For example,
   #      adding user-input to the input history, doesn't need to be broadcast.
   def put(new_state) do
-    #Logger.debug("#{__MODULE__} updating state...")
-    Agent.update(__MODULE__, fn _old -> new_state end)
+    #Logger.debug("#{RadixStore} updating state...")
+    Agent.update(RadixStore, fn _old -> new_state end)
   end
 
   def put_viewport(%Scenic.ViewPort{} = new_vp) do
-    Agent.update(__MODULE__, fn radix_state ->
+    Agent.update(RadixStore, fn radix_state ->
       radix_state |> put_in([:gui, :viewport], new_vp)
     end)
   end
@@ -52,7 +52,7 @@ defmodule Flamelex.Fluxus.RadixStore do
   #NOTE: When `Flamelex.GUI.RootScene` boots, it calls this function.
   #      We don't want to broadcast these changes out.
   def put_root_graph(new_graph) do
-    Agent.update(__MODULE__, fn radix_state ->
+    Agent.update(RadixStore, fn radix_state ->
       radix_state
       |> put_in([:root, :graph], new_graph)
     end)
@@ -60,18 +60,18 @@ defmodule Flamelex.Fluxus.RadixStore do
 
   # update/1 also broadcasts changes to the rest of the app
   def update(new_state) do
-    #Logger.debug("#{__MODULE__} updating state & broadcasting new_state...")
-    #Logger.debug("#{__MODULE__} updating state & broadcasting new_state: #{inspect(new_state)}")
+    #Logger.debug("#{RadixStore} updating state & broadcasting new_state...")
+    #Logger.debug("#{RadixStore} updating state & broadcasting new_state: #{inspect(new_state)}")
 
     Flamelex.Utils.PubSub.broadcast(
         topic: :radix_state_change,
         msg: {:radix_state_change, new_state})
 
-    Agent.update(__MODULE__, fn _old -> new_state end)
+    Agent.update(RadixStore, fn _old -> new_state end)
   end
 
   def update_viewport(%Scenic.ViewPort{} = new_vp) do
-    Agent.update(__MODULE__, fn radix_state ->
+    Agent.update(RadixStore, fn radix_state ->
       
       new_radix_state =
         radix_state |> put_in([:gui, :viewport], new_vp)

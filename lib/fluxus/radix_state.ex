@@ -146,12 +146,7 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
                open_tidbits: [],
                # mode: :read_only,
                #TODO put the scroll in another process, then it a) will hopefully be more seperated and b) we can just update that one (maybe even just by calling update_opts) and don't have to re-render every component we're scrolling, which is kinda crazy
-               scroll: %{
-                  accumulator: {0, 0},
-                  direction: :vertical,
-                  components: [],
-                  #acc_length: nil # this will get populated by the component, and will accumulate as TidBits get put in the StoryRiver 
-               }
+               scroll: {0, 0}
             },
             sidebar: %{
                active_tab: :ctrl_panel,
