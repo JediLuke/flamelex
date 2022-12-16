@@ -26,3 +26,5 @@ franklin-*.tar
 
 tags
 /data/
+
+priv/__scenic/
