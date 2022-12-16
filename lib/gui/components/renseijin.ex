@@ -217,6 +217,7 @@ defmodule Flamelex.GUI.Component.Renseijin do
             |> draw_circles(args)
             |> draw_triangles(args)
             |> draw_taijitu(args)
+            |> draw_outer_square(args)
          end, [
             id: __MODULE__,
             hidden: false,
@@ -293,6 +294,17 @@ defmodule Flamelex.GUI.Component.Renseijin do
          id: :taijitu,
          rotate: args.rotation
       ])
+   end
+
+   def draw_outer_square(graph, args) do
+
+      l = inner_circle_radius(args)
+   
+      graph
+      |> Scenic.Primitives.quad(
+         {{-l, -l}, {-l, l}, {l, -l}, {l, l}},
+         stroke: {1, :yellow}
+      )
    end
 
    def do_animate(graph, rotation) do
