@@ -65,7 +65,11 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
             # active_app: :renseijin,
             graph: nil, # This holds the layers construct
             layers: %{
-               one: nil
+               one: %{
+                  layout: %{
+                     editor: :full_screen
+                  }
+               }
             }
             # layers: [ # The final %Graph{} which we are holding on to for, for each layer
             #    #NOTE: We use a Keyword list, as it works better for pattern matching than maps with keys

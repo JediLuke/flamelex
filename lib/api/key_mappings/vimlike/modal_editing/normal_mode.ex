@@ -14,8 +14,17 @@ defmodule Flamelex.KeyMappings.Vim.NormalMode do
       :ok
    end
 
+   def process(_state, @sub_leader) do
+      Logger.debug " <<-- Sub-Leader key pressed -->>"
+      :ok
+   end
+
    # defer to Desktop key-mappings for leader commands
    def process(%{history: %{keystrokes: [@leader|_rest]}} = radix_state, key) do
+      Flamelex.Keymaps.Desktop.process(radix_state, key)
+   end
+
+   def process(%{history: %{keystrokes: [@sub_leader|_rest]}} = radix_state, key) do
       Flamelex.Keymaps.Desktop.process(radix_state, key)
    end
 

@@ -6,6 +6,7 @@ defmodule Flamelex.Keymaps.Editor.GlobalBindings do
          use ScenicWidgets.ScenicEventsDefinitions
 
          @leader @space_bar
+         @sub_leader @backslash
 
       end
    end

@@ -37,6 +37,17 @@ defmodule Flamelex.Keymaps.Desktop do
       :ok = Flamelex.API.Kommander.show()
    end
 
+   def process(%{
+      root: %{layers: %{one: %{explorer: %{active?: true}}}},
+      history: %{keystrokes: [@sub_leader|_rest]}} = radix_state, @lowercase_e
+   ) do
+      Flamelex.API.Editor.hide_explorer()
+   end
+
+   def process(%{history: %{keystrokes: [@sub_leader|_rest]}} = radix_state, @lowercase_e) do
+      Flamelex.API.Editor.show_explorer()
+   end
+
    # NOTE - this has to go below the match where we record the history of pressing @leader
    def process(_radix_state, key) when key in @valid_text_input_characters do
       :ignore
