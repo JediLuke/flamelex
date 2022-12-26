@@ -106,6 +106,10 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
                font_size: 22
             }
          },
+         projects: %{
+            open_proj: nil,
+            proj_list: []
+         },
          editor: %{
             font: ScenicWidgets.TextPad.Structs.Font.new(%{
                name: :ibm_plex_mono,
