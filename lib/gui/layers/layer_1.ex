@@ -94,10 +94,12 @@ defmodule Flamelex.GUI.Layers.LayerOne do
       explorer: explorer_frame,
       editor: editor_frame
    }, active_app: :editor}, radix_state) do
-      IO.puts "DID WE GET HERERE?????"
       {:ok,
          Scenic.Graph.build()
-         |> Scenic.Primitives.rect(explorer_frame.size, fill: :lime_green, translate: explorer_frame.pin)
+         |> ScenicWidgets.SideNav.add_to_graph(%{
+            frame: explorer_frame,
+            state: %{}
+         })
          |> QuillEx.GUI.Components.Editor.add_to_graph(%{
             frame: editor_frame,
             radix_state: radix_state,
