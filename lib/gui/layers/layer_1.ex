@@ -98,7 +98,7 @@ defmodule Flamelex.GUI.Layers.LayerOne do
          Scenic.Graph.build()
          |> Flamelex.GUI.Component.FileTree.add_to_graph(%{
             frame: explorer_frame,
-            state: %{}
+            state: radix_state.projects
          })
          |> QuillEx.GUI.Components.Editor.add_to_graph(%{
             frame: editor_frame,
