@@ -37,7 +37,7 @@ defmodule Flamelex.GUI.RootScene do
 
 
    def init(init_scene, _args, opts) do
-      Logger.debug("#{__MODULE__} initializing...")
+      # Logger.debug("#{__MODULE__} initializing...")
 
       #TODO we should return the radix_state here to save us from having to fetch it again in like 5 lines time
       Flamelex.Fluxus.RadixStore.put_viewport(init_scene.viewport)
@@ -64,17 +64,17 @@ defmodule Flamelex.GUI.RootScene do
    # end
 
    def handle_input({:viewport, {:enter, _coords}}, context, scene) do
-      Logger.debug "#{__MODULE__} ignoring `:viewport_enter`..."
+      # Logger.debug "#{__MODULE__} ignoring `:viewport_enter`..."
       {:noreply, scene}
    end
 
    def handle_input({:viewport, {:exit, _coords}}, context, scene) do
-      Logger.debug "#{__MODULE__} ignoring `:viewport_exit`..."
+      # Logger.debug "#{__MODULE__} ignoring `:viewport_exit`..."
       {:noreply, scene}
    end
 
    def handle_input({:viewport, {:reshape, {new_width, new_height} = new_dimensions}}, context, scene) do # e.g. of new_dimensions: {1025, 818}
-      Logger.debug "#{__MODULE__} received :viewport :reshape, dim: #{inspect new_dimensions}"
+      # Logger.debug "#{__MODULE__} received :viewport :reshape, dim: #{inspect new_dimensions}"
 
       new_viewport = %{scene.viewport|size: new_dimensions}
       Flamelex.Fluxus.RadixStore.update_viewport(new_viewport)
@@ -107,7 +107,7 @@ defmodule Flamelex.GUI.RootScene do
    end
 
    def handle_input(input, context, scene) do
-      Logger.debug "#{__MODULE__} recv'd some (non-ignored) input: #{inspect input}"
+      # Logger.debug "#{__MODULE__} recv'd some (non-ignored) input: #{inspect input}"
       Flamelex.Fluxus.input(input)
       {:noreply, scene}
    end

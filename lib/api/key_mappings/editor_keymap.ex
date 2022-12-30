@@ -8,10 +8,10 @@ defmodule Flamelex.Keymaps.Editor do
       buf = buffers |> Enum.find(& &1.id == active_buf)
       case buf.mode do
          {:vim, :normal} ->
-            Logger.debug "-- mode: #{inspect buf.mode}, input: #{inspect input}"
+            # Logger.debug "-- mode: #{inspect buf.mode}, input: #{inspect input}"
             Flamelex.KeyMappings.Vim.NormalMode.process(radix_state, input)
          {:vim, :insert} ->
-            Logger.debug "-- mode: #{inspect buf.mode}, input: #{inspect input}"
+            # Logger.debug "-- mode: #{inspect buf.mode}, input: #{inspect input}"
             Flamelex.KeyMappings.Vim.InsertMode.process(radix_state, input)
          other_mode ->
             #TODO let it crash! But the raise is pretty useful sometimes...

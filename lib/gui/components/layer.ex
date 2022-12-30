@@ -21,7 +21,7 @@ defmodule Flamelex.GUI.Component.Layer do
    #TODO handle the state & calc_state_fn not being mandatory args...
 
    def init(scene, %{layer_module: layer, radix_state: radix_state} = args, opts) do
-      Logger.debug "Initializing layer #{opts[:id]}..."
+      # Logger.debug "Initializing layer #{opts[:id]}..."
 
       init_state = layer.calc_state(radix_state)
       {:ok, init_graph} = layer.render(init_state, radix_state)

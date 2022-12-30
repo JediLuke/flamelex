@@ -5,7 +5,7 @@ defmodule Flamelex.Keymaps.Desktop do
    @ignorable_keys [@shift_space, @meta, @left_ctrl, @left_alt]
 
    def process(_radix_state, @leader) do
-      Logger.debug " <<-- Leader key pressed -->>"
+      # Logger.debug " <<-- Leader key pressed -->>"
       :ok
    end
 
@@ -33,7 +33,7 @@ defmodule Flamelex.Keymaps.Desktop do
 
    # open the Kommander with keybinding <leader>k
    def process(%{history: %{keystrokes: [@leader|_rest]}} = radix_state, @lowercase_k) do
-      Logger.debug "Opening KommandBuffer..."
+      # Logger.debug "Opening KommandBuffer..."
       :ok = Flamelex.API.Kommander.show()
    end
 

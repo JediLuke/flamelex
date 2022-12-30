@@ -5,7 +5,7 @@ defmodule Flamelex.API.Buffer do
    use Flamelex.ProjectAliases
    alias Flamelex.BufferManager
    alias QuillEx.Reducers.BufferReducer # NOTE: We use the QuillEx BufferReducer...
-   alias Flamelex.Fluxus.Reducers.Memex, as: MemexReducer
+  #  alias Flamelex.Fluxus.Reducers.Memex, as: MemexReducer
    alias Flamelex.Fluxus.RadixStore
 
    @doc """
@@ -174,9 +174,8 @@ defmodule Flamelex.API.Buffer do
   end
 
   def close_all! do
-    raise "this should work, but is it too dangerous??"
+    # raise "this should work, but is it too dangerous??"
     list() |> Enum.each(&close(&1))
-    # |> Enum.each(&Flamelex.Fluxus.fire_action({:close_buffer, &1}))
   end
 
 end

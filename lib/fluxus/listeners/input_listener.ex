@@ -11,7 +11,7 @@ defmodule Flamelex.Fluxus.InputListener do
     end
   
     def init(_args) do
-      Logger.debug("#{__MODULE__} initializing...")
+    #   Logger.debug("#{__MODULE__} initializing...")
       EventBus.subscribe({__MODULE__, ["general"]})
       {:ok, %{}}
     end

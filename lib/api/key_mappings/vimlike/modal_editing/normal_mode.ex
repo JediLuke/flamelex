@@ -10,12 +10,12 @@ defmodule Flamelex.KeyMappings.Vim.NormalMode do
    @down_one_row {1, 0}
 
    def process(_state, @leader) do
-      Logger.debug " <<-- Leader key pressed -->>"
+      # Logger.debug " <<-- Leader key pressed -->>"
       :ok
    end
 
    def process(_state, @sub_leader) do
-      Logger.debug " <<-- Sub-Leader key pressed -->>"
+      # Logger.debug " <<-- Sub-Leader key pressed -->>"
       :ok
    end
 

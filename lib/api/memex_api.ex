@@ -19,7 +19,7 @@ defmodule Flamelex.API.Memex do
 
   @doc ~s(Open the Memelex-GUI-pane inside Flamelex.)
   def open do
-    Logger.debug "#{__MODULE__} opening the Memex..."
+    # Logger.debug "#{__MODULE__} opening the Memex..."
     Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, :open_memex})
   end
 
@@ -32,7 +32,7 @@ defmodule Flamelex.API.Memex do
   # def modify()
 
   def close do
-    Logger.debug "#{__MODULE__} closing the Memex..."
+    # Logger.debug "#{__MODULE__} closing the Memex..."
     Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Memex, :close_memex})
   end
 

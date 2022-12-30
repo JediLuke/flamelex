@@ -18,12 +18,12 @@ defmodule Flamelex.Fluxus.UserInputHandler do
    # end
 
    def process(%{root: %{active_app: :desktop}} = radix_state, input) do
-      Logger.debug "Accepted input: #{inspect input} -- active_app: :desktop"
+      # Logger.debug "Accepted input: #{inspect input} -- active_app: :desktop"
       Flamelex.Keymaps.Desktop |> process_with_rescue(radix_state, input)
    end
 
    def process(%{root: %{active_app: :editor}} = radix_state, input) do
-      Logger.debug "Accepted input: #{inspect input} -- active_app: :editor"
+      # Logger.debug "Accepted input: #{inspect input} -- active_app: :editor"
       Flamelex.Keymaps.Editor |> process_with_rescue(radix_state, input)
    end
 
@@ -56,14 +56,14 @@ defmodule Flamelex.Fluxus.UserInputHandler do
    end
 
    defp record_input(radix_state, {:key, {key, @key_pressed, []}} = input) when input in @valid_text_input_characters do
-      Logger.debug "-- Recording INPUT: #{inspect key}"
+      # Logger.debug "-- Recording INPUT: #{inspect key}"
       #NOTE: We store the latest keystroke at the front of the list, not the back
       radix_state
       |> put_in([:history, :keystrokes], radix_state.history.keystrokes |> List.insert_at(0, input))
    end
 
    defp record_input(radix_state, input) do
-      Logger.debug "NOT recording: #{inspect input} as input..."
+      # Logger.debug "NOT recording: #{inspect input} as input..."
       radix_state
    end
 end
