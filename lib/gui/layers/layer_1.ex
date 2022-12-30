@@ -65,10 +65,6 @@ defmodule Flamelex.GUI.Layers.LayerOne do
       }
    end
 
-   # def calc_state(radix_state) do
-   #    dbg()
-   # end
-
    @impl Flamelex.GUI.Layer.Behaviour
    def render(%{active_app: :desktop}, _radix_state) do
       {:ok, Scenic.Graph.build()}
@@ -96,7 +92,7 @@ defmodule Flamelex.GUI.Layers.LayerOne do
    }, active_app: :editor}, radix_state) do
       {:ok,
          Scenic.Graph.build()
-         |> Flamelex.GUI.Component.FileTree.add_to_graph(%{
+         |> Flamelex.GUI.Component.FileExplorer.add_to_graph(%{
             frame: explorer_frame,
             state: radix_state.projects
          })
