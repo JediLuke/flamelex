@@ -3,6 +3,9 @@ defmodule Flamelex.GUI.Component.FileExplorer do
    alias ScenicWidgets.Core.Structs.Frame
    require Logger
 
+   # dont show these in the FileExplorer because they're too big & mostly useless
+   @ignored_dirs [".git", "_build", "deps"]
+   @ignored_files [".DS_Store"]
  
    def validate(%{frame: %Frame{} = _f, state: _state} = data) do
       #Logger.debug "#{__MODULE__} accepted params: #{inspect data}"
@@ -14,7 +17,9 @@ defmodule Flamelex.GUI.Component.FileExplorer do
       #TODO consider pulling the initial state from RadixState
       # so that if it breaks, it automatically updates...
 
-      init_nav_tree = open_project(args.state.open_proj)
+      init_nav_tree =
+         construct_tuple_tree(args.state.open_proj)
+         |> count_offsets([0], [])
 
       init_graph =
          render(args.frame, init_nav_tree)
@@ -37,8 +42,9 @@ defmodule Flamelex.GUI.Component.FileExplorer do
 
    def handle_info({:radix_state_change, %{projects: %{open_proj: new_proj} = new_state}}, scene) do
       # project has changed, so we update everything
-
-      side_nav_state = open_project(new_proj)
+      side_nav_state =
+         construct_tuple_tree(new_proj)
+         |> count_offsets([0], [])
       
       {:ok, [pid]} = Scenic.Scene.child(scene, :file_tree)
       GenServer.cast(pid, {:state_change, side_nav_state})
@@ -58,58 +64,48 @@ defmodule Flamelex.GUI.Component.FileExplorer do
          id: __MODULE__
       ])
    end
+
+   # def construct_tuple_tree(dir) do
+   #    # the scond argument to this function is a list of offsets.
+   #    # When calling this on the top level directory, this needs
+   #    # to be initialized to an empty list (as we don't have any
+   #    # offsets yet), but this function gets called recursively
+   #    # (when calculating the offsets of nested sub-directories)
+   #    # so we need to be able to pass this in for those cases
+   #    construct_tuple_tree(dir, [])
+   # end
    
-   def open_project(_open_proj = nil) do
+   # Sometimes this can get called with `nil`, e.g. if there's no open project
+   def construct_tuple_tree(nil) do
       []
    end
 
-   def open_project(proj_dir) when is_bitstring(proj_dir) do
-      if not File.dir?(proj_dir) do
-         raise "The path: #{inspect proj_dir} is not a directory."
+   def construct_tuple_tree(root_dir) when is_bitstring(root_dir) do
+      if not File.dir?(root_dir) do
+         raise "The path: #{inspect root_dir} is not a directory."
       end
 
-      top_lvl_tree =
-         with files_and_dirs <- File.ls!(proj_dir),
-            {files, directories} <- split_files_and_directories(files_and_dirs),
-            sorted_dirs <- sort_alphabetically(directories),
-            directory_tuples <- construct_dir_tuples(proj_dir, sorted_dirs),
-            sorted_files <- sort_alphabetically(files),
-            file_tuples <- construct_file_tuples(proj_dir, sorted_files) do
-               directory_tuples ++ file_tuples
-            end
-
-      construct_nav_tree(top_lvl_tree, [0], [])
+      files_and_dirs = File.ls!(root_dir) |> filter_ignored()
+      {files, dirs} = split_files_and_directories(root_dir, files_and_dirs)
+      
+      sorted_dirs = sort_alphabetically(dirs)
+      sorted_files = sort_alphabetically(files)
+         
+      dir_tuples = construct_dir_tuples(root_dir, sorted_dirs)
+      file_tuples = construct_file_tuples(root_dir, sorted_files)
+      
+      dir_tuples ++ file_tuples # directories get put at the top
    end
 
-   def construct_nav_tree([], _final_index, result) do
-      result # base case
+   def filter_ignored(dirs) do
+      Enum.filter(dirs, & not Enum.member?(@ignored_dirs ++ @ignored_files, &1))
    end
 
-   def construct_nav_tree([{:closed_node, label}|rest], index, result) do
-      new_index = increment_index(index)
-      new_result = result ++ [{:closed_node, label, new_index}]
-      construct_nav_tree(rest, new_index, new_result)
-   end
-
-   # def construct_nav_tree([{:open_node, dir}|rest], result) do
-   #    #TODO get last piece of the path here
-   #    label = "Luke"
-   #    index = [1,2]
-   #    sub_tree = []
-   #    new_result = result ++ [{:open_node, label, index, sub_tree}]
-   #    construct_nav_tree(rest, new_result)
-   # end
-
-   def construct_nav_tree([{:leaf, label, click_fn}|rest], index, result) do
-      new_index = increment_index(index)
-      new_result = result ++ [{:leaf, label, new_index, click_fn}]
-      construct_nav_tree(rest, new_index, new_result)
-   end
-
-   def split_files_and_directories(files_and_dirs) do
+   def split_files_and_directories(root_dir, files_and_dirs) do
       files_and_dirs
-      #NOTE: We need the `not` here so `files` comes first, and `directories` is the second list
-      |> Enum.split_with(fn x -> not File.dir?(x) end)
+      #NOTE: We need the `not` here so `files` comes first,
+      #      and `directories` is the second list
+      |> Enum.split_with(fn x -> not File.dir?(root_dir <> "/" <> x) end)
    end
 
    def sort_alphabetically(items) do
@@ -117,15 +113,45 @@ defmodule Flamelex.GUI.Component.FileExplorer do
    end
 
    def construct_dir_tuples(root_dir, dirs) do
-      dirs |> Enum.map(fn dir -> {:closed_node, dir} end)
+      # NOTE: here we recursively call `construct_tuple_tree`
+      dirs |> Enum.map(fn dir ->
+         sub_tree = construct_tuple_tree(root_dir <> "/" <> dir)
+         {:closed_node, dir, sub_tree}
+      end)
    end
 
    def construct_file_tuples(root_dir, files) do
       files |> Enum.map(fn filename ->
-         #TODO include proj_dir here so it works outside flamelex
-         open_file_fn = fn -> Flamelex.API.Buffer.open(filename) end
+         open_file_fn = fn -> Flamelex.API.Buffer.open(root_dir <> "/" <> filename) end
          {:leaf, filename, open_file_fn}
       end)
+   end
+
+   def count_offsets([], _final_index, result) do
+      result # base case
+   end
+
+   # start recursive algorithm with a new last-offset of `[0]` (because
+   # we increment it as the first step, so it begins at 1 anyway) and
+   # the final arg, the results, as an empty list
+   def count_offsets([{:closed_node, label, sub_tree}|rest], index, result) do
+      #NOTE: For nodes, we need to recursively count the indexes for the sub-tree aswell
+      new_index = increment_index(index)
+      new_sub_tree = count_offsets(sub_tree, new_index ++ [0], [])
+      new_result = result ++ [{:closed_node, label, new_index, new_sub_tree}]
+      count_offsets(rest, new_index, new_result)
+   end
+
+   # def count_offsets([{:open_node, dir}|rest], result) do
+   #    sub_tree = []
+   #    new_result = result ++ [{:open_node, label, index, sub_tree}]
+   #    count_offsets(rest, new_result)
+   # end
+
+   def count_offsets([{:leaf, label, click_fn}|rest], index, result) do
+      new_index = increment_index(index)
+      new_result = result ++ [{:leaf, label, new_index, click_fn}]
+      count_offsets(rest, new_index, new_result)
    end
 
    def increment_index(index) do
