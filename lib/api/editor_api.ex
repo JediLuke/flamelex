@@ -4,6 +4,10 @@ defmodule Flamelex.API.Editor do
       Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Editor, :split_layer_one}) #TODO just hack it for now...
    end
 
+   def hexdocs do
+      Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Editor, :open_hexdocs}) #TODO just hack it for now...
+   end
+
    def show_explorer do
       Flamelex.Fluxus.action({Flamelex.Fluxus.Reducers.Editor, :show_explorer})
    end

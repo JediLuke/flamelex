@@ -126,4 +126,14 @@ defmodule Flamelex.GUI.Layers.LayerOne do
       }
    end
 
+   def render(%{active_app: :hexdocs, frame: frame}, radix_state) do
+      {:ok,
+         Scenic.Graph.build()
+         |> Flamelex.GUI.Components.HexDocs.add_to_graph(%{
+            frame: frame,
+            state: %{}
+         })
+      }
+   end
+
 end

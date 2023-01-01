@@ -1,4 +1,4 @@
-defmodule Flamelex.GUI.Component.Template do
+defmodule Flamelex.GUI.Components.Template do
    use Scenic.Component
    alias ScenicWidgets.Core.Structs.Frame
    require Logger
@@ -40,4 +40,4 @@ defmodule Flamelex.GUI.Component.Template do
       ])
    end
 
- end
+end

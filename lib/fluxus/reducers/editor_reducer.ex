@@ -11,6 +11,14 @@ defmodule Flamelex.Fluxus.Reducers.Editor do
       {:ok, new_radix_state}
    end
 
+   def process(radix_state, :open_hexdocs) do
+      new_radix_state = 
+         radix_state
+         |> put_in([:root, :active_app], :hexdocs)
+
+      {:ok, new_radix_state}
+   end
+
    def process(radix_state, :show_explorer) do
       new_radix_state = radix_state
       |> put_in([:root, :layers, :one], %{explorer: %{active?: true}})
