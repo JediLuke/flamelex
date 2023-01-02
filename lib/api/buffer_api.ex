@@ -5,7 +5,6 @@ defmodule Flamelex.API.Buffer do
    use Flamelex.ProjectAliases
    alias Flamelex.BufferManager
    alias QuillEx.Reducers.BufferReducer # NOTE: We use the QuillEx BufferReducer...
-  #  alias Flamelex.Fluxus.Reducers.Memex, as: MemexReducer
    alias Flamelex.Fluxus.RadixStore
 
    @doc """
@@ -108,11 +107,8 @@ defmodule Flamelex.API.Buffer do
 
   Buffer.modify(b, insertion_op)
   ```
-  #NOTE: Modifying TidBits is a bit of a special case...
   """
-  # def modify(%Memelex.TidBit{} = t, modification) do
-  #   Flamelex.Fluxus.action({MemexReducer, {:modify_tidbit, t, modification}})
-  # end
+
 
   def modify(%{id: buf_id}, modification) do
     modify(buf_id, modification)

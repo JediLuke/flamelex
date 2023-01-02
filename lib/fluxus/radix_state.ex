@@ -148,11 +148,9 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
             })
          },
          memex: %{
-            graph: nil, # Store the %Graph{} here if we need to (for switching between apps easily)
             active?: Application.get_env(:memelex, :active?), # If the Memex is disabled at the app config level, we need to ignore a lot of actions
             story_river: %{
                open_tidbits: [],
-               # mode: :read_only,
                #TODO put the scroll in another process, then it a) will hopefully be more seperated and b) we can just update that one (maybe even just by calling update_opts) and don't have to re-render every component we're scrolling, which is kinda crazy
                scroll: {0, 0}
             },

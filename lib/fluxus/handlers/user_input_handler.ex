@@ -12,19 +12,16 @@ defmodule Flamelex.Fluxus.UserInputHandler do #TODO rename just InputHandler to 
       Flamelex.Keymaps.Kommander |> process_with_rescue(radix_state, input)
    end
 
-   # # def process(%{root: %{active_app: :memex}, kommander: %{hidden?: true}} = radix_state, input) do
-   # def process(%{root: %{active_app: :memex}} = radix_state, input) do
-   #     Keymaps.Memex |> handle_with_rescue(radix_state, input)
-   # end
-
    def process(%{root: %{active_app: :desktop}} = radix_state, input) do
-      # Logger.debug "Accepted input: #{inspect input} -- active_app: :desktop"
       Flamelex.Keymaps.Desktop |> process_with_rescue(radix_state, input)
    end
 
    def process(%{root: %{active_app: :editor}} = radix_state, input) do
-      # Logger.debug "Accepted input: #{inspect input} -- active_app: :editor"
       Flamelex.Keymaps.Editor |> process_with_rescue(radix_state, input)
+   end
+
+   def process(%{root: %{active_app: :memex}} = radix_state, input) do
+      Memelex.Keymaps.UserInputHandler |> process_with_rescue(radix_state, input)
    end
 
    def process(_radix_state, input) do
@@ -47,11 +44,11 @@ defmodule Flamelex.Fluxus.UserInputHandler do #TODO rename just InputHandler to 
                :ignore
       else
          :ok ->
-               {:ok, radix_state |> record_input(input)}
+            {:ok, radix_state |> record_input(input)}
          {:ok, new_radix_state} ->
-               {:ok, new_radix_state |> record_input(input)}
+            {:ok, new_radix_state |> record_input(input)}
          :ignore ->
-               :ignore
+            :ignore
       end
    end
 
@@ -209,12 +206,6 @@ end
 #     )
 #   end
 
-
-#   def lookup_action_for_input_async(%{mode: :memex} = radix_state, user_input) do
-#     #Logger.debug "#{__MODULE__} routing input received in Memex :mode."
-#     Flamelex.KeyMappings.Memex.keymap(radix_state, user_input)
-#     |> handle_lookup(radix_state)
-#   end
 
 #   #NOTE: this function is defined here, but it is run in it's own process...
 #   def lookup_action_for_input_async(%{mode: m} = radix_state, user_input)

@@ -78,7 +78,8 @@ defmodule Flamelex.Fluxus.RadixStore do
 
       Flamelex.Utils.PubSub.broadcast(
         topic: :radix_state_change,
-        msg: {:radix_state_change, new_radix_state})
+        msg: {:radix_state_change, new_radix_state}
+      )
 
       new_radix_state
     end)
