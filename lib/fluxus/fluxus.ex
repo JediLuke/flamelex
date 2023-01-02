@@ -30,10 +30,10 @@ defmodule Flamelex.Fluxus do
       with {:ok, results} <- do_declare(a) do
          [final_radix_state] =
             Enum.reduce(results, :accumulator, fn # NOTE - we replace this atom, so we have confidence when it matches the final result that this function worked
-               # add the results from ActionListener to the accumulator, discard ones from InputListener
+               # add the results from ActionListener to the accumulator, discard ones from UserInputListener
                {Flamelex.Fluxus.ActionListener, {:ok, new_radix_state}}, acc ->
                   [new_radix_state]
-               {Flamelex.Fluxus.InputListener, _res}, acc ->
+               {Flamelex.Fluxus.UserInputListener, _res}, acc ->
                   acc
             end)
 

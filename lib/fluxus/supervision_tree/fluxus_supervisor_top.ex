@@ -14,7 +14,7 @@ defmodule Flamelex.Fluxus.TopLevelSupervisor do
       {Registry, keys: :duplicate, name: Fluxus.PubSub}, # https://hexdocs.pm/elixir/1.12/Registry.html#module-using-as-a-dispatcher
       Flamelex.Fluxus.RadixStore,
       Flamelex.Fluxus.ActionListener,
-      Flamelex.Fluxus.InputListener
+      Flamelex.Fluxus.UserInputListener
     ]
 
     Supervisor.init(children, strategy: :one_for_all) #TODO make this :rest_for_one?

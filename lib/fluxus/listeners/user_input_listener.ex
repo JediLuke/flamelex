@@ -1,4 +1,4 @@
-defmodule Flamelex.Fluxus.InputListener do
+defmodule Flamelex.Fluxus.UserInputListener do
     @moduledoc """
     This process listens to events on the :general topic, and if they're
     actions, makes stuff happen.
