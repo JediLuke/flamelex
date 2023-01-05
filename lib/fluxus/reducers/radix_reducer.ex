@@ -45,7 +45,6 @@ defmodule Flamelex.Fluxus.RadixReducer do
 
    def process(radix_state, {reducer, action}) when is_atom(reducer) do
       try do
-         IO.puts "REDUCER #{inspect reducer} - ACTION #{inspect action}"
          reducer.process(radix_state, action)
       rescue
          e in FunctionClauseError ->
