@@ -45,8 +45,9 @@ defmodule Flamelex.Fluxus.UserInputHandler do #TODO rename just InputHandler to 
       else
          :ok ->
             {:ok, radix_state |> record_input(input)}
-         {:ok, new_radix_state} ->
-            {:ok, new_radix_state |> record_input(input)}
+         #TODO I don't think we should allow any InputHandler to return a RadixState, since we dont broadcast out from them...
+         # {:ok, new_radix_state} ->
+         #    {:ok, new_radix_state |> record_input(input)}
          :ignore ->
             :ignore
       end
