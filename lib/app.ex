@@ -8,16 +8,20 @@ defmodule Flamelex.App do
     #Logger.debug "#{__MODULE__} initializing..."
 
     children = [
-      #Note: Fluxus has to come before gui cause gui calls RadixStore to get it's init state
+      #NOTE: Fluxus has to come before the GUI because
+      # GUI calls RadixStore to get it's init state
+      #TODO maybe we should pass it in to both from this top level??
       Flamelex.Fluxus.TopLevelSupervisor,
-      # Flamelex.Buffer.TopLevelSupervisor,
       {Scenic, [viewport_config()]}
     ]
+
+    children = if boot_memelex?(),
+                    do: children ++ [Memelex.BootLoader],
+                  else: children
 
     opts = [strategy: :one_for_one, name: __MODULE__]
     Supervisor.start_link(children, opts)
   end
-
 
 
   @macbook_pro {1440, 855}
@@ -40,4 +44,7 @@ defmodule Flamelex.App do
     ]
   end
 
+  def boot_memelex? do
+    Application.get_env(:memelex, :active?, false)
+  end
 end
