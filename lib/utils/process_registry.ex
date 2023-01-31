@@ -11,7 +11,7 @@ defmodule Flamelex.Utils.ProcessRegistry do
     # https://github.com/uwiger/gproc/blob/uw-change-license/doc/gproc.md#reg3
     # :n means `name`  - and having it here enforces PiDs are registered uniquely - unique within the given context (local or global)
     # :l means `local` - so we just register the process on this node
-    Logger.debug "ProcessRegistry - registering: #{inspect tag}..."
+    # Logger.debug "ProcessRegistry - registering: #{inspect tag}..."
     :gproc.reg({:n, :l, tag})
   end
 
