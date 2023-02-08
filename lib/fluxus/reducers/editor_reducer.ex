@@ -1,6 +1,6 @@
 defmodule Flamelex.Fluxus.Reducers.Editor do
    @moduledoc false
-   use Flamelex.ProjectAliases
+   use Flamelex.Lib.ProjectAliases
    require Logger
 
 

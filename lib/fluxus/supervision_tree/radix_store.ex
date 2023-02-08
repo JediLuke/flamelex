@@ -63,7 +63,7 @@ defmodule Flamelex.Fluxus.RadixStore do
     #Logger.debug("#{RadixStore} updating state & broadcasting new_state...")
     #Logger.debug("#{RadixStore} updating state & broadcasting new_state: #{inspect(new_state)}")
 
-    Flamelex.Utils.PubSub.broadcast(
+    Flamelex.Lib.Utils.PubSub.broadcast(
         topic: :radix_state_change,
         msg: {:radix_state_change, new_state})
 
@@ -76,7 +76,7 @@ defmodule Flamelex.Fluxus.RadixStore do
       new_radix_state =
         radix_state |> put_in([:gui, :viewport], new_vp)
 
-      Flamelex.Utils.PubSub.broadcast(
+      Flamelex.Lib.Utils.PubSub.broadcast(
         topic: :radix_state_change,
         msg: {:radix_state_change, new_radix_state}
       )

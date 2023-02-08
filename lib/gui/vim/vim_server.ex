@@ -3,7 +3,7 @@ defmodule Flamelex.GUI.VimServer do
   This process holds state for when we use Vim commands.
   """
   use GenServer
-  use Flamelex.ProjectAliases
+  use Flamelex.Lib.ProjectAliases
   require Logger
 
   def default_state do

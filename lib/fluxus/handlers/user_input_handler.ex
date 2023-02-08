@@ -21,10 +21,7 @@ defmodule Flamelex.Fluxus.UserInputHandler do #TODO rename just InputHandler to 
    end
 
    def process(%{root: %{active_app: :memex}} = radix_state, input) do
-      #TODO send this input over to Memelex somehow
-      # Memelex.Keymaps.UserInputHandler |> process_with_rescue(radix_state, input)
-      # :ignore
-      # fire it off to Memelex, let Memelex worry about this one...
+      # fire it off to Memelex, they can worry about this one...
       Memelex.Fluxus.input(input)
       :ignore
    end

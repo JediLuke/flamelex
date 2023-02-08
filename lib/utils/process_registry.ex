@@ -1,6 +1,6 @@
-defmodule Flamelex.Utils.ProcessRegistry do
+defmodule Flamelex.Lib.Utils.ProcessRegistry do
   require Logger
-  use Flamelex.ProjectAliases
+  use Flamelex.Lib.ProjectAliases
 
 
   @doc """

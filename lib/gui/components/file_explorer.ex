@@ -30,7 +30,7 @@ defmodule Flamelex.GUI.Component.FileExplorer do
          |> assign(graph: init_graph)
          |> push_graph(init_graph)
 
-      Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
+      Flamelex.Lib.Utils.PubSub.subscribe(topic: :radix_state_change)
 
       {:ok, init_scene}
    end

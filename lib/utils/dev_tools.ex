@@ -1,4 +1,4 @@
-defmodule Flamelex.API.DevTools do
+defmodule Flamelex.DevTools do
 
     @doc """
     Returns the current input mode.
@@ -20,6 +20,17 @@ defmodule Flamelex.API.DevTools do
     def get_radix_state do
         Flamelex.Fluxus.RadixStore.get()
     end
+
+    @doc """
+  This function retrieves the default module information, presented by
+  the Eixir module. It should work similarly to `IEx.Helpers.h/1`
+  """
+  def query_module(m) do
+    help = IEx.Helpers.h m
+    IO.puts "-------------"
+    IO.puts help
+    help
+  end
 end
 
 defmodule Flamelex.API.DevTools.SubMenuTestOne do

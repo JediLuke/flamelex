@@ -23,7 +23,7 @@ defmodule Flamelex.GUI.RootScene do
    #TODO document the layers system
    # root scene doesn't subscribe to changes, it just spins up 7 layer processes
    # these _do_ subscribe to changes, specifically, just the change in their layer ;)
-   # Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
+   # Flamelex.Lib.Utils.PubSub.subscribe(topic: :radix_state_change)
 
 
    # Scenic sends us lots of keypresses etc... easiest to just filter them

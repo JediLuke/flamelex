@@ -13,7 +13,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
       # `Flamelex.GUI.ComponentBehaviour`
       @behaviour Flamelex.GUI.ComponentBehaviour
       use Scenic.Component
-      use Flamelex.ProjectAliases
+      use Flamelex.Lib.ProjectAliases
       require Logger
       
       #NOTE: We must use the full component module names here, aliases
@@ -84,7 +84,7 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
         register_self(params)
 
         #TODO this could also subscribe to the channel for this id
-        Flamelex.Utils.PubSub.subscribe(topic: :gui_event_bus)
+        Flamelex.Lib.Utils.PubSub.subscribe(topic: :gui_event_bus)
         
         init_scene_first_stage = scene
         |> assign(ref: params.ref)
@@ -134,13 +134,13 @@ defmodule Flamelex.GUI.ComponentBehaviour do #TODO this is only good for simple 
         # Logger.debug "#{__MODULE__} registering as: #{inspect tag}"
         #TODO search for if the process is already registered, if it is, engage recovery procedure
         #Process.monitor(Process.whereis(KommandBuffer))
-        Flamelex.Utils.ProcessRegistry.register(tag)
+        Flamelex.Lib.Utils.ProcessRegistry.register(tag)
         {:rego_tag, tag}
       end
 
       def update(ref, new_state) do
         #TODO here we might need rego_tag/1
-        Flamelex.Utils.ProcessRegistry.find(ref) |> GenServer.cast({:update, new_state})
+        Flamelex.Lib.Utils.ProcessRegistry.find(ref) |> GenServer.cast({:update, new_state})
       end
 
       def handle_cast({:update, new_state}, scene) do

@@ -59,7 +59,7 @@ defmodule Flamelex.Keymaps.Desktop do
 
    # open the Memex with keybinding <leader>h
    # def process(@lowercase_h, %{history: %{keystrokes: [@leader|_rest]}} = radix_state) do
-   #    :ok = Flamelex.API.Memex.open()
+   #    :ok = Flamelex.API.Diary.open()
    # end
    
 end

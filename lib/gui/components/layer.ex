@@ -33,7 +33,7 @@ defmodule Flamelex.GUI.Component.Layer do
       |> assign(state: init_state)
       |> push_graph(init_graph)
 
-      Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
+      Flamelex.Lib.Utils.PubSub.subscribe(topic: :radix_state_change)
 
       {:ok, init_scene}
    end
@@ -47,7 +47,7 @@ defmodule Flamelex.GUI.Component.Layer do
    #    |> assign(state: args[:state] || nil)
    #    |> push_graph(args.graph)
 
-   #    Flamelex.Utils.PubSub.subscribe(topic: :radix_state_change)
+   #    Flamelex.Lib.Utils.PubSub.subscribe(topic: :radix_state_change)
 
    #    {:ok, init_scene}
    # end

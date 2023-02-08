@@ -16,7 +16,7 @@ defmodule Flamelex.App do
     ]
 
     children = if boot_memelex?(),
-                    do: children ++ [Memelex.BootLoader],
+                    do: children ++ [Memelex.App.BootLoader],
                   else: children
 
     opts = [strategy: :one_for_one, name: __MODULE__]

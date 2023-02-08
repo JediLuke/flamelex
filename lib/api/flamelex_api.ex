@@ -21,7 +21,7 @@ defmodule Flamelex do
 end
 
 defmodule Flamelex.API do
-  use Flamelex.ProjectAliases
+  use Flamelex.Lib.ProjectAliases
 
   @doc """
   `Know Thyself`

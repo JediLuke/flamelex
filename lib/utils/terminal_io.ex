@@ -1,4 +1,4 @@
-defmodule Flamelex.Utilities.TerminalIO do
+defmodule Flamelex.Lib.Utils.TerminalIO do
 
   #TODO all this
 

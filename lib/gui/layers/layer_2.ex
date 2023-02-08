@@ -107,8 +107,8 @@ defmodule Flamelex.GUI.Layers.LayerTwo do
          {:sub_menu, "Buffer", buffer_menu(radix_state)},
          {:sub_menu, "Memex",
             [
-               {"open", &Flamelex.API.Memex.open/0},
-               {"close", &Flamelex.API.Memex.close/0},
+               {"open", &Flamelex.API.Diary.open/0},
+               {"close", &Flamelex.API.Diary.close/0},
                # random
                # journal
             ]},

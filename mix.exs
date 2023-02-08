@@ -1,4 +1,4 @@
-defmodule Flamelex.MixProject do
+defmodule Flamelex.App.MixProject do
   use Mix.Project
 
   def project do
@@ -38,26 +38,28 @@ defmodule Flamelex.MixProject do
       #         also break stuff
 
       #NOTE: These are the public declarations (pulled from github)
-      {:scenic, "~> 0.11.0-beta.0"},
+      # {:scenic, "~> 0.11.0-beta.0"},
       # {:scenic, git: "https://github.com/JediLuke/scenic", branch: "no_text_wrap"},
       # {:scenic_driver_local, "~> 0.11.0-beta.0"},
       # {:memelex, git: "https://github.com/JediLuke/memelex"},
       #      These are the imports for local dev
-      # {:scenic, path: "../scenic", override: true},
+      {:scenic, path: "../scenic", override: true, runtime: false},
       {:scenic_driver_local, path: "../scenic_driver_local", override: true},
       {:scenic_widget_contrib, path: "../scenic-widget-contrib", override: true},
-      {:memelex, path: "../memelex"},
-      {:quillex, path: "../quillex"},
+      {:memelex, path: "../memelex", runtime: false},
+      {:quillex, path: "../quillex", runtime: false},
       # these deps should all be fine
       # {:scenic_layout_o_matic, "~> 0.4.0"},
       {:ecto_sql, "~> 3.0"},
       {:truetype_metrics, "~> 0.5"},
-      {:font_metrics, "~> 0.5"},
+      # {:font_metrics, "~> 0.5"},
+      {:font_metrics, path: "../font_metrics", override: true},
       {:elixir_uuid, "~> 1.2"},
       {:wormhole, "~> 2.3"},
       {:jason, "~> 1.1"},
-      {:gproc, "~> 0.5.0"}, #TODO remove gproc, use Registry
+      # {:gproc, "~> 0.5.0"}, #TODO remove gproc, use Registry
       {:tzdata, "~> 1.0.4"},
+      {:map_diff, "~> 1.3"},
       # {:event_bus, "~> 1.6.2"},
       {:event_bus, path: "../event_bus", override: true},
       {:struct_access, "~> 1.1.2"},

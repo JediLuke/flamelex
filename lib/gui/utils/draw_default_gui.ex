@@ -1,5 +1,5 @@
 defmodule Flamelex.GUI.Utils.DefaultGUI.NEW do
-  use Flamelex.ProjectAliases
+  use Flamelex.Lib.ProjectAliases
   require Logger
   alias Flamelex.GUI.Utils.Draw
 

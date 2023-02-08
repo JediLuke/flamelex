@@ -1,4 +1,4 @@
-defmodule Flamelex.IExAutoRun do
+defmodule IExAutoRun do
   @moduledoc """
   This Elixir code will automatically be run when the Flamelex app starts.
 
@@ -15,9 +15,9 @@ defmodule Flamelex.IExAutoRun do
   defmacro __using__(_) do
     quote do
       # IO.puts "Executing the code in `Flamelex.IExAutoRun`, via the `.iex.exs` file..."
-      use Flamelex.ProjectAliases
+      use Flamelex.Lib.ProjectAliases
       import Flamelex # these are the highest level functions, they are automatically available
-      Flamelex.IExAutoRun.print_welcome_msg()
+      IExAutoRun.print_welcome_msg()
     end
   end
 
@@ -34,7 +34,7 @@ defmodule Flamelex.IExAutoRun do
   end
 
   # def punctuated_quote do
-  #   q = Flamelex.API.Memex.random_quote()
+  #   q = Flamelex.API.Diary.random_quote()
 
   #   ~s(“#{q.text}”
   #    - #{q.author}

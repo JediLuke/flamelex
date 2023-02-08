@@ -43,7 +43,7 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
    to FluxusRadix (kind of a loop-back) to be then handled.
    """
 
-   use Flamelex.ProjectAliases
+   use Flamelex.Lib.ProjectAliases
 
    @max_keystroke_history_limit 50
    @max_action_history_limit 50

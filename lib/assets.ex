@@ -1,4 +1,4 @@
-defmodule Flamelex.Assets do
+defmodule Flamelex.App.Scenic.Assets do
   use Scenic.Assets.Static,
     otp_app: :flamelex,
     alias: [

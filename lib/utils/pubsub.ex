@@ -1,4 +1,4 @@
-defmodule Flamelex.Utils.PubSub do
+defmodule Flamelex.Lib.Utils.PubSub do
   @registrar_proc Fluxus.PubSub
   @topic :radix_state_changes
 

@@ -1,6 +1,6 @@
 defmodule Flamelex.Fluxus.Reducers.Projects do
    @moduledoc false
-   use Flamelex.ProjectAliases
+   use Flamelex.Lib.ProjectAliases
    require Logger
 
    def process(radix_state, :close_all) do

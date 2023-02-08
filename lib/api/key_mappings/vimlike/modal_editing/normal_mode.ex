@@ -260,7 +260,7 @@ end
 #   # use Flamelex.Fluxus.KeyMappingBehaviour
 #   alias Flamelex.KeyMappings.Vim.{NormalMode, KommandMode,
 #                                            InsertMode, LeaderBindings}
-#   use Flamelex.ProjectAliases
+#   use Flamelex.Lib.ProjectAliases
 #   use ScenicWidgets.ScenicEventsDefinitions
 #   alias Flamelex.Fluxus.Structs.RadixState
 #   require Logger

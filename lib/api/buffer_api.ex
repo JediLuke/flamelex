@@ -2,7 +2,7 @@ defmodule Flamelex.API.Buffer do
    @moduledoc """
    The interface to all the Buffer commands.
    """
-   use Flamelex.ProjectAliases
+   use Flamelex.Lib.ProjectAliases
    alias Flamelex.BufferManager
    alias QuillEx.Reducers.BufferReducer # NOTE: We use the QuillEx BufferReducer...
    alias Flamelex.Fluxus.RadixStore
@@ -109,6 +109,10 @@ defmodule Flamelex.API.Buffer do
   ```
   """
 
+  # does editing actions on a buffer
+  def edit() do
+    raise "do it"
+  end
 
   def modify(%{id: buf_id}, modification) do
     modify(buf_id, modification)
