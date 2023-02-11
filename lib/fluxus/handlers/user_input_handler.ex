@@ -17,6 +17,8 @@ defmodule Flamelex.Fluxus.UserInputHandler do #TODO rename just InputHandler to 
    end
 
    def process(%{root: %{active_app: :editor}} = radix_state, input) do
+      #TODO route this to QuillEx
+      # QuillEx.Fluxus.input(input)
       Flamelex.Keymaps.Editor |> process_with_rescue(radix_state, input)
    end
 

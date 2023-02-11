@@ -42,11 +42,13 @@ defmodule Flamelex.KeyMappings.Vim.NormalMode do
       Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :insert}})
    end
 
+   # switch to insert mode - after current column
    def process(%{root: %{active_app: :editor}, editor: %{active_buf: active_buf}}, @lowercase_a) do
       Flamelex.API.Buffer.modify(active_buf, {:set_mode, {:vim, :insert}})
       Flamelex.API.Buffer.move_cursor(@right_one_column)
    end
 
+   # switch to insert mode - open up a new line below the current cursor for editing
    def process(radix_state, @lowercase_o) do
       active_buf = %{cursors: [cursor]} = Utils.filter_active_buf(radix_state)
       Flamelex.API.Buffer.modify(active_buf, {:insert_line, after: cursor.line, text: ""})
@@ -85,6 +87,16 @@ defmodule Flamelex.KeyMappings.Vim.NormalMode do
       end
 
       Flamelex.API.Buffer.move_cursor(delta)
+   end
+
+   def process(%{history: %{keystrokes: [@lowercase_g|_rest]}} = radix_state, @lowercase_g) do
+      active_buf = %{cursors: [cursor]} = Utils.filter_active_buf(radix_state)
+      #TODO THIS IMPLICITELY IMPLIES MOVING THE ACTIVE BUFFER
+      Flamelex.API.Buffer.move_cursor(:last_line)
+   end
+
+   def process(_radix_state, @lowercase_g) do
+      :ok # add to history
    end
 
    def process(%{history: %{keystrokes: [@lowercase_d|_rest]}} = radix_state, @lowercase_d) do
