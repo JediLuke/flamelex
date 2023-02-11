@@ -1,10 +1,12 @@
 defmodule Flamelex.App.MixProject do
   use Mix.Project
 
+  @version "0.4.2"
+
   def project do
     [
       app: :flamelex,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.9",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -19,6 +21,10 @@ defmodule Flamelex.App.MixProject do
       extra_applications: [:logger],
       mod: {Flamelex.App, []}
     ]
+  end
+
+  def version do
+    @version
   end
 
   #TODO use mix environments to figure out which memex to connect to?

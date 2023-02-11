@@ -42,6 +42,8 @@ defmodule Flamelex.GUI.Component.Renseijin do
    @animation_rate 10 # 100ms framerate? tick every 100ms?
    @cool_kid_radius 80 # area of effect for awesomeness to happen
 
+   @circle_size 47
+
    def validate(%{frame: %Frame{} = _f, animate?: animate?} = data) when is_boolean(animate?) do
       #Logger.debug "#{__MODULE__} has valid input data."
       {:ok, data}
@@ -204,9 +206,10 @@ defmodule Flamelex.GUI.Component.Renseijin do
 
    def render(frame) do
       args = %{
-         radius: frame.dimens.width/2*0.37, # we can get the scale_factor back this way!
+         # radius: frame.dimens.width/2*0.37, # we can get the scale_factor back this way!
+         radius: circle_rad(frame),
          center: center = Frame.center(frame),
-         outer_rim: 42,
+         outer_rim: @circle_size,
          gap_size: 4,
          rotation: 0
       }
@@ -216,13 +219,17 @@ defmodule Flamelex.GUI.Component.Renseijin do
             graph
             |> draw_circles(args)
             |> draw_triangles(args)
-            |> draw_taijitu(args)
+            |> draw_taijitu(frame, args)
             |> draw_outer_square(args)
          end, [
             id: __MODULE__,
             hidden: false,
             translate: {center.x, center.y}
          ])
+   end
+
+   def circle_rad(frame) do
+      frame.dimens.width/2*0.37 # we can get the scale_factor back this way!
    end
 
    def draw_circles(graph, args) do
@@ -267,16 +274,18 @@ defmodule Flamelex.GUI.Component.Renseijin do
                   stroke: {1, @primary_color})
    end
 
-   def equilateral_triangle_coords(radius) do
-      {
-         {(-1*:math.sqrt(3)) * radius/2, radius/2},
-         {0, -1*radius},
-         {:math.sqrt(3) * radius/2, radius/2}
-      }
-   end
 
-   def draw_taijitu(graph, args) do
-      radius = inner_circle_radius(args)/2
+
+   def draw_taijitu(graph, frame, args) do
+      radius = inner_circle_radius(args)
+      #TODO just having this grow & shrink would be AWESOME!!!
+      # radius = inner_circle_radius(args)/2
+
+      color = :yellow
+
+      # circle_rad = circle_rad(frame)
+
+      #TODO add tails
 
       graph
       # |> Scenic.Primitives.line({{0, -radius}, {0, radius}}, stroke: {1, :grey})
@@ -285,16 +294,75 @@ defmodule Flamelex.GUI.Component.Renseijin do
       # |> Scenic.Primitives.line({{-5, 0}, {5, 0}}, stroke: {1, :grey}, translate: {0, radius/2})
       |> Scenic.Primitives.group(fn graph ->
          graph
-         |> Scenic.Primitives.circle(radius/6, stroke: {1, :grey}, translate: {0, -radius/2})
-         |> Scenic.Primitives.circle(radius/6, stroke: {1, :grey}, translate: {0, radius/2})
-         |> Scenic.Primitives.arc({radius/2, @pi}, stroke: {1, :grey}, rotate: 3*@pi/2, translate: {0, -radius/2})
-         |> Scenic.Primitives.arc({radius/2, @pi}, stroke: {1, :grey}, rotate: @pi/2, translate: {0, radius/2})
-         |> Scenic.Primitives.circle(radius, stroke: {1, :grey})
+         |> Scenic.Primitives.circle(radius/6, stroke: {1, color}, translate: {0, -radius/2})
+         |> Scenic.Primitives.circle(radius/6, stroke: {1, color}, translate: {0, radius/2})
+         |> Scenic.Primitives.arc({radius/2, @pi}, stroke: {1, color}, rotate: 3*@pi/2, translate: {0, -radius/2})
+         |> Scenic.Primitives.arc({radius/2, @pi}, stroke: {1, color}, rotate: @pi/2, translate: {0, radius/2})
+         |> Scenic.Primitives.circle(radius, stroke: {1, color})
+         |> add_taijitu_tails(radius)
       end, [
          id: :taijitu,
          rotate: args.rotation
       ])
    end
+
+   def add_taijitu_tails(graph, inner_radius) do
+
+      width_factor = 3
+      finish_height = 2*inner_radius
+
+      graph
+      |> Scenic.Primitives.path( [
+         :begin,
+         {:move_to, 0, inner_radius},
+         {:bezier_to,
+            (0.67)*inner_radius*width_factor, inner_radius,
+            (1-0.67)*inner_radius*width_factor, finish_height,
+            inner_radius*width_factor, finish_height
+         }
+         # {:line_to, 300, 600},
+         # :close_path
+         ],
+         #  fill: :white,
+         # stroke_fill: :yellow,
+         # stroke_width: 2
+         stroke: {1, :yellow}
+      )
+
+      |> Scenic.Primitives.path( [
+         :begin,
+         {:move_to, 0, -inner_radius},
+         {:bezier_to,
+            -1*(0.67)*inner_radius*width_factor, -1*inner_radius,
+            -1*(1-0.67)*inner_radius*width_factor, -1*finish_height,
+            -1*inner_radius*width_factor, -1*finish_height
+         }
+         # {:line_to, 300, 600},
+         # :close_path
+         ],
+         #  fill: :white,
+         # stroke_fill: :yellow,
+         # stroke_width: 2
+         stroke: {1, :yellow}
+      )
+   end
+
+   #TODO this pattern was interesting... explore it later
+   # def add_taijitu_tails(graph, width) do
+   #    graph
+   #    |> Scenic.Primitives.path( [
+   #       :begin,
+   #       {:move_to, 0, width},
+   #       {:bezier_to, 0, 0, 0, 0, width, 0}
+   #       # {:line_to, 300, 600},
+   #       # :close_path
+   #     ],
+   #    #  fill: :white,
+   #    # stroke_fill: :yellow,
+   #    # stroke_width: 2
+   #    stroke: {1, :yellow}
+   #   )
+   # end
 
    def draw_outer_square(graph, args) do
 
@@ -303,7 +371,22 @@ defmodule Flamelex.GUI.Component.Renseijin do
       graph
       |> Scenic.Primitives.quad(
          {{-l, -l}, {-l, l}, {l, -l}, {l, l}},
-         stroke: {1, :yellow}
+         stroke: {1, :grey}
+      )
+      |> Scenic.Primitives.quad(
+         {{l, l}, {-l, l}, {-l, -l}, {l, -l}},
+         stroke: {1, :grey}
+      )
+      # |> render_pyramids()
+   end
+
+   def render_pyramids(graph) do
+      graph
+      |> Scenic.Primitives.triangle(
+            right_triangle_coords(),
+            id: {:top_left, :left},
+            stroke: {1, :white},
+            fill: :dark_gray
       )
    end
 
@@ -322,6 +405,23 @@ defmodule Flamelex.GUI.Component.Renseijin do
    }) do
       # outer_radius - rim + 2 * size + size/2
       outer_radius - rim + size
+   end
+
+   def equilateral_triangle_coords(radius) do
+      {
+         {(-1*:math.sqrt(3)) * radius/2, radius/2},
+         {0, -1*radius},
+         {:math.sqrt(3) * radius/2, radius/2}
+      }
+   end
+
+   def right_triangle_coords do
+      size = 100
+      {
+         {size, size}, # top-right vertex
+         {0, size}, # top-left vertex
+         {0, 0} # bottom vertex
+      } 
    end
 
    def within_box?({query_x, query_y}, %{x: base_x, y: base_y}, radius) do

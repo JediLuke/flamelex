@@ -26,7 +26,7 @@ defmodule IExAutoRun do
 
     Welcome to Flamelex
     -------------------
-    v0.3.7
+    v#{Flamelex.App.MixProject.version()}
 
     ")
 

@@ -90,13 +90,17 @@ defmodule Flamelex.KeyMappings.Vim.NormalMode do
    end
 
    def process(%{history: %{keystrokes: [@lowercase_g|_rest]}} = radix_state, @lowercase_g) do
-      active_buf = %{cursors: [cursor]} = Utils.filter_active_buf(radix_state)
+      # active_buf = %{cursors: [cursor]} = Utils.filter_active_buf(radix_state)
       #TODO THIS IMPLICITELY IMPLIES MOVING THE ACTIVE BUFFER
       Flamelex.API.Buffer.move_cursor(:last_line)
    end
 
    def process(_radix_state, @lowercase_g) do
       :ok # add to history
+   end
+
+   def process(_radix_state, @uppercase_G) do
+      Flamelex.API.Buffer.move_cursor(:first_line)
    end
 
    def process(%{history: %{keystrokes: [@lowercase_d|_rest]}} = radix_state, @lowercase_d) do

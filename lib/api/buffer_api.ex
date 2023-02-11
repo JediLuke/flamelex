@@ -4,7 +4,7 @@ defmodule Flamelex.API.Buffer do
    """
    use Flamelex.Lib.ProjectAliases
    alias Flamelex.BufferManager
-   alias QuillEx.Reducers.BufferReducer # NOTE: We use the QuillEx BufferReducer...
+   alias QuillEx.Reducers.BufferReducer, as: QuillExBufrReducer # NOTE: We use the QuillEx QuillExBufrReducer...
    alias Flamelex.Fluxus.RadixStore
 
    @doc """
@@ -19,7 +19,7 @@ defmodule Flamelex.API.Buffer do
    end
 
    def new(data) when is_bitstring(data) do
-      {:ok, radix_state} = Flamelex.Fluxus.declare({BufferReducer, {:open_buffer, %{data: data, mode: {:vim, :normal}}}})
+      {:ok, radix_state} = Flamelex.Fluxus.declare({QuillExBufrReducer, {:open_buffer, %{data: data, mode: {:vim, :normal}}}})
       radix_state.editor.active_buf
    end
 
@@ -34,8 +34,10 @@ defmodule Flamelex.API.Buffer do
   iex> Buffer.open("README.md")
   {:buffer, {:file, "README.md"}}
   """
+  
+  #TODO THIS NEEDS TO CHECK IF THE buffer is already open or not
   def open(filename) when is_bitstring(filename) do
-    {:ok, radix_state} = Flamelex.Fluxus.declare({BufferReducer, {:open_buffer, %{file: filename, mode: {:vim, :normal}}}})
+    {:ok, radix_state} = Flamelex.Fluxus.declare({QuillExBufrReducer, {:open_buffer, %{file: filename, mode: {:vim, :normal}}}})
     radix_state.editor.active_buf
   end
 
@@ -52,7 +54,7 @@ defmodule Flamelex.API.Buffer do
   end
 
   def switch({:buffer, _id} = buf) do
-    Flamelex.Fluxus.action({BufferReducer, {:activate, buf}})
+    Flamelex.Fluxus.action({QuillExBufrReducer, {:activate, buf}})
   end
 
   def switch(%{id: {:buffer, _id} = buf}) do
@@ -119,7 +121,7 @@ defmodule Flamelex.API.Buffer do
   end
 
   def modify({:buffer, _buf_id} = buffer, modification) do
-    Flamelex.Fluxus.action({BufferReducer, {:modify_buf, buffer, modification}})
+    Flamelex.Fluxus.action({QuillExBufrReducer, {:modify_buf, buffer, modification}})
   end
 
 
@@ -127,14 +129,19 @@ defmodule Flamelex.API.Buffer do
    Scroll the buffer around.
    """
    def scroll({_x_scroll, _y_scroll} = scroll_delta) do
-      Flamelex.Fluxus.action({BufferReducer, {:scroll, :active_buf, {:delta, scroll_delta}}})
+      Flamelex.Fluxus.action({QuillExBufrReducer, {:scroll, :active_buf, {:delta, scroll_delta}}})
    end
 
   @doc """
   Scroll the buffer around.
   """
+  @absolute_positions [:first_line, :last_line]
+  def move_cursor(absolute) when absolute in @absolute_positions do
+    Flamelex.Fluxus.action({QuillExBufrReducer, {:move_cursor, :active_buf, absolute}})
+  end
+
   def move_cursor({_column_delta, _line_delta} = cursor_move_delta) do
-    Flamelex.Fluxus.action({BufferReducer, {:move_cursor, {:delta, cursor_move_delta}}})
+    Flamelex.Fluxus.action({QuillExBufrReducer, {:move_cursor, {:delta, cursor_move_delta}}})
   end
 
   @doc """
@@ -145,7 +152,7 @@ defmodule Flamelex.API.Buffer do
   end
 
   def save({:buffer, _details} = buf) do
-    Flamelex.Fluxus.action({BufferReducer, {:save, buf}})
+    Flamelex.Fluxus.action({QuillExBufrReducer, {:save, buf}})
   end
 
 
@@ -170,7 +177,7 @@ defmodule Flamelex.API.Buffer do
 
   def close(buf) do
     #TODO this is causing GUI controller & VimServer to also restart??
-    Flamelex.Fluxus.action({BufferReducer, {:close_buffer, buf}})
+    Flamelex.Fluxus.action({QuillExBufrReducer, {:close_buffer, buf}})
   end
 
   def close_all! do

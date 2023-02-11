@@ -14,6 +14,13 @@ defmodule Flamelex.Lib.ProjectAliases do
         Diary
       }
 
+      alias Memelex.My
+
+      alias Memelex.My.{
+        Journal,
+        Wiki
+      }
+
       alias Flamelex.Fluxus
       
       alias Flamelex.GUI.Structs.Coordinates
