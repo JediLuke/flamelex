@@ -33,7 +33,9 @@ defmodule Flamelex.Lib.ProjectAliases do
       alias Flamelex.Lib.Utils.ProcessRegistry
       alias Flamelex.Lib.Utils.PubSub
 
-      use IceCream # https://github.com/joseph-lozano/ice_cream
+      # use IceCream # https://github.com/joseph-lozano/ice_cream
+
+      import Memelex.Environment, only: [reload_modz: 0]
 
     end
   end

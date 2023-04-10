@@ -240,5 +240,9 @@ defmodule Flamelex.Fluxus.Structs.RadixState do
 
 
 
+  def mutate(radix_state, :open_widget_wkb) do
+   radix_state
+   |> put_in([:root, :active_app], :widget_wkb)
+  end
 
 end

@@ -37,6 +37,7 @@ defmodule Flamelex.KeyMappings.Vim.InsertMode do
    # all input not handled above, can be handled as editor input
    def process(_radix_state, key) do
       try do
+         #TODO this is all going away when we move QuillEx over to having it's own Fluxus Tree
          QuillEx.UserInputHandler.Editor.process(key, Flamelex.API.Buffer)
       rescue
          FunctionClauseError ->

@@ -128,6 +128,12 @@ Buffer.list()
 ``` -->
 
 
+    ##NOTE: Steps to add a new piece of functionality:
+    #           1) Create a new API function, in an API module
+    #           2) Create a reducer function, in a Reducer module <-- You are here.
+    #           3) Update related components to handle potential new states (just changing between known states should work already, assuming your components know how to render the new state)
+
+
 ### Editing an open text file (through the IEx console)
 
 At this point in the tutorial, we have successfully opened a text file
@@ -282,6 +288,10 @@ Buffer.modify(Buffer.active_buffer(), {:insert, Memex.random_quote().text, %{coo
 
 
 
+#     ##NOTE: Steps to add a new piece of functionality:
+#     #           1) Create a new API function, in an API module
+#     #           2) Create a reducer function, in a Reducer module <-- You are here.
+#     #           3) Update related components to handle potential new states (just changing between known states should work already, assuming your components know how to render the new state)
 
 
 

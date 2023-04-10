@@ -36,6 +36,11 @@ defmodule Flamelex.GUI.Layers.LayerTwo do
       }
    end
 
+
+   #TODO automatically add a .gitignore into each memex directory so it's impossible to accidentally commit the memex - anything except the my_modz.ex file
+   # note that although it can never be committed, we also make a my_secretz.ex file
+
+   #TODO here, we could look into the Memex & conditionally add a custom menu
    def calc_menu_map(radix_state) do
       [
          {:sub_menu, "Flamelex",
@@ -102,13 +107,15 @@ defmodule Flamelex.GUI.Layers.LayerTwo do
                {:sub_menu, "DevTools", [
                   {"get radix state", fn -> Flamelex.API.DevTools.get_radix_state() |> IO.inspect() end},
                   {"temet nosce", &Flamelex.temet_nosce/0}
-               ]}
+               ]},
+               widget_workbench()
             ]},
          {:sub_menu, "Buffer", buffer_menu(radix_state)},
          {:sub_menu, "Memex",
             [
                {"open", &Flamelex.API.Diary.open/0},
                {"close", &Flamelex.API.Diary.close/0},
+               {"my_modz", fn -> Flamelex.API.Buffer.open(Memelex.Environment.my_modz_file()) end},
                # random
                # journal
             ]},
@@ -145,4 +152,7 @@ defmodule Flamelex.GUI.Layers.LayerTwo do
       ] 
    end
 
+   def widget_workbench do
+      {"widget wkb", &Flamelex.DevTools.widget_workbench/0}
+   end
 end

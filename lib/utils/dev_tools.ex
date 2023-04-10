@@ -13,6 +13,11 @@ defmodule Flamelex.DevTools do
       |> GenServer.cast({:action, {:switch_mode, m}})
     end
 
+    def widget_workbench do
+        IO.puts "WWE let's get ready to rumble!!"
+        Flamelex.Fluxus.action({Flamelex.Fluxus.RadixReducer, {:widget_wkb, :open}})
+    end
+
     def refresh_menubar do
         Flamelex.GUI.Component.MenuBar.refresh()
     end

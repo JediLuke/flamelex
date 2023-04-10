@@ -70,7 +70,7 @@ defmodule Flamelex.GUI.Layers.LayerOne do
       {:ok, Scenic.Graph.build()}
    end
 
-   def render(%{layout: :split, active_app: :editor, frames: [f1|f2]}, radix_state) do
+   def render(%{active_app: :editor, layout: :split, frames: [f1|f2]}, radix_state) do
       {:ok,
          Scenic.Graph.build()
          |> QuillEx.GUI.Components.Editor.add_to_graph(%{
@@ -86,10 +86,10 @@ defmodule Flamelex.GUI.Layers.LayerOne do
       }
    end
 
-   def render(%{layout: %{
+   def render(%{active_app: :editor, layout: %{
       explorer: explorer_frame,
       editor: editor_frame
-   }, active_app: :editor}, radix_state) do
+   }}, radix_state) do
       {:ok,
          Scenic.Graph.build()
          |> Flamelex.GUI.Component.FileExplorer.add_to_graph(%{
@@ -135,4 +135,19 @@ defmodule Flamelex.GUI.Layers.LayerOne do
       }
    end
 
+   def render(%{active_app: :widget_wkb, frame: frame}, _radix_state) do
+
+   #    g = Scenic.Graph.build()
+
+
+   #    {:ok, g}
+
+      {:ok,
+         Scenic.Graph.build()
+         |> Flamelex.GUI.Components.WidgetWkb.add_to_graph(%{
+            frame: frame,
+            state: %{}
+         })
+      }
+   end
 end
