@@ -19,7 +19,7 @@
   "parse_trans": {:hex, :parse_trans, "3.4.1", "6e6aa8167cb44cc8f39441d05193be6e6f4e7c2946cb2759f015f8c56b76e5ff", [:rebar3], [], "hexpm", "620a406ce75dada827b82e453c19cf06776be266f5a67cff34e1ef2cbb60e49a"},
   "quillex": {:git, "https://github.com/JediLuke/quillex", "477c3310dc824511c316366dedcd10a978ec1779", []},
   "scenic": {:git, "https://github.com/ScenicFramework/scenic.git", "3b38c12ea79a03d930986fe633ee3ae54dca0d1f", [tag: "v0.11.1"]},
-  "scenic_driver_local": {:git, "https://github.com/JediLuke/scenic_driver_local", "202f6c03beddbc65d8cbd9dc719c1b1271079283", [branch: "no_line_wrap"]},
+  "scenic_driver_local": {:git, "https://github.com/JediLuke/scenic_driver_local", "43b94d99fe0f692bda810e1be2643925f39904cf", [branch: "flamelex_vsn"]},
   "scenic_mcp": {:git, "https://github.com/scenic-contrib/scenic_mcp_experimental", "7f2329205ad9be3e22017312803e6f0fa1aab713", []},
   "scenic_widget_contrib": {:git, "https://github.com/JediLuke/scenic-widget-contrib", "b210dd168edb007a71925f3efcdb3ec529fb4c9d", [branch: "text_pad_wip"]},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.7", "354c321cf377240c7b8716899e182ce4890c5938111a1296add3ec74cf1715df", [:make, :mix, :rebar3], [], "hexpm", "fe4c190e8f37401d30167c8c405eda19469f34577987c76dde613e838bbc67f8"},

@@ -18,7 +18,7 @@ defmodule Flamelex.App.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :observer, :wx, :inets],
+      extra_applications: [:logger, :observer, :inets],
       mod: {Flamelex.App, []}
     ]
   end
@@ -34,7 +34,9 @@ defmodule Flamelex.App.MixProject do
     [
       {:scenic, git: "https://github.com/ScenicFramework/scenic.git", tag: "v0.11.1", override: true},
       # {:scenic, path: "../scenic_local", override: true},
-      {:scenic_driver_local, git: "https://github.com/JediLuke/scenic_driver_local", branch: "no_line_wrap"},
+      # {:scenic_driver_local, git: "https://github.com/JediLuke/scenic_driver_local", branch: "no_line_wrap"},
+      {:scenic_driver_local, git: "https://github.com/JediLuke/scenic_driver_local", branch: "flamelex_vsn", override: true},
+
       {:scenic_widget_contrib, git: "https://github.com/JediLuke/scenic-widget-contrib", branch: "text_pad_wip", override: true},
 
       # import Quillex & Memelex
@@ -44,7 +46,7 @@ defmodule Flamelex.App.MixProject do
       {:quillex, git: "https://github.com/JediLuke/quillex", runtime: false},
       {:memelex, git: "https://github.com/JediLuke/memelex", runtime: false},
       # {:memelex, path: "../memelex"},
-      
+
       # MCP server for AI automation
       {:scenic_mcp, git: "https://github.com/scenic-contrib/scenic_mcp_experimental"},
       # {:scenic_mcp, path: "../scenic_mcp"},
@@ -60,7 +62,10 @@ defmodule Flamelex.App.MixProject do
       {:jason, "~> 1.1"},
       {:tzdata, "~> 1.0.4"},
       {:event_bus, git: "https://github.com/JediLuke/event_bus", override: true},
-      {:struct_access, "~> 1.1.2"}
+      {:struct_access, "~> 1.1.2"},
+
+      # Spex testing framework for AI-driven development
+      {:sexy_spex, path: "../spex", only: :test}
 
       # maybe one day we will bring these back
       # {:stream_data, "~> 0.5", only: :test}
