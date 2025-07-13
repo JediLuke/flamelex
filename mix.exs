@@ -11,7 +11,8 @@ defmodule Flamelex.App.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      docs: docs()
+      docs: docs(),
+      releases: releases()
     ]
   end
 
@@ -43,9 +44,10 @@ defmodule Flamelex.App.MixProject do
       # ** the reason runtime is false here is because, the boot sequence of
       #    these apps is managed explicitely by Flamelex, so that we can define
       #    certain variables before booting the GUI. Thus we dont boot at runtime
-      {:quillex, git: "https://github.com/JediLuke/quillex", runtime: false},
-      {:memelex, git: "https://github.com/JediLuke/memelex", runtime: false},
-      # {:memelex, path: "../memelex"},
+      # {:quillex, git: "https://github.com/JediLuke/quillex", runtime: false},
+      {:quillex, path: "../quillex", runtime: false},
+      # {:memelex, git: "https://github.com/JediLuke/memelex", runtime: false},
+      {:memelex, path: "../memelex", runtime: false},
 
       # MCP server for AI automation
       {:scenic_mcp, git: "https://github.com/scenic-contrib/scenic_mcp_experimental"},
@@ -81,6 +83,21 @@ defmodule Flamelex.App.MixProject do
       # groups_for_modules: groups_for_modules(),
       # extras: extras(),
       # groups_for_extras: groups_for_extras()
+    ]
+  end
+
+  defp releases do
+    [
+      flamelex: [
+        applications: [
+          flamelex: :permanent,
+          quillex: :permanent,
+          memelex: :permanent,
+          scenic_mcp: :permanent
+        ],
+        cookie: "flamelex_secure_cookie_#{System.get_env("USER", "default")}",
+        quiet: true
+      ]
     ]
   end
 end

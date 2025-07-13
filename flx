@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Flamelex launcher script
-# This script boots Flamelex from anywhere on the system
+# This script boots Flamelex from anywhere on the system using the production release
 
 set -e
 
@@ -11,5 +11,11 @@ FLAMELEX_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Change to the flamelex directory
 cd "$FLAMELEX_DIR"
 
-# Launch Flamelex with any passed arguments
-exec iex -S mix run -- "$@"
+# Build release if it doesn't exist
+if [ ! -d "_build/prod/rel/flamelex" ]; then
+    echo "Building production release..."
+    MIX_ENV=prod mix release
+fi
+
+# Launch Flamelex using the production release
+exec ./_build/prod/rel/flamelex/bin/flamelex start "$@"

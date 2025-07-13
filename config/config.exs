@@ -2,8 +2,6 @@ import Config
 
 config :flamelex, :key_mapping, Flamelex.KeyMappings.VimClone
 
-config :memelex,
-  active?: true
 
 config :nx, default_backend: EXLA.Backend
 
@@ -41,3 +39,5 @@ config :logger,
 #   # interrupts_topic: :flx_interrupts,
 #   radix_state: Flamelex.Fluxus.RadixState,
 #   radix_reducer: Flamelex.Fluxus.RadixReducer
+
+import_config "#{config_env()}.exs"
