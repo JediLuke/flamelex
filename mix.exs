@@ -65,7 +65,7 @@ defmodule Flamelex.App.MixProject do
       {:struct_access, "~> 1.1.2"},
 
       # Spex testing framework for AI-driven development
-      {:sexy_spex, path: "../spex", only: :test}
+      {:sexy_spex, path: "../spex", only: [:dev, :test]}
 
       # maybe one day we will bring these back
       # {:stream_data, "~> 0.5", only: :test}
