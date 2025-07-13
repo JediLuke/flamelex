@@ -73,27 +73,54 @@ defmodule Flamelex.SmokeTestSpex do
         # Verify key processes are running to confirm successful load
         flamelex_running = Process.whereis(Flamelex.App) != nil
         
-        {:ok, Map.merge(context, %{loaded_screenshot: loaded_screenshot, fully_loaded: flamelex_running})}
+        # IMPORTANT: Check script table while the app is still running
+        script_table_content = try do
+          Flamelex.TestHelpers.ScriptInspector.extract_rendered_text()
+        rescue
+          error ->
+            IO.puts("   ⚠️  Script table access failed: #{inspect(error)}")
+            []
+        end
+        
+        ui_indicators = try do
+          Flamelex.TestHelpers.ScriptInspector.extract_flamelex_ui_indicators()
+        rescue
+          error ->
+            IO.puts("   ⚠️  UI indicators extraction failed: #{inspect(error)}")
+            []
+        end
+        
+        {:ok, Map.merge(context, %{
+          loaded_screenshot: loaded_screenshot, 
+          fully_loaded: flamelex_running,
+          script_content: script_table_content,
+          ui_indicators: ui_indicators
+        })}
       end
 
       then_ "the main GUI should be visible and responsive", context do
         # Primary validation: Flamelex should be fully loaded and running
         assert context.fully_loaded, "Flamelex should be fully loaded"
         
-        # If we managed to get a screenshot, validate it
-        if context.loaded_screenshot do
-          assert File.exists?(context.loaded_screenshot.filename),
-                 "Screenshot should be captured, proving GUI is running"
-          
-          # Verify screenshot file is not empty (indicates actual content was rendered)
-          file_size = File.stat!(context.loaded_screenshot.filename).size
-          assert file_size > 1000, 
-                 "Screenshot file should be substantial (>1KB), indicating real content was rendered. Got: #{file_size} bytes"
-        else
-          IO.puts("   ✅ GUI validation completed without screenshots (expected in test mode)")
-        end
+        # The key validation: use script table data captured while app was running
+        assert length(context.ui_indicators) > 0, 
+               "Should find Flamelex UI elements in rendered content. Found: #{inspect(context.ui_indicators)}"
         
-        IO.puts("   🎯 Smoke Test Core Success: Flamelex booted and is running!")
+        # Verify we found expected Flamelex elements
+        expected_elements = ["Flamelex", "Buffer", "Help"]
+        found_elements = Enum.filter(expected_elements, fn element ->
+          element in context.ui_indicators
+        end)
+        
+        assert length(found_elements) > 0,
+               "Should find at least one core UI element. Expected: #{inspect(expected_elements)}, Found: #{inspect(found_elements)}"
+        
+        # Log what we actually captured for debugging
+        IO.puts("   🎯 Rendered UI elements found: #{inspect(context.ui_indicators)}")
+        IO.puts("   📋 Total rendered elements: #{length(context.script_content)}")
+        IO.puts("   ✅ Core elements verified: #{inspect(found_elements)}")
+        
+        IO.puts("   🎯 Smoke Test Core Success: Flamelex GUI is rendering expected content!")
         :ok
       end
     end
@@ -145,7 +172,70 @@ defmodule Flamelex.SmokeTestSpex do
     end
 
     # =============================================================================
-    # 3. MEMEX INTEGRATION VALIDATION  
+    # 3. SCRIPT TABLE INSPECTION - CORE GUI VALIDATION
+    # =============================================================================
+
+    scenario "Flamelex GUI content is correctly rendered", context do
+      given_ "Flamelex is fully loaded and rendering", context do
+        # Give extra time for all GUI elements to be rendered
+        Process.sleep(2000)
+        {:ok, context}
+      end
+
+      when_ "we inspect the scenic script table for rendered content", context do
+        # Extract all rendered text from the script table
+        rendered_text = Flamelex.TestHelpers.ScriptInspector.extract_rendered_text()
+        
+        # Look for specific Flamelex UI indicators
+        ui_indicators = Flamelex.TestHelpers.ScriptInspector.extract_flamelex_ui_indicators()
+        
+        # Check if the GUI appears loaded based on content analysis
+        appears_loaded = Flamelex.TestHelpers.ScriptInspector.flamelex_appears_loaded?()
+        
+        # Get detailed breakdown for debugging
+        rendered_text_string = Flamelex.TestHelpers.ScriptInspector.get_rendered_text_string()
+        
+        {:ok, Map.merge(context, %{
+          all_rendered_text: rendered_text,
+          ui_indicators: ui_indicators,
+          appears_loaded: appears_loaded,
+          rendered_summary: rendered_text_string
+        })}
+      end
+
+      then_ "we should see expected Flamelex UI elements in the rendered content", context do
+        # Core validation: We should find Flamelex UI elements
+        assert length(context.ui_indicators) > 0,
+               "Should find Flamelex UI indicators. Found: #{inspect(context.ui_indicators)}"
+        
+        assert context.appears_loaded,
+               "Flamelex should appear loaded based on script table analysis"
+        
+        # Look for specific expected elements
+        expected_elements = ["Flamelex", "Buffer", "Help"]
+        found_elements = Enum.filter(expected_elements, fn element ->
+          element in context.ui_indicators
+        end)
+        
+        assert length(found_elements) > 0,
+               "Should find at least one core UI element. Expected: #{inspect(expected_elements)}, Found: #{inspect(found_elements)}"
+        
+        # Log detailed findings
+        IO.puts("   🎯 Script Table Analysis Results:")
+        IO.puts("   📋 Total rendered elements: #{length(context.all_rendered_text)}")
+        IO.puts("   🔍 UI indicators found: #{inspect(context.ui_indicators)}")
+        IO.puts("   ✅ Core elements verified: #{inspect(found_elements)}")
+        
+        # Log first few rendered elements for debugging
+        sample_text = context.all_rendered_text |> Enum.take(5)
+        IO.puts("   📄 Sample rendered text: #{inspect(sample_text)}")
+        
+        :ok
+      end
+    end
+
+    # =============================================================================
+    # 4. MEMEX INTEGRATION VALIDATION  
     # =============================================================================
 
     scenario "Memelex integration is working", context do
