@@ -140,43 +140,118 @@ defmodule Flamelex.BufferManagementSpex do
     scenario "Multiple buffers with different content", context do
       given_ "multiple buffers are created", context do
         # Create first buffer with content
-        Flamelex.API.Buffer.new()
+        buffer1 = Flamelex.API.Buffer.new()
         Process.sleep(300)
-        ScenicMcp.Probes.send_keys("First buffer content")
+        ScenicMcp.Probes.send_keys("First buffer unique content 12345")
         Process.sleep(200)
+        
+        # Verify first buffer content
+        has_first = Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("First buffer unique content 12345")
         
         # Create second buffer
-        Flamelex.API.Buffer.new()
+        buffer2 = Flamelex.API.Buffer.new()
         Process.sleep(300)
-        ScenicMcp.Probes.send_keys("Second buffer content")
+        ScenicMcp.Probes.send_keys("Second buffer different content ABCDE")
         Process.sleep(200)
+        
+        # Verify second buffer content (first should NOT be visible)
+        has_second = Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("Second buffer different content ABCDE")
+        first_not_visible = not Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("First buffer unique content 12345")
         
         # Create third buffer
-        Flamelex.API.Buffer.new()
+        buffer3 = Flamelex.API.Buffer.new()
         Process.sleep(300)
-        ScenicMcp.Probes.send_keys("Third buffer content")
+        ScenicMcp.Probes.send_keys("Third buffer separate content XYZ789")
         Process.sleep(200)
         
-        has_third = Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("Third buffer")
+        # Verify third buffer is current
+        has_third = Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("Third buffer separate content XYZ789")
+        second_not_visible = not Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("Second buffer different content ABCDE")
         
-        {:ok, Map.put(context, :has_third_buffer, has_third)}
+        {:ok, Map.merge(context, %{
+          buffer1: buffer1,
+          buffer2: buffer2, 
+          buffer3: buffer3,
+          has_first: has_first,
+          has_second: has_second,
+          has_third: has_third,
+          first_not_visible_when_second_active: first_not_visible,
+          second_not_visible_when_third_active: second_not_visible
+        })}
       end
 
-      when_ "user works with multiple buffers", context do
-        # Add more content to current buffer
-        ScenicMcp.Probes.send_keys(" - additional text")
+      when_ "user switches between buffers and edits them", context do
+        # Edit current buffer (buffer 3)
+        ScenicMcp.Probes.send_keys(" - edited in third")
         Process.sleep(200)
         
-        has_additional = Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("additional text")
+        third_edited = Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("XYZ789 - edited in third")
         
-        {:ok, Map.put(context, :has_additional, has_additional)}
+        # Switch back to buffer 2 (implementation will vary - might need specific keybinding)
+        # For now, assuming there's a buffer switching mechanism
+        # This is where we'd use actual buffer switching commands once implemented
+        Flamelex.API.Buffer.switch_to(context.buffer2)  # Or however switching works
+        Process.sleep(300)
+        
+        # Verify we're back in buffer 2 - its content should be visible, buffer 3 should not be
+        second_visible_again = Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("Second buffer different content ABCDE")
+        third_not_visible = not Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("Third buffer separate content XYZ789")
+        
+        # Edit buffer 2
+        ScenicMcp.Probes.send_keys(" - edited in second")
+        Process.sleep(200)
+        
+        second_edited = Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("ABCDE - edited in second")
+        
+        # Switch to buffer 1
+        Flamelex.API.Buffer.switch_to(context.buffer1)
+        Process.sleep(300)
+        
+        # Verify buffer 1 content is unchanged
+        first_unchanged = Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("First buffer unique content 12345")
+        second_not_visible_again = not Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("Second buffer")
+        
+        # Switch back to buffer 3 to verify edits were preserved
+        Flamelex.API.Buffer.switch_to(context.buffer3)
+        Process.sleep(300)
+        
+        third_edits_preserved = Flamelex.TestHelpers.ScriptInspector.rendered_text_contains?("XYZ789 - edited in third")
+        
+        {:ok, Map.merge(context, %{
+          third_edited: third_edited,
+          second_visible_again: second_visible_again,
+          third_not_visible: third_not_visible,
+          second_edited: second_edited,
+          first_unchanged: first_unchanged,
+          second_not_visible_again: second_not_visible_again,
+          third_edits_preserved: third_edits_preserved
+        })}
       end
 
-      then_ "each buffer should maintain its own content", context do
-        assert context.has_third_buffer, "Should have third buffer content"
-        assert context.has_additional, "Should be able to add to current buffer"
+      then_ "each buffer should maintain its own content independently", context do
+        # Verify initial buffer creation worked correctly
+        assert context.has_first, "Should create first buffer with unique content"
+        assert context.has_second, "Should create second buffer with different content"
+        assert context.has_third, "Should create third buffer with separate content"
         
-        IO.puts("   ✅ Multiple buffer content isolation working")
+        # Verify buffer isolation during creation
+        assert context.first_not_visible_when_second_active, "First buffer content should not be visible when second is active"
+        assert context.second_not_visible_when_third_active, "Second buffer content should not be visible when third is active"
+        
+        # Verify editing works
+        assert context.third_edited, "Should be able to edit current buffer (third)"
+        
+        # Verify buffer switching
+        assert context.second_visible_again, "Should be able to switch back to buffer 2"
+        assert context.third_not_visible, "Buffer 3 should not be visible when buffer 2 is active"
+        assert context.second_edited, "Should be able to edit buffer 2 after switching"
+        
+        # Verify content preservation
+        assert context.first_unchanged, "Buffer 1 content should remain unchanged"
+        assert context.second_not_visible_again, "Only active buffer content should be visible"
+        assert context.third_edits_preserved, "Edits to buffer 3 should be preserved when switching back"
+        
+        IO.puts("   ✅ Multiple buffer isolation, switching, and content preservation working")
         :ok
       end
     end

@@ -101,15 +101,58 @@ defmodule Flamelex.TestHelpers.ScriptInspector do
   end
 
   @doc """
-  Check if any rendered content contains the specified string.
-  This looks at all rendered text including GUI elements.
+  Check if any rendered user content contains the specified string.
+  This filters out GUI elements and only looks at actual user content.
   """
   def rendered_text_contains?(text) when is_binary(text) do
-    extract_rendered_text()
+    extract_user_content()
     |> Enum.any?(fn rendered_text ->
       String.contains?(rendered_text, text)
     end)
   end
+
+  @doc """
+  Extract only user-typed content, filtering out GUI elements.
+  """
+  def extract_user_content do
+    extract_rendered_text()
+    |> Enum.reject(&is_gui_element?/1)
+  end
+
+  # Filter out common GUI elements that aren't user content
+  defp is_gui_element?(text) when is_binary(text) do
+    gui_patterns = [
+      # Flamelex menu/button text
+      "Flamelex", "Buffer", "File", "Edit", "Help", "Memelex", "Quillex",
+      # Common UI elements
+      "Help", "About", "Options", "Buffers", "Command", "Mode",
+      # Common symbols
+      "[+]", "{ }", "[=]", "(o)", "<*>", ">_", "Y",
+      # Single characters that are likely UI elements
+      "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+      # Scenic script identifiers
+      "_main_", "_root_"
+    ]
+
+    # Check for exact matches with GUI patterns
+    exact_match = text in gui_patterns
+
+    # Check for font hashes (long alphanumeric strings)
+    font_hash = String.length(text) > 20 and String.match?(text, ~r/^[A-Za-z0-9_-]+$/)
+
+    # Check for script IDs (UUIDs or similar)
+    script_id = String.contains?(text, "-") and String.length(text) > 10
+
+    # Check for underscore-prefixed identifiers (Scenic internal names)
+    internal_id = String.starts_with?(text, "_") and String.ends_with?(text, "_")
+
+    # Check for single character strings (likely not user content unless it's actual typing)
+    single_char = String.length(text) == 1
+
+    exact_match or font_hash or script_id or internal_id or single_char
+  end
+
+  defp is_gui_element?(_), do: false
 
   @doc """
   Get all rendered text as a single string for easier inspection.
@@ -120,13 +163,14 @@ defmodule Flamelex.TestHelpers.ScriptInspector do
   end
 
   @doc """
-  Check if the rendered output appears to be empty (no content).
+  Check if the rendered output appears to be empty (no user content).
+  This filters out GUI elements and only looks for actual user-typed content.
   """
   def rendered_text_empty? do
-    text_content = extract_rendered_text()
+    user_content = extract_user_content()
 
-    text_content == [] or
-    Enum.all?(text_content, fn text ->
+    user_content == [] or
+    Enum.all?(user_content, fn text ->
       String.trim(text) == ""
     end)
   end
