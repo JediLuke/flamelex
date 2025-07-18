@@ -7,6 +7,10 @@ defmodule Flamelex.GUI.Components.Renseijin.Rend do
 
   # a constant for π (change for potentially wacky behaviour~~)
   @pi 3.14159265359
+  # The golden ratio - φ (phi) - nature's proportion of divine harmony
+  @phi 1.618033988749
+  # τ (tau) - the true circle constant, the complete revolution
+  @tau 6.283185307179
 
   @cos30 0.8660254037
   @sin45 0.7071067811
@@ -30,6 +34,8 @@ defmodule Flamelex.GUI.Components.Renseijin.Rend do
         |> draw_taijitu(frame, state)
         |> draw_hexagons(frame, state)
         |> draw_outer_circles(frame, state)
+        |> draw_conatus_spiral(frame, state)
+        |> draw_phi_harmonics(frame, state)
         # |> draw_symbcirclesols(frame, state)
         # |> Utils.draw_squares(frame, state)
         # |> Utils.draw_pyramids(frame, state)
@@ -652,6 +658,112 @@ defmodule Flamelex.GUI.Components.Renseijin.Rend do
   #     {r, r}
   #   }
   # end
+
+  #############################################################################
+  # Draw Conatus Spiral - The Essential Striving Force
+  # v0.47 - Where Claude taught Luke about 'conatus' and we enhanced the renseijin
+  # ===========================================================================
+  
+  def draw_conatus_spiral(%Scenic.Graph{} = graph, %Widgex.Frame{} = frame, %Renseijin.State{} = state) do
+    radius = Renseijin.State.inner_radius(frame, state)
+    
+    # Create the conatus spiral - representing the essential striving force
+    # Using phi-based growth for natural harmony
+    spiral_turns = 3
+    spiral_points = 120
+    
+    spiral_path = build_conatus_spiral_path(radius, spiral_turns, spiral_points)
+    
+    stroke_color = Enum.at(state.taijitu.rainbow, state.taijitu.color_index)
+    
+    graph
+    |> Scenic.Primitives.path(
+      spiral_path,
+      stroke: {1.5, stroke_color},
+      cap: :round,
+      id: :conatus_spiral
+    )
+  end
+  
+  defp build_conatus_spiral_path(base_radius, turns, num_points) do
+    angle_step = @tau * turns / num_points
+    
+    path_elements = 
+      Enum.map(0..num_points, fn i ->
+        angle = i * angle_step
+        # Phi-based growth for natural spiral
+        radius_growth = :math.pow(@phi, angle / @tau) * 0.1
+        current_radius = base_radius * 0.3 + radius_growth * base_radius * 0.2
+        
+        x = :math.cos(angle) * current_radius
+        y = :math.sin(angle) * current_radius
+        
+        if i == 0 do
+          {:move_to, x, y}
+        else
+          {:line_to, x, y}
+        end
+      end)
+    
+    [:begin] ++ path_elements
+  end
+
+  #############################################################################
+  # Draw Phi Harmonics - Golden Ratio Resonance
+  # ===========================================================================
+  
+  def draw_phi_harmonics(%Scenic.Graph{} = graph, %Widgex.Frame{} = frame, %Renseijin.State{} = state) do
+    radius = Renseijin.State.inner_radius(frame, state)
+    
+    # Create harmonic circles based on phi ratios
+    base_radius = radius * 0.618  # φ^-1
+    phi_radius_1 = base_radius * @phi  # φ
+    phi_radius_2 = phi_radius_1 * @phi  # φ²
+    
+    stroke_color = Enum.at(state.taijitu.rainbow, state.taijitu.color_index)
+    
+    graph
+    |> Scenic.Primitives.circle(base_radius,
+      stroke: {0.8, {:color_rgba, {255, 215, 0, 80}}},  # Translucent gold
+      id: :phi_harmonic_base
+    )
+    |> Scenic.Primitives.circle(phi_radius_1 * 0.618,
+      stroke: {0.6, {:color_rgba, {255, 215, 0, 60}}},  # More translucent
+      id: :phi_harmonic_1
+    )
+    |> Scenic.Primitives.circle(base_radius * 0.618,
+      stroke: {0.4, {:color_rgba, {255, 215, 0, 40}}},  # Very translucent
+      id: :phi_harmonic_2
+    )
+    # Add phi pentagon - the sacred geometry of phi
+    |> draw_phi_pentagon(base_radius * @phi)
+  end
+  
+  defp draw_phi_pentagon(%Scenic.Graph{} = graph, radius) do
+    # Pentagon vertices using phi relationships
+    pentagon_points = 
+      Enum.map(0..4, fn i ->
+        angle = i * @tau / 5 - @pi / 2  # Start at top
+        x = :math.cos(angle) * radius * 0.5
+        y = :math.sin(angle) * radius * 0.5
+        {x, y}
+      end)
+    
+    # Create path elements for pentagon
+    [{first_x, first_y} | rest_points] = pentagon_points
+    
+    path_elements = 
+      [{:move_to, first_x, first_y}] ++
+      Enum.map(rest_points, fn {x, y} -> {:line_to, x, y} end) ++
+      [:close_path]
+    
+    graph
+    |> Scenic.Primitives.path(
+      [:begin] ++ path_elements,
+      stroke: {1, {:color_rgba, {255, 215, 0, 100}}},
+      id: :phi_pentagon
+    )
+  end
 
   #############################################################################
   # Draw Pyramids
