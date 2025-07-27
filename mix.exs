@@ -1,7 +1,7 @@
 defmodule Flamelex.App.MixProject do
   use Mix.Project
 
-  @version "0.4.7"
+  @version "0.4.9"
 
   def project do
     [
@@ -33,12 +33,13 @@ defmodule Flamelex.App.MixProject do
 
   defp deps do
     [
-      {:scenic, git: "https://github.com/ScenicFramework/scenic.git", tag: "v0.11.1", override: true},
-      # {:scenic, path: "../scenic_local", override: true},
+      # {:scenic, git: "https://github.com/ScenicFramework/scenic.git", tag: "v0.11.1", override: true},
+      {:scenic, path: "../scenic_local", override: true},
       # {:scenic_driver_local, git: "https://github.com/JediLuke/scenic_driver_local", branch: "no_line_wrap"},
       {:scenic_driver_local, git: "https://github.com/JediLuke/scenic_driver_local", branch: "flamelex_vsn", override: true},
 
-      {:scenic_widget_contrib, git: "https://github.com/JediLuke/scenic-widget-contrib", branch: "text_pad_wip", override: true},
+      # {:scenic_widget_contrib, git: "https://github.com/JediLuke/scenic-widget-contrib", branch: "text_pad_wip", override: true},
+      {:scenic_widget_contrib, path: "../scenic-widget-contrib", override: true},
 
       # import Quillex & Memelex
       # ** the reason runtime is false here is because, the boot sequence of
@@ -50,8 +51,8 @@ defmodule Flamelex.App.MixProject do
       {:memelex, path: "../memelex", runtime: false},
 
       # MCP server for AI automation
-      {:scenic_mcp, git: "https://github.com/scenic-contrib/scenic_mcp_experimental"},
-      # {:scenic_mcp, path: "../scenic_mcp"},
+      # {:scenic_mcp, git: "https://github.com/scenic-contrib/scenic_mcp_experimental"},
+      {:scenic_mcp, path: "../scenic_mcp"},
 
       # one day, try this out again...
       # {:scenic_layout_o_matic, "~> 0.4.0"},
@@ -67,7 +68,10 @@ defmodule Flamelex.App.MixProject do
       {:struct_access, "~> 1.1.2"},
 
       # Spex testing framework for AI-driven development
-      {:sexy_spex, path: "../spex", only: [:dev, :test]}
+      {:sexy_spex, path: "../spex", only: [:dev, :test]},
+      
+      # Live reload for Scenic development
+      {:scenic_live_reload, "~> 0.3", only: :dev}
 
       # maybe one day we will bring these back
       # {:stream_data, "~> 0.5", only: :test}

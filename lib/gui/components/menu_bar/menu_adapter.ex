@@ -79,36 +79,52 @@ defmodule Flamelex.GUI.Components.MenuBar.MenuAdapter do
     items
     |> Enum.map(fn
       {label, function} when is_function(function, 0) ->
-        # Convert action item - use label as both ID and display text
-        # This matches how ScenicWidgets.MenuBar expects it
+        # IMPORTANT: ScenicWidgets.MenuBar expects {id, label} format
+        # But we need to preserve the function for execution
+        # The label serves as both the ID and display text
+        # The function will be found later via the original menu map
         {label, label}
         
       {:sub_menu, label, sub_items} ->
         # Keep sub-menu format as-is, but convert nested items
         {:sub_menu, label, convert_items(sub_items)}
+        
+      other ->
+        # Log unexpected format
+        require Logger
+        Logger.warn("Unexpected menu item format in convert_items: #{inspect(other)}")
+        nil
     end)
+    |> Enum.reject(&is_nil/1)
   end
   
   @doc """
   Handle menu item clicks by finding and executing the associated function
   """
   def handle_menu_click(item_id, original_menu_map) when is_binary(item_id) do
+    require Logger
+    Logger.info("MenuAdapter handling click for item: #{inspect(item_id)}")
+    
     # Search through the original menu map to find the function
     function = find_function_by_id(item_id, original_menu_map)
     
-    if function do
+    if function && is_function(function, 0) do
       try do
-        function.()
+        Logger.info("Executing function for menu item: #{item_id}")
+        result = function.()
+        Logger.info("Menu function executed successfully: #{inspect(result)}")
         :ok
       rescue
         e ->
-          require Logger
-          Logger.error("Error executing menu function: #{inspect(e)}")
+          Logger.error("Error executing menu function for #{item_id}: #{inspect(e)}")
           {:error, e}
       end
     else
-      require Logger
-      Logger.warn("No function found for menu item: #{item_id}")
+      Logger.warn("No function found for menu item: #{item_id} (found: #{inspect(function)})")
+      
+      # For debugging - let's see what's in the menu map
+      Logger.info("Original menu map structure: #{inspect(original_menu_map, pretty: true)}")
+      
       {:error, :not_found}
     end
   end
@@ -133,11 +149,27 @@ defmodule Flamelex.GUI.Components.MenuBar.MenuAdapter do
           {:cont, nil}
         end
         
+      {label, _non_function}, _acc ->
+        # Skip non-function items gracefully
+        if label == item_id do
+          require Logger
+          Logger.warn("Found menu item '#{item_id}' but it's not a function")
+          {:halt, :not_a_function}
+        else
+          {:cont, nil}
+        end
+        
       {:sub_menu, _label, sub_items}, _acc ->
         case find_in_items(item_id, sub_items) do
           nil -> {:cont, nil}
           function -> {:halt, function}
         end
+        
+      other, _acc ->
+        # Handle any other unexpected formats
+        require Logger
+        Logger.warn("Unexpected menu item format: #{inspect(other)}")
+        {:cont, nil}
     end)
   end
 end

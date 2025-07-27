@@ -142,7 +142,7 @@ defmodule Flamelex.GUI.Menus.MainMenu do
 
   def api_menu do
     {:sub_menu, "API",
-     ScenicWidgets.MenuBar.modules_and_zero_arity_functions("Elixir.Flamelex.API")}
+     Flamelex.GUI.Components.MenuBar.modules_and_zero_arity_functions("Elixir.Flamelex.API")}
   end
 
   def help_menu do

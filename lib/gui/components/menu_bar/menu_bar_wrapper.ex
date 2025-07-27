@@ -62,6 +62,10 @@ defmodule Flamelex.GUI.Components.MenuBar.Wrapper do
   def init(scene, %{frame: frame, original_menu_map: menu_map}, _opts) do
     Logger.info("MenuBar.Wrapper init with menu_map: #{inspect(menu_map, pretty: true)}")
     
+    # Build a function registry from the menu map
+    function_registry = build_function_registry(menu_map)
+    Logger.info("Built function registry with #{map_size(function_registry)} entries")
+    
     # Convert Flamelex menu format to ScenicWidgets format
     scenic_menu_map = MenuAdapter.convert_to_scenic_widgets(menu_map)
     Logger.info("Converted menu_map: #{inspect(scenic_menu_map, pretty: true)}")
@@ -89,18 +93,60 @@ defmodule Flamelex.GUI.Components.MenuBar.Wrapper do
     scene = scene
     |> assign(graph: graph)
     |> assign(original_menu_map: menu_map)
+    |> assign(function_registry: function_registry)
     |> push_graph(graph)
     
     {:ok, scene}
   end
   
+  # Build a registry mapping menu item labels to their functions
+  defp build_function_registry(menu_map) do
+    menu_map
+    |> Enum.reduce(%{}, fn item, acc ->
+      extract_functions(item, acc)
+    end)
+  end
+  
+  defp extract_functions({:sub_menu, _label, items}, acc) do
+    Enum.reduce(items, acc, &extract_functions/2)
+  end
+  
+  defp extract_functions({label, function}, acc) when is_function(function, 0) do
+    Map.put(acc, label, function)
+  end
+  
+  defp extract_functions(_, acc), do: acc
+  
   @impl Scenic.Component
   def handle_event({:menu_item_clicked, item_id}, _from, scene) do
     Logger.info("MenuBar wrapper received click: #{inspect(item_id)}")
     
-    # Execute the associated function from the original menu map
-    MenuAdapter.handle_menu_click(item_id, scene.assigns.original_menu_map)
+    # Look up the function in our registry
+    function_registry = scene.assigns.function_registry
     
+    case Map.get(function_registry, item_id) do
+      function when is_function(function, 0) ->
+        Logger.info("Executing function for menu item: #{item_id}")
+        try do
+          result = function.()
+          Logger.info("Menu function executed successfully: #{inspect(result)}")
+        rescue
+          e ->
+            Logger.error("Error executing menu function for #{item_id}: #{inspect(e)}")
+        end
+        
+      nil ->
+        Logger.warn("No function found in registry for menu item: #{item_id}")
+        Logger.debug("Function registry: #{inspect(function_registry)}")
+    end
+    
+    {:noreply, scene}
+  end
+  
+  # Handle input that gets forwarded from the MenuBar component
+  def handle_input(input, context, scene) do
+    Logger.debug("MenuBar wrapper received input: #{inspect(input)}")
+    # Let the child component handle its own input
     {:noreply, scene}
   end
   
