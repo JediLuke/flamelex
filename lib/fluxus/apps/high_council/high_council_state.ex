@@ -2,7 +2,7 @@ defmodule Flamelex.GUI.Component.HighCouncil.State do
   @moduledoc """
   State management for the High council component.
   """
-  use StructAccess
+  # use StructAccess  # Temporarily commented due to compilation issues
   alias Memelex.Lib.Structs.MemexConcepts.V01.Agent
 
   defstruct agents: [],

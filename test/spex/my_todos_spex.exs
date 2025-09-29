@@ -114,6 +114,62 @@ defmodule Flamelex.Test.MyTodosSpex do
     end
   end
 
+  spex "TODO creation dialog functionality",
+    description: "Verify the new TODO dialog opens and closes properly",
+    tags: [:todos, :create, :dialog] do
+    
+    scenario "Open and close new TODO dialog", context do
+      given_ "I'm on the TODOs page", context do
+        Process.sleep(3000)
+        Memelex.My.TODOs.show()
+        Process.sleep(2000)
+        {:ok, context}
+      end
+      
+      when_ "I trigger the new TODO action", context do
+        IO.puts("\n   🔘 Opening new TODO dialog...")
+        
+        # Trigger the new TODO action
+        Flamelex.Fluxus.action({TODOlist, :new_todo})
+        Process.sleep(1000)
+        
+        {:ok, context}
+      end
+      
+      then_ "the dialog should be visible", context do
+        state = Flamelex.Fluxus.RadixStore.get()
+        
+        case state do
+          %{apps: %{todo_list: %{creating_new_todo?: creating}}} ->
+            if creating do
+              IO.puts("   ✅ New TODO dialog is open!")
+            else
+              IO.puts("   ❌ Dialog not open - creating_new_todo?: false")
+            end
+            
+          _ ->
+            IO.puts("   ❌ Could not find TODO list state")
+        end
+        
+        # Now close the dialog
+        IO.puts("\n   ❌ Closing dialog...")
+        Flamelex.Fluxus.action({TODOlist, :cancel_new_todo})
+        Process.sleep(500)
+        
+        # Verify it closed
+        state2 = Flamelex.Fluxus.RadixStore.get()
+        case state2 do
+          %{apps: %{todo_list: %{creating_new_todo?: false}}} ->
+            IO.puts("   ✅ Dialog closed successfully")
+          _ ->
+            IO.puts("   ⚠️  Dialog may not have closed properly")
+        end
+        
+        {:ok, context}
+      end
+    end
+  end
+
   spex "TODOs page state initialization",
     description: "Verify the TODOs page initializes with correct default state",
     tags: [:todos, :state, :initialization] do

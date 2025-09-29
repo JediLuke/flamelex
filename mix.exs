@@ -52,7 +52,7 @@ defmodule Flamelex.App.MixProject do
 
       # MCP server for AI automation
       # {:scenic_mcp, git: "https://github.com/scenic-contrib/scenic_mcp_experimental"},
-      {:scenic_mcp, path: "../scenic_mcp"},
+      {:scenic_mcp, path: "../scenic_mcp", override: true},
 
       # one day, try this out again...
       # {:scenic_layout_o_matic, "~> 0.4.0"},

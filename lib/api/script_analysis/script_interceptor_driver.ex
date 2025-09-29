@@ -7,7 +7,7 @@ defmodule Flamelex.API.ScriptAnalysis.ScriptInterceptorDriver do
   in real-time for debugging and performance analysis.
   """
   
-  use Scenic.Driver
+  # use Scenic.Driver  # Temporarily commented due to compilation issues
   require Logger
   
   alias Scenic.Driver.Local, as: LocalDriver

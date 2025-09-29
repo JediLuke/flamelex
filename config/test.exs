@@ -9,3 +9,6 @@ config :memelex,
     memex_directory: "/Users/luke/memex/test/Lavoisier",
     backups_directory: "/Users/luke/memex/backups/test/Lavoisier"
   }
+
+# Use different port for scenic_mcp in test environment to avoid conflicts
+config :scenic_mcp, port: 9998

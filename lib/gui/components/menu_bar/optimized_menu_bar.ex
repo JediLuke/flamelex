@@ -15,7 +15,7 @@ defmodule Flamelex.GUI.Components.OptimizedMenuBar do
 
   # Constants from original MenuBar
   @left_margin 15
-  @default_font :roboto
+  @default_font :ibm_plex_mono
   @default_item_width 180
   @default_top_line_font_size 36
   @default_sub_menu_height 40

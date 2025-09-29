@@ -118,26 +118,38 @@ defmodule Flamelex.GUI.Components.MenuBar.Wrapper do
   defp extract_functions(_, acc), do: acc
   
   @impl Scenic.Component
-  def handle_event({:menu_item_clicked, item_id}, _from, scene) do
-    Logger.info("MenuBar wrapper received click: #{inspect(item_id)}")
+  def handle_event({:menu_item_clicked, item_id}, from, scene) do
+    Logger.info("MenuBar wrapper received click: #{inspect(item_id)} from: #{inspect(from)}")
     
     # Look up the function in our registry
     function_registry = scene.assigns.function_registry
+    Logger.info("Function registry keys: #{inspect(Map.keys(function_registry))}")
     
     case Map.get(function_registry, item_id) do
       function when is_function(function, 0) ->
-        Logger.info("Executing function for menu item: #{item_id}")
+        Logger.info("✅ Found function for menu item '#{item_id}', executing...")
         try do
           result = function.()
           Logger.info("Menu function executed successfully: #{inspect(result)}")
         rescue
           e ->
             Logger.error("Error executing menu function for #{item_id}: #{inspect(e)}")
+            Logger.error("Stacktrace: #{Exception.format(:error, e, __STACKTRACE__)}")
         end
         
       nil ->
-        Logger.warn("No function found in registry for menu item: #{item_id}")
-        Logger.debug("Function registry: #{inspect(function_registry)}")
+        Logger.warn("❌ No function found in registry for menu item: '#{item_id}'")
+        Logger.warn("Available items in registry: #{inspect(Map.keys(function_registry))}")
+        
+        # Check if it's the "rapid selector" issue
+        if item_id == "rapid selector" do
+          Logger.error("⚠️  This is the 'rapid selector' BadFunctionError issue!")
+          Logger.error("The click event is reaching the wrapper correctly.")
+          Logger.error("The error must be happening elsewhere in the system.")
+        end
+        
+      other ->
+        Logger.error("❌ Unexpected value in function registry for '#{item_id}': #{inspect(other)}")
     end
     
     {:noreply, scene}

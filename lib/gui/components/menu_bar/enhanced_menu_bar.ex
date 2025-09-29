@@ -530,9 +530,9 @@ defmodule Flamelex.GUI.Components.MenuBar.EnhancedMenuBar do
         
       {:error, _reason} ->
         # Fallback to a default font
-        {:ok, {_type, default_metrics}} = Scenic.Assets.Static.meta(:roboto_mono)
+        {:ok, {_type, default_metrics}} = Scenic.Assets.Static.meta(:ibm_plex_mono)
         font_data = %{
-          name: :roboto_mono,
+          name: :ibm_plex_mono,
           size: size,
           ascent: FontMetrics.ascent(size, default_metrics),
           descent: FontMetrics.descent(size, default_metrics),

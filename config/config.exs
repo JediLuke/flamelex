@@ -27,6 +27,11 @@ config :scenic,
        :assets,
        module: Flamelex.App.Scenic.Assets
 
+# Configure scenic_mcp port for Flamelex
+config :scenic_mcp, 
+  port: 9999,
+  app_name: "Flamelex"
+
 config :logger,
   level: :info,
   truncate: :infinity,

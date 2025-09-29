@@ -29,13 +29,26 @@ defmodule Flamelex.GUI.Component.TODOlist do
   def init(scene, %{frame: %Frame{} = f}, opts) do
     state = Flamelex.Fluxus.RadixStore.get().apps.todo_list
 
-    graph = render(f, state)
+    # Add semantic information for the TODO list component
+    semantic_info = %{
+      type: :todo_list,
+      role: :application,
+      label: "My TODOs",
+      description: "Personal task and TODO management",
+      state: %{
+        item_count: length(state.list || []),
+        has_selection: state.selected != nil
+      }
+    }
+
+    graph = render(f, state, semantic_info)
 
     init_scene =
       scene
       |> assign(frame: f)
       |> assign(graph: graph)
       |> assign(state: state)
+      |> assign(semantic: semantic_info)
       |> push_graph(graph)
 
     Flamelex.Lib.Utils.PubSub.subscribe(topic: :radix_state_change)
@@ -67,26 +80,67 @@ defmodule Flamelex.GUI.Component.TODOlist do
     # keep the old scroll
     new_state = put_in(new_state, [:scroll], old_state.scroll)
 
-    new_graph = render(f, new_state)
+    # Update semantic info with new state
+    semantic_info = scene.assigns[:semantic] || %{}
+    updated_semantic = Map.merge(semantic_info, %{
+      state: %{
+        item_count: length(new_state.list || []),
+        has_selection: new_state.selected != nil
+      }
+    })
+    
+    new_graph = render(f, new_state, updated_semantic)
 
     new_scene =
       scene
       |> assign(graph: new_graph)
       |> assign(state: new_state)
+      |> assign(semantic: updated_semantic)
       |> push_graph(new_graph)
 
     {:noreply, new_scene}
   end
 
-  def render(%Widgex.Frame{} = f, %TODOlist.State{} = state) do
+  def render(%Widgex.Frame{} = f, %TODOlist.State{} = state, semantic_info \\ nil) do
     [title_frame, tools_frame, list_frame] = calc_layout_frames(f)
 
-    Scenic.Graph.build()
+    graph = Scenic.Graph.build()
+    # Add a nice gradient background
+    |> render_background(f)
     # |> Frame.draw_guidewires(args.frame, color: :blue)
     |> render_title(title_frame, "My TODOs")
     |> render_todo_list(list_frame, state)
     # render tools last because it needs to be drawn on top of the app layer due to dropdown menus
     |> render_tools(tools_frame, state)
+    |> add_semantic_annotations(semantic_info)
+    
+    # Render the new TODO dialog if needed
+    if state.creating_new_todo? do
+      graph |> render_new_todo_dialog(f, state)
+    else
+      graph
+    end
+  end
+
+  defp add_semantic_annotations(graph, nil), do: graph
+  
+  defp add_semantic_annotations(graph, semantic_info) do
+    graph
+    |> Scenic.Primitives.text("",
+      id: {:semantic_todo_list, :main},
+      hidden: true,
+      semantic: semantic_info
+    )
+  end
+
+  defp render_background(graph, frame) do
+    # Create a nice gradient background
+    graph
+    |> Scenic.Primitives.rect(
+      {frame.size.width, frame.size.height},
+      fill: {:linear, {0, 0, 0, frame.size.height, :blue, :dark_slate_blue}},
+      translate: frame.pin.point
+    )
   end
 
   def handle_cast({:radix_state_change, new_rdx}, scene) do
@@ -222,8 +276,20 @@ defmodule Flamelex.GUI.Component.TODOlist do
           id: :status_select,
           translate: {280, 20}
         )
-        |> Scenic.Components.button("Search.....", id: :new_todo, t: {500, 21})
-        |> Scenic.Components.button("New TODO", id: :new_todo, t: {800, 21})
+        # Add sort dropdown
+        |> ScenicWidgets.SpareParts.LukesDropDown.add_to_graph(
+          {[
+            {"Default", :default},
+            {"Priority (High → Low)", :priority_high},
+            {"Priority (Low → High)", :priority_low},
+            {"Date (Newest → Oldest)", :date_newest},
+            {"Date (Oldest → Newest)", :date_oldest}
+          ], s.sort_order || :default},
+          id: :sort_select,
+          translate: {480, 20}
+        )
+        |> Scenic.Components.button("Search.....", id: :search_todos, t: {700, 21})
+        |> Scenic.Components.button("New TODO", id: :new_todo, t: {900, 21})
       end,
       translate: frame.pin.point
       # scissor: frame.size.box
@@ -238,6 +304,7 @@ defmodule Flamelex.GUI.Component.TODOlist do
         graph
         |> Scenic.Primitives.text("No TODOs for this filter",
           font_size: 50,
+          font: :ibm_plex_mono,
           fill: :white,
           # translate: {frame.size.width / 2, frame.size.height / 2}
           translate: {72, 172}
@@ -391,6 +458,11 @@ defmodule Flamelex.GUI.Component.TODOlist do
     Flamelex.Fluxus.action({TODOlist.Reducer, {:filter_todos, filter_by}})
     {:noreply, scene}
   end
+  
+  def handle_event({:value_changed, :sort_select, sort_by}, _context, scene) do
+    Flamelex.Fluxus.action({TODOlist.Reducer, {:sort_todos, sort_by}})
+    {:noreply, scene}
+  end
 
   def handle_event({:btn_pressed, :new_todo}, _context, scene) do
     Flamelex.Fluxus.action({TODOlist, :new_todo})
@@ -429,4 +501,136 @@ defmodule Flamelex.GUI.Component.TODOlist do
   #       {x, y}
   #   end
   # end
+
+  defp render_new_todo_dialog(graph, frame, state) do
+    # Create a semi-transparent overlay
+    overlay_width = frame.size.width
+    overlay_height = frame.size.height
+    
+    # Dialog dimensions
+    dialog_width = min(600, overlay_width * 0.8)
+    dialog_height = 400
+    dialog_x = (overlay_width - dialog_width) / 2
+    dialog_y = (overlay_height - dialog_height) / 2
+    
+    graph
+    # Semi-transparent black overlay
+    |> Scenic.Primitives.rect(
+      {overlay_width, overlay_height},
+      fill: {:color_rgba, {0, 0, 0, 180}},
+      translate: frame.pin.point,
+      input: [:cursor_button],
+      id: :todo_dialog_overlay
+    )
+    # Dialog background
+    |> Scenic.Primitives.rect(
+      {dialog_width, dialog_height},
+      fill: :white,
+      stroke: {2, :dark_slate_blue},
+      translate: {dialog_x, dialog_y},
+      id: :todo_dialog_bg
+    )
+    # Dialog title
+    |> Scenic.Primitives.text(
+      "Create New TODO",
+      font_size: 24,
+      font: :ibm_plex_mono,
+      fill: :dark_slate_blue,
+      translate: {dialog_x + 20, dialog_y + 40}
+    )
+    # Title input field
+    |> Scenic.Primitives.text(
+      "Title:",
+      font_size: 16,
+      font: :ibm_plex_mono,
+      fill: :black,
+      translate: {dialog_x + 20, dialog_y + 90}
+    )
+    |> Scenic.Components.text_field(
+      state.new_todo_form.title,
+      id: :new_todo_title,
+      width: dialog_width - 40,
+      height: 35,
+      hint: "Enter TODO title...",
+      translate: {dialog_x + 20, dialog_y + 100}
+    )
+    # Description field
+    |> Scenic.Primitives.text(
+      "Description:",
+      font_size: 16,
+      font: :ibm_plex_mono,
+      fill: :black,
+      translate: {dialog_x + 20, dialog_y + 160}
+    )
+    |> Scenic.Components.text_field(
+      state.new_todo_form.description,
+      id: :new_todo_description,
+      width: dialog_width - 40,
+      height: 35,
+      hint: "Enter description...",
+      translate: {dialog_x + 20, dialog_y + 170}
+    )
+    # Priority dropdown
+    |> Scenic.Primitives.text(
+      "Priority:",
+      font_size: 16,
+      font: :ibm_plex_mono,
+      fill: :black,
+      translate: {dialog_x + 20, dialog_y + 230}
+    )
+    |> Scenic.Components.dropdown(
+      {[
+        {"High", :high},
+        {"Medium", :medium},
+        {"Low", :low}
+      ], state.new_todo_form.priority},
+      id: :new_todo_priority,
+      translate: {dialog_x + 20, dialog_y + 240}
+    )
+    # Buttons
+    |> Scenic.Components.button(
+      "Cancel",
+      id: :cancel_new_todo,
+      theme: :secondary,
+      translate: {dialog_x + dialog_width - 180, dialog_y + dialog_height - 60}
+    )
+    |> Scenic.Components.button(
+      "Create",
+      id: :create_new_todo,
+      theme: :primary,
+      translate: {dialog_x + dialog_width - 90, dialog_y + dialog_height - 60}
+    )
+  end
+
+  # Handle new TODO dialog events
+  def handle_event({:click, :todo_dialog_overlay}, _context, scene) do
+    # Close dialog when clicking outside
+    Flamelex.Fluxus.action({TODOlist, :cancel_new_todo})
+    {:noreply, scene}
+  end
+
+  def handle_event({:value_changed, :new_todo_title, value}, _context, scene) do
+    Flamelex.Fluxus.action({TODOlist, {:update_new_todo_form, :title, value}})
+    {:noreply, scene}
+  end
+
+  def handle_event({:value_changed, :new_todo_description, value}, _context, scene) do
+    Flamelex.Fluxus.action({TODOlist, {:update_new_todo_form, :description, value}})
+    {:noreply, scene}
+  end
+
+  def handle_event({:value_changed, :new_todo_priority, value}, _context, scene) do
+    Flamelex.Fluxus.action({TODOlist, {:update_new_todo_form, :priority, value}})
+    {:noreply, scene}
+  end
+
+  def handle_event({:btn_pressed, :cancel_new_todo}, _context, scene) do
+    Flamelex.Fluxus.action({TODOlist, :cancel_new_todo})
+    {:noreply, scene}
+  end
+
+  def handle_event({:btn_pressed, :create_new_todo}, _context, scene) do
+    Flamelex.Fluxus.action({TODOlist, :create_todo})
+    {:noreply, scene}
+  end
 end

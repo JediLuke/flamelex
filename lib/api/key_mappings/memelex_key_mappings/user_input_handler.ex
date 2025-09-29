@@ -1,7 +1,29 @@
 defmodule Memelex.Keymaps.UserInputHandler do
-  use ScenicWidgets.ScenicEventsDefinitions
+  # use ScenicWidgets.ScenicEventsDefinitions  # Temporarily commented due to compilation issues
   alias Memelex.Fluxus.Reducers.TidbitReducer
   require Logger
+  
+  # Define key constants inline
+  @key_released "key_released"
+  @key_pressed "key_pressed"
+  @tab_key "tab"
+  @backspace_key "backspace"
+  @arrow_keys ["up", "down", "left", "right"]
+  @left_arrow "left"
+  @right_arrow "right"
+  @up_arrow "up"
+  @down_arrow "down"
+  @left_shift "left_shift"
+  @valid_text_input_characters [
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    " ", ".", ",", "!", "?", ":", ";", "'", "\"", "-", "_", "(", ")", "[", "]", "{", "}", "@", "#", "$", "%", "^", "&", "*", "+", "=", "/", "\\", "|", "~", "`"
+  ]
+  
+  # Helper function to convert key to string
+  defp key2string(key) when is_binary(key), do: key
+  defp key2string(key), do: to_string(key)
 
   # TODO @shift_tab make focus move backwards
 

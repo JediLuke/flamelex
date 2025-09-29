@@ -105,6 +105,7 @@ defmodule Memelex.GUI.Components.CollectionsMantel do
     # |> ScenicWidgets.Markup.Header1.draw(frame, "Collections")
     |> Scenic.Primitives.text("Collections",
           font_size: @font_size,
+          font: :ibm_plex_mono,
           # note we dont want to use Center here because that returns the centroid of the
           # frame in _absolute_ coordinates (taking into account frame pins & such)
           # whereas here we really just want to translate the text relative to the

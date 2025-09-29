@@ -1,8 +1,9 @@
 defmodule Flamelex.GUI.RootScene do
   @moduledoc false
   use Scenic.Scene
-  use ScenicWidgets.ScenicEventsDefinitions
+  # use ScenicWidgets.ScenicEventsDefinitions  # Temporarily commented out due to compilation issues
   alias Flamelex.GUI.Layers.{Layer0, Layer01, NeoLayer02, Layer3, Layer4}
+  import Scenic.Primitives
   require Logger
 
 
@@ -123,6 +124,12 @@ defmodule Flamelex.GUI.RootScene do
     end
   end
 
+  def handle_input({:cursor_button, _} = input, context, scene) do
+    # Let mouse clicks be handled by the normal Scenic component tree first
+    # If no component handles it, then it will bubble back up here
+    {:noreply, scene}
+  end
+
   def handle_input(input, context, scene) do
     # forward user input to Fluxus.Radix where it shall be processed against the current state to find the correct action
     Flamelex.Fluxus.user_input(input)
@@ -170,4 +177,5 @@ defmodule Flamelex.GUI.RootScene do
     [_menubar_frame, app_frame] = Widgex.Frame.v_split(full_window_frame, px: menubar_h)
     app_frame
   end
+
 end

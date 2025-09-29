@@ -4,8 +4,11 @@ defmodule Flamelex.GUI.Component.AgentHuddle.UserInputHandler do
   """
 
   require Logger
-  use ScenicWidgets.ScenicEventsDefinitions
+  # use ScenicWidgets.ScenicEventsDefinitions  # Temporarily commented due to compilation issues
   alias Flamelex.GUI.Component.AgentHuddle
+  
+  # Define key constants inline
+  @key_released "key_released"
   alias Flamelex.GUI.Component.AgentHuddle.Reducer
 
   def handle(rdx, input) do

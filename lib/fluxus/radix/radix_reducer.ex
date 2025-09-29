@@ -116,9 +116,9 @@ defmodule Flamelex.Fluxus.RadixReducer do
     Flamelex.GUI.Component.HighCouncil.Reducer.process(rdx, action)
   end
 
-  # def process(rdx, {Flamelex.GUI.Component.TODOlist.Reducer, action}) do
-  #   Flamelex.GUI.Component.TODOlist.Reducer.process(rdx, action)
-  # end
+  def process(rdx, {Flamelex.GUI.Component.TODOlist.Reducer, action}) do
+    Flamelex.GUI.Component.TODOlist.Reducer.process(rdx, action)
+  end
 
   def process(rdx, {:open_tidbit, %Memelex.TidBit{} = _t} = action) do
     Flamelex.GUI.Component.RapidSelector.Reducer.process(rdx, action)
