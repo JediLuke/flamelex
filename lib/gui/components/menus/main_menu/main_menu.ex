@@ -15,6 +15,7 @@ defmodule Flamelex.GUI.Menus.MainMenu do
         help_menu()
       ]
       |> Enum.reject(&is_nil/1)
+      |> Flamelex.GUI.Menus.MenuHelpers.convert_to_menubar_format()
   end
 
   def flamelex_menu do
@@ -142,7 +143,7 @@ defmodule Flamelex.GUI.Menus.MainMenu do
 
   def api_menu do
     {:sub_menu, "API",
-     ScenicWidgets.MenuBar.modules_and_zero_arity_functions("Elixir.Flamelex.API")}
+     Flamelex.GUI.Menus.MenuHelpers.modules_and_zero_arity_functions("Elixir.Flamelex.API")}
   end
 
   def help_menu do
