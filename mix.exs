@@ -34,7 +34,7 @@ defmodule Flamelex.App.MixProject do
     [
       # {:scenic, git: "https://github.com/JediLuke/scenic", branch: "update_deps_instructions_for_ubuntu_24", override: true},
       {:scenic, path: "../scenic", override: true},
-      {:scenic_driver_local, git: "https://github.com/JediLuke/scenic_driver_local", branch: "no_line_wrap"},
+      {:scenic_driver_local, git: "https://github.com/JediLuke/scenic_driver_local", branch: "flamelex_vsn"},
       {:scenic_widget_contrib, path: "../scenic-widget-contrib", override: true},
       {:quillex, path: "../quillex", runtime: false},
       {:memelex, path: "../memelex", runtime: false}, # TODO use same runtime false trick as above
