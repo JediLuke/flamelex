@@ -6,7 +6,10 @@ defmodule Flamelex.GUI.Component.TODOlist.State do
             selected: nil,
             scroll: {0, 0},
             turbo_scroll?: false,
-            filter: nil
+            filter: nil,
+            sort_order: :default,  # :default, :priority_high, :priority_low, :date_newest, :date_oldest
+            creating_new_todo?: false,
+            new_todo_form: %{title: "", description: "", priority: :medium}
 
   def new do
     %__MODULE__{}

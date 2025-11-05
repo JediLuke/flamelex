@@ -213,11 +213,13 @@ defmodule Flamelex.GUI.Component.HighCouncil.Render do
   end
 
   def render_tools(graph, %Widgex.Frame{} = f) do
+    IO.puts "happening..."
     graph
     # |> Flamelex.GUI.Utils.Draw.background(f, :grey, translate: f.pin.point)
     |> Scenic.Components.button("New agent",
       id: :new_agent,
-      translate: {f.pin.x + 10, f.pin.y + 10}
+      t: {70, 67}
+      # translate: {f.pin.x + 100, f.pin.y + 100}
       # translate: Widgex.Frame.center(f).point
     )
   end

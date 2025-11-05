@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+# Flamelex launcher script
+# Boots Flamelex from anywhere on the system using the production release
+# By default, always rebuilds to ensure latest code is running
+
+set -e
+
+# Get the directory where this script is located
+FLAMELEX_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Change to the flamelex directory
+cd "$FLAMELEX_DIR"
+
+# Parse command line flags
+SKIP_BUILD=false
+CLEAN_BUILD=false
+
+for arg in "$@"; do
+    case $arg in
+        -s|--skip)
+            SKIP_BUILD=true
+            shift
+            ;;
+        -c|--clean)
+            CLEAN_BUILD=true
+            shift
+            ;;
+        -h|--help)
+            echo "Flamelex launcher"
+            echo ""
+            echo "Usage: flx [options]"
+            echo ""
+            echo "Options:"
+            echo "  -s, --skip     Skip rebuild (faster startup)"
+            echo "  -c, --clean    Clean build directory and rebuild"
+            echo "  -h, --help     Show this help message"
+            echo ""
+            echo "By default, flx always rebuilds to ensure latest code."
+            exit 0
+            ;;
+    esac
+done
+
+# Build/rebuild logic
+if [ "$SKIP_BUILD" = true ]; then
+    echo "Skipping build..."
+elif [ "$CLEAN_BUILD" = true ]; then
+    echo "Cleaning build artifacts..."
+    rm -rf _build/prod
+    echo "Building production release from scratch..."
+    MIX_ENV=prod mix release
+elif [ ! -d "_build/prod/rel/flamelex" ]; then
+    echo "Building production release for the first time..."
+    MIX_ENV=prod mix release
+else
+    echo "Rebuilding production release..."
+    MIX_ENV=prod mix release --overwrite
+fi
+
+# Launch Flamelex
+exec ./_build/prod/rel/flamelex/bin/flamelex start "$@"

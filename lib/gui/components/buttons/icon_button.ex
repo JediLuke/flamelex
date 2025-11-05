@@ -30,7 +30,8 @@ defmodule Memelex.GUI.Components.IconButton do
       |> assign(state: %{mode: :inactive})
       |> push_graph(init_graph)
 
-    request_input(init_scene, [:cursor_pos, :cursor_button])
+    # Don't request global input - let events bubble up naturally
+    # request_input(init_scene, [:cursor_pos, :cursor_button])
 
     {:ok, init_scene}
   end
@@ -103,7 +104,9 @@ defmodule Memelex.GUI.Components.IconButton do
         # )
       end,
       id: {:icon_button, id},
-      translate: args.frame.pin.point
+      translate: args.frame.pin.point,
+      # Enable input events for this button
+      input: [:cursor_pos, :cursor_button]
     )
   end
 

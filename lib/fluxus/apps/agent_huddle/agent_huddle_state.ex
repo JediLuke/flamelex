@@ -3,7 +3,7 @@ defmodule Flamelex.GUI.Component.AgentHuddle.State do
   State management for the Agent huddle component.
   """
 
-  use StructAccess
+  # use StructAccess  # Temporarily commented due to compilation issues
 
   defstruct [
     # Define state fields here

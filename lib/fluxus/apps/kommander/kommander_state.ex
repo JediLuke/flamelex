@@ -1,6 +1,6 @@
 defmodule Flamelex.GUI.Component.Kommander.State do
   @moduledoc false
-  use StructAccess
+  # use StructAccess  # Temporarily commented due to compilation issues
 
   defstruct buf_ref: nil,
             font: nil

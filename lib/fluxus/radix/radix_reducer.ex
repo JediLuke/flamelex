@@ -47,6 +47,10 @@ defmodule Flamelex.Fluxus.RadixReducer do
     Flamelex.GUI.Layers.Layer3.Mutator.deactivate_popup(rdx)
   end
 
+  def process(%{layers: %{three: %{start_new_memex_popup_open?: true}}} = rdx, {:memex_aperi, :close}) do
+    Flamelex.GUI.Layers.Layer3.Mutator.deactivate_popup(rdx)
+  end
+
   def process(%{layers: %{three: %{open_memex_popup_open?: true}}} = rdx, action) do
     Logger.warning "Ignoring action #{inspect action} cause we're in a popup state..."
     rdx
@@ -68,12 +72,15 @@ defmodule Flamelex.Fluxus.RadixReducer do
     Flamelex.GUI.Component.Kommander.Reducer.process(rdx, action)
   end
 
+  alias Flamelex.GUI.Component.RapidSelector
+
   def process(rdx, {:load_memex, %Memelex.Environment{} = env}) do
-    rdx
     # TODO when I eventually go multi-env, this may be a problem...
+
+    rdx
     |> put_in([:memex, :active?], true)
     |> put_in([:memex, :env], env)
-    |> Flamelex.GUI.Component.RapidSelector.Reducer.process({:load_memex, %Memelex.Environment{} = env})
+    |> RapidSelector.Reducer.process({:load_memex, env})
   end
 
   def process(rdx, {Flamelex.GUI.Component.TODOlist, action}) do
@@ -85,6 +92,11 @@ defmodule Flamelex.Fluxus.RadixReducer do
     rdx
     |> Flamelex.GUI.Component.TODOlist.Reducer.process(action)
     |> Flamelex.GUI.Component.TODOdetails.Reducer.process(action)
+  end
+
+  def process(rdx, :novum_memexi) do
+    rdx
+    |> Flamelex.GUI.Layers.Layer3.Mutator.activate_popup(:start_new_memex)
   end
 
   def process(rdx, :memex_aperi) do
@@ -104,9 +116,9 @@ defmodule Flamelex.Fluxus.RadixReducer do
     Flamelex.GUI.Component.HighCouncil.Reducer.process(rdx, action)
   end
 
-  # def process(rdx, {Flamelex.GUI.Component.TODOlist.Reducer, action}) do
-  #   Flamelex.GUI.Component.TODOlist.Reducer.process(rdx, action)
-  # end
+  def process(rdx, {Flamelex.GUI.Component.TODOlist.Reducer, action}) do
+    Flamelex.GUI.Component.TODOlist.Reducer.process(rdx, action)
+  end
 
   def process(rdx, {:open_tidbit, %Memelex.TidBit{} = _t} = action) do
     Flamelex.GUI.Component.RapidSelector.Reducer.process(rdx, action)

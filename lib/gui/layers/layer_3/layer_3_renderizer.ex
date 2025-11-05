@@ -15,6 +15,7 @@ defmodule Flamelex.GUI.Layers.Layer3.Renderizer do
     %Layer3.State{} = state
   ) when old_frame != new_frame do
     # delete the old primitive to force a re-render from scratch
+	IO.puts "RE RENDER 3"
     graph
     |> Scenic.Graph.delete(@layer_3)
     |> draw_layer_3(new_frame, state)
@@ -31,6 +32,7 @@ defmodule Flamelex.GUI.Layers.Layer3.Renderizer do
     %Widgex.Frame{} = frame,
     %Layer3.State{} = state
   ) do
+	IO.puts "DONT RENDER 3"
     Logger.debug "Layer3 render called, but no change detected."
     graph
   end
@@ -43,6 +45,7 @@ defmodule Flamelex.GUI.Layers.Layer3.Renderizer do
   ) do
     # if the layer isn't in the base graph, we need to draw it,
     # otherwise proceed to render pipeline
+    IO.puts "IN FOR A PENNY"
     case Scenic.Graph.get(graph, @layer_3) do
       [] ->
         graph
@@ -67,18 +70,6 @@ defmodule Flamelex.GUI.Layers.Layer3.Renderizer do
   end
 
   @popup_modal :popup_modal
-  defp render_popup_modal(graph, frame, %{open_memex_popup_open?: false} = state) do
-    case Scenic.Graph.get(graph, @popup_modal) do
-      [] ->
-        # we aren't supposed to show the popup, and it isn't there, so just do nothing
-        graph
-
-      _primitive ->
-        # hide the modal by straight up deleting it !
-        graph
-        |> Scenic.Graph.delete(@popup_modal)
-    end
-  end
 
   defp render_popup_modal(graph, frame, %{open_memex_popup_open?: true} = state) do
     case Scenic.Graph.get(graph, @popup_modal) do
@@ -96,6 +87,39 @@ defmodule Flamelex.GUI.Layers.Layer3.Renderizer do
         graph
         |> render_background(frame, state)
         |> render_modal_box(frame, state)
+    end
+  end
+
+  defp render_popup_modal(graph, frame, %{start_new_memex_popup_open?: true} = state) do
+	IO.puts "YYYYY OPEN TrUE FOR START"
+    case Scenic.Graph.get(graph, @popup_modal) do
+      [] ->
+        # draw the modal
+        graph
+        |> Scenic.Primitives.group(fn graph ->
+          graph
+          |> render_background(frame, state)
+          |> render_modal_box(frame, state)
+        end, id: @popup_modal)
+
+      _primitive ->
+        # push the modal through the render/update pipeline
+        graph
+        |> render_background(frame, state)
+        |> render_modal_box(frame, state)
+    end
+  end
+
+  defp render_popup_modal(graph, _frame, _state) do
+    case Scenic.Graph.get(graph, @popup_modal) do
+      [] ->
+        # we aren't supposed to show the popup, and it isn't there, so just do nothing
+        graph
+
+      _primitive ->
+        # hide the modal by straight up deleting it !
+        graph
+        |> Scenic.Graph.delete(@popup_modal)
     end
   end
 
@@ -204,8 +228,28 @@ defmodule Flamelex.GUI.Layers.Layer3.Renderizer do
         stroke: {2, :blue},
         translate: {modal_x, modal_y}
       )
+      |> draw_modal_box_content(frame, state)
       |> draw_close_modal_button(frame, state)
     end, id: @modal_box)
+  end
+
+  defp draw_modal_box_content(graph, frame, state) do
+    font_size = 24
+
+    modal_width = frame.size.width * 0.6
+    modal_height = frame.size.height * 0.67
+    modal_x = frame.pin.x + (frame.size.width - modal_width) / 2
+    modal_y = frame.pin.y + (frame.size.height - modal_height) / 2
+
+    ## todo should look at state but for now only support now
+    graph
+    |> Scenic.Primitives.text("Check terminal plz",
+      id: :modal_content,
+      font: :ibm_plex_mono,
+      font_size: font_size,
+      fill: :black,
+      translate: {modal_x + 50, modal_y + 50}
+    )
   end
 
   defp draw_close_modal_button(graph, frame, state) do

@@ -17,11 +17,12 @@ defmodule Flamelex.GUI do
     [
       name: :main_viewport,
       # size: @monitor_32inch_80pc,
-      size: {1620, 1000},
+      size: @macbook_pro,
       default_scene: {Flamelex.GUI.RootScene, nil},
       drivers: [
         [
           module: Scenic.Driver.Local,
+          # module: Flamelex.API.ScriptAnalysis.ScriptInterceptorDriver,
           window: [title: "Flamelex", resizeable: true],
           on_close: :stop_system
         ]

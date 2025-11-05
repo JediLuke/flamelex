@@ -13,11 +13,7 @@ defmodule Flamelex.GUI.Layers.NeoLayer02 do
   # mutators on various operations like adding a new buffer etc to update layer 2 and re-compute the menu map - it's
   # diable but for now it's just not solving any actual problem I have, this works
 
-  def validate(
-        %{
-          frame: %Widgex.Frame{} = frame
-        } = data
-      ) do
+  def validate(%{frame: %Widgex.Frame{} = frame} = data) do
     {:ok, frame}
   end
 
@@ -27,7 +23,11 @@ defmodule Flamelex.GUI.Layers.NeoLayer02 do
     _opts
   ) do
 
-    state = Layer2.State.new(Flamelex.Fluxus.RadixStore.fetch())
+    rdx = Flamelex.Fluxus.RadixStore.fetch()
+IO.inspect(rdx.memex, label: "L2 rdx mmx")
+IO.inspect(rdx.layers.two |> Map.keys(), label: "rdx $$/?")
+    state = Layer2.State.new(rdx)
+	|> IO.inspect(label: "L2 STATE")
     graph = Layer2.Renderizer.render(frame, state)
 
     new_scene =
@@ -51,6 +51,7 @@ defmodule Flamelex.GUI.Layers.NeoLayer02 do
 
     if l2_state == scene.assigns.state do
       # state didn't change, do nothing
+      IO.puts "MENUBAR STATE SAME"
       {:noreply, scene}
     else
       new_graph = Layer2.Renderizer.render(scene.assigns.frame, l2_state)

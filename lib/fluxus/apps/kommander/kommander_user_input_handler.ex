@@ -1,6 +1,23 @@
 defmodule Flamelex.Keymaps.Kommander do
-  use ScenicWidgets.ScenicEventsDefinitions
+  # use ScenicWidgets.ScenicEventsDefinitions  # Temporarily commented due to compilation issues
   require Logger
+  
+  # Define key constants inline since ScenicEventsDefinitions is commented out
+  @shift_space "shift_space"
+  @left_shift "left_shift" 
+  @meta "meta"
+  @left_ctrl "left_ctrl"
+  @key_released "key_released"
+  @key_held "key_held"
+  @key_pressed "key_pressed"
+  @escape_key "escape"
+  @enter_key "enter"
+  @valid_text_input_characters [
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    " ", ".", ",", "!", "?", ":", ";", "'", "\"", "-", "_", "(", ")", "[", "]", "{", "}", "@", "#", "$", "%", "^", "&", "*", "+", "=", "/", "\\", "|", "~", "`"
+  ]
 
   @ignorable_keys [@shift_space, @left_shift, @meta, @left_ctrl]
 

@@ -3,8 +3,11 @@ defmodule Flamelex.GUI.Component.HighCouncil.UserInputHandler do
   Handles user input for the High council component.
   """
   require Logger
-  use ScenicWidgets.ScenicEventsDefinitions
+  # use ScenicWidgets.ScenicEventsDefinitions  # Temporarily commented due to compilation issues
   alias Flamelex.GUI.Component.HighCouncil
+  
+  # Define key constants inline
+  @key_released "key_released"
   alias Flamelex.GUI.Component.HighCouncil.Reducer
 
   def handle(rdx, input) do

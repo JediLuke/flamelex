@@ -53,14 +53,18 @@ defmodule Flamelex.GUI.Component.AgentHuddle.Reducer do
   def process(%RadixState{} = rdx, {:activate_agent, %Memelex.TidBit{
     data: %Agent{config: %{"mfa" => {agent_module, :start_link, [_args]}}}
   } = agent_t}) do
-    case GenServer.call(agent_module, :activate) do
-      {:ok, new_agent_tidbit} ->
-        rdx
-        |> AgentHuddle.Mutator.refresh_tidbit(new_agent_tidbit)
+    r = Memelex.AgentHandler.boot_agent(agent_t.data)
+    IO.inspect(r, label: "BOOT RESULT")
 
-      {:error, reason} ->
-        raise "Could not activate the agent, reason: #{inspect reason}"
-    end
+    rdx
+    #case GenServer.call(agent_module, :activate) do
+    # {:ok, new_agent_tidbit} ->
+    #   rdx
+    #   |> AgentHuddle.Mutator.refresh_tidbit(new_agent_tidbit)
+
+    # {:error, reason} ->
+    #   raise "Could not activate the agent, reason: #{inspect reason}"
+    #end
   end
 
   def process(%RadixState{} = rdx, {:deactivate_agent, %Memelex.TidBit{

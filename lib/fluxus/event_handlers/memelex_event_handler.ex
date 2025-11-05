@@ -2,7 +2,6 @@ defmodule Flamelex.Fluxus.MemelexEventHandler do
   @moduledoc """
   This is where Flamelex is able to handle events from Memelex.
   """
-  # alias Flamelex.GUI.Component.TODOlist
   alias Flamelex.GUI.Component.TODOdetails
   alias Flamelex.GUI.Component.RapidSelector
   require Logger
@@ -102,13 +101,6 @@ defmodule Flamelex.Fluxus.MemelexEventHandler do
   # end
 end
 
-# def process(radix_state, {:loaded_memex, new_memex_env}) do
-#   radix_state
-#   # TODO when I eventually go multi-env, this may be a problem...
-#   |> put_in([:memex, :active?], true)
-#   |> put_in([:memex, :env], new_memex_env)
-#   # |> Flamelex.Fluxus.Structs.RadixState.calc_menu_map()
-# end
 
 # def process(radix_state, {:open_text_snippet, %{data: %{"file_path" => file_path}}}) do
 #   # raise "here we should open it in sublime or gedit"
@@ -274,14 +266,6 @@ end
 #   :ignore
 # end
 
-# def process(radix_state, memex_state, {:loaded_memex, new_memex_env}) do
-#   new_radix_state =
-#     radix_state
-#     |> put_in([:memex, :env], new_memex_env)
-#     |> Flamelex.Fluxus.Structs.RadixState.calc_menu_map()
-
-#   {:ok, new_radix_state, memex_state}
-# end
 
 # def process(
 #       radix_state,

@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+# Flamelex daemon launcher script
+# This script manages Flamelex as a background daemon using the production release
+
+set -e
+
+# Get the directory where this script is located
+FLAMELEX_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Change to the flamelex directory
+cd "$FLAMELEX_DIR"
+
+# Build release if it doesn't exist
+if [ ! -d "_build/prod/rel/flamelex" ]; then
+    echo "Building production release..."
+    MIX_ENV=prod mix release
+fi
+
+# Function to show usage
+usage() {
+    echo "Usage: $0 {start|stop|restart|status|console}"
+    echo "  start   - Start Flamelex as a daemon"
+    echo "  stop    - Stop the Flamelex daemon"
+    echo "  restart - Restart the Flamelex daemon"
+    echo "  status  - Check if Flamelex is running"
+    echo "  console - Start Flamelex with an interactive console"
+    exit 1
+}
+
+# Get command (default to start if none provided)
+COMMAND="${1:-start}"
+
+case "$COMMAND" in
+    start)
+        echo "Starting Flamelex daemon..."
+        ./_build/prod/rel/flamelex/bin/flamelex daemon
+        ;;
+    stop)
+        echo "Stopping Flamelex daemon..."
+        ./_build/prod/rel/flamelex/bin/flamelex stop
+        ;;
+    restart)
+        echo "Restarting Flamelex daemon..."
+        ./_build/prod/rel/flamelex/bin/flamelex restart
+        ;;
+    status)
+        ./_build/prod/rel/flamelex/bin/flamelex ping
+        ;;
+    console)
+        echo "Starting Flamelex with console..."
+        ./_build/prod/rel/flamelex/bin/flamelex start
+        ;;
+    *)
+        usage
+        ;;
+esac

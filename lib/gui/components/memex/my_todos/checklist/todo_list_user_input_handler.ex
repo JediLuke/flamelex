@@ -23,4 +23,10 @@ defmodule Flamelex.GUI.Component.TODOlist.UserInputHandler do
   def handle(rdx, @escape_key) do
     [{TODOdetails.Reducer, :close_todo_details}]
   end
+
+  # Catch-all clause for any unhandled input
+  def handle(_rdx, input) do
+    Logger.debug("#{__MODULE__} received unhandled input: #{inspect(input)}")
+    :ignore
+  end
 end

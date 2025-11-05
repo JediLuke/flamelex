@@ -82,6 +82,7 @@ defmodule Flamelex.Fluxus.RadixState do
 #       },
 
   def new() do
+    
     # rdx =
       %__MODULE__{
         layers: %{
@@ -104,11 +105,7 @@ defmodule Flamelex.Fluxus.RadixState do
           agent_huddle: AgentHuddle.State.new(),
           rapid_selector: RapidSelector.State.new()
         },
-        memex: %{
-          active?: false,
-          env: nil,
-          open_memex_popup_open?: false
-        },
+        memex: new_radix_memex_state(),
         fonts: fonts(),
       }
 
@@ -117,6 +114,24 @@ defmodule Flamelex.Fluxus.RadixState do
 
     # rdx
     # |> put_in([:layers, :two], layer_2)
+  end
+
+  def new_radix_memex_state() do
+    case Memelex.environment_details() do
+      %Memelex.Environment{} = env ->
+        %{
+          active?: true,
+          env: env,
+          open_memex_popup_open?: false
+        }
+
+      _otherwise ->
+        %{
+          active?: false,
+          env: nil,
+          open_memex_popup_open?: false
+        }
+    end
   end
 
   # def theme do

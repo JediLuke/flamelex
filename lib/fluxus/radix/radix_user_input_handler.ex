@@ -106,6 +106,19 @@ defmodule Flamelex.Fluxus.Radix.UserInputHandler do
     QlxWrap.UserInputHandler.handle(rdx, input)
   end
 
+  # Handle input when no apps are active - allow visual feedback to work
+  def handle(
+        %{
+          layers: %{one: %{active_apps: []}}
+        } = rdx,
+        input
+      ) do
+    Logger.info "🎯 MCP Test: Processing input with no active apps - #{inspect input}"
+    # Return :ignore to let the visual feedback in RootScene work
+    # The RootScene will handle the visual feedback before forwarding to Fluxus
+    :ignore
+  end
+
   def handle(rdx, input) do
     Logger.warning "#{__MODULE__} Ignoring input #{inspect input}..."
     :ignore
