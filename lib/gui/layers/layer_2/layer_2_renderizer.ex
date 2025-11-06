@@ -1,17 +1,17 @@
 defmodule Flamelex.GUI.Layers.Layer2.Renderizer do
   @moduledoc """
   Layer 2 Renderizer for Flamelex GUI.
-  
+
   ## MenuBar Integration
-  
+
   This module has been updated to use the integrated ScenicWidgets.MenuBar component
   instead of the original Flamelex MenuBar implementation. The integration provides:
-  
+
   - Enhanced visual design with proper triangle indicators
-  - Improved input handling and hover behavior  
+  - Improved input handling and hover behavior
   - Grace area support for diagonal mouse movement in sub-menus
   - Better theme integration with Flamelex's dark theme
-  
+
   The MenuBar.Wrapper component handles format conversion and event routing,
   allowing seamless integration while preserving all existing functionality.
   """
@@ -27,18 +27,44 @@ defmodule Flamelex.GUI.Layers.Layer2.Renderizer do
   # exists, and if it does exist modifying it in place
 
   def render(%Widgex.Frame{} = layer_f, layer_state) do
-    rdx = Flamelex.Fluxus.RadixStore.get()
-    
-    # Build the graph with the integrated ScenicWidgets.MenuBar component
-    # This uses the MenuBar.Wrapper which handles format conversion and event routing
+    # Custom theme matching widget workbench configuration
+    custom_theme = %{
+      # Scenic's dark theme colors
+      background: :black,
+      text: :white,
+      hover_bg: {40, 40, 40},
+      hover_text: :white,
+      dropdown_bg: :black,
+      dropdown_text: :white,
+      dropdown_hover_bg: {40, 40, 40},
+      dropdown_hover_text: :white,
+      border: :light_grey,
+
+      # Custom dimensions for taller menu
+      menu_height: 60,
+      item_width: 150,
+      sub_menu_width: 240,  # 60% wider than main menus (150 * 1.6)
+      item_height: 35,  # Slightly taller dropdown items
+      padding: 8,
+
+      # Typography
+      font: :roboto_mono,
+      font_size: 18,  # Larger font for better readability
+
+      # Text Overflow
+      text_overflow: :ellipsis,
+      max_text_width: 200,  # Wider for sub-menus
+      ellipsis_char: "..."
+    }
+
     graph =
       Scenic.Graph.build()
       |> Flamelex.GUI.Components.MenuBar.Wrapper.add_to_graph(
         %{
           frame: calc_menubar_frame(layer_f, layer_state),
-          menu_map: layer_state.menu_map  # Original Flamelex menu format
-        },
-        id: :flamelex_menubar
+          menu_map: layer_state.menu_map,
+          theme: custom_theme
+        }
       )
       |> add_memex_env_indicator_component(layer_f, rdx)
 

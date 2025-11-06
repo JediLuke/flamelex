@@ -33,12 +33,9 @@ defmodule Flamelex.App.MixProject do
 
   defp deps do
     [
-      # {:scenic, git: "https://github.com/ScenicFramework/scenic.git", tag: "v0.11.1", override: true},
-      {:scenic, path: "../scenic_local", override: true},
-      # {:scenic_driver_local, git: "https://github.com/JediLuke/scenic_driver_local", branch: "no_line_wrap"},
-      {:scenic_driver_local, git: "https://github.com/JediLuke/scenic_driver_local", branch: "flamelex_vsn", override: true},
-
-      # {:scenic_widget_contrib, git: "https://github.com/JediLuke/scenic-widget-contrib", branch: "text_pad_wip", override: true},
+      # {:scenic, git: "https://github.com/JediLuke/scenic", branch: "update_deps_instructions_for_ubuntu_24", override: true},
+      {:scenic, path: "../scenic", override: true},
+      {:scenic_driver_local, git: "https://github.com/JediLuke/scenic_driver_local", branch: "flamelex_vsn"},
       {:scenic_widget_contrib, path: "../scenic-widget-contrib", override: true},
 
       # import Quillex & Memelex
