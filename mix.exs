@@ -69,9 +69,13 @@ defmodule Flamelex.App.MixProject do
 
       # Spex testing framework for AI-driven development
       {:sexy_spex, path: "../spex", only: [:dev, :test]},
-      
+
       # Live reload for Scenic development
-      {:scenic_live_reload, "~> 0.3", only: :dev}
+      {:scenic_live_reload, "~> 0.3", only: :dev},
+
+      # Tidewave MCP server for Elixir runtime introspection
+      {:tidewave, "~> 0.5", only: :dev},
+      {:bandit, "~> 1.0", only: :dev}
 
       # maybe one day we will bring these back
       # {:stream_data, "~> 0.5", only: :test}
