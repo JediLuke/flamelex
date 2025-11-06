@@ -65,11 +65,22 @@ defmodule Flamelex.App do
   end
 
   defp start_flamelex(args) do
-    [
+    children = [
       flamelex_pubsub_broker(),
       {Flamelex.Fluxus.Supervisor, args},
       {Scenic, [Flamelex.GUI.viewport_config()]}
     ]
+
+    # Conditionally start Tidewave MCP server for development
+    children = children ++
+      if Mix.env() == :dev and Code.ensure_loaded?(Tidewave) and Code.ensure_loaded?(Bandit) do
+        Logger.info("Starting Tidewave MCP server on port 4000")
+        [{Bandit, plug: Tidewave, port: 4000}]
+      else
+        []
+      end
+
+    children
   end
 
   defp flamelex_pubsub_broker do
